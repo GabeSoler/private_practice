@@ -1,0 +1,22 @@
+{% extends '../../_base.html' %}
+
+{% block content %}
+
+<h2>My Clients</h2>
+
+<p>
+  <a href="{%url 'tools:add_client'%}">Add new client</a>
+</p>
+
+<ul>
+  {% for client in clients%}
+    <li>
+      <a href="{% url 'tools:client' client.pk %}"> | {{client.code}}</a> - {{client.nick_name}} | {{client.date_added|date:'M d,Y H:i'}}
+        <a class="list-item" href="{% url "tools:session_list_by_client" client.pk %}">Sessions</a>
+    </li>
+    {% empty %}
+    <li>There are no clients yet. </li>
+  </ul>
+  {% endfor %}
+
+  {% endblock content %}

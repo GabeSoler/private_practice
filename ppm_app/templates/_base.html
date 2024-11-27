@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{%block title%}PrivatePractice{%endblock title%}</title>
+
+    {% load django_bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static "tools/css/style.css" %}">
+
+</head>
+
+<body class='bg-light'>
+<nav class="navbar navbar-expand-lg bg-primary sticky-top start-0" data-bs-theme="dark">
+    <div class='container-fluid'>
+        <a class='navbar-brand' href="{% url 'tools:index' %}">
+            Private Practice</a>
+
+        <button class='navbar-toggler' type='button' data-bs-toggle='collapse'
+        data-bs-target='#navbarCollapse' aria-controls='navbarCollapse'
+        aria-expanded='false' aria-label='Toggle navigation'>
+        <span class='navbar-toggler-icon'></span>
+        </button>
+        
+        <!-- collapsable part of the Navegation Bar -->
+        <div class='collapse navbar-collapse' id='navbarCollapse'>
+            <ul class='navbar-nav me-auto mb2 mb-md-0'> <!-- 'me' refers to left, and 'ms' to right -->
+                <li class='nav-item'>
+                    <a class='nav-link' href="{% url 'tools:client_list' %}">
+                        My Clients</a></li>
+                <li class='nav-item'>
+                    <a class='nav-link' href="{% url 'tools:session_list' %}">
+                        My Sessions</a></li>
+            </ul><!-- End of links on left side of nvbar -->
+            <!-- Account related links-->
+            <ul class='navbar-nav ms-auto mb-2 mb-md-0'>
+                {% if user.is_authenticated %}
+                <class='nav-item'>
+                    <span class='navbar-text me-2'>Hello, {{user.username}}!
+                    <form action="{% url 'accounts:logout' %}" method='post' style='display:inline;'>
+                        {% csrf_token %}
+                        <button name='submit' class='btn btn-outline-secondary btn-sm'>
+                            Log out</button>
+                        </form>
+                      </li>
+                      </span>
+                    {% else %}
+                <li class='nav-item'>
+                    <a class='nav-link' href="{% url 'accounts:register'%}">Signup</a></li>
+                <li class='nav-item'>
+                    <a class='nav-link' href="{% url 'accounts:login' %}">Log in</a></li>
+                {% endif %}
+            </ul> 
+               <!-- End of account related links -->
+         </div> <!-- Closes collapsible parts of navbar -->
+    </div><!-- closes navbar container-->
+</nav><!-- end of navbar -->
+
+<!-- Main section -->
+
+<main class='container'>
+      
+    <!-- As a heading with display -->
+
+    <h1 class="display-6">{% block page_header %}{% endblock page_header %}</h1>
+
+
+
+
+    <div> 
+        {% block content %} {% endblock content %}      
+    </div>
+    
+    
+</main>
+<footer>
+</br></br>
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary fixed-bottom">
+        <div class="container-fluid">
+          <a class="navbar-brand" href={% url "tools:index" %}>Home</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarText">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
+              <li class="nav-item">
+                <a class="nav-link fw-light" aria-current="page" href="mailto:creatherapy.app@gmail.com">Email</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link fw-light" href='/about/'>About</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link fw-light" href='/about/'>Therapy</a>
+              </li>
+            </ul>
+            <span class="navbar-text fw-light">
+              All content was created and developed by Dr Gabriel Soler.
+            </span>
+          </div>
+        </div>
+      </nav>
+
+
+</footer>
+</body>
+</html>
+
