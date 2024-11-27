@@ -15,6 +15,18 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from .conf import swingtime_settings
 from choices import *
 
+class TenantModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    name = models.CharField(max_length=20)
+    description = models.CharField(max_length=200,blank=True)
+    class Meta:
+        verbose_name = "tenant"
+        verbose_name_plural = "tenants"
+        ordering = "name"
+    def __str__(self):
+        return self.name
+
 class RoomCalendar(models.Model):
     """ a room calendar model that will hold the events """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -22,13 +34,20 @@ class RoomCalendar(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     name = models.CharField(default="",max_length=20)
     description = models.CharField(default="",max_length=200)
-    tenants = models.ManyToManyField(get_user_model())
+    tenants = models.ManyToManyField(TenantModel,related_query_name="tenants")
+    class Meta:
+        verbose_name = "room calendar"
+        verbose_name_plural = "room calendars"
+        ordering = "name"
+    def __str__(self):
+        return self.name
 
 
 class Event(models.Model):
     """
     Container model for general metadata and associated ``Occurrence`` entries.
     """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     room_calendar = models.ForeignKey(RoomCalendar,on_delete=models.CASCADE)
     title = models.CharField(max_length=32)
     description = models.CharField(max_length=100)
@@ -45,25 +64,20 @@ class Event(models.Model):
     def get_absolute_url(self):
         return reverse("swingtime-event", args=[str(self.id)])
 
-
+    def upcoming_occurrences(self):
+        return self.occurrence_set.filter(start_time__gte=datetime.now())
+    
     def next_occurrence(self):
-        """
-        Return the single occurrence set to start on or after the current time
-        if available, otherwise ``None``.
-        """
+        """ return next occurrence """
         upcoming = self.upcoming_occurrences()
         return upcoming[0] if upcoming else None
 
     def daily_occurrences(self, dt=None):
-        """
-        Convenience method wrapping ``Occurrence.objects.daily_occurrences``.
-        """
+        """ returns a day occurrences """
         return Occurrence.objects.daily_occurrences(dt=dt, event=self)
     
     def add_single_occurrence(self,event, start_time, end_time):
-        """
-        adds one occurrence of this event
-        """
+        """adds one occurrence of this event"""
         self.occurrence_set.create(start_time=start_time, end_time=end_time)
 
 
@@ -71,8 +85,8 @@ class MultiOccurrenceModel(models.model):
     """ Model that holds the multiple occurrences setting of an Event """
     event = models.OneToOneField(Event, on_delete=models.CASCADE)
     day = models.DateField(default=date.today) # todo add date select widget in forms
-    start_time_delta = models.IntegerField(choices=default_timeslot_options)
-    end_time_delta = models.IntegerField(choices=default_timeslot_options)
+    start_time = models.IntegerField(choices=default_timeslot_options)
+    end_time = models.IntegerField(choices=default_timeslot_options)
     # recurrence options
     until = models.DateField(required=False, default=date.today)
     frequency = models.IntegerField(default=rrule.WEEKLY,choices=FREQUENCY_CHOICES)
@@ -111,12 +125,15 @@ class MultiOccurrenceModel(models.model):
             raise NotImplementedError(_("Unknown interval rule " + self.frequency))
         return params
     
-    def add_occurrences(self,event, start_time, end_time, **rrule_params):
+    def add_occurrences(self):
         """
         adds multiple occurrences of this event
         """
+        rrule_params = self._build_rrule_params()
         until = rrule_params.get("until")
-        event = self.event
+        event = time(self.event)
+        start_time = time(self.start_time)
+        end_time = self.end_time
         if until:
             rrule_params.setdefault("freq", rrule.DAILY)
             event_duration = end_time - start_time
@@ -128,14 +145,15 @@ class MultiOccurrenceModel(models.model):
             self.occurrence_set.bulk_create(occurrences)
         else:
             self.occurrence_set.create(start_time=start_time, end_time=end_time)
+    
+    def upcoming(self):
+        """Return all occurrences of an linked event that are set to start on or after the current
+        time."""
+        event = self.event
+        return event.occurrence_set.filter(start_time__gte=datetime.now())
 
-    def upcoming_occurrences(self):
-        """
-        Return all occurrences that are set to start on or after the current
-        time.
-        """
-        return self.occurrence_set.filter(start_time__gte=datetime.now())
-
+    def clean_upcoming(self):
+        self.upcoming().delete()
 
 class OccurrenceManager(models.Manager):
     def daily_occurrences(self, dt=None, event=None):
@@ -171,13 +189,13 @@ class Occurrence(models.Model):
     Represents the start end time for a specific occurrence of a master ``Event``
     object.
     """
-
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     start_time = models.DateTimeField("start time")
     end_time = models.DateTimeField("end time")
     event = models.ForeignKey(
         Event, verbose_name="event", editable=False, on_delete=models.CASCADE
     )
-
+    multi_occurrence_model = models.ForeignKey(MultiOccurrenceModel,on_delete=models.PROTECT)
     objects = OccurrenceManager()
 
     class Meta:
