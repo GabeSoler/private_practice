@@ -6,7 +6,7 @@ from django import http
 from django.db import models
 from django.shortcuts import get_object_or_404, render,redirect
 
-from .models import Event, Occurrence,RoomCalendar
+from .models import Event, Occurrence,RoomCalendarModel,MultiOccurrenceModel
 from . import utils
 from forms import EventForm,MultipleOccurrenceForm
 from .conf import swingtime_settings
@@ -20,10 +20,9 @@ from django.shortcuts import get_object_or_404, render
 
 
 
-#! swing demo from here 
-def room_calendars_view(request, abbr):
+def room_calendars_view(request):
     user = request.user
-    room_calendar = get_object_or_404(RoomCalendar,user=user)
+    room_calendar = get_object_or_404(RoomCalendarModel,user=user)
     events = Event.objects.filter(
         room_calendar=room_calendar,
         user = user)
@@ -47,10 +46,11 @@ def event_view(request,event_pk):
     return render(request,"calendar_app/event_list.html",context)
 
 
-def event_add_view(request):
+def event_add_view(request,room_pk):
+    """ add an event, it needs to set occurrences to appear in the calendar"""
     if request.method !='POST':
         #no data submitted; create a blank form
-        form = EventForm()
+        form = EventForm(user=request.user,room_calendar=room_pk)
     else:
         #POST data submitted; process data
         form = EventForm(data=request.POST)
@@ -63,7 +63,8 @@ def event_add_view(request):
     context = {'form':form}
     return render(request,'tools/client_session/add_client.html',context)
 
-def event_occurrence_add_view(request,event_pk):
+def event_multiple_view(request,event_pk):
+    """ loads a multiple form and creates the events"""
     event = Event.objects.get(pk=event_pk)
     if request.method !='POST':
         #no data submitted; create a blank form
@@ -75,29 +76,29 @@ def event_occurrence_add_view(request,event_pk):
             instance = form.save(commit=False)
             instance.user = request.user
             instance.event = event
-            start_time = instance.start_time
-            end_time = instance.end_time
-            rrule
-            event.add_occurrences()
             instance.save()
+            multi = MultiOccurrenceModel.objects.get(instance)
+            multi.add_occurrences()
             return redirect('calendar_app:events')
     #display a blank or invalid form
     context = {'form':form}
     return render(request,"calendar_app/event_detail.html",context)
 
-def event_occurrence_edit_view(request,event_pk):
+def event_multiple_edit_view(request,event_pk):
+    """edit the occurrence repetition erasing future events"""
     event = Event.objects.get(pk=event_pk)
+    multiple = MultiOccurrenceModel.objects.get(event=event)
     if request.method !='POST':
         #no data submitted; create a blank form
-        form = MultipleOccurrenceForm(instance=event)
+        form = MultipleOccurrenceForm(instance=multiple)
     else:
         #POST data submitted; process data
         form = MultipleOccurrenceForm(data=request.POST)
         if form.is_valid():
-            instance = form.save(commit=False)
-            instance.user = request.user
-            instance.event = event
-            instance.save()
+            form.save()
+            multi = MultiOccurrenceModel.objects.get(form)
+            multi.clean_upcoming()
+            multi.add_occurrences()
             return redirect('calendar_app:events')
     #display a blank or invalid form
     context = {'form':form}

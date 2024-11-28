@@ -7,4 +7,8 @@ urlpatterns = [
     path('accounts/',include('accounts.urls')),
     path('',include('tools.urls')),
 
+#third party
+    path("unicorn/", include("django_unicorn.urls")),
+
+
 ]

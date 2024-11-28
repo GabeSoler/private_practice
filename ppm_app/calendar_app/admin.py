@@ -1,28 +1,36 @@
 from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib import admin
-from swingtime.models import *
+from calendar_app.models import *
 
 
-class EventTypeAdmin(admin.ModelAdmin):
-    list_display = ("label", "abbr")
 
 
 class OccurrenceInline(admin.TabularInline):
-    model = Occurrence
+    model = OccurrenceModel
     extra = 1
 
-
-class EventNoteInline(GenericTabularInline):
-    model = Note
-    extra = 1
+class MultiOccurrenceInline(admin.TabularInline):
+    model = MultiOccurrenceModel
 
 
 class EventAdmin(admin.ModelAdmin):
     list_display = ("title", "event_type", "description")
     list_filter = ("event_type",)
     search_fields = ("title", "description")
-    inlines = [EventNoteInline, OccurrenceInline]
+    inlines = [MultiOccurrenceInline, OccurrenceInline]
+
 
 
 admin.site.register(Event, EventAdmin)
-admin.site.register(EventType, EventTypeAdmin)
+
+
+class TenantInline(admin.TabularInline):
+    model = TenantModel
+
+
+class RoomCalendarAdmin(admin.ModelAdmin):
+    list_display = ("user", "name", "description","tenants")
+    list_filter = ("name",)
+    search_fields = ("name", "tenants")
+    inlines = [RoomCalendarModel, TenantInline]
+

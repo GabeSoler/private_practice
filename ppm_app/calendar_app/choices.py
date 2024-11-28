@@ -1,13 +1,6 @@
 from dateutil import rrule
 from datetime import datetime, date, time, timedelta
-from .conf import swingtime_settings
-from . import utils
-
-
-MINUTES_INTERVAL = swingtime_settings.TIMESLOT_INTERVAL.seconds // 60
-SECONDS_INTERVAL = utils.time_delta_total_seconds(
-    swingtime_settings.DEFAULT_OCCURRENCE_DURATION
-)
+from django.utils.translation import gettext_lazy as _
 
 
 def timeslot_options():

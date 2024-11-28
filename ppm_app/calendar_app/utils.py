@@ -10,7 +10,7 @@ from django.db.models.query import QuerySet
 from django.utils.safestring import mark_safe
 
 from .conf import swingtime_settings
-from .models import EventType, Occurrence
+from .models import OccurrenceModel
 
 
 def time_delta_total_seconds(time_delta):
@@ -37,21 +37,6 @@ def month_boundaries(dt=None):
 def default_css_class_cycler():
     return itertools.cycle(("evt-even", "evt-odd"))
 
-
-def css_class_cycler():
-    """
-    Return a dictionary keyed by ``EventType`` abbreviations, whose values are an
-    iterable or cycle of CSS class names.
-
-    """
-    FMT = "evt-{0}-{1}".format
-    return defaultdict(
-        default_css_class_cycler,
-        (
-            (e.abbr, itertools.cycle((FMT(e.abbr, "even"), FMT(e.abbr, "odd"))))
-            for e in EventType.objects.all()
-        ),
-    )
 
 
 class BaseOccurrenceProxy(object):
@@ -113,7 +98,7 @@ def create_timeslot_table(
     * ``time_delta`` - a ``datetime.timedelta`` instance
     * ``min_column`` - the minimum number of columns to show in the table
     * ``css_class_cycles`` - if not ``None``, a callable returning a dictionary
-      keyed by desired ``EventType`` abbreviations with values that iterate over
+      keyed by desired abbreviations with values that iterate over
       progressive CSS class names for the particular abbreviation.
     * ``proxy_class`` - a wrapper class for accessing an ``Occurrence`` object.
       This class should also expose ``event_type`` and ``event_type`` attrs, and
@@ -130,7 +115,7 @@ def create_timeslot_table(
     if isinstance(items, QuerySet):
         items = items._clone()
     elif not items:
-        items = Occurrence.objects.daily_occurrences(dt).select_related("event")
+        items = OccurrenceModel.objects.daily_occurrences(dt).select_related("event")
 
     # build a mapping of timeslot "buckets"
     timeslots = {}
