@@ -5,7 +5,8 @@ app_name = 'room_calendar_app'
 
 urlpatterns = [
 
-    path("/", views.room_calendars_view , name="calendar_index"),
+    path("", views.index_view , name="calendar_index"),
+    path("calendar-home", views.room_calendars_view , name="calendar_home"),
     path("event", views.event_view, name="event"),
     path("event-list", views.event_listing, name="event_list"),
     

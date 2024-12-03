@@ -8,8 +8,9 @@ class EventListView(UnicornView):
     events = Event.objects.filter(user=user)
 
     def mount(self):
-        user_page = self.component_args['user']
-        user = user_page
+        user_mount = self.request.user
+        self.user = user_mount
+        events = events
 
 
          

@@ -1,13 +1,8 @@
-"""
-Convenience forms for adding and updating ``Event`` and ``Occurrence``s.
-"""
-from datetime import datetime, date, time, timedelta
 from django import forms
 from django.forms.utils import to_current_timezone
 from django.utils.translation import gettext_lazy as _
 from django.forms.widgets import SelectDateWidget
 
-from dateutil import rrule
 from .models import *
 from .choices import *
 
@@ -51,7 +46,7 @@ class SplitDateTimeWidget(forms.MultiWidget):
         return [None, None]
 
 
-class MultipleOccurrenceForm(forms.Model):
+class MultipleOccurrenceForm(forms.ModelForm):
     class Meta:
         model = MultiOccurrenceModel
         fields = ("day_start","start_time","end_time",
@@ -116,5 +111,5 @@ class SingleOccurrenceForm(forms.ModelForm):
     end_time = forms.SplitDateTimeField(widget=SplitDateTimeWidget)
 
     class Meta:
-        model = Occurrence
+        model = OccurrenceModel
         fields = "__all__"

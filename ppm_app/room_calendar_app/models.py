@@ -84,7 +84,7 @@ class Event(models.Model):
 class MultiOccurrenceModel(models.Model):
     """ Model that holds the multiple occurrences setting of an Event """
     event = models.OneToOneField(Event, on_delete=models.CASCADE)
-    day_start = models.DateField(auto_now=True)
+    day_start = models.DateField()
     start_time = models.IntegerField(choices=default_timeslot_options)
     end_time = models.IntegerField(choices=default_timeslot_options)
     # recurrence options

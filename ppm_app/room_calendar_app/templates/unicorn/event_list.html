@@ -5,7 +5,7 @@
     <ul>
         {% for event in events %} 
           <li>
-            <a href="{% url 'room_calendar_app:event' event.pk %}"> | {{event.time}}</a> - {{event.tenant}} | {{event.date_added|date:'M d,Y H:i'}}
+            <a href="{% url 'room_calendar_app:event' event.pk %}"> | {{event.time}}</a> - {{event.tenant}}
               <a class="list-item" href="{% url "room_calendar_app:occurrences" event.pk %}">Occurrences</a>
           </li>
           {% empty %}
