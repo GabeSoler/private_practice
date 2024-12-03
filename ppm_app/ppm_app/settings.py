@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     #mine
     'tools',
     'accounts',
-    'calendar_app',
+    'room_calendar_app',
     #third party
     'django_bootstrap5',
     "django_unicorn", 

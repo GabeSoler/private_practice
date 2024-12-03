@@ -6,19 +6,29 @@
     <title>{%block title%}PrivatePractice{%endblock title%}</title>
 
     {% load django_bootstrap5 %}
+    {% load unicorn %}
     {% bootstrap_css %}
+    {% unicorn_scripts %}
     {% bootstrap_javascript %}
     {% load static %}
     <link rel="stylesheet" href="{% static "tools/css/style.css" %}">
 
+
+<html>
+  <head>
+  </head>
+  <body>
+  </body>
+  </html>
 </head>
 
 <body class='bg-light'>
-<nav class="navbar navbar-expand-lg bg-primary sticky-top start-0" data-bs-theme="dark">
+  {% csrf_token %}
+  <nav class="navbar navbar-expand-lg bg-primary sticky-top start-0" data-bs-theme="dark">
     <div class='container-fluid'>
-        <a class='navbar-brand' href="{% url 'tools:index' %}">
-            Private Practice</a>
-
+      <a class='navbar-brand' href="{% url 'tools:index' %}">
+        Private Practice</a>
+        
         <button class='navbar-toggler' type='button' data-bs-toggle='collapse'
         data-bs-target='#navbarCollapse' aria-controls='navbarCollapse'
         aria-expanded='false' aria-label='Toggle navigation'>

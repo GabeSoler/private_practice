@@ -1,0 +1,17 @@
+{% extends '../../_base.html' %}
+
+{% block content %}
+{% load unicorn %}
+{% csrf_token %}
+
+{% unicorn user=user %}
+
+<h2>My Events</h2>
+
+<p>
+  <a href="{%url 'tools:add_client'%}">Add new Event</a>
+</p>
+
+
+{% unicorn "event_list" %}
+  {% endblock content %}
