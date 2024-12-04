@@ -1,0 +1,17 @@
+{% extends '../../_base.html' %}
+
+{%block content%}
+
+{% load django_bootstrap5 %}
+  <h2>Link Tenant to Calendar: {{calendar.name}}</h2>
+  <a href={% url 'room_calendar_app:room_calendar' calendar.pk %}>Back to Calendar</a></br>
+  <a href={% url 'room_calendar_app:add_occurrence' %}>Add Occurrence</a>
+
+
+  <form action="{% url 'room_calendar_app:link_tenant' calendar.pk %}" method='post'>
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% bootstrap_button button_type='submit' content='Add a tenant' %}
+  </form>
+
+  {% endblock content %}

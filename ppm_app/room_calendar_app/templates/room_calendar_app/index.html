@@ -7,10 +7,22 @@
 
 <h2>My Events</h2>
 
-<p>
-  <a href="{%url 'tools:add_client'%}">Add new Event</a>
-</p>
+<ul>
+  <li><a href="{%url 'room_calendar_app:add_event'%}">Add new Event</a></li>
+  <li><a href="{%url 'room_calendar_app:add_occurrence'%}">Add new Occurrence</a></li>
+  <li><a href="{%url 'room_calendar_app:add_occurrence_multiple'%}">Add Multiple Occurrences</a></li>
+  <li><a href="{%url 'room_calendar_app:event_list'%}">Event list</a></li>
+  <li><a href="{%url 'room_calendar_app:occurrence_list'%}">Occurrence list</a></li>
+</ul>
 
+<ul>
+  <li><a href="{%url 'room_calendar_app:add_room_calendar'%}">Add new Room Calendar</a></li>
+  <li><a href="{%url 'room_calendar_app:room_calendar_list'%}">Room Calendar list</a></li>
+</ul>
 
-{% unicorn "event_list" %}
+<ul>
+  <li><a href="{%url 'room_calendar_app:tenant_list'%}">Tenant list</a></li>
+</ul>
+
+{% unicorn "hello-world" %}
   {% endblock content %}

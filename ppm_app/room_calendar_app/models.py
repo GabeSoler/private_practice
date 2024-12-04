@@ -47,8 +47,9 @@ class Event(models.Model):
     Container model for general metadata and associated ``OccurrenceModel`` entries.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    room_calendar = models.ForeignKey(RoomCalendarModel,on_delete=models.CASCADE)
-    client = models.ForeignKey(Client, on_delete=models.PROTECT,blank=True)
+    user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    room_calendar = models.ForeignKey(RoomCalendarModel,on_delete=models.PROTECT,blank=True,null=True)
+    client = models.ForeignKey(Client, on_delete=models.PROTECT,blank=True,null=True)
     title = models.CharField(max_length=32)
     description = models.CharField(max_length=100)
     event_type = models.CharField(choices=EVENT_TYPE,max_length=20, verbose_name="event type")

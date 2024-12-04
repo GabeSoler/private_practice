@@ -1,17 +1,22 @@
 {% extends '../../_base.html' %}
 
 {% block content %}
-{% load unicorn %}
-{% csrf_token %}
-
-{% unicorn user=user %}
 
 <h2>My Events</h2>
 
-<p>
-  <a href="{%url 'tools:add_client'%}">Add new Event</a>
-</p>
+<ul>
+  <li><a href="{%url 'room_calendar_app:add_event'%}">Add new event</a></li>
+  <li><a href="{%url 'room_calendar_app:calendar_index'%}">back to calendar home</a></li>
+</ul>
 
+<ul>
+  {% for event in events%}
+    <li>
+      <a href="{% url 'room_calendar_app:event' event.pk %}"> {{event.get_event_type_display}}| {{event.title}}</a>
+    </li>
+    {% empty %}
+    <li>There are no events yet. </li>
+  </ul>
+  {% endfor %}
 
-{% unicorn "event_list" %}
   {% endblock content %}

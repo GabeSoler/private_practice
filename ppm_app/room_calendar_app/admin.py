@@ -23,13 +23,17 @@ class EventAdmin(admin.ModelAdmin):
 admin.site.register(Event, EventAdmin)
 
 
-class TenantInline(admin.TabularInline):
-    model = TenantModel
-
 
 class RoomCalendarAdmin(admin.ModelAdmin):
-    list_display = ("user", "name", "description","tenants")
+    list_display = ("user", "name", "description")
     list_filter = ("name",)
-    search_fields = ("name", "tenants")
-    inlines = [RoomCalendarModel, TenantInline]
+    search_fields = ("name",)
 
+admin.site.register(RoomCalendarModel,RoomCalendarAdmin)
+
+
+class TenantAdmin(admin.ModelAdmin):
+    list_display = ("name", "description","id")
+
+
+admin.site.register(TenantModel,TenantAdmin)

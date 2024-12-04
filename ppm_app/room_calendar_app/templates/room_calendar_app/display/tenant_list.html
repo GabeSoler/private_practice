@@ -1,0 +1,25 @@
+{% extends '../../_base.html' %}
+
+{% block content %}
+
+<h2>My tenancies</h2>
+
+<ul>
+  <li><a href="{%url 'room_calendar_app:add_tenant'%}">Add new tenant</a></li>
+  <li><a href="{%url 'room_calendar_app:calendar_index'%}">back to calendar home</a></li>
+</ul>
+
+<ul>
+  {% for tenant in tenant_list %}
+    <li>
+      <a href="{% url 'room_calendar_app:tenant' tenant.pk %}">{{tenant.name}}</a>|{{tenant.description}}
+    </li>
+    {% empty %}
+    <li>There are no tenants yet. </li>
+    {% endfor %}
+  </ul>
+
+  <li><a href="{%url 'room_calendar_app:add_tenant'%}">Add tenant</a></li>
+
+
+  {% endblock content %}

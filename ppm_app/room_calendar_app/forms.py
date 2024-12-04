@@ -74,32 +74,49 @@ class MultipleOccurrenceForm(forms.ModelForm):
                     }
 
 
-    
-class EventForm(forms.ModelForm):
-    """
-    A simple form for adding and updating Event attributes
+class RoomCalendarForm(forms.ModelForm):
+    class Meta:
+        model = RoomCalendarModel
+        fields = ("name","description")
+        labels = {
+        "name" : "Name of your Room Calendar",
+        "description" : "Describe your place",
+        }
 
-    """
+class TenantForm(forms.ModelForm):
+    class Meta:
+        model = TenantModel
+        fields = ("name","description")
+        labels = {
+            "name":"Your name to display",
+            "description":"a description of the place you are linking to",
+        }
+
+class LinkTenantForm(forms.Form):
+    tenant_id = forms.UUIDField(required=True)
+
+class EventForm(forms.ModelForm):
+    """Event form"""
 
     class Meta:
         model = Event
         fields = ("client","room_calendar",
                   "title","description","event_type",)
         labels = {
-            "client":"",
-            "room_calendar":"",
-            "title":"",
-            "description":"",
-            "event_type":"",
+            "client":"It there a client associated?(optional)",
+            "room_calendar":"Which room it belongs to?",
+            "title":"Give it a memorable title",
+            "description":"What it is about?",
+            "event_type":"Select a type of event",
         }
 
     def __init__(self, *args, **kwargs):
       	# Extract the user from the view
         user = kwargs.pop('user')
-        super(Client, self).__init__(*args, **kwargs)
+        super(EventForm, self).__init__(*args, **kwargs)
         # Filter authors related to the logged-in user
         self.fields['client'].queryset = Client.objects.filter(user=user)
-        self.fields['room_calendar'].queryset = RoomCalendarModel(tenants__contain=user)
+        self.fields['room_calendar'].queryset = RoomCalendarModel.objects.filter(tenants__user=user)
 
 class SingleOccurrenceForm(forms.ModelForm):
     """
