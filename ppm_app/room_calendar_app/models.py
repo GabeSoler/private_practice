@@ -6,6 +6,7 @@ from dateutil import rrule
 from datetime import datetime, date, time, timedelta
 
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 import uuid
 
@@ -126,13 +127,37 @@ class MultiOccurrenceModel(models.Model):
             raise NotImplementedError(_("Unknown interval rule " + self.frequency))
         return params
     
+    def is_day_week_overlap(self,slot_starts,slot_ends,week_day)->bool:
+        """ checks if there is overlap over a day of the week and recurrences forward on the same day and time slot"""
+        search = OccurrenceModel.objects.filter(start_time__week_day=week_day).filter(Q(start_time__time__gte=slot_starts) and Q(end_time__time__lte=slot_ends))
+        if search:
+            return True
+        else:
+            return False
+    def is_day_month_overlap(self,slot_starts,slot_ends,month_day)->bool:
+        search = OccurrenceModel.objects.filter(start_time__day=month_day).filter(Q(start_time__time__gte=slot_starts) and Q(end_time__time__lte=slot_ends))
+        if search:
+            return True
+        else:
+            return False
+    def is_day_week_month_overlap(self,slot_starts,slot_ends,week_day,week_number)->bool: #todo figure out how to set week numbers in a month
+        search = OccurrenceModel.objects.filter(
+            Q(start_time__gte=datetime.now()) and 
+            Q(start_time__week_day=week_day) and 
+            Q(start_time__time__gte=slot_starts) and 
+            Q(end_time__time__lte=slot_ends))
+        if search:
+            return True
+        else:
+            return False
+        
     def add_occurrences(self):
         """
         adds multiple occurrences of this event
         """
         rrule_params = self._build_rrule_params()
         until = rrule_params.get("until")
-        event = time(self.event)
+        event = self.event
         start_time = time(self.start_time)
         end_time = self.end_time
         if until:

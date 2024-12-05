@@ -98,8 +98,8 @@ def event_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     if request.method !='POST':
         #no data submitted; create a blank form
-        event = Event.objects.create(user=request.user)
-        form = EventForm(instance=event)
+        #event = Event.objects.create(user=request.user)
+        form = EventForm(user=request.user)
     else:
         #POST data submitted; process data
         form = EventForm(data=request.POST)

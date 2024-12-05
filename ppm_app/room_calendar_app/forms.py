@@ -3,6 +3,9 @@ from django.forms.utils import to_current_timezone
 from django.utils.translation import gettext_lazy as _
 from django.forms.widgets import SelectDateWidget
 
+from django.db.models import Q
+
+
 from .models import *
 from .choices import *
 
@@ -97,7 +100,8 @@ class LinkTenantForm(forms.Form):
 
 class EventForm(forms.ModelForm):
     """Event form"""
-
+    client = forms.ModelChoiceField(queryset=None,empty_label="no client?")
+    room_calendar = forms.ModelChoiceField(queryset=None,empty_label="no room?")
     class Meta:
         model = Event
         fields = ("client","room_calendar",
@@ -116,7 +120,7 @@ class EventForm(forms.ModelForm):
         super(EventForm, self).__init__(*args, **kwargs)
         # Filter authors related to the logged-in user
         self.fields['client'].queryset = Client.objects.filter(user=user)
-        self.fields['room_calendar'].queryset = RoomCalendarModel.objects.filter(tenants__user=user)
+        self.fields['room_calendar'].queryset = RoomCalendarModel.objects.filter(Q(tenants__user=user)|Q(user=user))
 
 class SingleOccurrenceForm(forms.ModelForm):
     """
@@ -130,3 +134,5 @@ class SingleOccurrenceForm(forms.ModelForm):
     class Meta:
         model = OccurrenceModel
         fields = "__all__"
+
+
