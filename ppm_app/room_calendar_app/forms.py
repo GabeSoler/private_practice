@@ -1,52 +1,11 @@
 from django import forms
 from django.forms.utils import to_current_timezone
 from django.utils.translation import gettext_lazy as _
-from django.forms.widgets import SelectDateWidget
-
 from django.db.models import Q
 
 
 from .models import *
 from .choices import *
-
-class MultipleIntegerField(forms.MultipleChoiceField):
-    """
-    A form field for handling multiple integers.
-
-    """
-
-    def __init__(self, choices, size=None, label=None, widget=None):
-        widget = widget or forms.SelectMultiple(attrs={"size": size or len(choices)})
-        super().__init__(
-            required=False,
-            choices=choices,
-            label=label,
-            widget=widget,
-        )
-
-    def clean(self, value):
-        return [int(i) for i in super().clean(value)]
-
-
-class SplitDateTimeWidget(forms.MultiWidget):
-    """
-    A Widget that splits datetime input into a SelectDateWidget for dates and
-    Select widget for times.
-
-    """
-
-    def __init__(self, attrs=None):
-        widgets = (
-            SelectDateWidget(attrs=attrs),
-            forms.Select(choices=default_timeslot_options, attrs=attrs),
-        )
-        super().__init__(widgets)
-
-    def decompress(self, value):
-        if value:
-            value = to_current_timezone(value)
-            return [value.date(), value.time().replace(microsecond=0)]
-        return [None, None]
 
 
 class MultipleOccurrenceForm(forms.ModelForm):
@@ -100,8 +59,6 @@ class LinkTenantForm(forms.Form):
 
 class EventForm(forms.ModelForm):
     """Event form"""
-    client = forms.ModelChoiceField(queryset=None,empty_label="no client?")
-    room_calendar = forms.ModelChoiceField(queryset=None,empty_label="no room?")
     class Meta:
         model = Event
         fields = ("client","room_calendar",
@@ -114,25 +71,17 @@ class EventForm(forms.ModelForm):
             "event_type":"Select a type of event",
         }
 
-    def __init__(self, *args, **kwargs):
-      	# Extract the user from the view
-        user = kwargs.pop('user')
-        super(EventForm, self).__init__(*args, **kwargs)
-        # Filter authors related to the logged-in user
-        self.fields['client'].queryset = Client.objects.filter(user=user)
-        self.fields['room_calendar'].queryset = RoomCalendarModel.objects.filter(Q(tenants__user=user)|Q(user=user))
 
-class SingleOccurrenceForm(forms.ModelForm):
-    """
-    A simple form for adding and updating single Occurrence attributes
-
-    """
-
-    start_time = forms.SplitDateTimeField(widget=SplitDateTimeWidget)
-    end_time = forms.SplitDateTimeField(widget=SplitDateTimeWidget)
-
+class OccurrenceForm(forms.ModelForm):
+    """ occurrence form """
     class Meta:
         model = OccurrenceModel
-        fields = "__all__"
-
+        fields = ("start_time","end_time","event")
+        labels = {"start_time":"Time to start",
+                  "end_time":"End",
+                  "event":"attach an event"}
+        widgets = {
+            "start_time":forms.SplitDateTimeField,
+            "end_time":forms.SplitDateTimeField,
+        }
 

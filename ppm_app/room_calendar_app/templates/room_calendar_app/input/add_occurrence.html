@@ -8,7 +8,7 @@
   <a href={% url 'room_calendar_app:add_event' %}>Add Event</a>
 
 
-  <form action="{% url 'room_calendar_app:add_session' %}" method='post'>
+  <form action="{% url 'room_calendar_app:add_occurrence' %}" method='post'>
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button button_type='submit' content='Add occurrence' %}

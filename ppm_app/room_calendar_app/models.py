@@ -4,7 +4,7 @@ from django.db import models
 from datetime import datetime
 from dateutil import rrule
 from datetime import datetime, date, time, timedelta
-
+from django.utils.timezone import now
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
@@ -31,7 +31,8 @@ class RoomCalendarModel(models.Model):
     """ a room calendar model that will hold the events """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE,related_name="controller")
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     name = models.CharField(default="",max_length=20)
     description = models.CharField(default="",max_length=200)
     tenants = models.ManyToManyField(TenantModel,related_query_name="tenants")
@@ -49,6 +50,9 @@ class Event(models.Model):
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    updated_at = models.DateTimeField(auto_now=True, editable=False)
+
     room_calendar = models.ForeignKey(RoomCalendarModel,on_delete=models.PROTECT,blank=True,null=True)
     client = models.ForeignKey(Client, on_delete=models.PROTECT,blank=True,null=True)
     title = models.CharField(max_length=32)
@@ -58,7 +62,7 @@ class Event(models.Model):
     class Meta:
         verbose_name = "event"
         verbose_name_plural = "events"
-        ordering = ("title","event_type")
+        ordering = ("updated_at","title")
 
     def __str__(self):
         return self.title
@@ -86,6 +90,8 @@ class Event(models.Model):
 class MultiOccurrenceModel(models.Model):
     """ Model that holds the multiple occurrences setting of an Event """
     event = models.OneToOneField(Event, on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True)
+
     day_start = models.DateField()
     start_time = models.IntegerField(choices=default_timeslot_options)
     end_time = models.IntegerField(choices=default_timeslot_options)
@@ -242,15 +248,12 @@ class OccurrenceManager(models.Manager):
 
 
 class OccurrenceModel(models.Model):
-    """
-    Represents the start end time for a specific occurrence of a master ``Event``
-    object.
-    """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    start_time = models.DateTimeField("start time")
-    end_time = models.DateTimeField("end time")
+    """ sets an occurrence by having a start and end, and a event attached """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
     event = models.ForeignKey(Event, verbose_name="event", on_delete=models.CASCADE)
-    multi_occurrence_model = models.ForeignKey(MultiOccurrenceModel,on_delete=models.PROTECT, blank=True)
+    multi_occurrence_model = models.ForeignKey(MultiOccurrenceModel,on_delete=models.SET_NULL,null=True, blank=True)
     objects = OccurrenceManager()
 
     class Meta:

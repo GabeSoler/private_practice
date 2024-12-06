@@ -2,8 +2,9 @@ from django.shortcuts import get_object_or_404, render,redirect
 from django.http import Http404
 
 from .models import Event, OccurrenceModel,RoomCalendarModel,MultiOccurrenceModel,TenantModel
-from .forms import EventForm,MultipleOccurrenceForm,RoomCalendarForm,TenantForm,LinkTenantForm
+from .forms import EventForm,MultipleOccurrenceForm,RoomCalendarForm,TenantForm,LinkTenantForm,OccurrenceForm
 from django.shortcuts import get_object_or_404, render
+from tools.models import Client
 
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
@@ -97,9 +98,9 @@ def tenant_add_view(request):
 def event_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     if request.method !='POST':
-        #no data submitted; create a blank form
-        #event = Event.objects.create(user=request.user)
-        form = EventForm(user=request.user)
+        form = EventForm()
+        form.fields["room_calendar"].queryset = RoomCalendarModel.objects.filter(tenants__user=request.user)
+        form.fields["client"].queryset = Client.objects.filter(user=request.user)
     else:
         #POST data submitted; process data
         form = EventForm(data=request.POST)
@@ -112,22 +113,23 @@ def event_add_view(request):
     context = {'form':form}
     return render(request,'room_calendar_app/input/add_event.html',context)
 
-def occurrence_add_view(request,room_pk):
+def occurrence_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     if request.method !='POST':
         #no data submitted; create a blank form
-        form = EventForm(user=request.user,room_calendar=room_pk)
+        form = OccurrenceForm()
+        form.fields["event"].queryset = Event.objects.filter(user=request.user)
     else:
         #POST data submitted; process data
-        form = EventForm(data=request.POST)
+        form = OccurrenceForm(data=request.POST)
         if form.is_valid():
             isinstance = form.save(commit=False)
             isinstance.user = request.user 
             isinstance.save()
-            return redirect('tools:client_list')
+            return redirect('room_calendar_app:occurrence_list')
     #display a blank or invalid form
     context = {'form':form}
-    return render(request,'tools/client_session/add_client.html',context)
+    return render(request,'room_calendar_app/input/add_occurrence.html',context)
 
 def occurrence_multiple_add_view(request,event_pk):
     """ loads a multiple form and creates the events"""
