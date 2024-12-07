@@ -1,26 +1,9 @@
 {% extends '../../_base.html' %}
-{% block title%}{{calendar.title}}{%endblock title%}
-
-{% block page_header %}{{calendar.name}}{% endblock page_header%}
+{% load unicorn %}
 
 {% block content %}
-<div class="card" style="width: 18rem;">
-    <div class="card-body">
-      <h5 class="card-title">{{calendar.name}}</h5>
-      <p class="card-text">Description: {{calendar.description}}</p>
-      <h4>Tenants</h4>
-      <ul>
-        {% for tenant in tenants %}
-        <li>{{tenant}}</li>
-        {% endfor %}
-      </ul> 
-      <a href="{% url 'room_calendar_app:link_tenant' calendar.pk %}" class="card-link">Link a tenant</a>
-      <p><a href="{%url 'room_calendar_app:edit_room_calendar' calendar.pk %}">
-        Edit calendar</a></p>
-    </div>
-  </div>
 
 
+{% unicorn "calendar" user=user %}
 
-
-{%endblock content%}
+  {% endblock content %}

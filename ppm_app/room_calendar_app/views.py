@@ -14,6 +14,9 @@ def check_owner(topic_owner,request_user):
 def index_view(request):
     return render(request,"room_calendar_app/index.html")
 
+def week_view(request):
+    return render(request,"room_calendar_app/display/calendar.html")
+
 
 
 def room_calendar_listing_view(request):
@@ -27,7 +30,7 @@ def room_calendar_view(request,calendar_pk):
     calendar = get_object_or_404(RoomCalendarModel, pk=calendar_pk)
     tenants = calendar.tenants.all()
     context = {"calendar": calendar,"tenants":tenants}
-    return render(request,"room_calendar_app/display/calendar.html",context)
+    return render(request,"room_calendar_app/display/room_calendar.html",context)
 
 def event_view(request,event_pk):
     event = get_object_or_404(Event, pk=event_pk)

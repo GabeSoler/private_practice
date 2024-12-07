@@ -25,7 +25,7 @@ urlpatterns = [
     path("occurrence-multiple-edit/", views.occurrence_multiple_edit_view, name="edit_occurrence_multiple"),
 
     path("day-view/", views.occurrence_multiple_edit_view, name="day-view"), #todo
-    path("week-view/", views.occurrence_multiple_edit_view, name="week-view"),#todo
+    path("week-view/", views.week_view, name="week-view"),#todo
 
     path("link-tenant/<uuid:calendar_pk>/", views.tenant_link_view, name="link_tenant"),
 

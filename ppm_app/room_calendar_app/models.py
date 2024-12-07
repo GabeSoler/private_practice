@@ -250,9 +250,9 @@ class OccurrenceManager(models.Manager):
 class OccurrenceModel(models.Model):
     """ sets an occurrence by having a start and end, and a event attached """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    start_time = models.DateTimeField()
+    start_time = models.DateTimeField(unique=True)
     end_time = models.DateTimeField()
-    event = models.ForeignKey(Event, verbose_name="event", on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
     multi_occurrence_model = models.ForeignKey(MultiOccurrenceModel,on_delete=models.SET_NULL,null=True, blank=True)
     objects = OccurrenceManager()
 
@@ -263,7 +263,7 @@ class OccurrenceModel(models.Model):
         base_manager_name = "objects"
 
     def __str__(self):
-        return "{}: {}".format(self.title, self.start_time.isoformat())
+        return "{}: {}".format(self.event.title, self.start_time.isoformat())
 
     def get_absolute_url(self):
         return reverse("swingtime-occurrence", args=[str(self.event.id), str(self.id)])
