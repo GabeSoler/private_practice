@@ -76,21 +76,15 @@ class OccurrenceForm(forms.ModelForm):
     """ occurrence form """
     class Meta:
         model = OccurrenceModel
-        fields = ("start_time","end_time","event")
+        fields = ("start_time","duration","event")
         labels = {"start_time":"Time to start (please select 15 min increments)",
-                  "end_time":"End (please select 15 min increments)",
+                  "duration":"how long",
                   "event":"Attach an event (ie a client)"}
         widgets = {
-            "start_time":forms.SplitDateTimeWidget(date_format='%Y-%m-%d',
-                                                   time_format="%a %m %y",
-                                                   date_attrs={"type":"date"},
-                                                   time_attrs={"type":"time","max":"21:00","min":"08:00","step":"900"},
-                                                   
-                                                   ),
-                                                   
-            "end_time":forms.SplitDateTimeWidget(date_format='%Y-%m-%d',
-                                                   time_format="%a %m %y",
-                                                   date_attrs={"type":"date"},
-                                                   time_attrs={"type":"time","max":"21:00","min":"08:00","step":"900"}),
-        }
+            "start_time":forms.SplitDateTimeWidget(
+                                                    date_format='%Y-%m-%d',
+                                                    time_format="%a %m %y",
+                                                    date_attrs={"type":"date"},
+                                                    time_attrs={"type":"time","max":"21:00","min":"08:00","step":"900"}
+                                                    )}
 

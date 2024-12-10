@@ -251,7 +251,7 @@ class OccurrenceModel(models.Model):
     """ sets an occurrence by having a start and end, and a event attached """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     start_time = models.DateTimeField(unique=True)
-    end_time = models.DateTimeField()
+    duration = models.IntegerField(choices=DURATION)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     multi_occurrence_model = models.ForeignKey(MultiOccurrenceModel,on_delete=models.SET_NULL,null=True, blank=True)
     objects = OccurrenceManager()
@@ -259,7 +259,7 @@ class OccurrenceModel(models.Model):
     class Meta:
         verbose_name ="occurrence"
         verbose_name_plural = "occurrences"
-        ordering = ("start_time", "end_time")
+        ordering = ("start_time",)
         base_manager_name = "objects"
 
     def __str__(self):

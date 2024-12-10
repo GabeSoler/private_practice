@@ -99,6 +99,13 @@ ORDINAL = (
     (-1, _("last")),
 )
 
+DURATION = (
+    (30, _("30 min")),
+    (60, _("1 hour")),
+    (90, _("1.5 hours")),
+    (120, _("2 hours")),
+)
+
 FREQUENCY_CHOICES = (
     (rrule.DAILY, _("Day(s)")),
     (rrule.WEEKLY, _("Week(s)")),

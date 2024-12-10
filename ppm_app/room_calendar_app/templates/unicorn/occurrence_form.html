@@ -1,0 +1,52 @@
+<!-- I added a bootsstrap version of the form and need to do it unicorn based-->
+<!--TODO connect inputs to model, add validation, customise the options of the datetime widget-->
+<div>
+    <form action="/calendar/occurrence-add/" method="post">
+        <input type="hidden" name="csrfmiddlewaretoken" value="VCW3fhuvkuWTTbI016cCk4ZTI3ExIy7vyj0KVH1GKmZkliGwmhXDlvmFRJsXNg4R">
+        <div class="mb-3">
+            <label class="form-label">Time to start (please select 15 min increments)</label>
+            <input type="date" name="start_time_0" class="form-control" 
+                placeholder="Time to start (please select 15 min increments)" 
+                required="" id="id_start_time_0">
+            <input type="time" 
+                name="start_time_1" max="21:00" min="08:00" step="900" class="form-control" 
+                placeholder="Time to start (please select 15 min increments)" 
+                required="" id="id_start_time_1">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="id_duration">how long</label>
+                <select name="duration" class="form-select" required="" id="id_duration">
+                    <option value="" selected="">---------</option>
+                    
+                    <option value="30">30 min</option>
+                    
+                    <option value="60">1 hour</option>
+                    
+                    <option value="90">1.5 hours</option>
+                    
+                    <option value="120">2 hours</option>
+    
+    </select></div><div class="mb-3"><label class="form-label" 
+        for="id_event">Attach an event (ie a client)</label>
+        <select name="event" class="form-select" required="" id="id_event">
+            <option value="" selected="">---------</option>
+            
+            <option value="53938302-53a9-4b21-99c9-b4b92ad7c7b9">A session</option>
+            
+            <option value="79bfe9a6-573d-4bf6-a8d7-0588bd91f8ac">A session</option>
+            
+            <option value="c4cc7118-ee4a-4c1a-9e02-fbf1671f81d4">A session</option>
+            
+            <option value="0474d66d-25fe-42da-a07d-d7bf04df032f">A session</option>
+            
+            <option value="144ff441-925e-4f27-899d-813cea2c2d6c">A session</option>
+            
+            <option value="3405154f-3efe-4fbc-88eb-5b1947fa7bfd">hey i am working</option>
+            
+            <option value="951fc5f9-1680-46ee-bb35-59f0430b626f">holaa</option>
+            
+            <option value="6ed6e586-eb2d-4db3-8345-9b8bb124211f">it was sdidficult</option>
+    
+    </select></div>
+        <button class="btn btn-primary" type="submit">Add occurrence</button>
+      </form></div>
