@@ -42,6 +42,11 @@ def tenant_view(request,tenant_pk):
     context = {"tenant": tenant}
     return render(request,"room_calendar_app/display/tenant.html",context)
 
+def occurrence_view(request,occurrence_pk):
+    occurrence = get_object_or_404(OccurrenceModel, pk=occurrence_pk)
+    context = {"occurrence": occurrence}
+    return render(request,"room_calendar_app/display/occurrence_detail.html",context)
+
 
 def tenant_listing_view(request):
     """View a list of user's events """
@@ -58,9 +63,9 @@ def event_listing_view(request):
 
 def occurrence_listing_view(request):
     """View all ``events``."""
-    occurrences = OccurrenceModel.objects.all(user=request.user)  #? I already changed this one
-    context = occurrences
-    return render(request, "room_calendar_app/event_list.html", context) #todo check template
+    occurrences = OccurrenceModel.objects.filter(event__user=request.user)
+    context = {"occurrences":occurrences}
+    return render(request, "room_calendar_app/display/occurrence_list.html", context) 
 
 def room_calendar_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
@@ -189,6 +194,23 @@ def event_edit_view(request,event_pk):
     #display a blank or invalid form
     context = {'form':form}
     return render(request,"room_calendar_app/input/add_event.html",context)
+
+def occurrence_edit_view(request,occurrence_pk):
+    """edit the occurrence repetition erasing future events"""
+    event = OccurrenceModel.objects.get(pk=occurrence_pk)
+    if request.method !='POST':
+        #no data submitted; create a blank form
+        form = OccurrenceForm(instance=event)
+    else:
+        #POST data submitted; process data
+        check_owner(event.user,request.user)
+        form = OccurrenceForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('room_calendar_app:occurrence_list')
+    #display a blank or invalid form
+    context = {'form':form}
+    return render(request,"room_calendar_app/input/add_occurrence.html",context)
 
 def tenant_edit_view(request,tenant_pk):
     """edit the occurrence repetition erasing future events"""

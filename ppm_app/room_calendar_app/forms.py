@@ -74,6 +74,7 @@ class EventForm(forms.ModelForm):
 
 class OccurrenceForm(forms.ModelForm):
     """ occurrence form """
+    start_time = forms.SplitDateTimeField()
     class Meta:
         model = OccurrenceModel
         fields = ("start_time","duration","event")

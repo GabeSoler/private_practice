@@ -226,15 +226,6 @@ class OccurrenceManager(models.Manager):
         )
 
         return qs.filter(event=event) if event else qs
-
-    def is_overlapping(self,occurrence):
-        """checks if an instance overlaps with another"""
-        start = occurrence.start_time
-        end = occurrence.end_time
-        search = self.filter(
-                start_time__gte=start,
-                end_time__lte=end,)
-        return True if search else False
     
     def is_overlapping_multiple(self,multiple_model):
         """checks if an multiple occurrence call overlaps with current occurrences"""
@@ -251,7 +242,7 @@ class OccurrenceModel(models.Model):
     """ sets an occurrence by having a start and end, and a event attached """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     start_time = models.DateTimeField(unique=True)
-    duration = models.IntegerField(choices=DURATION)
+    duration = models.DurationField(choices=DURATION)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     multi_occurrence_model = models.ForeignKey(MultiOccurrenceModel,on_delete=models.SET_NULL,null=True, blank=True)
     objects = OccurrenceManager()
@@ -273,8 +264,19 @@ class OccurrenceModel(models.Model):
     
     def repeat_next_week(self,weeks=1):
         start_time = self.start_time + timedelta(weeks=weeks)
-        end_time = self.end_time + timedelta(weeks=weeks)
-        self.objects.create(start_time=start_time,end_time=end_time,event=self.event)
+        duration = self.duration + timedelta(weeks=weeks)
+        self.objects.create(start_time=start_time,duration=duration,event=self.event)
+
+    def is_overlapping(self):
+        """checks if an instance overlaps with another"""
+        start = self.start_time
+        duration = self.duration
+        end = start + timedelta.min(self.duration)
+        search = self.objects.filter(
+                Q(start_time__gte=start,start_time__lte=end) and
+                Q(duration__lte=duration)
+        )
+        return True if search else False
 
 
     @property
