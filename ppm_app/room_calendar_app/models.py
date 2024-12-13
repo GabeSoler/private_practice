@@ -242,7 +242,7 @@ class OccurrenceModel(models.Model):
     """ sets an occurrence by having a start and end, and a event attached """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     start_time = models.DateTimeField(unique=True)
-    duration = models.DurationField(choices=DURATION)
+    duration = models.DurationField()
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     multi_occurrence_model = models.ForeignKey(MultiOccurrenceModel,on_delete=models.SET_NULL,null=True, blank=True)
     objects = OccurrenceManager()

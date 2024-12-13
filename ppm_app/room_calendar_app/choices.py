@@ -3,7 +3,7 @@ from datetime import datetime, date, time, timedelta
 from django.utils.translation import gettext_lazy as _
 
 
-def timeslot_options():
+def time_slot_options():
     """
 Creats a list of time options from 8 to 21 every 15 min
     """
@@ -26,7 +26,7 @@ Creats a list of time options from 8 to 21 every 15 min
 
 
 
-default_timeslot_options = timeslot_options()
+default_timeslot_options = time_slot_options()
 
 
 

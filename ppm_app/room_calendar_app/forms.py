@@ -83,7 +83,7 @@ class OccurrenceForm(forms.ModelForm):
                   "event":"Attach an event (ie a client)"}
         widgets = {
             "start_time":forms.SplitDateTimeWidget(
-                                                    date_format='%Y-%m-%d',
+                                                    date_format="%Y-%m-%d",
                                                     time_format="%a %m %y",
                                                     date_attrs={"type":"date"},
                                                     time_attrs={"type":"time","max":"21:00","min":"08:00","step":"900"}
