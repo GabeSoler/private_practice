@@ -1,6 +1,5 @@
 from dateutil import rrule
 from datetime import datetime, date, time, timedelta
-from django.utils.translation import gettext_lazy as _
 
 
 def time_slot_options():
@@ -25,11 +24,27 @@ Creats a list of time options from 8 to 21 every 15 min
 
 
 
-
 default_timeslot_options = time_slot_options()
 
 
+def time_slots()->list:
+    time_slots = []
+    for x in range(80,220,5):
+        hour = x//10 #divisino without residual ?
+        minute = x%10*6 #residual,if 5 multiplies to get 30
+        slot = time(hour=hour,minute=minute) #creates multiple choices for a time select
+        time_slots.append(slot)
+    return time_slots
 
+def duration_times()->dict:
+    return {
+        "half":timedelta(min=30),
+        "hour":timedelta(hours=1),
+        "hour_half":timedelta(min=90),
+        "two_hours":timedelta(hours=2),
+        "three_hours":timedelta(hours=3),
+        "four_hours":timedelta(hours=4),
+    }
 
 EVENT_TYPE = [
     ("client", "Client Session"),
