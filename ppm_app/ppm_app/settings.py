@@ -163,3 +163,6 @@ BOOTSTRAP5 = {
 STATIC_URL = 'static/'
 STATIC_ROOT = "static/" #change when knowing the reall address, plus change url patterns
 MEDIA_URL = 'media/'
+
+
+USE_TZ = False #change to True when ready to deploy??

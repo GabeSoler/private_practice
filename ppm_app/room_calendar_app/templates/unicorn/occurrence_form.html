@@ -1,20 +1,40 @@
 <!-- I added a bootsstrap version of the form and need to do it unicorn based-->
 <!--TODO connect inputs to model, add validation, customise the options of the datetime widget-->
-<div>
-    <form>
+{% load unicorn %}
+<div class="container">
+    <div
+        class="alert alert-warning"
+        role="alert"
+    >
+        <p>{% unicorn_errors %}
+        </p>
+    </div>
+    
+    <div class="card">
+    <ul>
+        {% for occurrence in user_occurrences %}
+            <li>{{occurrence.title}}-{{occurrence.start_time}}-{{occurrence.duration}}</li>
+            {% empty %}
+            <li>No events</li>
+        {% endfor %}
+        </ul>
+    </div>
+    <form unicorn:submit.prevent="save_occurrence">
         <input type="hidden" name="csrfmiddlewaretoken" value="VCW3fhuvkuWTTbI016cCk4ZTI3ExIy7vyj0KVH1GKmZkliGwmhXDlvmFRJsXNg4R">
         <div class="mb-3">
             <label class="form-label">Time to start</label>
             
-            <input unicorn:model="start_date" id="id_start_date" type="date" class="form-control" 
+            <!-- start date widget -->
+            <input unicorn:model.lazy="start_date" id="id_start_date" type="date" class="form-control" 
                 placeholder="Date of the event" 
                 required="True">
             
-            <select unicorn:model="start_time" type="select" 
+            <!-- Start time widget -->
+            <select unicorn:model.lazy="start_time" type="select" 
                 class="form-select" 
                 required="" id="id_start_time">
-                {% for slot, name in time_slot_options%}
-                <option value="{{slot}}">{{name}}</option>
+                {% for slot in time_slot_options %}
+                <option value="{{slot}}">{{slot}}</option>
                 {% endfor %}
         </select>
         
@@ -22,25 +42,20 @@
             <div class="mb-3">
                 <label class="form-label" for="id_duration">how long</label>
             
-            <select unicorn:model="duration" name="duration" class="form-select" required="" id="id_duration">
-                    <option value="" selected="">---------</option>
-                    
-                    <option value="0:30:00">30 min</option>
-                    
-                    <option value="1:00:00">1 hour</option>
-                    
-                    <option value="1:30:00">1.5 hours</option>
-                    
-                    <option value="2:00:00">2 hours</option>
+            <select unicorn:model.lazy="duration" name="duration" class="form-select" required="" id="id_duration">
+                    {% for time in duration_times %}
+                    <option value="{{time}}">{{time}}</option>
+                    {% endfor %}
     
-    </select></div>
+        </select>
+    </div>
     
     
     <div class="mb-3"><label class="form-label" 
         for="id_event">Attach an event (ie a client)</label>
         
         
-        <select unicorn:model="event" name="event" class="form-select" required="" id="id_event">
+        <select unicorn:model.lazy="event" name="event" class="form-select" required="" id="id_event">
             <option value="" selected="">---------</option>
             
             {% for event in event_select %}
@@ -48,7 +63,11 @@
             
             {% endfor %}
 
-    </select></div>
-        <button unicorn:click="save_occurrence()"  class="btn btn-primary">Add occurrence</button>
-      </form></div>
+    </select>
+</div>
+</form>
+
+<button unicorn:click="save_occurrence()"  class="btn btn-primary">Add occurrence</button>
+
+</div>
 

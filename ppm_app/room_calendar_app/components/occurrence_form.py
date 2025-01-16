@@ -1,22 +1,39 @@
 from django_unicorn.components import UnicornView
-from ..models import OccurrenceModel,Event
-from ..choices import default_timeslot_options
+from ..forms import OccurrenceUnicornForm
+from ..models import Event,OccurrenceModel
+from ..choices import time_slots,duration_times
+from datetime import datetime,timedelta
+from django.utils import timezone
 
 class OccurrenceFormView(UnicornView):
-    form_class = OccurrenceModel
+    form_class = OccurrenceUnicornForm
+    event = Event.objects.none()
+    event_select = Event.objects.none()
+    time_slot_options = time_slots()
+    duration_times = duration_times()
+    start_date = ""
     start_time = ""
     duration = ""
-    event = ""
-    event_select = None
+
     def mount(self):
         self.event_select = Event.objects.filter(user=self.request.user)
-        start_date = ""
-        start_hour = ""
-        time_slot_options = default_timeslot_options
+
     def save_occurrence(self):
+        start_datetime = datetime.combine(self.start_date,self.start_time)
+        event = Event.objects.get(pk=self.event)
         if self.is_valid:
-            OccurrenceModel.objects.create(user=self.request.user,
-                                         start_time=self.start_time,
+            occurrence = OccurrenceModel.objects.create(
+                                         start_time=start_datetime,
                                          duration=self.duration,
-                                         event=self.event)
+                                         event=event)
+            occurrence.save()
             self.reset()
+            return
+        else:
+            return
+        
+
+    def user_occurrences(self):
+        today = timezone.now() - timedelta(days=1)
+        user_occurrences = OccurrenceModel.objects.filter(event__user=self.request.user,created_at__gte=today)
+        return user_occurrences

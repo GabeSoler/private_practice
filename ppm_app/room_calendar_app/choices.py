@@ -1,5 +1,6 @@
 from dateutil import rrule
 from datetime import datetime, date, time, timedelta
+from django.utils.translation import gettext_lazy as _
 
 
 def time_slot_options():
@@ -36,15 +37,15 @@ def time_slots()->list:
         time_slots.append(slot)
     return time_slots
 
-def duration_times()->dict:
-    return {
-        "half":timedelta(min=30),
-        "hour":timedelta(hours=1),
-        "hour_half":timedelta(min=90),
-        "two_hours":timedelta(hours=2),
-        "three_hours":timedelta(hours=3),
-        "four_hours":timedelta(hours=4),
-    }
+def duration_times()->list:
+    return (
+            str(timedelta(minutes=30)),
+            str(timedelta(hours=1)),
+            str(timedelta(minutes=90)),
+            str(timedelta(hours=2)),
+            str(timedelta(hours=3)),
+            str(timedelta(hours=4)),
+            )
 
 EVENT_TYPE = [
     ("client", "Client Session"),

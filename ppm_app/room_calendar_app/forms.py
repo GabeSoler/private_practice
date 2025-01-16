@@ -89,3 +89,12 @@ class OccurrenceForm(forms.ModelForm):
                                                     time_attrs={"type":"time","max":"21:00","min":"08:00","step":"900"}
                                                     )}
 
+
+class OccurrenceUnicornForm(forms.Form):
+    """ occurrence form """
+    start_date = forms.DateField()
+    start_time = forms.TimeField()
+    duration = forms.DurationField()
+    event = forms.ModelChoiceField(queryset=Event.objects.all())
+
+
