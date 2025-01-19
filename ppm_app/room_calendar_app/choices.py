@@ -8,7 +8,7 @@ def time_slot_options():
 Creats a list of time options from 8 to 21 every 15 min
     """
 
-    interval = timedelta(minutes=15)
+    interval = timedelta(minutes=30)
     start_time = time(hour=8)
     end_delta = timedelta(hours=13)
     format = "%I:%M %p"
@@ -36,6 +36,7 @@ def time_slots()->list:
         slot = time(hour=hour,minute=minute) #creates multiple choices for a time select
         time_slots.append(slot)
     return time_slots
+
 
 def duration_times()->list:
     return (

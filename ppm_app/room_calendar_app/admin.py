@@ -13,7 +13,7 @@ class MultiOccurrenceInline(admin.TabularInline):
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ("title", "event_type", "description")
+    list_display = ("title", "event_type", "user")
     list_filter = ("event_type",)
     search_fields = ("title", "description")
     inlines = [MultiOccurrenceInline, OccurrenceInline]

@@ -7,13 +7,12 @@ from datetime import datetime, date, time, timedelta
 from django.utils.timezone import now
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-
+from .choices import FREQUENCY_CHOICES, ON_EACH, ORDINAL, WEEKDAY_LONG, WEEKDAY_SHORT, ISO_WEEKDAYS_MAP, EVENT_TYPE, time_slots,default_timeslot_options
 import uuid
 
 from django.db import models
 from django.urls import reverse
 from tools.models import Client
-from .choices import *
 
 class TenantModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -287,4 +286,6 @@ class OccurrenceModel(models.Model):
     @property
     def room_calendar(self):
         return self.event.room_calendar
-
+    @property
+    def day(self):
+        return self.start_time.day

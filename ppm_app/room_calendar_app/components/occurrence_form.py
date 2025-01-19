@@ -20,7 +20,7 @@ class OccurrenceFormView(UnicornView):
 
     def save_occurrence(self):
         start_datetime = datetime.combine(self.start_date,self.start_time)
-        event = Event.objects.get(pk=self.event)
+        event = self.event
         if self.is_valid:
             occurrence = OccurrenceModel.objects.create(
                                          start_time=start_datetime,
@@ -34,6 +34,6 @@ class OccurrenceFormView(UnicornView):
         
 
     def user_occurrences(self):
-        today = timezone.now() - timedelta(days=1)
-        user_occurrences = OccurrenceModel.objects.filter(event__user=self.request.user,created_at__gte=today)
+        hour = timezone.now() - timedelta(hours=2)
+        user_occurrences = OccurrenceModel.objects.filter(event__user=self.request.user,created_at__gte=hour)
         return user_occurrences
