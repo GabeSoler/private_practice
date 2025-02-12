@@ -5,6 +5,8 @@ from .models import Event, OccurrenceModel,RoomCalendarModel,MultiOccurrenceMode
 from .forms import EventForm,MultipleOccurrenceForm,RoomCalendarForm,TenantForm,LinkTenantForm,OccurrenceForm
 from django.shortcuts import get_object_or_404, render
 from tools.models import Client
+from django.contrib.auth.decorators import login_required
+
 
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
@@ -14,6 +16,7 @@ def check_owner(topic_owner,request_user):
 def index_view(request):
     return render(request,"room_calendar_app/index.html")
 
+@login_required
 def week_view(request):
     return render(request,"room_calendar_app/display/calendar.html")
 

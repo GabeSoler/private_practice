@@ -21,11 +21,12 @@
     </div>
     <form unicorn:submit.prevent="save_occurrence">
         <input type="hidden" name="csrfmiddlewaretoken" value="VCW3fhuvkuWTTbI016cCk4ZTI3ExIy7vyj0KVH1GKmZkliGwmhXDlvmFRJsXNg4R">
-        <div class="mb-3">
-            <label class="form-label">Time to start</label>
+        <div class="mb-3 input-group">
+            <label class="input-group-text">Start</label>
             
             <!-- start date widget -->
-            <input unicorn:model.lazy="start_date" id="id_start_date" type="date" class="form-control" 
+            <input unicorn:model.lazy="start_date" id="id_start_date" type="date" 
+                class="form-control" 
                 placeholder="Date of the event" 
                 required="True">
             
@@ -39,8 +40,8 @@
         </select>
         
             </div>
-            <div class="mb-3">
-                <label class="form-label" for="id_duration">how long</label>
+            <div class="mb-3 input-group">
+                <label class="input-group-text" for="id_duration">Duration</label>
             
             <select unicorn:model.lazy="duration" name="duration" class="form-select" required="" id="id_duration">
                     {% for time in duration_times %}
@@ -51,8 +52,9 @@
     </div>
     
     <!-- Event Widget -->
-    <div class="mb-3"><label class="form-label" 
-        for="id_event">Attach an event (ie a client)</label>
+    <div class="mb-3 input-group">
+        <label class="input-group-text" 
+        for="id_event">Event</label>
         <select unicorn:model.lazy="event" name="event" class="form-select" required="" id="id_event">
             <option value="" selected="">---------</option>
             

@@ -11,11 +11,17 @@
     {% unicorn_scripts %}
     {% bootstrap_javascript %}
     {% load static %}
+
+
     <link rel="stylesheet" href="{% static "tools/css/style.css" %}">
 
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+    <!-- Hyperscript -->
+    <script src="https://unpkg.com/hyperscript.org@0.9.14"></script>
 </head>
 
-<body class='bg-light'>
+<body class='bg-light' hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
   {% csrf_token %}
   <nav class="navbar navbar-expand-lg bg-primary sticky-top start-0" data-bs-theme="dark">
     <div class='container-fluid'>

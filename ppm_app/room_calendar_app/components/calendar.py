@@ -1,37 +1,26 @@
 from django_unicorn.components import UnicornView
 from ..models import Event,OccurrenceModel,RoomCalendarModel
 from django.utils import timezone
-from ..choices import time_slots
-
-
+from calendar_utils import week_dict_occ,week_days
 class CalendarView(UnicornView):
+    user = None
     event = Event.objects.none()
     calendars = RoomCalendarModel.objects.none()
-
+    now = timezone.now()
+    week_days_display = []
+    week_dict_display = {}
+    
     def mount(self):
         self.user = self.request.user
+        self.week_dic_display = week_dict_occ(self.occurrences())
+        self.week_days_display = week_days(date=self.now)
 
     def occurrences(self):
-        today = timezone.now().date()
+        today = self.now
         week = today.isocalendar().week
         week = OccurrenceModel.objects.filter(start_time__week=week).order_by("start_time")
         return week
     
-    def week_dict(self):
-        week_dict = {}
-        occurrences = self.occurrences()
-        for slot in time_slots():
-            week_dict[slot] = {}
-            for i in range(1,8):
-                weekday = {i:object}
-                week_dict[slot].update(weekday)
-        for slot,day in week_dict.items():
-            for d,_ in day.items():
-                iso_day = int(d)
-                input = occurrences.filter(start_time__time=slot, start_time__iso_week_day=iso_day)
-                week_dict[slot][iso_day] = input
-        return week_dict
-
 
     def calendars(self):
         """ you can access supposedly as values"""

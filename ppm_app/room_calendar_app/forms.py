@@ -98,3 +98,7 @@ class OccurrenceUnicornForm(forms.Form):
     event = forms.ModelChoiceField(queryset=Event.objects.all())
 
 
+class WeekCalendarView(forms.Form):
+    """calendar switch form"""
+    date = forms.DateField()
+    calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all())

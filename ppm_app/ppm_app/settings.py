@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,7 +38,8 @@ INSTALLED_APPS = [
     'room_calendar_app',
     #third party
     'django_bootstrap5',
-    "django_unicorn", 
+    "template_partials",
+
 
     #default
     "django.contrib.admin",
@@ -83,9 +85,13 @@ WSGI_APPLICATION = "ppm_app.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'gsole',
+        'PASSWORD': config('POSTGRESS_KEY'),
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

@@ -10,6 +10,7 @@ from django.db.models import Q
 from .choices import FREQUENCY_CHOICES, ON_EACH, ORDINAL, WEEKDAY_LONG, WEEKDAY_SHORT, ISO_WEEKDAYS_MAP, EVENT_TYPE, time_slots,default_timeslot_options
 import uuid
 
+from django.db.models import F
 from django.db import models
 from django.urls import reverse
 from tools.models import Client
@@ -92,8 +93,8 @@ class MultiOccurrenceModel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     day_start = models.DateField()
-    start_time = models.IntegerField(choices=default_timeslot_options)
-    end_time = models.IntegerField(choices=default_timeslot_options)
+    start_time = models.DateTimeField(choices=default_timeslot_options)
+    end_time = models.DateTimeField(choices=default_timeslot_options)
     # recurrence options
     until = models.DateField(default=date.today,blank=True)
     frequency = models.IntegerField(default=rrule.WEEKLY,choices=FREQUENCY_CHOICES)
@@ -243,6 +244,7 @@ class OccurrenceModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     start_time = models.DateTimeField()
     duration = models.DurationField()
+    end_time = models.DateTimeField()
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     multi_occurrence_model = models.ForeignKey(MultiOccurrenceModel,on_delete=models.SET_NULL,null=True, blank=True)
     objects = OccurrenceManager()

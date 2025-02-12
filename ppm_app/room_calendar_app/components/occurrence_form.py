@@ -19,11 +19,13 @@ class OccurrenceFormView(UnicornView):
         self.event_select = Event.objects.filter(user=self.request.user)
 
     def save_occurrence(self):
-        start_datetime = datetime.combine(self.start_date,self.start_time)
+        start_datetime = datetime.combine(date=self.start_date,time=self.start_time)
         event = self.event
+        end_time = start_datetime + self.duration
         if self.is_valid:
             occurrence = OccurrenceModel.objects.create(
                                          start_time=start_datetime,
+                                         end_time=end_time,
                                          duration=self.duration,
                                          event=event)
             occurrence.save()

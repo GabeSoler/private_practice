@@ -1,7 +1,7 @@
 from dateutil import rrule
 from datetime import datetime, date, time, timedelta
 from django.utils.translation import gettext_lazy as _
-
+import pendulum as p
 
 def time_slot_options():
     """
@@ -37,6 +37,15 @@ def time_slots()->list:
         time_slots.append(slot)
     return time_slots
 
+def time_slots_pendulum()->list:
+    time_slots = []
+    start_time_slot = p.time(hour=8)
+    end_time_slot = p.time(hour=22)
+    interval = p.interval(start_time_slot,end_time_slot)
+    for x in interval.range("minute",15):
+        time_slots.append(x)
+    return time_slots
+
 
 def duration_times()->list:
     return (
@@ -46,6 +55,27 @@ def duration_times()->list:
             str(timedelta(hours=2)),
             str(timedelta(hours=3)),
             str(timedelta(hours=4)),
+            )
+
+def duration_times_pendulum()->list:
+    return (
+            (p.duration(minutes=30)),
+            (p.duration(hours=1)),
+            (p.duration(minutes=90)),
+            (p.duration(hours=2)),
+            (p.duration(hours=3)),
+            (p.duration(hours=4)),
+            )
+
+
+def duration_times_as_dt()->list:
+    return (
+            timedelta(minutes=30),
+            timedelta(hours=1),
+            timedelta(minutes=90),
+            timedelta(hours=2),
+            timedelta(hours=3),
+            timedelta(hours=4),
             )
 
 EVENT_TYPE = [
