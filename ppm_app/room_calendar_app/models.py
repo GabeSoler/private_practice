@@ -2,16 +2,12 @@ from django.db import models
 
 # Create your models here.
 from datetime import datetime
-from dateutil import rrule
-from datetime import datetime, date, time, timedelta
-from django.utils.timezone import now
+from datetime import timedelta
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .choices import ON_EACH, ORDINAL, WEEKDAY_LONG, WEEKDAY_SHORT, EVENT_TYPE, time_slots,default_timeslot_options
+from .choices import EVENT_TYPE
 import uuid
 
-from django.db.models import F
-from django.db import models
 from django.urls import reverse
 from tools.models import Client
 

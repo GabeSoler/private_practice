@@ -1,13 +1,9 @@
 from django import forms
 from django.forms.utils import to_current_timezone
-from django.utils.translation import gettext_lazy as _
-from django.db.models import Q
 from django.forms.widgets import SelectDateWidget
 
-
-from .models import *
-from .choices import *
-
+from .models import RoomCalendarModel,Event,TenantModel,OccurrenceModel
+from .choices import default_timeslot_options
 
 class RoomCalendarForm(forms.ModelForm):
     class Meta:

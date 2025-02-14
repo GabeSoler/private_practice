@@ -3,7 +3,6 @@ from django.http import Http404
 
 from .models import Event, OccurrenceModel,RoomCalendarModel,TenantModel
 from .forms import EventForm,RoomCalendarForm,TenantForm,LinkTenantForm,OccurrenceForm,OccurrenceProxyForm
-from django.shortcuts import get_object_or_404, render
 from tools.models import Client
 from django.contrib.auth.decorators import login_required
 from .choices import time_slots,duration_times
