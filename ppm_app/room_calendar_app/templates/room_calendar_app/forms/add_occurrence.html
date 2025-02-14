@@ -1,0 +1,20 @@
+{% extends '../../_base.html' %}
+
+{%block content%}
+
+{% load django_bootstrap5 %}
+  <h2>Add Occurrence</h2>
+  <a href={% url 'room_calendar_app:occurrence_list' %}>Occurrence list</a></br>
+  <a href={% url 'room_calendar_app:add_event' %}>Add Event</a>
+
+
+  <form action="{% url 'room_calendar_app:add_occurrence' %}" method='post'>
+    {% csrf_token %}
+    {% bootstrap_field form.start_date %}
+    {% bootstrap_field form.start_time %}
+    {% bootstrap_field form.duration %}
+    {% bootstrap_field form.event %}
+    {% bootstrap_button button_type='submit' content='Add occurrence' %}
+  </form>
+
+  {% endblock content %}

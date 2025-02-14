@@ -1,44 +1,9 @@
+{% extends '../../_base.html' %}
+
+
 {% load partials %}
 
-{% partialdef week_view %}
-
-<h3>Week View</h3>  
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      {% for day in week_days_display %}
-
-        <th scope="col">{{day|date}}</th>
-        {% endfor %}
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      {% for slot,data in week_dict_display.items %}
-      <th scope="row">{{slot}}</th>
-
-        {% for weekday,occurrence in data.items %}
-            <td>{{occurrence.event.user}}-
-              {{occurrence.start_time|time}}-
-              {{occurrence.end_time|time}}
-            </td>
-           {% empty %}
-           </td>
-        {% endfor %}
-          </td>
-
-        <tr>
-      {% empty %}
-        </tr>
-      {% endfor %}
-    </tr>
-  </tbody>
-</table>
-{% endpartialdef week_view %}
-
-
-
+{% block content %}
 
 <div>
     <h1>Events in this week</h1>
@@ -64,6 +29,46 @@
     
       </ul>
     
+
+      <!-- Partial def -->
+      {% partialdef week_view %}
+
+      <h3>Week View</h3>  
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            {% for day in week_days_display %}
+      
+              <th scope="col">{{day|date}}</th>
+              {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {% for slot,data in week_dict_display.items %}
+            <th scope="row">{{slot}}</th>
+      
+              {% for weekday,occurrence in data.items %}
+                  <td>{{occurrence.event.user}}-
+                    {{occurrence.start_time|time}}-
+                    {{occurrence.end_time|time}}
+                  </td>
+                 {% empty %}
+                 </td>
+              {% endfor %}
+                </td>
+      
+              <tr>
+            {% empty %}
+              </tr>
+            {% endfor %}
+          </tr>
+        </tbody>
+      </table>
+      {% endpartialdef week_view %}
+      <!-- End partial def -->
+
     
     {{week_dict_occ}}
       </br></br>
@@ -75,3 +80,4 @@
     
     </div>
     
+    {% endblock content %}

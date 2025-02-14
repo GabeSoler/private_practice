@@ -12,7 +12,7 @@
 <ul>
   {% for occurrence in occurrences%}
     <li>
-      <a href="{% url 'room_calendar_app:occurrence' occurrence.pk %}"> {{occurrence.room_calendar}}| {{occurrence.title}}</a>
+      <a href="{% url 'room_calendar_app:occurrence' occurrence.pk %}"> {{occurrence.room_calendar}}| {{occurrence.title}} - {{occurrence.start_time}}</a>
     </li>
     {% empty %}
     <li>There are no occurrences yet. </li>

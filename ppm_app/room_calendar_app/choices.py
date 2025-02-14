@@ -1,4 +1,3 @@
-from dateutil import rrule
 from datetime import datetime, date, time, timedelta
 from django.utils.translation import gettext_lazy as _
 import pendulum as p
@@ -29,6 +28,7 @@ default_timeslot_options = time_slot_options()
 
 
 def time_slots()->list:
+    """ Creates a list with time slots from 8 am to 10 pm every 15 minutes """
     time_slots = []
     for x in range(80,220,5):
         hour = x//10 #divisino without residual ?
@@ -37,17 +37,11 @@ def time_slots()->list:
         time_slots.append(slot)
     return time_slots
 
-def time_slots_pendulum()->list:
-    time_slots = []
-    start_time_slot = p.time(hour=8)
-    end_time_slot = p.time(hour=22)
-    interval = p.interval(start_time_slot,end_time_slot)
-    for x in interval.range("minute",15):
-        time_slots.append(x)
-    return time_slots
+
 
 
 def duration_times()->list:
+    """ Creates a list of durations """
     return (
             str(timedelta(minutes=30)),
             str(timedelta(hours=1)),
@@ -55,16 +49,6 @@ def duration_times()->list:
             str(timedelta(hours=2)),
             str(timedelta(hours=3)),
             str(timedelta(hours=4)),
-            )
-
-def duration_times_pendulum()->list:
-    return (
-            (p.duration(minutes=30)),
-            (p.duration(hours=1)),
-            (p.duration(minutes=90)),
-            (p.duration(hours=2)),
-            (p.duration(hours=3)),
-            (p.duration(hours=4)),
             )
 
 
@@ -153,28 +137,12 @@ DURATION = (
     (120, _("2 hours")),
 )
 
-FREQUENCY_CHOICES = (
-    (rrule.DAILY, _("Day(s)")),
-    (rrule.WEEKLY, _("Week(s)")),
-    (rrule.MONTHLY, _("Month(s)")),
-    (rrule.YEARLY, _("Year(s)")),
-)
 
 REPEAT_CHOICES = (
     ("count", _("By count")),
     ("until", _("Until date")),
 )
 
-ISO_WEEKDAYS_MAP = (
-    None,
-    rrule.MO,
-    rrule.TU,
-    rrule.WE,
-    rrule.TH,
-    rrule.FR,
-    rrule.SA,
-    rrule.SU,
-)
 
 ON_EACH = (("on", _("On the")), 
            ("each", _("Each:")))

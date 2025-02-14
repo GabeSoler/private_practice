@@ -172,3 +172,9 @@ MEDIA_URL = 'media/'
 
 
 USE_TZ = False #change to True when ready to deploy??
+
+
+
+LOGIN_REDIRECT_URL = 'tools:index'
+LOGOUT_REDIRECT_URL = 'tools:index'
+LOGIN_URL = 'account_login'

@@ -7,7 +7,7 @@ from datetime import datetime, date, time, timedelta
 from django.utils.timezone import now
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .choices import FREQUENCY_CHOICES, ON_EACH, ORDINAL, WEEKDAY_LONG, WEEKDAY_SHORT, ISO_WEEKDAYS_MAP, EVENT_TYPE, time_slots,default_timeslot_options
+from .choices import ON_EACH, ORDINAL, WEEKDAY_LONG, WEEKDAY_SHORT, EVENT_TYPE, time_slots,default_timeslot_options
 import uuid
 
 from django.db.models import F
@@ -87,117 +87,6 @@ class Event(models.Model):
         self.occurrence_set.create(start_time=start_time, end_time=end_time)
 
 
-class MultiOccurrenceModel(models.Model):
-    """ Model that holds the multiple occurrences setting of an Event """
-    event = models.OneToOneField(Event, on_delete=models.CASCADE)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    day_start = models.DateField()
-    start_time = models.DateTimeField(choices=default_timeslot_options)
-    end_time = models.DateTimeField(choices=default_timeslot_options)
-    # recurrence options
-    until = models.DateField(default=date.today,blank=True)
-    frequency = models.IntegerField(default=rrule.WEEKLY,choices=FREQUENCY_CHOICES)
-    interval = models.IntegerField(blank=True,default=1)
-    # weekly options
-    week_days_1 = models.IntegerField(choices=WEEKDAY_SHORT,blank=True)
-    week_days_2 = models.IntegerField(choices=WEEKDAY_SHORT,blank=True)
-    week_days_3 = models.IntegerField(choices=WEEKDAY_SHORT,blank=True)
-    # monthly options
-    month_option = models.CharField(choices=ON_EACH,default="each",max_length=20)
-    month_ordinal = models.IntegerField(choices=ORDINAL,blank=True) # which week of month
-    month_ordinal_day = models.IntegerField(choices=WEEKDAY_LONG,blank=True) #which day of that week
-    each_month_day = models.IntegerField(default=1,blank=True)
-
-    def _build_rrule_params(self):
-        iso = ISO_WEEKDAYS_MAP
-        params = {"frequency":self.frequency,
-                  "interval":self.interval,
-                  "until":self.until,
-                  "byweekday":None,
-                  "bysetpos":None,
-                  "bymonthday":self.each_month_day,
-                  }
-
-        if self.frequency == rrule.WEEKLY:
-            params["byweekday"] = (self.week_days_1,self.week_days_2,self.week_days_3)
-        elif self.frequency == rrule.MONTHLY:
-            if self.month_option == "on":
-                ordinal = self.month_ordinal
-                day = iso[self.month_ordinal_day]
-                params.update(byweekday=day, bysetpos=ordinal)
-            else:
-                params["bymonthday"] = self.each_month_day
-
-        elif self.frequency != rrule.DAILY:
-            raise NotImplementedError(_("Unknown interval rule " + self.frequency))
-        return params
-    
-    def is_day_week_overlap(self,slot_starts,slot_ends,week_day)->bool:
-        """ checks if there is overlap over a day of the week and recurrences forward on the same day and time slot"""
-        search = OccurrenceModel.objects.filter(start_time__week_day=week_day).filter(Q(start_time__time__gte=slot_starts) and Q(end_time__time__lte=slot_ends))
-        if search:
-            return True
-        else:
-            return False
-    def is_day_month_overlap(self,slot_starts,slot_ends,month_day)->bool:
-        search = OccurrenceModel.objects.filter(start_time__day=month_day).filter(Q(start_time__time__gte=slot_starts) and Q(end_time__time__lte=slot_ends))
-        if search:
-            return True
-        else:
-            return False
-    def is_day_week_month_overlap(self,slot_starts,slot_ends,week_day,week_number)->bool: #todo figure out how to set week numbers in a month
-        search = OccurrenceModel.objects.filter(
-            Q(start_time__gte=datetime.now()) and 
-            Q(start_time__week_day=week_day) and 
-            Q(start_time__time__gte=slot_starts) and 
-            Q(end_time__time__lte=slot_ends))
-        if search:
-            return True
-        else:
-            return False
-        
-    def add_occurrences(self):
-        """
-        adds multiple occurrences of this event
-        """
-        rrule_params = self._build_rrule_params()
-        until = rrule_params.get("until")
-        event = self.event
-        start_time = time(self.start_time)
-        end_time = self.end_time
-        if until:
-            rrule_params.setdefault("freq", rrule.DAILY)
-            event_duration = end_time - start_time
-            occurrences = []
-            for date_instance in rrule.rrule(dtstart=start_time, **rrule_params):
-                occurrences.append(
-                    OccurrenceModel(start_time=date_instance, end_time=date_instance + event_duration, event=event)
-                )
-            self.occurrence_set.bulk_create(occurrences)
-        else:
-            self.occurrence_set.create(start_time=start_time, end_time=end_time)
-    
-    def upcoming(self):
-        """Return all occurrences of an linked event that are set to start on or after the current
-        time."""
-        event = self.event
-        return event.occurrence_set.filter(start_time__gte=datetime.now())
-
-    def clean_upcoming(self):
-        self.upcoming().delete()
-    @property
-    def multiple_start_date(self):
-        day = self.day_start
-        start = self.start_time
-        compose_start_date = datetime(day=day,time=start)
-        return compose_start_date
-    @property
-    def multiple_end_date(self):
-        day = self.day_start
-        end = self.end_time
-        compose_end_date = datetime(day=day,time=end)
-        return compose_end_date
 
 class OccurrenceManager(models.Manager):
     def daily_occurrences(self, dt=None, event=None):
@@ -246,7 +135,6 @@ class OccurrenceModel(models.Model):
     duration = models.DurationField()
     end_time = models.DateTimeField()
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    multi_occurrence_model = models.ForeignKey(MultiOccurrenceModel,on_delete=models.SET_NULL,null=True, blank=True)
     objects = OccurrenceManager()
 
     class Meta:

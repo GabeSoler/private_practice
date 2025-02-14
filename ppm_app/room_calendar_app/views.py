@@ -1,11 +1,12 @@
 from django.shortcuts import get_object_or_404, render,redirect
 from django.http import Http404
 
-from .models import Event, OccurrenceModel,RoomCalendarModel,MultiOccurrenceModel,TenantModel
-from .forms import EventForm,MultipleOccurrenceForm,RoomCalendarForm,TenantForm,LinkTenantForm,OccurrenceForm
+from .models import Event, OccurrenceModel,RoomCalendarModel,TenantModel
+from .forms import EventForm,RoomCalendarForm,TenantForm,LinkTenantForm,OccurrenceForm,OccurrenceProxyForm
 from django.shortcuts import get_object_or_404, render
 from tools.models import Client
 from django.contrib.auth.decorators import login_required
+from .choices import time_slots,duration_times
 
 
 def check_owner(topic_owner,request_user):
@@ -18,7 +19,7 @@ def index_view(request):
 
 @login_required
 def week_view(request):
-    return render(request,"room_calendar_app/display/calendar.html")
+    return render(request,"room_calendar_app/display/week_view.html")
 
 
 
@@ -126,20 +127,23 @@ def event_add_view(request):
 
 def occurrence_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
+    events = Event.objects.filter(user=request.user) #filter events to user
     if request.method !='POST':
         #no data submitted; create a blank form
-        form = OccurrenceForm()
-        form.fields["event"].queryset = Event.objects.filter(user=request.user)
+        form = OccurrenceProxyForm()
     else:
         #POST data submitted; process data
-        form = OccurrenceForm(data=request.POST)
+        form = OccurrenceProxyForm(data=request.POST)
         if form.is_valid():
-            isinstance = form.save(commit=False)
-            isinstance.user = request.user 
-            isinstance.save()
+            occurrence = OccurrenceModel()
+            occurrence.duration = form.cleaned_data['duration']
+            occurrence.start_time = form.cleaned_data['start_date'] + form.cleaned_data['start_time']
+            occurrence.end_time = form.cleaned_data['start_date'] + form.cleaned_data['duration']
+            occurrence.event = form.cleaned_data['event']
+            occurrence.save()
             return redirect('room_calendar_app:occurrence_list')
     #display a blank or invalid form
-    context = {'form':form}
+    context = {'form':form,'events':events,'duration_times':duration_times,'time_slot_options':time_slots}
     return render(request,'room_calendar_app/input/add_occurrence.html',context)
 
 def occurrence_multiple_add_view(request,event_pk):
@@ -147,16 +151,16 @@ def occurrence_multiple_add_view(request,event_pk):
     event = Event.objects.get(pk=event_pk)
     if request.method !='POST':
         #no data submitted; create a blank form
-        form = MultipleOccurrenceForm()
+        form = OccurrenceProxyForm()
     else:
         #POST data submitted; process data
-        form = MultipleOccurrenceForm(data=request.POST)
+        form = OccurrenceProxyForm(data=request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.user = request.user
             instance.event = event
             instance.save()
-            multi = MultiOccurrenceModel.objects.get(instance)
+            multi = None #!change
             multi.add_occurrences()
             return redirect('room_calendar_app:events')
     #display a blank or invalid form
@@ -255,16 +259,16 @@ def tenant_link_view(request,calendar_pk):
 def occurrence_multiple_edit_view(request,event_pk):
     """edit the occurrence repetition erasing future events"""
     event = Event.objects.get(pk=event_pk)
-    multiple = MultiOccurrenceModel.objects.get(event=event)
+    multiple = None  #!change
     if request.method !='POST':
         #no data submitted; create a blank form
-        form = MultipleOccurrenceForm(instance=multiple)
+        form = OccurrenceProxyForm(instance=multiple)
     else:
         #POST data submitted; process data
-        form = MultipleOccurrenceForm(data=request.POST)
+        form = OccurrenceProxyForm(data=request.POST)
         if form.is_valid():
             form.save()
-            multi = MultiOccurrenceModel.objects.get(form)
+            multi = None #!change
             multi.clean_upcoming()
             multi.add_occurrences()
             return redirect('room_calendar_app:events')
