@@ -1,20 +1,19 @@
-{% extends '../../_base.html' %}
 
-{%block content%}
 
 {% load django_bootstrap5 %}
-  <h2>Add Occurrence</h2>
-  <a href={% url 'room_calendar_app:occurrence_list' %}>Occurrence list</a></br>
-  <a href={% url 'room_calendar_app:add_event' %}>Add Event</a>
-
-
-  <form action="{% url 'room_calendar_app:add_occurrence' %}" method='post'>
+<!-- using the proxy form, and then saving the occurrence -->
+ <div class"card bg-primary-subtle m-2 p-2 rounded">
+  <form action="{% url 'room_calendar_app:add_occurrence' %}" method='post' class="bg-primary-subtle ps-3">
     {% csrf_token %}
-    {% bootstrap_field form.start_date %}
-    {% bootstrap_field form.start_time %}
-    {% bootstrap_field form.duration %}
-    {% bootstrap_field form.event %}
-    {% bootstrap_button button_type='submit' content='Add occurrence' %}
+    <div class="row my-2">
+    {% bootstrap_field form.start_date show_label="true" wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+    {% bootstrap_field form.start_time show_label="true" wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+  </div>
+
+  <div class="row">
+    {% bootstrap_field form.duration show_label="true"  wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+    {% bootstrap_button button_type='submit' content='Add occurrence' extra_classes="col" %}
+</div>
   </form>
 
-  {% endblock content %}
+</div>

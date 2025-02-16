@@ -1,9 +1,8 @@
 from django import forms
-from django.forms.utils import to_current_timezone
-from django.forms.widgets import SelectDateWidget
+from .my_widgets import DateBooted
 
 from .models import RoomCalendarModel,Event,TenantModel,OccurrenceModel
-from .choices import default_timeslot_options
+from .choices import default_timeslot_options,duration_times_as_choices
 
 class RoomCalendarForm(forms.ModelForm):
     class Meta:
@@ -43,7 +42,6 @@ class EventForm(forms.ModelForm):
 
 class OccurrenceForm(forms.ModelForm):
     """ occurrence form """
-    start_time = forms.SplitDateTimeField()
     class Meta:
         model = OccurrenceModel
         fields = ("start_time","duration","event")
@@ -61,10 +59,10 @@ class OccurrenceForm(forms.ModelForm):
 
 class OccurrenceProxyForm(forms.Form):
     """ occurrence form """
-    start_date = forms.DateField()
-    start_time = forms.TimeField(input_formats='H:i')
-    duration = forms.DurationField()
-    event = forms.ModelChoiceField(queryset=Event.objects.all())
+    start_date = forms.DateField(widget=DateBooted, label="On")
+    start_time = forms.ChoiceField(choices=default_timeslot_options,label="At")
+    duration = forms.ChoiceField(choices=duration_times_as_choices,label="For")
+    event = forms.ModelChoiceField(queryset=Event.objects.all(),label="Event")
 
 
 class WeekCalendarView(forms.Form):
@@ -74,22 +72,22 @@ class WeekCalendarView(forms.Form):
 
 
 
-class SplitDateTimeWidget(forms.MultiWidget):
-    """
-    A Widget that splits datetime input into a SelectDateWidget for dates and
-    Select widget for times.
+# class SplitDateTimeWidget(forms.MultiWidget):
+#     """
+#     A Widget that splits datetime input into a SelectDateWidget for dates and
+#     Select widget for times.
 
-    """
+#     """
 
-    def __init__(self, attrs=None):
-        widgets = (
-            SelectDateWidget(attrs=attrs),
-            forms.Select(choices=default_timeslot_options, attrs=attrs),
-        )
-        super().__init__(widgets)
+#     def __init__(self, attrs=None):
+#         widgets = (
+#             SelectDateWidget(attrs=attrs),
+#             forms.Select(choices=default_timeslot_options, attrs=attrs),
+#         )
+#         super().__init__(widgets)
 
-    def decompress(self, value):
-        if value:
-            value = to_current_timezone(value)
-            return [value.date(), value.time().replace(microsecond=0)]
-        return [None, None]
+#     def decompress(self, value):
+#         if value:
+#             value = to_current_timezone(value)
+#             return [value.date(), value.time().replace(microsecond=0)]
+#         return [None, None]

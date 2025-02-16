@@ -8,7 +8,8 @@
   <a href={% url 'room_calendar_app:add_event' %}>Add Event</a>
 
 
-
+<div class="card m-3">
   {% include '../forms/occurrence_form.html' %}
-
+</div>
+  {% include '../forms/add_occurrence.html' %}
   {% endblock content %}

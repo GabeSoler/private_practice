@@ -9,6 +9,7 @@
   <li><a href="{%url 'room_calendar_app:calendar_index'%}">back to calendar home</a></li>
 </ul>
 
+<div class="card">
 <ul>
   {% for event in events%}
     <li>
@@ -18,5 +19,7 @@
     <li>There are no events yet. </li>
   </ul>
   {% endfor %}
+
+</div>
 
   {% endblock content %}

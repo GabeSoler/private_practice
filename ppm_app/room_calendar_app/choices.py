@@ -4,22 +4,15 @@ import pendulum as p
 
 def time_slot_options():
     """
-Creats a list of time options from 8 to 21 every 15 min
+Creats a list of time options from 8 to 22 every 15 min
     """
 
-    interval = timedelta(minutes=30)
-    start_time = time(hour=8)
-    end_delta = timedelta(hours=13)
     format = "%I:%M %p"
-    dt = datetime.combine(date.today(), time(0))
-    dt_start = datetime.combine(dt.date(), start_time)
-    dt_end = dt_start + end_delta
     options = []
-
-    while dt_start <= dt_end:
-        options.append((str(dt_start.time()), dt_start.strftime(format)))
-        dt_start += interval
-
+    today = p.now()
+    interval = p.interval(today.at(8),today.at(22))
+    for dt in interval.range('minutes',30):
+        options.append((str(dt.time()), dt.strftime(format)))
     return options
 
 
@@ -52,15 +45,13 @@ def duration_times()->list:
             )
 
 
-def duration_times_as_dt()->list:
-    return (
-            timedelta(minutes=30),
-            timedelta(hours=1),
-            timedelta(minutes=90),
-            timedelta(hours=2),
-            timedelta(hours=3),
-            timedelta(hours=4),
-            )
+def duration_times_as_choices()->list:
+    choices_list = []
+    for t in duration_times():
+        choices_list.append((t,t))
+    return choices_list
+        
+
 
 EVENT_TYPE = [
     ("client", "Client Session"),
