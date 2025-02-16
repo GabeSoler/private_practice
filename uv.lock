@@ -92,16 +92,16 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "asgiref", specifier = ">=3.8.1" },
-    { name = "django", specifier = ">=5.1.6" },
+    { name = "asgiref", specifier = ">=3.8.1,<4" },
+    { name = "django", specifier = ">=5.1.6,<6" },
     { name = "django-bootstrap5", specifier = ">=24.3" },
     { name = "django-template-partials", specifier = ">=24.4" },
-    { name = "pendulum", specifier = ">=3.0.0" },
-    { name = "psycopg2", specifier = ">=2.9.10" },
-    { name = "python-decouple", specifier = ">=3.8" },
-    { name = "six", specifier = ">=1.17.0" },
-    { name = "sqlparse", specifier = ">=0.5.3" },
-    { name = "time-machine", specifier = ">=2.16.0" },
+    { name = "pendulum", specifier = ">=3.0.0,<4" },
+    { name = "psycopg2", specifier = ">=2.9.10,<3" },
+    { name = "python-decouple", specifier = ">=3.8,<4" },
+    { name = "six", specifier = ">=1.17.0,<2" },
+    { name = "sqlparse", specifier = ">=0.5.3,<1" },
+    { name = "time-machine", specifier = ">=2.16.0,<3" },
     { name = "tzdata", specifier = ">=2025.1" },
 ]
 

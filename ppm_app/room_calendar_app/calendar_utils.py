@@ -1,9 +1,10 @@
 """ A series of functions to deal with the calendar"""
 import pendulum as p
 from choices import time_slots
+from django.db.models import Q
 
 def week_days(date=None)->list:
-    if date != None:
+    if date is None:
         date_ref = p.today()
     else:
         date_ref = date
@@ -25,13 +26,13 @@ def slot_dic()->dict:
     return week_dict
 
 
-def week_dict(occurrences:object):
+def week_dict(occurrences:dict)->dict:
     """organises the dictionary by the slots and allows multiple occurrences"""
     week_dict = slot_dic()
-    week_days = week_days()
+    week_days_dict = week_days()
     for slot,day in week_dict.items():
         for d,_ in day.items():
-            date = week_days[d-1]
+            date = week_days_dict[d-1]
             p_date = p.instance(date)
             iso_day = d
             dt_slot = p_date.at(hour=slot.hour,minute=slot.minute)
@@ -41,7 +42,7 @@ def week_dict(occurrences:object):
             week_dict[slot][iso_day] = input         
     return week_dict
 
-def week_dict_occ(occurrences):
+def week_dict_by_occ(occurrences:dict)->dict:
     """organises the dictionary by the occurrence"""
     week_dict = slot_dic()
     for occurrence in occurrences:
