@@ -1,4 +1,5 @@
 .venv
+.env
 __pycache__/
 db.sqlite3
 .DS_Store
@@ -14,14 +15,12 @@ demo/static
 MANIFEST
 dist
 .tox/
-django_swingtime.egg-info/
 /dev
 .cache/
 .coverage
 .pytest_cache
 venv
 Dockerrun.aws.json
-.python-version
 /temp
 /docs/_build
 
