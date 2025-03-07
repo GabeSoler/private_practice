@@ -6,7 +6,9 @@ app_name = 'room_calendar_app'
 urlpatterns = [
 
     path("", views.index_view , name="calendar_index"),
-    path("event/<uuid:event_pk>/", views.event_view, name="event"),
+    path("event/<uuid:event_pk>/", views.event_occurrence_view, name="event"),
+
+
     path("event-list/", views.event_listing_view, name="event_list"),
     path("occurrence-list/", views.occurrence_listing_view, name="occurrence_list"),
     path("occurrence/<uuid:occurrence_pk>/", views.occurrence_view, name="occurrence"),

@@ -12,9 +12,11 @@ def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
         raise Http404
     
-
+@login_required
 def index_view(request):
-    return render(request,"room_calendar_app/index.html")
+    events = Event.objects.filter(user=request.user)
+    context = {"events":events}
+    return render(request,"room_calendar_app/index.html",context)
 
 @login_required
 def week_view(request):
@@ -35,10 +37,29 @@ def room_calendar_view(request,calendar_pk):
     context = {"calendar": calendar,"tenants":tenants}
     return render(request,"room_calendar_app/display/room_calendar.html",context)
 
-def event_view(request,event_pk):
+def event_occurrence_view(request,event_pk):
+    """ add an event, add occurrences, show occurrences"""
     event = get_object_or_404(Event, pk=event_pk)
-    context = {"event": event}
-    return render(request,"room_calendar_app/display/event.html",context)
+    occurrences = OccurrenceModel.objects.filter(event=event) #filter events to user
+    if request.method !='POST':
+        #no data submitted; create a blank form
+        form = OccurrenceProxyForm()
+    else:
+        #POST data submitted; process data
+        form = OccurrenceProxyForm(data=request.POST)
+        if form.is_valid():
+            occurrence = OccurrenceModel()
+            occurrence.duration = form.cleaned_data['duration']
+            occurrence.start_time = form.cleaned_data['start_date'] + form.cleaned_data['start_time']
+            occurrence.end_time = form.cleaned_data['start_date'] + form.cleaned_data['duration']
+            occurrence.event = form.cleaned_data['event']
+            occurrence.save()
+            return redirect('room_calendar_app:occurrence_list')
+    #display a blank or invalid form
+    context = {'form':form,"event":event,"occurrences":occurrences}
+    return render(request,'room_calendar_app/dynamic/event.html',context)
+
+    return render(request,"room_calendar_app/dynamic/event.html",context)
 
 def tenant_view(request,tenant_pk):
     tenant = get_object_or_404(TenantModel, pk=tenant_pk)

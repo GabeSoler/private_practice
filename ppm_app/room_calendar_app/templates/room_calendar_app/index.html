@@ -1,16 +1,24 @@
 {% extends '../_base.html' %}
 
 {% block content %}
-{% csrf_token %}
 
 
 <h2>My Events</h2>
+
+<div class="card" id="event-list"> <!-- a list of events of user -->
+  <ul>
+  {% for event in events %}
+  <li>
+    <a href="{% url 'room_calendar_app:event' event.pk %}"> {{event.get_event_type_display}}| {{event.title}}</a>
+  </li>
+  {% endfor %}
+  </ul>
+</div><!-- end of list -->
 
 <ul>
   <li><a href="{%url 'room_calendar_app:add_event'%}">Add new Event</a></li>
   <li><a href="{%url 'room_calendar_app:add_occurrence'%}">Add new Occurrence</a></li>
   <li><a href="{%url 'room_calendar_app:add_occurrence_multiple'%}">Add Multiple Occurrences</a></li>
-  <li><a href="{%url 'room_calendar_app:event_list'%}">Event list</a></li>
   <li><a href="{%url 'room_calendar_app:occurrence_list'%}">Occurrence list</a></li>
   <li><a href="{%url 'room_calendar_app:add_occurrence'%}">Add Occurrence</a></li>
 </ul>

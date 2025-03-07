@@ -1,0 +1,39 @@
+{% extends '../../_base.html' %}
+{% block title%}{{event.title}}{%endblock title%}
+
+{% block content %}
+<div class="card bg-secondary-subtle">
+    <div class="card-header bg-primary-subtle">
+      <h5 class="card-title d-inline">{{event.title|title}}</h5> 
+        <small>
+          <a href="{%url 'room_calendar_app:edit_event' event.pk %}" class="card-link col">
+          Edit</a>
+        </small>
+        <a href="{% url 'room_calendar_app:calendar_index' %}" class="card-link float-end">Back</a>
+
+    </div>
+    <div class="card-body">
+      <div class="row">
+      <p class="card-text col">Room: {{event.room_calendar}}</p>
+      <p class="card-text col">Client: {{event.client}} </P>
+      <p class="card-text col">Description: {{event.description}} </p>
+      </div>
+    </div>
+  </div>
+
+{% include '../forms/add_occurrence.html' %}
+
+
+<ul class="list-group my-3">
+  {% for occurrence in occurrences%}
+    <li class="list-group-item bg-primary-subtle text-success">
+      <a href="{% url 'room_calendar_app:occurrence' occurrence.pk %}"
+      class="link-success"
+      >{{occurrence.start_time}} - {{occurrence.end_time|time}}</a>
+    </li>
+    {% empty %}
+    <li>There are no occurrences yet. </li>
+    {% endfor %}
+  </ul>
+
+{%endblock content%}
