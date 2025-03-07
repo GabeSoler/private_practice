@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     #third party
     'django_bootstrap5',
     "template_partials",
+    "django_htmx",
+
 
 
     #default
@@ -58,6 +60,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_htmx.middleware.HtmxMiddleware", # django-htmx middleware
+
 ]
 
 ROOT_URLCONF = "ppm_app.urls"
@@ -137,6 +141,8 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+STATIC_ROOT = "static/" #change when knowing the reall address, plus change url patterns
+MEDIA_URL = 'media/'
 
 
 #config of bootstrap5, I added a theme called 'sandstone' from bootswatch
@@ -165,10 +171,6 @@ BOOTSTRAP5 = {
     }
 
 
-
-STATIC_URL = 'static/'
-STATIC_ROOT = "static/" #change when knowing the reall address, plus change url patterns
-MEDIA_URL = 'media/'
 
 
 USE_TZ = False #change to True when ready to deploy??
