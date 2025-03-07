@@ -46,6 +46,8 @@ def event_occurrence_view(request,event_pk):
     """ add an event, add occurrences, show occurrences"""
     template = 'room_calendar_app/dynamic/event.html'
     event = get_object_or_404(Event, pk=event_pk)
+    occurrences = OccurrenceModel.objects.filter(event=event) #filter events to user
+    form = OccurrenceProxyForm()
     if request.htmx:
         #htmx request triggers save and refresh of occurrences and refreshes form with errors
         form = OccurrenceProxyForm(data=request.POST)
@@ -61,8 +63,6 @@ def event_occurrence_view(request,event_pk):
         context = {'form':form,"event":event,"occurrences":occurrences}
         return render(request,form_list_template,context)
     #else display full page
-    occurrences = OccurrenceModel.objects.filter(event=event) #filter events to user
-    form = OccurrenceProxyForm()
     context = {'form':form,"event":event,"occurrences":occurrences}
     return render(request,template,context)
 
