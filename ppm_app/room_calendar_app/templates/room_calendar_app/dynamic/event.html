@@ -1,4 +1,6 @@
 {% extends '../../_base.html' %}
+{% load partials %}
+{% load django_bootstrap5 %}
 {% block title%}{{event.title}}{%endblock title%}
 
 {% block content %}
@@ -21,10 +23,42 @@
     </div>
   </div>
 
-{% include '../forms/add_occurrence.html' %}
+
+<!-- using the proxy form, and then saving the occurrence -->
+<div class"card bg-primary-subtle m-2 p-2 rounded">
+  
+  {% partialdef occurrence-form inline %}
+
+  <form class="bg-primary-subtle ps-3" hx-swap-oob="true">
+    {% csrf_token %}
+    <div class="row my-2">
+    {% bootstrap_field form.start_date show_label="true" wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+    {% bootstrap_field form.start_time show_label="true" wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+  </div>
+
+  <div class="row">
+    {% bootstrap_field form.duration show_label="true"  wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+    <button
+      type="button"
+      class="btn btn-primary col col-6 mx-4"
+      hx-post={% url 'room_calendar_app:event' event.pk %}
+      hx-target="#occurrence-list"
+    >
+    Add Occurrence
+    </button>
+  </div>
+
+  </form>
+  
+  {% endpartialdef occurrence-form %}
+
+</div>
 
 
-<ul class="list-group my-3">
+<!-- occurrence list to be swapped -->
+
+<ul class="list-group my-3" id="occurrence-list">
+  {% partialdef occurrence-list inline %}
   {% for occurrence in occurrences%}
     <li class="list-group-item bg-primary-subtle text-success">
       <a href="{% url 'room_calendar_app:occurrence' occurrence.pk %}"
@@ -34,6 +68,9 @@
     {% empty %}
     <li>There are no occurrences yet. </li>
     {% endfor %}
+    {% endpartialdef %}
   </ul>
+
+
 
 {%endblock content%}

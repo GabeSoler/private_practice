@@ -3,7 +3,10 @@
 {% load django_bootstrap5 %}
 <!-- using the proxy form, and then saving the occurrence -->
  <div class"card bg-primary-subtle m-2 p-2 rounded">
-  <form action="{% url 'room_calendar_app:add_occurrence' %}" method='post' class="bg-primary-subtle ps-3">
+  
+  {% partialdef occurrence-form inline %}
+
+  <form class="bg-primary-subtle ps-3" hx-oob='true'>
     {% csrf_token %}
     <div class="row my-2">
     {% bootstrap_field form.start_date show_label="true" wrapper_class="col" layout="horizontal" label_class="text-primary" %}
@@ -12,8 +15,18 @@
 
   <div class="row">
     {% bootstrap_field form.duration show_label="true"  wrapper_class="col" layout="horizontal" label_class="text-primary" %}
-    {% bootstrap_button button_type='submit' content='Add occurrence' extra_classes="col" %}
-</div>
+    <button
+      type="button"
+      class="btn btn-primary col col-6 mx-4"
+      hx-post={% url 'room_calendar_app:event' event.pk %}
+      hx-target="#occurrence-list"
+    >
+    Add Occurrence
+    </button>
+  </div>
+
   </form>
+  
+  {% endpartialdef %}
 
 </div>

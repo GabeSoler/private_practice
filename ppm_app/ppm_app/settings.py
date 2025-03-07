@@ -141,8 +141,9 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-STATIC_ROOT = "static/" #change when knowing the reall address, plus change url patterns
+STATIC_ROOT = "assets/" #change when knowing the real address, plus change url patterns
 MEDIA_URL = 'media/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 #config of bootstrap5, I added a theme called 'sandstone' from bootswatch
