@@ -7,6 +7,8 @@ from tools.models import Client
 from django.contrib.auth.decorators import login_required
 from .choices import time_slots,duration_times
 from django.template.loader import render_to_string
+from django.views.decorators.cache import cache_control
+from django.views.decorators.vary import vary_on_headers
 
 
 def check_owner(topic_owner,request_user):
@@ -38,31 +40,30 @@ def room_calendar_view(request,calendar_pk):
     context = {"calendar": calendar,"tenants":tenants}
     return render(request,"room_calendar_app/display/room_calendar.html",context)
 
+@cache_control(max_age=300)
+@vary_on_headers("HX-Request")
 def event_occurrence_view(request,event_pk):
     """ add an event, add occurrences, show occurrences"""
     template = 'room_calendar_app/dynamic/event.html'
     event = get_object_or_404(Event, pk=event_pk)
     occurrences = OccurrenceModel.objects.filter(event=event) #filter events to user
     form = OccurrenceProxyForm()
-    context = {'form':form,"event":event,"occurrences":occurrences}
     if request.htmx:
         #htmx request triggers save and refresh of occurrences and refreshes form with errors
         form = OccurrenceProxyForm(data=request.POST)
-        list_template = template + "#occurrence-list"
-        form_template = template + "#occurrence-form"
+        form_list_template = template + "#occurrence-form-list"
         if form.is_valid():
             occurrence = OccurrenceModel()
             occurrence.duration = form.cleaned_data['duration']
             occurrence.start_time = form.cleaned_data['start_date'] + form.cleaned_data['start_time']
             occurrence.end_time = form.cleaned_data['start_date'] + form.cleaned_data['duration']
-            occurrence.event = form.cleaned_data['event']
+            occurrence.event = event
             occurrence.save()
-        template_partials = [list_template, form_template]
-        response_content = ""
-        for template_name in template_partials:
-            response_content += render_to_string(template_name, context)
-        return HttpResponse(response_content)
+            occurrences = OccurrenceModel.objects.filter(event=event)
+        context = {'form':form,"event":event,"occurrences":occurrences}
+        return render(request,form_list_template,context)
     #else display full page
+    context = {'form':form,"event":event,"occurrences":occurrences}
     return render(request,template,context)
 
     return render(request,"room_calendar_app/dynamic/event.html",context)
