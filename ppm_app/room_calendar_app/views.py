@@ -6,10 +6,9 @@ from .forms import EventForm,RoomCalendarForm,TenantForm,LinkTenantForm,Occurren
 from tools.models import Client
 from django.contrib.auth.decorators import login_required
 from .choices import time_slots,duration_times
-from django.template.loader import render_to_string
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_headers
-
+import datetime as dt
 
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
@@ -53,11 +52,17 @@ def event_occurrence_view(request,event_pk):
         form = OccurrenceProxyForm(data=request.POST)
         form_list_template = template + "#occurrence-form-list"
         if form.is_valid():
-            occurrence = OccurrenceModel()
-            occurrence.duration = form.cleaned_data['duration']
-            occurrence.start_time = form.cleaned_data['start_date'] + form.cleaned_data['start_time']
-            occurrence.end_time = form.cleaned_data['start_date'] + form.cleaned_data['duration']
-            occurrence.event = event
+            start_date_form  = form.cleaned_data['start_date'] #datetime
+            start_time_form  = form.cleaned_data['start_time'] #time object
+            duration_form  = form.cleaned_data['duration'] #time difference
+            start_time_add = dt.datetime.combine(start_date_form,start_time_form)
+            end_time_add = start_time_add + duration_form
+            occurrence = OccurrenceModel(
+                duration=duration_form,
+                start_time=start_time_add,
+                end_time=end_time_add,
+                event=event
+                )
             occurrence.save()
             occurrences = OccurrenceModel.objects.filter(event=event)
         context = {'form':form,"event":event,"occurrences":occurrences}

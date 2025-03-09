@@ -60,9 +60,8 @@ class OccurrenceForm(forms.ModelForm):
 class OccurrenceProxyForm(forms.Form):
     """ occurrence form """
     start_date = forms.DateField(widget=DateBooted, label="On")
-    start_time = forms.ChoiceField(choices=default_timeslot_options,label="At")
-    duration = forms.ChoiceField(choices=duration_times_as_choices,label="For")
-    event = forms.ModelChoiceField(queryset=Event.objects.all(),label="Event")
+    start_time = forms.TimeField(label="At",widget=forms.Select(choices=default_timeslot_options))
+    duration = forms.DurationField(label="For",widget=forms.Select(choices=duration_times_as_choices))
 
 
 class WeekCalendarView(forms.Form):
