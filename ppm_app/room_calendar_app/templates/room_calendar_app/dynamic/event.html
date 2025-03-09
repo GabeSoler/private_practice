@@ -31,23 +31,32 @@
 
 <div class"card bg-primary-subtle m-2 p-2 rounded">
   <form class="bg-primary-subtle ps-3">
-    <div class="row my-2">
+    <table class="table">
+    <tr>
+      <td class="col bg-primary-subtle">
     {% bootstrap_field form.start_date show_label="true" wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+      </td>
+      <td class="col bg-primary-subtle">
     {% bootstrap_field form.start_time show_label="true" wrapper_class="col" layout="horizontal" label_class="text-primary" %}
-  </div>
+      </td>
+  </tr>
 
-  <div class="row">
+    <tr>
+      <td class="col bg-primary-subtle">
     {% bootstrap_field form.duration show_label="true"  wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+      </td>
+      <td class="col bg-primary-subtle">
     <button
       type="button"
-      class="btn btn-primary col col-6 mx-4"
+      class="btn btn-primary col-12"
       hx-post={% url 'room_calendar_app:event' event.pk %}
       hx-target="#form-list-wrap"
     >
     Add Occurrence
     </button>
-  </div>
-
+  </td>
+</tr>
+</table>
   </form>
 </div>
 
