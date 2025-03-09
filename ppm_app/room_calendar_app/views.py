@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render,redirect
-from django.http import Http404, HttpResponse
+from django.http import Http404
 
 from .models import Event, OccurrenceModel,RoomCalendarModel,TenantModel
 from .forms import EventForm,RoomCalendarForm,TenantForm,LinkTenantForm,OccurrenceForm,OccurrenceProxyForm
@@ -9,6 +9,8 @@ from .choices import time_slots,duration_times
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_headers
 import datetime as dt
+from django.utils import timezone
+
 
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
@@ -43,9 +45,10 @@ def room_calendar_view(request,calendar_pk):
 @vary_on_headers("HX-Request")
 def event_occurrence_view(request,event_pk):
     """ add an event, add occurrences, show occurrences"""
+    now = timezone.now()
     template = 'room_calendar_app/dynamic/event.html'
     event = get_object_or_404(Event, pk=event_pk)
-    occurrences = OccurrenceModel.objects.filter(event=event) #filter events to user
+    occurrences = OccurrenceModel.objects.filter(event=event,start_time__gte=now).order_by('-start_time') #filter events to user
     form = OccurrenceProxyForm()
     if request.htmx:
         #htmx request triggers save and refresh of occurrences and refreshes form with errors
@@ -64,7 +67,7 @@ def event_occurrence_view(request,event_pk):
                 event=event
                 )
             occurrence.save()
-            occurrences = OccurrenceModel.objects.filter(event=event)
+            #occurrences = OccurrenceModel.objects.filter(event=event)
         context = {'form':form,"event":event,"occurrences":occurrences}
         return render(request,form_list_template,context)
     #else display full page

@@ -24,7 +24,7 @@
   </div>
 
 
-<!-- using the proxy form, and then saving the occurrence -->
+<!-- Add occurrence widget -->
 <div class="" id="form-list-wrap"> 
 
 {% partialdef occurrence-form-list inline %}
@@ -61,19 +61,25 @@
 </div>
 
 
-<!-- occurrence list to be swapped -->
-
-<ul class="list-group my-3" id="occurrence-list">
-  {% for occurrence in occurrences%}
-    <li class="list-group-item bg-primary-subtle text-success">
-      <a href="{% url 'room_calendar_app:occurrence' occurrence.pk %}"
-      class="link-success"
-      >{{occurrence.start_time}} - {{occurrence.end_time|time}}</a>
-    </li>
-    {% empty %}
-    <li>There are no occurrences yet. </li>
-    {% endfor %}
-  </ul>
+<!-- occurrence list -->
+<div class="card bg-primary-subtle">
+  <div class="card-header">Next Occurrences</div>
+  <div class="card-body bg-secondary">
+    <ul class="list-group list-group-flush" id="occurrence-list">
+      {% for occurrence in occurrences%}
+        <li class="list-group-item list-group-item-action list-group-item-primary">
+          <a href="{% url 'room_calendar_app:occurrence' occurrence.pk %}"
+          class="link-success"
+          >{{occurrence.start_time}} - {{occurrence.end_time|time}}</a>
+        </li>
+        {% empty %}
+        <li><There are no occurrences yet.> </li>
+        {% endfor %}
+      </ul>
+  </div>
+  <div class="card-footer text-muted"><a href={% url 'room_calendar_app:week_view' %}>See in calendar</a></div>
+</div>
+  
   
   
   {% endpartialdef %}
