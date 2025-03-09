@@ -6,9 +6,9 @@
 <h2>My Events</h2>
 
 <div class="card" id="event-list"> <!-- a list of events of user -->
-  <ul>
+  <ul class="list-group">
   {% for event in events %}
-  <li>
+  <li class="list-group-item list-group-item-action list-group-item-info">
     <a href="{% url 'room_calendar_app:event' event.pk %}"> {{event.get_event_type_display}}| {{event.title}}</a>
   </li>
   {% endfor %}
@@ -16,6 +16,7 @@
 </div><!-- end of list -->
 
 <ul>
+  <li><a href="{%url 'room_calendar_app:event_list'%}">Event Management</a></li>
   <li><a href="{%url 'room_calendar_app:add_event'%}">Add new Event</a></li>
   <li><a href="{%url 'room_calendar_app:add_occurrence'%}">Add new Occurrence</a></li>
   <li><a href="{%url 'room_calendar_app:add_occurrence_multiple'%}">Add Multiple Occurrences</a></li>

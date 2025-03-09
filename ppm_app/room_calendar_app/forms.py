@@ -32,15 +32,15 @@ class EventForm(forms.ModelForm):
         fields = ("client","room_calendar",
                   "title","description","event_type",)
         labels = {
-            "client":"It there a client associated?(optional)",
-            "room_calendar":"Which room it belongs to?",
-            "title":"Give it a memorable title",
-            "description":"What it is about?",
-            "event_type":"Select a type of event",
+            "client":"Client?",
+            "room_calendar":"Room",
+            "title":"Title",
+            "description":"Description",
+            "event_type":"Type",
         }
 
 
-class OccurrenceForm(forms.ModelForm):
+class OccurrenceForm(forms.ModelForm): #! not in use
     """ occurrence form """
     class Meta:
         model = OccurrenceModel

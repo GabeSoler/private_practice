@@ -25,9 +25,9 @@
 
 
 <!-- Add occurrence widget -->
-<div class="" id="form-list-wrap"> 
+<div class="" id="occurrence-form-wrap"> 
 
-{% partialdef occurrence-form-list inline %}
+{% partialdef occurrence-form inline %} <!-- Start form partial -->
 
 <div class"card bg-primary-subtle m-2 p-2 rounded">
   <form class="bg-primary-subtle ps-3">
@@ -50,7 +50,7 @@
       type="button"
       class="btn btn-primary col-12"
       hx-post={% url 'room_calendar_app:event' event.pk %}
-      hx-target="#form-list-wrap"
+      hx-target="#occurrence-form-wrap"
     >
     Add Occurrence
     </button>
@@ -59,8 +59,14 @@
 </table>
   </form>
 </div>
+</div>
+{% endpartialdef %} <!-- end form partial -->
 
 
+
+<div class="" id="occurrence-list-wrap"> 
+
+{% partialdef occurrence-list inline %} <!-- Start form partial -->
 <!-- occurrence list -->
 <div class="card bg-primary-subtle">
   <div class="card-header text-primary">Next Occurrences</div>
@@ -81,8 +87,7 @@
 </div>
   
   
-  
-  {% endpartialdef %}
+  {% endpartialdef %} <!-- end list partial -->
 
 </div>
 

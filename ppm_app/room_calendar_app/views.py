@@ -10,6 +10,7 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_headers
 import datetime as dt
 from django.utils import timezone
+from django_htmx.http import retarget
 
 
 def check_owner(topic_owner,request_user):
@@ -19,7 +20,8 @@ def check_owner(topic_owner,request_user):
 @login_required
 def index_view(request):
     events = Event.objects.filter(user=request.user)
-    context = {"events":events}
+    event_form = EventForm()
+    context = {"events":events,'event_form':event_form}
     return render(request,"room_calendar_app/index.html",context)
 
 @login_required
@@ -53,7 +55,7 @@ def event_occurrence_view(request,event_pk):
     if request.htmx:
         #htmx request triggers save and refresh of occurrences and refreshes form with errors
         form = OccurrenceProxyForm(data=request.POST)
-        form_list_template = template + "#occurrence-form-list"
+        form_list_template = template + "#occurrence-form"
         if form.is_valid():
             start_date_form  = form.cleaned_data['start_date'] #datetime
             start_time_form  = form.cleaned_data['start_time'] #time object
@@ -67,14 +69,16 @@ def event_occurrence_view(request,event_pk):
                 event=event
                 )
             occurrence.save()
-            #occurrences = OccurrenceModel.objects.filter(event=event)
-        context = {'form':form,"event":event,"occurrences":occurrences}
-        return render(request,form_list_template,context)
+            list_template = template + '#occurrence-list'
+            context = {"occurrences":occurrences}
+            response = render(request,list_template,context)
+            return retarget(response,'#occurrence-list-wrap') # target list if valid
+        context = {'form':form}
+        return render(request,form_list_template,context) # change form if invalid
     #else display full page
     context = {'form':form,"event":event,"occurrences":occurrences}
     return render(request,template,context)
 
-    return render(request,"room_calendar_app/dynamic/event.html",context)
 
 def tenant_view(request,tenant_pk):
     tenant = get_object_or_404(TenantModel, pk=tenant_pk)
@@ -93,12 +97,29 @@ def tenant_listing_view(request):
     context = {"tenant_list":tenant_list}
     return render(request, "room_calendar_app/display/tenant_list.html", context) #todo check template
 
-
+@cache_control(max_age=300)
+@vary_on_headers("HX-Request")
 def event_listing_view(request):
     """View a list of user's events """
     events = Event.objects.filter(user=request.user)  #? I already changed this one
-    context = {"events":events}
-    return render(request, "room_calendar_app/display/event_list.html", context) #todo check template
+    template =  "room_calendar_app/dynamic/event_list.html"
+    form = EventForm()
+    if request.htmx:
+        #htmx request triggers save and refresh of occurrences and refreshes form with errors
+        form = EventForm(data=request.POST)
+        form_event_template = template + "#event-form"
+        if form.is_valid():
+            occurrence = form.save(commit=False)
+            occurrence.user = request.user
+            occurrence.save()
+            list_template = template + '#event-list'
+            context = {"events":events} # context for valid form
+            response = render(request,list_template,context)
+            return retarget(response,'#event-list-wrap')
+        context = {'form':form} # context for invalid form
+        return render(request,form_event_template,context)
+    context = {"events":events,'form':form}     # context for empty form
+    return render(request, template, context) #todo check template
 
 def occurrence_listing_view(request):
     """View all ``events``."""
@@ -193,7 +214,6 @@ def occurrence_multiple_add_view(request,event_pk):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.user = request.user
-            instance.event = event
             instance.save()
             multi = None #!change
             multi.add_occurrences()
