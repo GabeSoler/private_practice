@@ -62,7 +62,7 @@ def event_occurrence_view(request,event_pk):
             duration_form  = form.cleaned_data['duration'] #time difference
             start_time_add = dt.datetime.combine(start_date_form,start_time_form)
             end_time_add = start_time_add + duration_form
-            occurrence = OccurrenceModel(
+            occurrence,_ = OccurrenceModel.objects.get_or_create(
                 duration=duration_form,
                 start_time=start_time_add,
                 end_time=end_time_add,
@@ -78,6 +78,43 @@ def event_occurrence_view(request,event_pk):
     #else display full page
     context = {'form':form,"event":event,"occurrences":occurrences}
     return render(request,template,context)
+
+@cache_control(max_age=300)
+@vary_on_headers("HX-Request")
+def edit_occurrence__inline_form(request,occurrence_pk):
+    template = 'room_calendar_app/dynamic/event.html'
+    occurrence = OccurrenceModel.objects.get(pk=occurrence_pk)
+    if request.method == 'GET': # render the occurrence form inline
+        form = OccurrenceProxyForm()
+        form.start_date = occurrence.start_time.date()
+        form.start_time = occurrence.end_time.time()
+        form.duration = occurrence.duration
+        context = {'form':form}
+        form_template = template + '#occurrence-form'
+        return render(request,form_template,context)
+    elif request.method == 'POST':
+        #htmx request triggers save and refresh of occurrences and refreshes form with errors
+        form = OccurrenceProxyForm(data=request.POST)
+        if form.is_valid():     # render the li of the occurrence back
+            start_date_form  = form.cleaned_data['start_date'] #datetime
+            start_time_form  = form.cleaned_data['start_time'] #time object
+            duration_form  = form.cleaned_data['duration'] #time difference
+            start_time_add = dt.datetime.combine(start_date_form,start_time_form)
+            end_time_add = start_time_add + duration_form
+            occurrence,_ = OccurrenceModel.objects.get_or_create(
+                duration=duration_form,
+                start_time=start_time_add,
+                end_time=end_time_add,
+                event=occurrence.event
+                )
+            occurrence.save()
+            list_template = template + '#occurrence-li'
+            context = {"occurrence":occurrence}
+            response = render(request,list_template,context)
+            return retarget(response,'#occurrence-list-wrap') 
+
+        ...
+        
 
 
 def tenant_view(request,tenant_pk):
@@ -180,27 +217,6 @@ def event_add_view(request):
     #display a blank or invalid form
     context = {'form':form}
     return render(request,'room_calendar_app/input/add_event.html',context)
-
-def occurrence_add_view(request):
-    """ add an event, it needs to set occurrences to appear in the calendar"""
-    events = Event.objects.filter(user=request.user) #filter events to user
-    if request.method !='POST':
-        #no data submitted; create a blank form
-        form = OccurrenceProxyForm()
-    else:
-        #POST data submitted; process data
-        form = OccurrenceProxyForm(data=request.POST)
-        if form.is_valid():
-            occurrence = OccurrenceModel()
-            occurrence.duration = form.cleaned_data['duration']
-            occurrence.start_time = form.cleaned_data['start_date'] + form.cleaned_data['start_time']
-            occurrence.end_time = form.cleaned_data['start_date'] + form.cleaned_data['duration']
-            occurrence.event = form.cleaned_data['event']
-            occurrence.save()
-            return redirect('room_calendar_app:occurrence_list')
-    #display a blank or invalid form
-    context = {'form':form,'events':events,'duration_times':duration_times,'time_slot_options':time_slots}
-    return render(request,'room_calendar_app/input/add_occurrence.html',context)
 
 def occurrence_multiple_add_view(request,event_pk):
     """ loads a multiple form and creates the events"""

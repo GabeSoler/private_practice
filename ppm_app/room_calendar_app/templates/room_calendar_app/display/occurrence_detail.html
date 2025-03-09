@@ -1,15 +1,15 @@
 {% extends '../../_base.html' %}
 {% block title%}{{occurrence.title}}{%endblock title%}
 
-{% block page_header %}{{occurrence.title}}{% endblock page_header%}
+{% block page_header %}Occurrence of '{{occurrence.event}}'{% endblock page_header%}
 
 {% block content %}
 
-<div class="card" style="width: 18rem;">
+<div class="card">
     <div class="card-body">
-      <h5 class="card-title">{{occurrence.title}}</h5>
-      <p class="card-text">Type: {{occurrence.room_calendar}}</p>
-      <p class="card-text">Main goal of the process: {{occurrence.event}} </P>
+      <h5 class="card-text">{{occurrence.start_time}} - {{occurrence.end_time|time}} </h5>
+      <p class="card-text">Room: {{occurrence.room_calendar}}</p>
+      <p class="card-text">Event: {{occurrence.event}} </P>
       <a href="{% url 'room_calendar_app:occurrence_list' %}" class="card-link">Back to occurrence list</a>
       <p><a href="{%url 'room_calendar_app:edit_occurrence' occurrence.pk %}">
         Edit occurrence</a></p>

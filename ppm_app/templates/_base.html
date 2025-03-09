@@ -107,7 +107,7 @@
       </span>
     </a>
   </li>
-    <!--Profile Test-->
+    <!--Events-->
     <li class="nav-item">
       <a class="nav-link fw-light link-secondary fs-4 {% if request.path == "/tests/" %}active{% endif %}" 
       data-bs-toggle="tooltip" data-bs-title="My Profile"
@@ -136,7 +136,7 @@
       <a class="nav-link fw-light link-secondary fs-4 {% if request.path == '/techniques/components_list/' %}active{% endif %}" 
       data-bs-toggle="tooltip" data-bs-title="Read Techniques"
       data-bs-custom-class="custom-tooltip"
-      href="{% url "room_calendar_app:add_occurrence" %}">
+      href="{% url "room_calendar_app:event_list" %}">
       <i class="bi bi-lightbulb-fill"></i>
       <span class="d-none d-md-inline fs-5">
         +Occurrence

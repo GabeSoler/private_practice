@@ -59,8 +59,8 @@
 </table>
   </form>
 </div>
-</div>
 {% endpartialdef %} <!-- end form partial -->
+</div>
 
 
 
@@ -73,11 +73,13 @@
   <div class="card-body bg-primary-subtle">
     <ul class="list-group list-group-flush" id="occurrence-list">
       {% for occurrence in occurrences%}
+      {% partialdef occurrence-li %}
         <li class="list-group-item list-group-item-action list-group-item-primary">
-          <a href="{% url 'room_calendar_app:occurrence' occurrence.pk %}"
+          <a hx-get=""
           class="link-success"
           >{{occurrence.start_time}} - {{occurrence.end_time|time}}</a>
         </li>
+        {% endpartialdef %}
         {% empty %}
         <li><There are no occurrences yet.> </li>
         {% endfor %}
