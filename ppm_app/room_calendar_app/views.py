@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render,redirect
-from django.http import Http404
+from django.http import Http404,HttpResponse
 
 from .models import Event, OccurrenceModel,RoomCalendarModel,TenantModel
 from .forms import EventForm,RoomCalendarForm,TenantForm,LinkTenantForm,OccurrenceForm,OccurrenceProxyForm
@@ -46,16 +46,16 @@ def room_calendar_view(request,calendar_pk):
 @cache_control(max_age=300)
 @vary_on_headers("HX-Request")
 def event_occurrence_view(request,event_pk):
-    """ add an event, add occurrences, show occurrences"""
+    """ add an event, add occurrences, show next occurrences"""
     now = timezone.now()
     template = 'room_calendar_app/dynamic/event.html'
     event = get_object_or_404(Event, pk=event_pk)
     occurrences = OccurrenceModel.objects.filter(event=event,start_time__gte=now).order_by('-start_time') #filter events to user
     form = OccurrenceProxyForm()
     if request.htmx:
-        #htmx request triggers save and refresh of occurrences and refreshes form with errors
+        #htmx request triggers save and refresh of occurrences and refreshes form when errors
         form = OccurrenceProxyForm(data=request.POST)
-        form_list_template = template + "#occurrence-form"
+        form_template = template + "#occurrence-form"
         if form.is_valid():
             start_date_form  = form.cleaned_data['start_date'] #datetime
             start_time_form  = form.cleaned_data['start_time'] #time object
@@ -73,48 +73,17 @@ def event_occurrence_view(request,event_pk):
             context = {"occurrences":occurrences}
             response = render(request,list_template,context)
             return retarget(response,'#occurrence-list-wrap') # target list if valid
-        context = {'form':form}
-        return render(request,form_list_template,context) # change form if invalid
+        context = {'form':form,'event':event}
+        return render(request,form_template,context) # change form if invalid
     #else display full page
     context = {'form':form,"event":event,"occurrences":occurrences}
     return render(request,template,context)
 
-@cache_control(max_age=300)
-@vary_on_headers("HX-Request")
-def edit_occurrence__inline_form(request,occurrence_pk):
-    template = 'room_calendar_app/dynamic/event.html'
-    occurrence = OccurrenceModel.objects.get(pk=occurrence_pk)
-    if request.method == 'GET': # render the occurrence form inline
-        form = OccurrenceProxyForm()
-        form.start_date = occurrence.start_time.date()
-        form.start_time = occurrence.end_time.time()
-        form.duration = occurrence.duration
-        context = {'form':form}
-        form_template = template + '#occurrence-form'
-        return render(request,form_template,context)
-    elif request.method == 'POST':
-        #htmx request triggers save and refresh of occurrences and refreshes form with errors
-        form = OccurrenceProxyForm(data=request.POST)
-        if form.is_valid():     # render the li of the occurrence back
-            start_date_form  = form.cleaned_data['start_date'] #datetime
-            start_time_form  = form.cleaned_data['start_time'] #time object
-            duration_form  = form.cleaned_data['duration'] #time difference
-            start_time_add = dt.datetime.combine(start_date_form,start_time_form)
-            end_time_add = start_time_add + duration_form
-            occurrence,_ = OccurrenceModel.objects.get_or_create(
-                duration=duration_form,
-                start_time=start_time_add,
-                end_time=end_time_add,
-                event=occurrence.event
-                )
-            occurrence.save()
-            list_template = template + '#occurrence-li'
-            context = {"occurrence":occurrence}
-            response = render(request,list_template,context)
-            return retarget(response,'#occurrence-list-wrap') 
-
-        ...
-        
+def edit_occurrence_list(request,occurrence_pk):
+    if request.method == 'DELETE':
+        occurrence = OccurrenceModel.objects.get(pk=occurrence_pk)
+        occurrence.delete()
+        return HttpResponse() # empty response that empties the li object
 
 
 def tenant_view(request,tenant_pk):

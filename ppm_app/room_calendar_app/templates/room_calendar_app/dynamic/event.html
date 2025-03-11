@@ -73,15 +73,19 @@
   <div class="card-body bg-primary-subtle">
     <ul class="list-group list-group-flush" id="occurrence-list">
       {% for occurrence in occurrences%}
-      {% partialdef occurrence-li %}
-        <li class="list-group-item list-group-item-action list-group-item-primary">
-          <a hx-get=""
-          class="link-success"
-          >{{occurrence.start_time}} - {{occurrence.end_time|time}}</a>
+      {% partialdef occurrence-li inline %}
+      <li class="list-group-item list-group-item-action list-group-item-primary" id="{{occurrence.pk}}">
+          <span class="text-primary">{{occurrence.start_time}} - {{occurrence.end_time|time}}</span>
+          <i class="bi bi-x-circle-fill text-danger" 
+          hx-delete={% url 'room_calendar_app:edit_occurrence_list' occurrence.pk %}
+          hx-trigger="click"
+          hx-target="closest li"
+          hx-swap="outerHTML"
+          ></i>
         </li>
         {% endpartialdef %}
         {% empty %}
-        <li><There are no occurrences yet.> </li>
+        <li><There are no occurrences yet.></li>
         {% endfor %}
       </ul>
   </div>
