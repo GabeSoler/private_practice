@@ -91,11 +91,6 @@ def tenant_view(request,tenant_pk):
     context = {"tenant": tenant}
     return render(request,"room_calendar_app/display/tenant.html",context)
 
-def occurrence_view(request,occurrence_pk):
-    occurrence = get_object_or_404(OccurrenceModel, pk=occurrence_pk)
-    context = {"occurrence": occurrence}
-    return render(request,"room_calendar_app/display/occurrence_detail.html",context)
-
 
 def tenant_listing_view(request):
     """View a list of user's events """

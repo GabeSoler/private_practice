@@ -9,9 +9,8 @@ urlpatterns = [
     path("event/<uuid:event_pk>/", views.event_occurrence_view, name="event"),
 
 
-    path("event-list/", views.event_listing_view, name="event_list"),
+    path("event-add-list/", views.event_listing_view, name="event_list"),
     path("occurrence-list/", views.occurrence_listing_view, name="occurrence_list"),
-    path("occurrence/<uuid:occurrence_pk>/", views.occurrence_view, name="occurrence"),
     path("room-calendar/<uuid:calendar_pk>/", views.room_calendar_view, name="room_calendar"),
     path("room-calendar-list/", views.room_calendar_listing_view, name="room_calendar_list"),
     path("tenant-list/", views.tenant_listing_view, name="tenant_list"),
