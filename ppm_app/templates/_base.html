@@ -10,6 +10,7 @@
     {% bootstrap_javascript %}
     {% load static %}
     {% load django_htmx %}
+    {% load partials %}
 
     <link rel="stylesheet" href="{% static "tools/css/style.css" %}">
 
@@ -26,7 +27,10 @@
 </head>
 
 <body class='bg-light' hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-  {% csrf_token %}
+  {% partialdef messages inline %}
+  {% bootstrap_messages %}
+  {% endpartialdef %}
+
   <nav class="navbar navbar-expand-lg bg-primary sticky-top start-0" data-bs-theme="dark">
     <div class='container-fluid'>
       <a class='navbar-brand' href="{% url 'tools:index' %}">
