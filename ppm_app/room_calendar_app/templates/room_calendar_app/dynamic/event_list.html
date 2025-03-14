@@ -6,7 +6,7 @@
 {% block content %}
 <div class="card bg-secondary-subtle">
     <div class="card-header bg-primary-subtle">
-      <h5 class="card-title d-inline">Your Events</h5> 
+      <h5 class="card-title d-inline">Add Event to your list</h5> 
     </div>
   </div>
 
@@ -72,6 +72,7 @@
         {% for event in events %}
         <li class="list-group-item list-group-item-action list-group-item-primary">
             <a href="{% url 'room_calendar_app:event' event.pk %}">{{event.title}} | {{event.get_event_type_display}}</a>
+            <a class="link-secondary" href={% url 'room_calendar_app:edit_event' event.pk %}>Edit</a>
         </li>
         {% empty %}
         <li><There are no occurrences yet.> </li>

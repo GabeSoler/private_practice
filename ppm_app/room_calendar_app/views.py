@@ -234,8 +234,8 @@ def event_edit_view(request,event_pk):
             form.save()
             return redirect('room_calendar_app:events')
     #display a blank or invalid form
-    context = {'form':form}
-    return render(request,"room_calendar_app/input/add_event.html",context)
+    context = {'form':form,'event':event}
+    return render(request,"room_calendar_app/dynamic/event_edit.html",context)
 
 def occurrence_edit_view(request,occurrence_pk):
     """edit the occurrence repetition erasing future events"""
