@@ -49,8 +49,8 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
-    room_calendar = models.ForeignKey(RoomCalendarModel,on_delete=models.PROTECT,blank=True,null=True)
-    client = models.ForeignKey(Client, on_delete=models.PROTECT,blank=True,null=True)
+    room_calendar = models.ForeignKey(RoomCalendarModel,on_delete=models.SET_NULL,blank=True,null=True)
+    client = models.ForeignKey(Client, on_delete=models.SET_NULL,blank=True,null=True)
     title = models.CharField(max_length=32)
     description = models.CharField(max_length=100)
     event_type = models.CharField(choices=EVENT_TYPE,max_length=20, verbose_name="event type")
@@ -78,11 +78,20 @@ class Event(models.Model):
         """ returns a day occurrences """
         return OccurrenceModel.objects.daily_occurrences(dt=dt, event=self)
     
-    def add_single_occurrence(self, start_time, end_time):
-        """adds one occurrence of this event"""
-        self.occurrence_set.create(start_time=start_time, end_time=end_time)
-
-
+    @property
+    def color_class(self):
+        match self.event_type:
+            case 'client':
+                return 'primary'
+            case 'super':
+                return 'secondary'
+            case 'admin':
+                return 'danger'
+            case 'Processing':
+                return 'warning'
+            case 'CPD':
+                return 'info'
+        
 
 class OccurrenceManager(models.Manager):
     def daily_occurrences(self, dt=None, event=None):
@@ -130,8 +139,9 @@ class OccurrenceModel(models.Model):
     start_time = models.DateTimeField()
     duration = models.DurationField()
     end_time = models.DateTimeField()
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.SET_NULL,null=True)
     objects = OccurrenceManager()
+    calendar = models.ForeignKey(RoomCalendarModel,null=True,blank=True,on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name ="occurrence"

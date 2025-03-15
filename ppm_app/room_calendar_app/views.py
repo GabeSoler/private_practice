@@ -19,7 +19,7 @@ def check_owner(topic_owner,request_user):
     
 @login_required
 def index_view(request):
-    events = Event.objects.filter(user=request.user)
+    events = Event.objects.filter(user=request.user).order_by('-event_type')
     event_form = EventForm()
     context = {"events":events,'event_form':event_form}
     return render(request,"room_calendar_app/index.html",context)
@@ -46,7 +46,7 @@ def room_calendar_view(request,calendar_pk):
 @cache_control(max_age=300)
 @vary_on_headers("HX-Request")
 def event_occurrence_view(request,event_pk):
-    """ add an event, add occurrences, show next occurrences"""
+    """ Explore an event next occurrences and add new ones"""
     now = timezone.now()
     template = 'room_calendar_app/dynamic/event.html'
     event = get_object_or_404(Event, pk=event_pk)
@@ -66,7 +66,9 @@ def event_occurrence_view(request,event_pk):
                 duration=duration_form,
                 start_time=start_time_add,
                 end_time=end_time_add,
-                event=event
+                event=event,
+                calendar = event.room_calendar # I am spiting the room into two sources, 
+                                                #one by default from event and one editable for unique cases
                 )
             occurrence.save()
             list_template = template + '#occurrence-list'
@@ -102,7 +104,7 @@ def tenant_listing_view(request):
 @vary_on_headers("HX-Request")
 def event_listing_view(request):
     """View a list of user's events """
-    events = Event.objects.filter(user=request.user)  #? I already changed this one
+    events = Event.objects.filter(user=request.user).order_by('-created_at')  #? I already changed this one
     template =  "room_calendar_app/dynamic/event_list.html"
     form = EventForm()
     if request.htmx:
@@ -121,12 +123,6 @@ def event_listing_view(request):
         return render(request,form_event_template,context)
     context = {"events":events,'form':form}     # context for empty form
     return render(request, template, context) #todo check template
-
-def occurrence_listing_view(request):
-    """View all ``events``."""
-    occurrences = OccurrenceModel.objects.filter(event__user=request.user)
-    context = {"occurrences":occurrences}
-    return render(request, "room_calendar_app/display/occurrence_list.html", context) 
 
 def room_calendar_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
@@ -163,24 +159,6 @@ def tenant_add_view(request):
     #display a blank or invalid form
     context = {'form':form,"action":action}
     return render(request,'room_calendar_app/input/add_tenant.html',context)
-
-def event_add_view(request):
-    """ add an event, it needs to set occurrences to appear in the calendar"""
-    if request.method !='POST':
-        form = EventForm()
-        form.fields["room_calendar"].queryset = RoomCalendarModel.objects.filter(tenants__user=request.user)
-        form.fields["client"].queryset = Client.objects.filter(user=request.user)
-    else:
-        #POST data submitted; process data
-        form = EventForm(data=request.POST)
-        if form.is_valid():
-            form = form.save(commit=False)
-            form.user = request.user
-            form.save()
-            return redirect('room_calendar_app:event_list')
-    #display a blank or invalid form
-    context = {'form':form}
-    return render(request,'room_calendar_app/input/add_event.html',context)
 
 def occurrence_multiple_add_view(request,event_pk):
     """ loads a multiple form and creates the events"""
