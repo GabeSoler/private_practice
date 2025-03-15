@@ -199,3 +199,20 @@ DATE_INPUT_FORMATS = [
     "%d %B %Y",  # '25 October 2006'
     "%d %B, %Y",  # '25 October, 2006'
 ]
+
+
+# logging conf to add some info when things are wrong (there are more complex setups). 
+# By default django messages are shown when debug True even in info level.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+}

@@ -18,7 +18,9 @@
 
 
 <div class"card bg-primary-subtle m-2 p-2 rounded">
+
   <form action={% url 'room_calendar_app:edit_event' event.pk %} method="post" class="bg-primary-subtle ps-3">
+     {% csrf_token %} <!-- HTMX headers include the token, but but need to put it in normal form post -->
     <table class="table">
     <tr>
       <td class="col bg-primary-subtle">
