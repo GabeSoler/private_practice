@@ -37,11 +37,29 @@ def room_calendar_listing_view(request):
     context = {"calendar_mine": room_calendar_mine,"calendar_tenant": room_calendar_tenant}
     return render(request,"room_calendar_app/display/room_calendar_list.html",context)
 
+@cache_control(max_age=300)
+@vary_on_headers("HX-Request")
 def room_calendar_view(request,calendar_pk):
-    calendar = get_object_or_404(RoomCalendarModel, pk=calendar_pk)
+    calendar = get_object_or_404(RoomCalendarModel, pk=calendar_pk,user=request.user)
     tenants = calendar.tenants.all()
-    context = {"calendar": calendar,"tenants":tenants}
-    return render(request,"room_calendar_app/display/room_calendar.html",context)
+    form = LinkTenantForm()
+    template = "room_calendar_app/dynamic/room_calendar.html"
+    if request.htmx:
+        form = LinkTenantForm(data=request.POST)
+        form_template = template + '#form-partial'
+        if form.is_valid():
+            tenant_list_template = template + '#tenant-list'
+            tenant_uuid = form.cleaned_data["tenant_id"]
+            tenant = get_object_or_404(TenantModel,pk=tenant_uuid)
+            calendar.tenants.add(tenant)
+            tenants = calendar.tenants.all()
+            context = {"tenants":tenants}
+            response = render(request,tenant_list_template,context)
+            return retarget(response,'#tenant-list-wrapper')
+        context = {'form':form}
+        return render(request,form_template,context)
+    context = {"calendar": calendar,"tenants":tenants,'form':form}
+    return render(request,template,context)
 
 @cache_control(max_age=300)
 @vary_on_headers("HX-Request")

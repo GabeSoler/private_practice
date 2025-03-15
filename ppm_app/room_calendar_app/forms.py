@@ -23,7 +23,7 @@ class TenantForm(forms.ModelForm):
         }
 
 class LinkTenantForm(forms.Form):
-    tenant_id = forms.UUIDField(required=True)
+    tenant_id = forms.UUIDField(required=True,label='Tenant Code',help_text='Ask for it to another user')
 
 class EventForm(forms.ModelForm):
     """Event form"""
