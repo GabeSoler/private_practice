@@ -41,26 +41,34 @@
       {% partialdef week_view inline  %}
 
       <h3>Week View</h3>  
-      <table class="table">
+      <table class="table table-secondary table-striped-columns table-sm">
         <thead>
           <tr>
             <th scope="col">#</th>
             {% for day in calendar.week_days %}
       
-            <th scope="col">{{day|date:'d-m-y'}}</th>
+            <th scope="col"
+            style="font-size:.8rem;"            
+            >{{day|date:'d-m-y'}}</th>
               {% endfor %}
           </tr>
         </thead>
         <tbody>
           <tr>
-            {% for slot,data in calendar.week_days.items %}
-            <th scope="row">{{slot}}</th>
+            {% for slot,data in calendar.week_dict.items %}
+            <th scope="row" 
+            style="font-size:.6rem;"
+            >{{slot|time:"H:i"}}</th>
       
               {% for weekday,occurrence in data.items %}
-                  <td>{{occurrence.event.user}}-
-                    {{occurrence.start_time|time}}-
-                    {{occurrence.end_time|time}}
-                  </td>
+                  <td class="
+                  {% if occurrence.start_time %} table-info {% endif %}
+                  " 
+                  style="font-size:.6rem;"
+                  id="{{slot}}"
+                  >{{occurrence.event.user}}-
+                    {{occurrence.start_time|time:"H:i"}}-
+                    {{occurrence.end_time|time:"H:i"}}</td>
                  {% empty %}
                  </td>
               {% endfor %}

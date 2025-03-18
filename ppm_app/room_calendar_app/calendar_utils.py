@@ -45,10 +45,10 @@ class CalendarRender:
     @property
     def week_dict(self)->dict:
         """organises the dictionary by the occurrence, it cannot handle two in a slot (which is the idea)"""
-        week_dict = self.week_slot_dic()
+        week_dict = self.week_slot_dic
         for occurrence in self.occurrences:
             start_time = p.instance(occurrence.start_time)
-            end_time = p.instance(occurrence.end_time)
+            end_time = p.instance(occurrence.end_time).subtract(minutes=30)
             time_range = p.interval(start_time,end_time)
             iso_day = start_time.isoweekday()
             for time in time_range.range('minutes',30):
