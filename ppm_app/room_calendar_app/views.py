@@ -3,15 +3,13 @@ from django.http import Http404,HttpResponse
 
 from .models import Event, OccurrenceModel,RoomCalendarModel,TenantModel
 from .forms import EventForm,RoomCalendarForm,TenantForm,LinkTenantForm,OccurrenceForm,OccurrenceProxyForm
-from tools.models import Client
 from django.contrib.auth.decorators import login_required
-from .choices import time_slots,duration_times
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_headers
 import datetime as dt
 from django.utils import timezone
 from django_htmx.http import retarget
-
+from .calendar_utils import CalendarRender
 
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
@@ -25,8 +23,15 @@ def index_view(request):
     return render(request,"room_calendar_app/index.html",context)
 
 @login_required
+@cache_control(max_age=300)
+@vary_on_headers("HX-Request")
 def week_view(request):
-    return render(request,"room_calendar_app/display/week_view.html")
+    today = timezone.now()
+    user_calendars = RoomCalendarModel.objects.filter(user=request.user)
+    occurrences = OccurrenceModel.objects.filter(event__user=request.user,start_time__week=today.isocalendar()[1])
+    calendar = CalendarRender(occurrences=occurrences,date=today)
+    context = {'calendar':calendar,'occurrences':occurrences,'user_calendars':user_calendars}
+    return render(request,"room_calendar_app/dynamic/week_view.html",context)
 
 
 

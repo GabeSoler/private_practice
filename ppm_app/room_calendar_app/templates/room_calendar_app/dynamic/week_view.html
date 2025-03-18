@@ -1,0 +1,90 @@
+{% extends '../../_base.html' %}
+
+
+{% load partials %}
+
+{% block content %}
+
+<div>
+    <h1>Events in this week</h1>
+    <h3> week days </h3>
+      <ul>
+      {% for day in calendar.week_days%}
+      <li>{{day|date}}</li>
+      {% endfor %}
+      </ul>
+
+      <h3> Occurrences </h3>
+      <ul>
+      {% for occurrence in occurrences %}
+        
+      <li>
+        {{occurrence.event.user}} -
+        {{occurrence.start_time}} -
+        {{occurrence.duration}} -
+        {{occurrence.end_time}}
+      </li>
+    {% endfor %}
+    
+      </ul>
+    <h4>calendars of user</h4>
+      <ul>
+      {% for calendar in user_calendars %}
+        
+      <li>{{calendar}}</li>
+    {% endfor %}
+    
+      </ul>
+    
+
+      <!-- Partial def -->
+      {% partialdef week_view inline  %}
+
+      <h3>Week View</h3>  
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            {% for day in calendar.week_days %}
+      
+            <th scope="col">{{day|date:'d-m-y'}}</th>
+              {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            {% for slot,data in calendar.week_days.items %}
+            <th scope="row">{{slot}}</th>
+      
+              {% for weekday,occurrence in data.items %}
+                  <td>{{occurrence.event.user}}-
+                    {{occurrence.start_time|time}}-
+                    {{occurrence.end_time|time}}
+                  </td>
+                 {% empty %}
+                 </td>
+              {% endfor %}
+                </td>
+      
+              <tr>
+            {% empty %}
+              </tr>
+            {% endfor %}
+          </tr>
+        </tbody>
+      </table>
+      {% endpartialdef week_view %}
+      <!-- End partial def -->
+
+    
+    {{week_dict_occ}}
+      </br></br>
+      <div class="card border">
+    
+      </div>
+    
+    
+    
+    </div>
+    
+    {% endblock content %}
