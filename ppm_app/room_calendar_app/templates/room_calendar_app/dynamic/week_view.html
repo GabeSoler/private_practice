@@ -1,48 +1,41 @@
 {% extends '../../_base.html' %}
 
 
+{% load django_bootstrap5 %}
 {% load partials %}
-
 {% block content %}
 
 <div>
-    <h1>Events in this week</h1>
-    <h3> week days </h3>
-      <ul>
-      {% for day in calendar.week_days%}
-      <li>{{day|date}}</li>
-      {% endfor %}
-      </ul>
-
-      <h3> Occurrences </h3>
-      <ul>
-      {% for occurrence in occurrences %}
-        
-      <li>
-        {{occurrence.event.user}} -
-        {{occurrence.start_time}} -
-        {{occurrence.duration}} -
-        {{occurrence.end_time}}
-      </li>
-    {% endfor %}
-    
-      </ul>
-    <h4>calendars of user</h4>
-      <ul>
-      {% for calendar in user_calendars %}
-        
-      <li>{{calendar}}</li>
-    {% endfor %}
-    
-      </ul>
+    <h1>Week View</h1>
+    {% partialdef form-partial inline %}
+      <table
+        class="table table-primary table-striped-columns table-sm mb-0"
+        id="switch-table"
+      >
+          <tr class="">
+            <form>
+            <td>{% bootstrap_field switch_form.date show_label='skip'  %}</td>
+            <td>{% bootstrap_field switch_form.calendar show_label='skip'  %}</td>
+            <td>
+              <button
+              class="btn btn-info"
+              hx-get={% url "room_calendar_app:week_view" %}
+              hx-target="#switch-table"
+              hx-swap="outerHTML">
+              Search</button>
+            </td>
+          </form>
+          </tr>
+        </table>
+        {% endpartialdef %}
     
 
-      <!-- Partial def -->
-      {% partialdef week_view inline  %}
-
-      <h3>Week View</h3>  
-      <table class="table table-secondary table-striped-columns table-sm">
-        <thead>
+      <!-- Partial def  week calendar -->
+      {% partialdef week-view-partial inline  %}
+      
+      <table class="table table-secondary table-striped-columns table-sm"
+      id="week-view-table">
+      <thead>
           <tr>
             <th scope="col">#</th>
             {% for day in calendar.week_days %}
@@ -81,16 +74,10 @@
           </tr>
         </tbody>
       </table>
-      {% endpartialdef week_view %}
+      {% endpartialdef %}
       <!-- End partial def -->
 
-    
-    {{week_dict_occ}}
-      </br></br>
-      <div class="card border">
-    
-      </div>
-    
+        
     
     
     </div>

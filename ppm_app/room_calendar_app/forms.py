@@ -3,6 +3,8 @@ from .my_widgets import DateBooted
 
 from .models import RoomCalendarModel,Event,TenantModel,OccurrenceModel
 from .choices import default_timeslot_options,duration_times_as_choices
+from django.utils import timezone
+
 
 class RoomCalendarForm(forms.ModelForm):
     class Meta:
@@ -64,29 +66,8 @@ class OccurrenceProxyForm(forms.Form):
     duration = forms.DurationField(label="For",widget=forms.Select(choices=duration_times_as_choices))
 
 
-class WeekCalendarView(forms.Form):
+class WeekCalendarForm(forms.Form):
     """calendar switch form"""
-    date = forms.DateField()
-    calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all())
+    date = forms.DateTimeField(widget=DateBooted,initial=timezone.now())
+    calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all(),required=False)
 
-
-
-# class SplitDateTimeWidget(forms.MultiWidget):
-#     """
-#     A Widget that splits datetime input into a SelectDateWidget for dates and
-#     Select widget for times.
-
-#     """
-
-#     def __init__(self, attrs=None):
-#         widgets = (
-#             SelectDateWidget(attrs=attrs),
-#             forms.Select(choices=default_timeslot_options, attrs=attrs),
-#         )
-#         super().__init__(widgets)
-
-#     def decompress(self, value):
-#         if value:
-#             value = to_current_timezone(value)
-#             return [value.date(), value.time().replace(microsecond=0)]
-#         return [None, None]

@@ -7,6 +7,8 @@ urlpatterns = [
     path('accounts/',include('accounts.urls')),
     path('',include('tools.urls')),
     path('calendar/',include('room_calendar_app.urls')),
+    path("__reload__/", include("django_browser_reload.urls")), # to use django reload
+
 
 
 ]

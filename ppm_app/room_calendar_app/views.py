@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render,redirect
 from django.http import Http404,HttpResponse
 
 from .models import Event, OccurrenceModel,RoomCalendarModel,TenantModel
-from .forms import EventForm,RoomCalendarForm,TenantForm,LinkTenantForm,OccurrenceForm,OccurrenceProxyForm
+from .forms import EventForm,RoomCalendarForm,TenantForm,LinkTenantForm,OccurrenceForm,OccurrenceProxyForm,WeekCalendarForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_headers
@@ -26,12 +26,35 @@ def index_view(request):
 @cache_control(max_age=300)
 @vary_on_headers("HX-Request")
 def week_view(request):
-    today = timezone.now()
-    user_calendars = RoomCalendarModel.objects.filter(user=request.user)
-    occurrences = OccurrenceModel.objects.filter(event__user=request.user,start_time__week=today.isocalendar()[1])
-    calendar = CalendarRender(occurrences=occurrences,date=today)
-    context = {'calendar':calendar,'occurrences':occurrences,'user_calendars':user_calendars}
-    return render(request,"room_calendar_app/dynamic/week_view.html",context)
+    ref_date = timezone.now()
+    occurrences = OccurrenceModel.objects.filter(event__user=request.user,
+                                                 start_time__week=ref_date.isocalendar()[1])
+    switch_form = WeekCalendarForm()
+    switch_form.fields['calendar'].queryset = RoomCalendarModel.objects.filter(user=request.user)
+    template = "room_calendar_app/dynamic/week_view.html"
+    if request.htmx:
+        switch_form = WeekCalendarForm(data=request.POST)
+        if switch_form.is_valid():
+            template_calendar = template + "#week-view-partial"
+            ref_date = switch_form.cleaned_data['date']
+            try:
+                room_calendar = switch_form.cleaned_data['calendar']
+            except Exception as e:
+                print(e)
+                room_calendar = False
+            if room_calendar:
+                occurrences = OccurrenceModel.objects.filter(start_time__week=ref_date.isocalendar()[1],
+                                                            room_calendar=room_calendar)
+            calendar = CalendarRender(occurrences=occurrences,date=ref_date)
+            context = {'calendar':calendar}
+            response = render(request,template_calendar,context)
+            return retarget(response,"#week-view-table") # retarget if valid switch week table
+        form_partial_template = template + "#form-partial" #form re render if invalid
+        context = {'switch_form':switch_form}
+        return render(request,form_partial_template,context)
+    calendar = CalendarRender(occurrences=occurrences,date=ref_date) #request when no htmx today by default
+    context = {'calendar':calendar,'switch_form':switch_form}
+    return render(request,template,context)
 
 
 
