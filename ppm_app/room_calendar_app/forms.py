@@ -37,7 +37,7 @@ class EventForm(forms.ModelForm):
             "client":"Client?",
             "room_calendar":"Room",
             "title":"Title",
-            "description":"Description",
+            "description":"Note",
             "event_type":"Type",
         }
 
@@ -68,6 +68,6 @@ class OccurrenceProxyForm(forms.Form):
 
 class WeekCalendarForm(forms.Form):
     """calendar switch form"""
-    date = forms.DateTimeField(widget=DateBooted,initial=timezone.now())
-    calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all(),required=False)
+    date = forms.DateField(widget=DateBooted,initial=timezone.now())
+    calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.none(),required=False)
 

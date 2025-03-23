@@ -25,6 +25,7 @@
 
     <!-- HTMX -->
     <script src="{% static 'htmx.min.js' %}" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/debug.js" defer></script>
 
     {% django_htmx_script %}
 
@@ -33,9 +34,6 @@
 </head>
 
 <body class='bg-light' hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-  {% partialdef messages inline %}
-  {% bootstrap_messages %}
-  {% endpartialdef %}
 
   <nav class="navbar navbar-expand-lg bg-primary sticky-top start-0" data-bs-theme="dark">
     <div class='container-fluid'>
@@ -66,6 +64,10 @@
                 <li class='nav-item'>
                     <a class='nav-link' href="{% url 'room_calendar_app:week_view' %}">
                         My Calendar</a></li>
+                {% if debug %}
+                        <li class='nav-item'><p class="text-dark">
+                      {% htmx_script %}</p></li>
+                        {% endif %}
             </ul><!-- End of links on left side of nvbar -->
             <!-- Account related links-->
             <ul class='navbar-nav ms-auto mb-2 mb-md-0'>
@@ -92,6 +94,14 @@
 </nav><!-- end of navbar -->
 
 <!-- Main section -->
+
+{% partialdef messages inline %}<!-- Dj messages-->
+<div id="messages_wrap">
+{% bootstrap_messages %}
+</div>
+{% endpartialdef %}
+
+
 
 <main class='container'>
       

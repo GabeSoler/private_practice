@@ -51,8 +51,8 @@ class Event(models.Model):
 
     room_calendar = models.ForeignKey(RoomCalendarModel,on_delete=models.SET_NULL,blank=True,null=True)
     client = models.ForeignKey(Client, on_delete=models.SET_NULL,blank=True,null=True)
-    title = models.CharField(max_length=32)
-    description = models.CharField(max_length=100)
+    title = models.CharField(max_length=32,blank=True)
+    description = models.CharField(max_length=100,blank=True)
     event_type = models.CharField(choices=EVENT_TYPE,max_length=20, verbose_name="event type")
 
     class Meta:

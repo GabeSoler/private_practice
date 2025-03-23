@@ -3,36 +3,43 @@
 
 {% load django_bootstrap5 %}
 {% load partials %}
+{% block title %}Week View{% endblock title %}
+
 {% block content %}
 
-<div>
-    <h1>Week View</h1>
-    {% partialdef form-partial inline %}
-      <table
-        class="table table-primary table-striped-columns table-sm mb-0"
-        id="switch-table"
-      >
-          <tr class="">
-            <form>
-            <td>{% bootstrap_field switch_form.date show_label='skip'  %}</td>
-            <td>{% bootstrap_field switch_form.calendar show_label='skip'  %}</td>
-            <td>
+<div id="wrapper">
+
+  <div id="form-table-wrapper">
+  {% partialdef form-partial inline %}
+  <table
+  class="table table-primary table-striped-columns table-sm mb-0"
+  id="switch-table"
+  >
+  <tr class="" id="calendar-form-tr">
+    <form id="calendar-form">
+            <td id="cell-form-field-date">{% bootstrap_field switch_form.date show_label='skip'  %}</td>
+            <td id="cell-form-field-calendar">{% bootstrap_field switch_form.calendar show_label='skip'  %}</td>
+            <td id="cell-form-button">
               <button
+              type="button"
               class="btn btn-info"
-              hx-get={% url "room_calendar_app:week_view" %}
-              hx-target="#switch-table"
-              hx-swap="outerHTML">
+              hx-post={% url "room_calendar_app:week_view" %}
+              hx-target="#calendar-table-wrapper"
+              hx-ext="debug"
+              id="form-button"
+              >
               Search</button>
             </td>
           </form>
-          </tr>
-        </table>
-        {% endpartialdef %}
-    
+        </tr>
+      </table>
+      {% endpartialdef %} <!-- end partial table -->
+      </div>
 
       <!-- Partial def  week calendar -->
-      {% partialdef week-view-partial inline  %}
       
+  <div id="calendar-table-wrapper">
+    {% partialdef calendar-view-partial inline  %}
       <table class="table table-secondary table-striped-columns table-sm"
       id="week-view-table">
       <thead>
@@ -54,16 +61,18 @@
             >{{slot|time:"H:i"}}</th>
       
               {% for weekday,occurrence in data.items %}
-                  <td class="
-                  {% if occurrence.start_time %} table-info {% endif %}
-                  " 
+              {% if occurrence.start_time %}
+                  <td class="table-info" 
                   style="font-size:.6rem;"
                   id="{{slot}}"
                   >{{occurrence.event.user}}-
                     {{occurrence.start_time|time:"H:i"}}-
                     {{occurrence.end_time|time:"H:i"}}</td>
-                 {% empty %}
-                 </td>
+                    {% else %}
+                    {% comment %} Empty cells, possible link to create event here {% endcomment %}
+                    <td>-
+                    </td>
+                    {% endif %}
               {% endfor %}
                 </td>
       
@@ -73,8 +82,9 @@
             {% endfor %}
           </tr>
         </tbody>
-      </table>
+      </table>      
       {% endpartialdef %}
+    </div>
       <!-- End partial def -->
 
         

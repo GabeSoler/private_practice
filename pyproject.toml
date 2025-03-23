@@ -7,9 +7,9 @@ requires-python = ">=3.12"
 dependencies = [
     "asgiref>=3.8.1,<4",
     "Django>=5.1.6,<6",
-    "django-bootstrap5>=24.3",
+    "django-bootstrap5>=25.1",
     "django-browser-reload>=1.18.0",
-    "django-htmx>=1.22.0",
+    "django-htmx>=1.23.0",
     "django-template-partials>=24.4",
     "pendulum>=3.0.0,<4",
     "psycopg2>=2.9.10,<3",
@@ -17,5 +17,5 @@ dependencies = [
     "six>=1.17.0,<2",
     "sqlparse>=0.5.3,<1",
     "time-machine>=2.16.0,<3",
-    "tzdata>=2025.1",
+    "tzdata>=2025.2",
 ]

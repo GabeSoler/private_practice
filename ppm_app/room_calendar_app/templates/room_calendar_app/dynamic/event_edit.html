@@ -54,6 +54,32 @@
 {% endpartialdef %} <!-- end form partial -->
 </div>
 
+<!-- occurrence list -->
+<div class="" id="event-list-wrap">
 
+  {% partialdef event-list inline %} <!-- Start list partial -->
+  <div class="card bg-primary-subtle">
+    <div class="card-header text-primary">Your Events</div>
+    <div class="card-body bg-primary-subtle">
+      <ul class="list-group list-group-flush" id="occurrence-list">
+  
+          {% for event_item in events %}
+          <li class="list-group-item list-group-item-action {% if event_item == event %}list-group-item-warning {% else %} list-group-item-primary {% endif %}">
+              <a href="{% url 'room_calendar_app:event' event_item.pk %}">{{event_item.title}} | {{event_item.get_event_item_type_display}} | {{event_item.created_at|date}}</a>
+              <a class="link-secondary" href={% url 'room_calendar_app:edit_event' event_item.pk %}>Edit</a>
+          </li>
+          {% empty %}
+          <li><There are no occurrences yet.> </li>
+          {% endfor %}
+        </ul>
+    </div>
+    <div class="card-footer text-muted"><a href={% url 'room_calendar_app:room_calendar_list' %}>My Rooms</a></div>
+  </div>
+    
+    
+    
+    {% endpartialdef %} <!-- end list partial -->
+  </div>
+  
 
 {%endblock content%}

@@ -10,6 +10,9 @@ import datetime as dt
 from django.utils import timezone
 from django_htmx.http import retarget
 from .calendar_utils import CalendarRender
+from django.contrib import messages
+import logging
+import pendulum as p
 
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
@@ -26,32 +29,35 @@ def index_view(request):
 @cache_control(max_age=300)
 @vary_on_headers("HX-Request")
 def week_view(request):
+    template = "room_calendar_app/dynamic/week_view.html"
+    room_calendars_user = RoomCalendarModel.objects.filter(user=request.user) #filter room_calendars options
+    if request.htmx:
+        switch_form_partial = WeekCalendarForm(data=request.POST)
+        if switch_form_partial.is_valid():
+            date = switch_form_partial.cleaned_data['date']
+            ref_date_partial = p.datetime(date.year,date.month,date.day)
+            if switch_form_partial.cleaned_data['calendar']:
+                room_calendar = switch_form_partial.cleaned_data['calendar']
+                occurrences = OccurrenceModel.objects.filter(start_time__week=ref_date_partial.week_of_year,
+                                                            room_calendar=room_calendar)
+            else:
+                occurrences = OccurrenceModel.objects.filter(event__user=request.user,
+                                                 start_time__week=ref_date_partial.week_of_year)
+            calendar_partial = CalendarRender(occurrences=occurrences,date=ref_date_partial)
+            template_calendar = template + "#calendar-view-partial"
+            context = {'calendar':calendar_partial}
+            return render(request,template_calendar,context)
+        form_partial_template = template + "#form-partial" #form re render if invalid
+        switch_form_partial.fields['calendar'].queryset = room_calendars_user
+        context = {'switch_form':switch_form_partial}
+        response = render(request,form_partial_template,context)
+        return retarget(response,"#calendar-form-tr") # retarget if valid switch week table
     ref_date = timezone.now()
+    ref_date = p.instance(ref_date)
     occurrences = OccurrenceModel.objects.filter(event__user=request.user,
                                                  start_time__week=ref_date.isocalendar()[1])
     switch_form = WeekCalendarForm()
-    switch_form.fields['calendar'].queryset = RoomCalendarModel.objects.filter(user=request.user)
-    template = "room_calendar_app/dynamic/week_view.html"
-    if request.htmx:
-        switch_form = WeekCalendarForm(data=request.POST)
-        if switch_form.is_valid():
-            template_calendar = template + "#week-view-partial"
-            ref_date = switch_form.cleaned_data['date']
-            try:
-                room_calendar = switch_form.cleaned_data['calendar']
-            except Exception as e:
-                print(e)
-                room_calendar = False
-            if room_calendar:
-                occurrences = OccurrenceModel.objects.filter(start_time__week=ref_date.isocalendar()[1],
-                                                            room_calendar=room_calendar)
-            calendar = CalendarRender(occurrences=occurrences,date=ref_date)
-            context = {'calendar':calendar}
-            response = render(request,template_calendar,context)
-            return retarget(response,"#week-view-table") # retarget if valid switch week table
-        form_partial_template = template + "#form-partial" #form re render if invalid
-        context = {'switch_form':switch_form}
-        return render(request,form_partial_template,context)
+    switch_form.fields['calendar'].queryset = room_calendars_user
     calendar = CalendarRender(occurrences=occurrences,date=ref_date) #request when no htmx today by default
     context = {'calendar':calendar,'switch_form':switch_form}
     return render(request,template,context)
@@ -246,19 +252,23 @@ def room_calendar_edit_view(request,room_calendar_pk):
 
 def event_edit_view(request,event_pk):
     """edit the occurrence repetition erasing future events"""
-    event = Event.objects.get(pk=event_pk)
+    user = request.user
+    events = Event.objects.filter(user=user)
+    event = get_object_or_404(Event,pk=event_pk,user=user)
     if request.method !='POST':
         #no data submitted; create a blank form
         form = EventForm(instance=event)
     else:
         #POST data submitted; process data
-        check_owner(event.user,request.user)
         form = EventForm(data=request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('room_calendar_app:events')
+            instance = form.save(commit=False)
+            instance.user = event.user
+            instance.save()
+            messages.info(request,"Event Updated")
+            return redirect('room_calendar_app:event_list')
     #display a blank or invalid form
-    context = {'form':form,'event':event}
+    context = {'form':form,'event':event,'events':events}
     return render(request,"room_calendar_app/dynamic/event_edit.html",context)
 
 def occurrence_edit_view(request,occurrence_pk):
