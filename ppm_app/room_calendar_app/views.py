@@ -11,7 +11,6 @@ from django.utils import timezone
 from django_htmx.http import retarget
 from .calendar_utils import CalendarRender
 from django.contrib import messages
-import logging
 import pendulum as p
 
 def check_owner(topic_owner,request_user):
