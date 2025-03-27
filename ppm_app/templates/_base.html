@@ -139,7 +139,7 @@
       data-bs-toggle="tooltip" data-bs-title="My Profile"
       data-bs-custom-class="custom-tooltip"
       href="{% url "room_calendar_app:event_list" %}">
-        <i class="bi bi-person-vcard-fill"></i>
+      <i class="bi bi-calendar2-event-fill"></i>
       <span class="d-none d-md-inline fs-5">
         Events
         </span>
@@ -151,25 +151,12 @@
       data-bs-toggle="tooltip" data-bs-title="My Journal"
       data-bs-custom-class="custom-tooltip"
       href="{% url "room_calendar_app:week_view" %}">
-      <i class="bi bi-pen-fill"></i>
+      <i class="bi bi-calendar-date"></i>
       <span class="d-none d-md-inline fs-5">
         Week View
         </span>
   </a>
     </li>
-    <!-- Add Technique -->
-    <li class="nav-item">
-      <a class="nav-link fw-light link-secondary fs-4 {% if request.path == '/techniques/components_list/' %}active{% endif %}" 
-      data-bs-toggle="tooltip" data-bs-title="Read Techniques"
-      data-bs-custom-class="custom-tooltip"
-      href="{% url "room_calendar_app:event_list" %}">
-      <i class="bi bi-lightbulb-fill"></i>
-      <span class="d-none d-md-inline fs-5">
-        +Occurrence
-        </span>
-  </a>
-    </li>
-
     <!--Theory page -->
     <li class="nav-item">
       <a class="nav-link fw-light link-secondary fs-4" 
@@ -177,7 +164,7 @@
       data-bs-custom-class="custom-tooltip"
       href="{% url "tools:client_list" %}"
       >
-      <i class="bi bi-patch-question-fill"></i>
+      <i class="bi bi-journal-medical"></i>
       <span class="d-none d-md-inline fs-5">
         Clients
       </span>

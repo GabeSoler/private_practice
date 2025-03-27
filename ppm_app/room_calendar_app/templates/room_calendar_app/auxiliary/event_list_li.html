@@ -1,0 +1,10 @@
+<ul class="dropdown-menu"
+id="event-list-hx"
+>
+{% for event in events %}
+<li><a class="dropdown-item" href={% url "room_calendar_app:event" event.pk %}>{{event.title}}</a></li>
+{% empty %}
+<li><a class="dropdown-item" href={% url "room_calendar_app:event_list" %}>Add Events</a></li>
+
+{% endfor %}
+</ul>

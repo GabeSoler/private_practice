@@ -6,7 +6,7 @@ from django.db.models import Q
 
 class CalendarRender:
     """ A class to create calendar dictionaries and render in template """
-    def __init__(self,occurrences,date_ref):
+    def __init__(self,occurrences,date_ref=None):
         self.occurrences = occurrences
         self.date = date_ref or p.today()
 

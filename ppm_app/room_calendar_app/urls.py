@@ -33,4 +33,9 @@ urlpatterns = [
 
     path("link-tenant/<uuid:calendar_pk>/", views.tenant_link_view, name="link_tenant"),
 
+
+    path("hx-event-list/", views.week_view_auxiliary, name="event_list_auxiliary"),
+
+
+
 ]

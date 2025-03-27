@@ -30,11 +30,16 @@ def index_view(request):
 @cache_control(max_age=300)
 @vary_on_headers("HX-Request")
 def week_view(request):
+    """ Displays a calendar table with occurrences
+        You can change the week to display or select a specific room calendar
+       """
     template = "room_calendar_app/dynamic/week_view.html"
     room_calendar_user = RoomCalendarModel.objects.filter(tenants__user=request.user) #filter room_calendars options
     if request.htmx:
         form_partial = WeekCalendarForm(data=request.POST)
         if form_partial.is_valid():
+            """ main functionality changing content by date or calendar, 
+            if calendar is empty all occurrences of user"""
             date = form_partial.cleaned_data['date_reference']
             assert date is not None, "date should be something"
             ref_date_partial = p.datetime(date.year,date.month,date.day)
@@ -49,23 +54,23 @@ def week_view(request):
             template_calendar = template + "#calendar-view-partial"
             context = {'calendar':calendar_partial}
             return render(request,template_calendar,context)
-        form_partial_template = template + "#form-partial" #form re render if invalid
+        form_partial_template = template + "#form-partial"
         form_partial.fields['calendar'].queryset = room_calendar_user
         context = {'form':form_partial}
-        assert form_partial.is_valid is True,"the form must be valid (if secure)"
         response = render(request,form_partial_template,context)
-        return retarget(response,"#calendar-form-tr") # retarget if valid switch week table
-    ref_date = timezone.now()
-    ref_date = p.instance(ref_date)
-    occurrences = OccurrenceModel.objects.filter(event__user=request.user,
-                                                 start_time__week=ref_date.week_of_year)
+        return retarget(response,"#calendar-form-tr") # retarget if not valid switch week table (edge cases)
+    occurrences = OccurrenceModel.objects.none() #? the content is loaded after page load by hmx
     form = WeekCalendarForm()
     form.fields['calendar'].queryset = room_calendar_user
-    calendar = CalendarRender(occurrences=occurrences,date_ref=ref_date) #request when no htmx today by default
+    calendar = CalendarRender(occurrences=occurrences) # today by default
     context = {'calendar':calendar,'form':form}
     return render(request,template,context)
 
-
+def week_view_auxiliary(request):
+    events = Event.objects.filter(user=request.user)
+    template = "room_calendar_app/auxiliary/event_list_li.html"
+    context = {"events":events}
+    return render(request,template,context)
 
 def room_calendar_listing_view(request):
     tenant = TenantModel.objects.filter(user=request.user)
