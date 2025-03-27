@@ -56,7 +56,7 @@
                     <a class='nav-link' href="{% url 'tools:session_list' %}">
                         My Sessions</a></li>
                 <li class='nav-item'>
-                    <a class='nav-link' href="{% url 'room_calendar_app:calendar_index' %}">
+                    <a class='nav-link' href="{% url 'room_calendar_app:event_list' %}">
                         My Events</a></li>
                 <li class='nav-item'>
                     <a class='nav-link' href="{% url 'room_calendar_app:room_calendar_list' %}">
@@ -120,8 +120,8 @@
 </main>
 
 <!--Fixed footer nav -->
-<footer class="bg-primary">
-  <ul class="nav nav-underline px-3 bg-primary fixed-bottom nav-justified">
+<footer class="bg-primary mt-5">
+  <ul class="nav nav-underline px-3 bg-primary fixed-bottom nav-fill">
     <li class="nav-item">
       <a class="nav-link fw-light link-secondary fs-4 {% if request.path == '/' %}active{% endif %}" 
       data-bs-toggle="tooltip" data-bs-title="Home"

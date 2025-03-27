@@ -39,12 +39,11 @@ def week_view(request):
         form_partial = WeekCalendarForm(data=request.POST)
         if form_partial.is_valid():
             """ main functionality changing content by date or calendar, 
-            if calendar is empty all occurrences of user"""
+            if calendar is empty all occurrences of user """
             date = form_partial.cleaned_data['date_reference']
             assert date is not None, "date should be something"
             ref_date_partial = p.datetime(date.year,date.month,date.day)
             if form_partial.cleaned_data['calendar']:
-                assert form_partial.cleaned_data['calendar'] is not None,"Not passed calendar to fx"
                 occurrences = OccurrenceModel.objects.filter(start_time__week=ref_date_partial.week_of_year,
                                                             calendar=form_partial.cleaned_data['calendar'])
             else:
