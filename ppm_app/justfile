@@ -6,6 +6,10 @@ play:
 test *arg:
     uv run python3 manage.py test {{arg}}
 
+#start testing
+testx:
+    uv run python3 manage.py test --parallel --keepdb
+
 # run migrate
 migrate:
     uv run python3 manage.py migrate

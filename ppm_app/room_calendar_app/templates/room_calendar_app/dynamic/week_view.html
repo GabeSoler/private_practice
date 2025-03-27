@@ -11,28 +11,37 @@
 
   <div id="form-table-wrapper">
   {% partialdef form-partial inline %}
-  <table
+  <form
+    hx-post={% url "room_calendar_app:week_view" %}
+    hx-target="#calendar-table-wrapper"
+    hx-trigger="change"
+    >
+    <table
   class="table table-primary table-striped-columns table-sm mb-0"
   id="switch-table"
   >
-  <tr class="" id="calendar-form-tr">
-    <form id="calendar-form">
-            <td id="cell-form-field-date">{% bootstrap_field switch_form.date show_label='skip'  %}</td>
-            <td id="cell-form-field-calendar">{% bootstrap_field switch_form.calendar show_label='skip'  %}</td>
-            <td id="cell-form-button">
-              <button
-              type="button"
-              class="btn btn-info"
-              hx-post={% url "room_calendar_app:week_view" %}
-              hx-target="#calendar-table-wrapper"
-              hx-ext="debug"
-              id="form-button"
-              >
-              Search</button>
-            </td>
-          </form>
-        </tr>
-      </table>
+    <tr class="" id="calendar-form-tr">
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form.date_reference show_label='skip'  %}
+        </td>
+        <td id="cell-form-field-calendar"
+          >{% bootstrap_field form.calendar show_label='skip'  %}
+        </td>
+        <td id="cell-form-button">
+          <button
+          class="btn btn-info"
+          type="button"
+          hx-post={% url "room_calendar_app:week_view" %}
+          hx-target="#calendar-table-wrapper"
+          {% comment %} hx-include="[name='date_reference']" {% endcomment %}
+          hx-ext="debug"
+          id="form-button"
+          >
+          Search</button>
+        </td>
+      </tr>
+    </table>
+  </form>
       {% endpartialdef %} <!-- end partial table -->
       </div>
 

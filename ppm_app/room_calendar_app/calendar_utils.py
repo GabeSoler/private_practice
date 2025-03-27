@@ -6,16 +6,13 @@ from django.db.models import Q
 
 class CalendarRender:
     """ A class to create calendar dictionaries and render in template """
-    def __init__(self,occurrences,date=None):
-        self.date = p.instance(date)
+    def __init__(self,occurrences,date_ref):
         self.occurrences = occurrences
+        self.date = date_ref or p.today()
 
     @property
     def week_days(self)->list:
-        if self.date is None:
-            date_ref = p.today()
-        else:
-            date_ref = self.date
+        date_ref = self.date
         week_start = date_ref.start_of("week")
         week_end = date_ref.end_of("week")
         iter_week = p.interval(week_start,week_end)

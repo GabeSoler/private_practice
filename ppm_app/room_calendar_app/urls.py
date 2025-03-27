@@ -23,7 +23,8 @@ urlpatterns = [
     path("room-calendar-add/", views.room_calendar_add_view, name="add_room_calendar"),
     path("room-calendar-edit/<uuid:room_calendar_pk>/", views.room_calendar_edit_view, name="edit_room_calendar"),
      
-    path("occurrence-edit/<uuid:occurrence_pk>", views.edit_occurrence_list, name="edit_occurrence_list"),
+    path("occurrence_list-edit/<uuid:occurrence_pk>", views.edit_occurrence_list, name="edit_occurrence_list"),
+    path("occurrence-edit/<uuid:occurrence_pk>", views.occurrence_edit_view, name="edit_occurrence"),
     path("occurrence-multiple_add/", views.occurrence_multiple_add_view, name="add_occurrence_multiple"),
     path("occurrence-multiple-edit/", views.occurrence_multiple_edit_view, name="edit_occurrence_multiple"),
 

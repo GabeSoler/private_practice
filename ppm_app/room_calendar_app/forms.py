@@ -1,5 +1,4 @@
 from django import forms
-from .my_widgets import DateBooted
 
 from .models import RoomCalendarModel,Event,TenantModel,OccurrenceModel
 from .choices import default_timeslot_options,duration_times_as_choices
@@ -42,7 +41,7 @@ class EventForm(forms.ModelForm):
         }
 
 
-class OccurrenceForm(forms.ModelForm): #! not in use
+class OccurrenceForm(forms.ModelForm): #! will use it for a detailed edit, in case of change of calendar
     """ occurrence form """
     class Meta:
         model = OccurrenceModel
@@ -61,13 +60,13 @@ class OccurrenceForm(forms.ModelForm): #! not in use
 
 class OccurrenceProxyForm(forms.Form):
     """ occurrence form """
-    start_date = forms.DateField(widget=DateBooted, label="On")
+    start_date = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}), label="On")
     start_time = forms.TimeField(label="At",widget=forms.Select(choices=default_timeslot_options))
     duration = forms.DurationField(label="For",widget=forms.Select(choices=duration_times_as_choices))
 
 
 class WeekCalendarForm(forms.Form):
     """calendar switch form"""
-    date = forms.DateField(widget=DateBooted,initial=timezone.now())
-    calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.none(),required=False)
+    date_reference = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=timezone.now())
+    calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all(),required=False)
 

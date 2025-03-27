@@ -4,7 +4,6 @@ from django.db import models
 from datetime import datetime
 from datetime import timedelta
 from django.contrib.auth import get_user_model
-from django.db.models import Q
 from .choices import EVENT_TYPE
 import uuid
 
@@ -64,22 +63,10 @@ class Event(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("swingtime-event", args=[str(self.id)])
-
-    def upcoming_occurrences(self):
-        return self.occurrence_set.filter(start_time__gte=datetime.now())
-    
-    def next_occurrence(self):
-        """ return next occurrence """
-        upcoming = self.upcoming_occurrences()
-        return upcoming[0] if upcoming else None
-
-    def daily_occurrences(self, dt=None):
-        """ returns a day occurrences """
-        return OccurrenceModel.objects.daily_occurrences(dt=dt, event=self)
+        return reverse("room_calendar_app:event", args=[str(self.id)])
     
     @property
-    def color_class(self):
+    def color_class(self): #to add a color class or other relative to event type
         match self.event_type:
             case 'client':
                 return 'primary'
@@ -94,43 +81,24 @@ class Event(models.Model):
         
 
 class OccurrenceManager(models.Manager):
-    def daily_occurrences(self, dt=None, event=None):
-        """
-        Returns a queryset of for instances that have any overlap with a
-        particular day.
-
-        ``dt`` may be either a datetime.datetime, datetime.date object, or
-          ``None``. If ``None``, default to the current day.
-
-         ``event`` can be an ``Event`` instance for further filtering.
-        """
-        dt = dt or datetime.now()
-        start = datetime(dt.year, dt.month, dt.day)
-        end = start.replace(hour=23, minute=59, second=59)
-        qs = self.filter(
-            models.Q(
-                start_time__gte=start,
-                start_time__lte=end,
-            )
-            | models.Q(
-                end_time__gte=start,
-                end_time__lte=end,
-            )
-            | models.Q(start_time__lt=start, end_time__gt=end)
+    def create_unique(self,start_time:datetime,duration:datetime,event:Event,room=None):
+        """ creates an occurrence and checks if overlaps with others. 
+            Returns (True,None) if it does not overlaps, and (False,Queryset) if it does  """
+        end_time = start_time + duration
+        calendar = room if room else event.room_calendar
+        new_occ = self.create(
+            start_time=start_time,
+            duration=duration,
+            end_time=end_time,
+            event=event,
+            calendar=calendar,
         )
-
-        return qs.filter(event=event) if event else qs
-    
-    def is_overlapping_multiple(self,multiple_model):
-        """checks if an multiple occurrence call overlaps with current occurrences"""
-        start = multiple_model.multiple_start_date
-        end = multiple_model.multiple_end_date
-        search = self.filter(
-                start_time__gte=start,
-                end_time__lte=end,)
-        return True if search else False
-
-
+        overlaps = new_occ.overlap_set()
+        if overlaps:
+            return False,overlaps
+        else:
+            new_occ.save()
+            True,None
 
 class OccurrenceModel(models.Model):
     """ sets an occurrence by having a start and end, and a event attached """
@@ -153,35 +121,49 @@ class OccurrenceModel(models.Model):
         return "{}: {}".format(self.event.title, self.start_time.isoformat())
 
     def get_absolute_url(self):
-        return reverse("swingtime-occurrence", args=[str(self.event.id), str(self.id)])
+        return reverse("room_calendar_app:edit_occurrence_list", args=[str(self.event.id), str(self.id)])
 
     def __lt__(self, other):
         return self.start_time < other.start_time
     
     def repeat_next_week(self,weeks=1):
         start_time = self.start_time + timedelta(weeks=weeks)
-        duration = self.duration + timedelta(weeks=weeks)
-        self.objects.create(start_time=start_time,duration=duration,event=self.event)
+        end_time = self.end_time + timedelta(weeks=weeks)
+        created,set = self.manager.create_unique(start_time=start_time,
+                                  end_time=end_time,
+                                  duration=self.duration,
+                                  event=self.event,
+                                  room_calendar=self.room_calendar
+                                  )
+        return created
 
-    def is_overlapping(self):
-        """checks if an instance overlaps with another"""
+    def overlap_set(self):
+        """
+        Returns a queryset of for instances that have any overlap with a
+        particular day.
+        """
         start = self.start_time
-        duration = self.duration
-        end = start + timedelta.min(self.duration)
-        search = self.objects.filter(
-                Q(start_time__gte=start,start_time__lte=end) and
-                Q(duration__lte=duration)
+        end = self.end_time
+        qs = OccurrenceModel.objects.filter(
+            models.Q(
+                start_time__gte=start,
+                start_time__lte=end,
+            )
+            | models.Q(
+                end_time__gte=start,
+                end_time__lte=end,
+            )
+            | models.Q(start_time__lt=start, end_time__gt=end)
         )
-        return True if search else False
-
+        return qs
 
     @property
-    def title(self):
+    def event_title(self):
         return self.event.title
 
     @property
     def room_calendar(self):
         return self.event.room_calendar
     @property
-    def day(self):
+    def week_day(self):
         return self.start_time.day

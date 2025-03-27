@@ -24,41 +24,45 @@ def index_view(request):
     context = {"events":events,'event_form':event_form}
     return render(request,"room_calendar_app/index.html",context)
 
+
+
 @login_required
 @cache_control(max_age=300)
 @vary_on_headers("HX-Request")
 def week_view(request):
     template = "room_calendar_app/dynamic/week_view.html"
-    room_calendars_user = RoomCalendarModel.objects.filter(user=request.user) #filter room_calendars options
+    room_calendar_user = RoomCalendarModel.objects.filter(tenants__user=request.user) #filter room_calendars options
     if request.htmx:
-        switch_form_partial = WeekCalendarForm(data=request.POST)
-        if switch_form_partial.is_valid():
-            date = switch_form_partial.cleaned_data['date']
+        form_partial = WeekCalendarForm(data=request.POST)
+        if form_partial.is_valid():
+            date = form_partial.cleaned_data['date_reference']
+            assert date is not None, "date should be something"
             ref_date_partial = p.datetime(date.year,date.month,date.day)
-            if switch_form_partial.cleaned_data['calendar']:
-                room_calendar = switch_form_partial.cleaned_data['calendar']
+            if form_partial.cleaned_data['calendar']:
+                assert form_partial.cleaned_data['calendar'] is not None,"Not passed calendar to fx"
                 occurrences = OccurrenceModel.objects.filter(start_time__week=ref_date_partial.week_of_year,
-                                                            room_calendar=room_calendar)
+                                                            calendar=form_partial.cleaned_data['calendar'])
             else:
                 occurrences = OccurrenceModel.objects.filter(event__user=request.user,
                                                  start_time__week=ref_date_partial.week_of_year)
-            calendar_partial = CalendarRender(occurrences=occurrences,date=ref_date_partial)
+            calendar_partial = CalendarRender(occurrences=occurrences,date_ref=ref_date_partial)
             template_calendar = template + "#calendar-view-partial"
             context = {'calendar':calendar_partial}
             return render(request,template_calendar,context)
         form_partial_template = template + "#form-partial" #form re render if invalid
-        switch_form_partial.fields['calendar'].queryset = room_calendars_user
-        context = {'switch_form':switch_form_partial}
+        form_partial.fields['calendar'].queryset = room_calendar_user
+        context = {'form':form_partial}
+        assert form_partial.is_valid is True,"the form must be valid (if secure)"
         response = render(request,form_partial_template,context)
         return retarget(response,"#calendar-form-tr") # retarget if valid switch week table
     ref_date = timezone.now()
     ref_date = p.instance(ref_date)
     occurrences = OccurrenceModel.objects.filter(event__user=request.user,
-                                                 start_time__week=ref_date.isocalendar()[1])
-    switch_form = WeekCalendarForm()
-    switch_form.fields['calendar'].queryset = room_calendars_user
-    calendar = CalendarRender(occurrences=occurrences,date=ref_date) #request when no htmx today by default
-    context = {'calendar':calendar,'switch_form':switch_form}
+                                                 start_time__week=ref_date.week_of_year)
+    form = WeekCalendarForm()
+    form.fields['calendar'].queryset = room_calendar_user
+    calendar = CalendarRender(occurrences=occurrences,date_ref=ref_date) #request when no htmx today by default
+    context = {'calendar':calendar,'form':form}
     return render(request,template,context)
 
 
@@ -118,8 +122,8 @@ def event_occurrence_view(request,event_pk):
                 start_time=start_time_add,
                 end_time=end_time_add,
                 event=event,
-                calendar = event.room_calendar # I am spiting the room into two sources, 
-                                                #one by default from event and one editable for unique cases
+                calendar = event.room_calendar  # I am spiting the room into two sources, 
+                                                # one by default from event and one editable for 'rare' cases
                 )
             occurrence.save()
             list_template = template + '#occurrence-list'
