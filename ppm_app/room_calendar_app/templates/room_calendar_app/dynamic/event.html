@@ -5,25 +5,24 @@
 {% block title%}{{event.title}}{%endblock title%}
 
 {% block content %}
-<div class="card bg-secondary-subtle">
-    <div class="card-header bg-primary-subtle">
-      <h5 class="card-title d-inline">{{event.title|title}}</h5> 
-        <small>
-          <a href="{%url 'room_calendar_app:edit_event' event.pk %}" class="card-link col">
-          Edit</a>
-        </small>
-        <a href="{% url 'room_calendar_app:calendar_index' %}" class="card-link float-end">Events</a>
 
+  <div class="accordion" id="accordionFlushExample">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed text-primary bg-primary-subtle border-bottom border-primary" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+          Event: {{event.title|title}}
+        </button>
+      </h2>
+      <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+        <div class="accordion-body bg-info-subtle">      <div class="row">
+          <p class="card-text col"><strong>Room:</strong> {{event.room_calendar}}</p>
+          <p class="card-text col"><strong>Client:</strong> {{event.client}} </P>
+          <p class="card-text col"><strong>Note:</strong> {{event.description}} </p>
+          </div>
     </div>
-    <div class="card-body">
-      <div class="row">
-      <p class="card-text col">Room: {{event.room_calendar}}</p>
-      <p class="card-text col">Client: {{event.client}} </P>
-      <p class="card-text col">Description: {{event.description}} </p>
       </div>
     </div>
-  </div>
-
+  </div>  
 
 <!-- Add occurrence widget -->
 <div class="" id="occurrence-form-wrap"> 
