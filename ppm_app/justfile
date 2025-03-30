@@ -8,7 +8,7 @@ test *arg:
 
 #start testing
 testx:
-    uv run python3 manage.py test --parallel --keepdb
+    uv run python3 manage.py test --parallel
 
 # run migrate
 migrate:
