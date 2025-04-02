@@ -1,8 +1,0 @@
-# requirements.txt
-
-asgiref==3.8.1
-Django==5.1.6
-django-template-partials==24.4
-psycopg2==2.9.10
-python-decouple==3.8
-sqlparse==0.5.3

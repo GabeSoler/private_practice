@@ -1,8 +1,0 @@
-<form action="{% url 'room_calendar_app:add_event' %}" method='post'>
-    {% csrf_token %}
-    {% bootstrap_form event_ form %}
-    {% bootstrap_form event_ form %}
-    {% bootstrap_form event_ form %}
-    {% bootstrap_form event_ form %}
-    {% bootstrap_button button_type='submit' content='Add Event' %}
-  </form>
