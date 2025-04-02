@@ -33,7 +33,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     #mine
-    'tools',
+    'session_client',
     'accounts',
     'room_calendar_app',
     #third party
@@ -94,7 +94,7 @@ WSGI_APPLICATION = "ppm_app.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'ppm_db',
         'USER': 'gsole',
         'PASSWORD': config('POSTGRESS_KEY'),
         'HOST': 'localhost',

@@ -4,7 +4,7 @@ from django.urls import path
 
 from . import views
 
-app_name = 'tools'
+app_name = 'session_client'
 
 urlpatterns = [
     #Home page

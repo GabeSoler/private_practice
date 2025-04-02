@@ -8,7 +8,7 @@ from .choices import EVENT_TYPE
 import uuid
 
 from django.urls import reverse
-from tools.models import Client
+from session_client.models import Client
 
 class TenantModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
