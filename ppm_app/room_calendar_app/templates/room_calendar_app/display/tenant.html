@@ -1,0 +1,23 @@
+{% extends '../../_base.html' %}
+{% block title%}{{tenant.name}}{%endblock title%}
+
+{% block page_header %}{{tenant.name}}{% endblock page_header%}
+
+{% block content %}
+<div class="card" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">{{tenant.name}}</h5>
+      <p class="card-text">Type: {{tenant.description}}</p>
+      <p class="card-text">Unique code: {{tenant.pk}}</p>
+      <p class="card-text">Give the code to a Room Calendar controller to link it</p>
+      
+      <a href="{% url 'room_calendar_app:tenant_list' %}" class="card-link">Back to tenants</a>
+      <p><a href="{%url 'room_calendar_app:edit_tenant' tenant.pk %}">
+        Edit tenant</a></p>
+    </div>
+  </div>
+
+
+
+
+{%endblock content%}

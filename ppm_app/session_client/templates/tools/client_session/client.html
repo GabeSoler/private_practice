@@ -1,0 +1,28 @@
+{% extends '../../_base.html' %}
+{% block title%}{{client.code}}{%endblock title%}
+
+{% block page_header %}{{client.code}}{% endblock page_header%}
+
+{% block content %}
+<div class="card" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">{{client.nick_name}}</h5>
+      <h6 class="card-subtitle mb-2 text-body-secondary">Started on: {{client.created_at|date}}</h6>
+      <p class="card-text">Type: {{client.get_type_display}}</p>
+      <p class="card-text">Main goal of the process: {{client.goal}} </P>
+      <p class="card-text">Original Motive: {{client.motive}} </p>
+      <p class="card-text">Relational landscape: {{client.rel}}</p>
+      <p class="card-text">Strategy: {{client.strategy}}  </p>
+      <p class="card-text">Agreed Fee: {{client.fee}}</p>
+      <p class="card-text">{{client.active|yesno:"Active,Archived"}}</p>
+      <a href="{% url 'tools:client_list' %}" class="card-link">Back to Clients</a>
+      <a href="{% url 'tools:session_list_by_client' client.pk %}" class="card-link">Sessions</a>
+      <p><a href="{%url 'tools:edit_client' client.pk %}">
+        Edit Client</a></p>
+    </div>
+  </div>
+
+
+
+
+{%endblock content%}

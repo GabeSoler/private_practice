@@ -1,0 +1,16 @@
+{% extends '../../_base.html' %}
+
+{%block content%}
+{% load django_bootstrap5 %}
+  <h2>Add Session</h2>
+  <a href={% url 'tools:session_list' %}>Back to Sessions</a></br>
+  <a href={% url 'tools:add_client' %}>Add a Client First</a>
+
+
+  <form action="{% url 'tools:add_session' %}" method='post'>
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% bootstrap_button button_type='submit' content='Add Session' %}
+  </form>
+
+  {% endblock content %}
