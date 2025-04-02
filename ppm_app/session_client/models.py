@@ -28,7 +28,7 @@ class Client(models.Model):
         return f"{self.code}"
     
     def get_absolute_url(self):
-        return reverse("tools:client", kwargs={"client_pk":self.pk})
+        return reverse("session_client:client", kwargs={"client_pk":self.pk})
     
 class Session(models.Model):
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
@@ -49,5 +49,5 @@ class Session(models.Model):
         return f"Session: {date}"
     
     def get_absolute_url(self):
-        return reverse("tools:session", kwargs={"session_pk":self.id})
+        return reverse("session_client:session", kwargs={"session_pk":self.id})
   

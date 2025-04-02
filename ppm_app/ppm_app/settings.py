@@ -36,13 +36,12 @@ INSTALLED_APPS = [
     'session_client',
     'accounts',
     'room_calendar_app',
+
     #third party
     'django_bootstrap5',
     "template_partials",
     "django_htmx",
     "django_browser_reload",
-
-
 
 
     #default
@@ -181,9 +180,8 @@ USE_TZ = False #change to True when ready to deploy??
 
 
 
-LOGIN_REDIRECT_URL = 'tools:index'
-LOGOUT_REDIRECT_URL = 'tools:index'
-LOGIN_URL = 'account_login'
+LOGIN_REDIRECT_URL = 'session_client:index'
+LOGOUT_REDIRECT_URL = 'session_client:index'
 
 DATE_FORMAT = "%d/%m/%Y"
 

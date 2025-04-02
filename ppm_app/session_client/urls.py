@@ -1,4 +1,4 @@
-"""Defines URL patterns for tools."""
+"""Defines URL patterns for session_client."""
 
 from django.urls import path
 

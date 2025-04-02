@@ -14,8 +14,8 @@
       <My class="card-text">Attendance: {{session.get_attended_display}}</p>
       <p class="card-text">{{session.paid|yesno:"Paid,Not Paid"}} </p>
       <p class="card-text">Amount: {{session.amount_paid}} </p>
-      <a href="{% url 'tools:session_list' %}" class="card-link">Back to sessions</a>
-      <a href="{% url 'tools:edit_session' session.pk %}" class="card-link">Edit Session</a>
+      <a href="{%url 'session_client:session_list' %}" class="card-link">Back to sessions</a>
+      <a href="{%url 'session_client:edit_session' session.pk %}" class="card-link">Edit Session</a>
     </div>
   </div>
 

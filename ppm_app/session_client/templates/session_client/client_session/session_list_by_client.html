@@ -7,13 +7,13 @@
 <h2>{{client.nick_name}}'s Sessions</h2>
 
 <p>
-  <a href="{%url 'tools:add_session'%}">Add new Session</a>
+  <a href="{%url 'session_client:add_session'%}">Add new Session</a>
 </p>
 
 <ul>
   {% for session in sessions %}
   <li>
-    <a href="{%url "tools:session" session.pk %}">
+    <a href="{%url "session_client:session" session.pk %}">
     {{session.created_at|date:'d,M,Y'}}</a> | {{session.client}} |
     {{session.get_attended_display}}|
     {{session.paid|yesno:"Paid,Not Paid"}}
@@ -24,7 +24,7 @@
   </ul>
   {% endfor %}
 </br>
-<a class="link" href="{% url "tools:index" %}">Back to Index</a>
-<a class="link" href="{% url "tools:client" client.pk %}">Client's page</a>
+<a class="link" href="{% url "session_client:index" %}">Back to Index</a>
+<a class="link" href="{% url "session_client:client" client.pk %}">Client's page</a>
 
   {% endblock content %}
