@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "asgiref",
+        "keyup",
         "psycopg",
         "sqlparse",
         "tzdata"

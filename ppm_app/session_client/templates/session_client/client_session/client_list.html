@@ -1,22 +1,63 @@
 {% extends '../../_base.html' %}
 
 {% block content %}
-
+{% load partials %}
+{% load django_bootstrap5 %}
 <h2>My Clients</h2>
 
-<p>
-  <a href="{%url 'session_client:add_client'%}">Add new client</a>
-</p>
 
-<ul>
+<!-- Add occurrence widget -->
+<div class="" id="client-form-wrap"> 
+
+  {% partialdef client-form-partial inline %} <!-- Start form partial -->
+  
+  
+  <div class"card bg-primary-subtle m-2 p-2 rounded">
+  
+    <form class="form bg-primary-subtle ps-3"
+    hx-post={% url 'session_client:client_list' %}
+    hx-target="#client-form-wrap"
+    hx-trigger="keyup[key=='Enter']"
+    hx-ext="debug"
+    hx-swap="innerHTML"
+    >
+      <table class="table" id="client-form-table">
+      <tr>
+        <td class="col bg-primary-subtle" id="form-td-code">
+      {% bootstrap_field form.code wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+        </td>
+        <td class="col bg-primary-subtle" id="form-td-nickname">
+      {% bootstrap_field form.nick_name wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+        </td>
+    </tr>
+      <tr>
+        <td class="col bg-primary-subtle" id="form-td-type">
+      {% bootstrap_field form.type wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+        </td>
+        <td class="col bg-primary-subtle" id="form-td-fee">
+      {% bootstrap_field form.fee wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+        </td>
+    </tr>
+  </form>
+</table>
+  </div>
+  {% endpartialdef %} <!-- end form partial -->
+  </div>
+
+<div id="client-list-wrapper">
+  {% partialdef client-list-partial inline %}
+<ul class="list-group" id="client-list-ul">
   {% for client in clients%}
-    <li>
-      <a href="{%url 'session_client:client' client.pk %}"> | {{client.code}}</a> - {{client.nick_name}} | {{client.date_added|date:'M d,Y H:i'}}
-        <a class="list-item" href="{% url "session_client:session_list_by_client" client.pk %}">Sessions</a>
+    <li class="list-group-item list-group-item-success" id="{{client.code}}">
+      <a href="{%url 'session_client:client' client.pk %}">{{client.code}}</a> - {{client.nick_name}} | {{client.created_at|date:'M d,Y'}}
+        <small><a class="list-item text-secondary" href="{% url "session_client:session_list_by_client" client.pk %}">Sessions</a></small>
     </li>
     {% empty %}
     <li>There are no clients yet. </li>
+    
+    {% endfor %}
   </ul>
-  {% endfor %}
+  {% endpartialdef %}
+</div>
 
   {% endblock content %}

@@ -13,16 +13,16 @@ class Client(models.Model):
     updated_at = models.DateTimeField(auto_now=True, editable=False)
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     #Client labels
-    code = models.CharField(default='',max_length=10) #Create a code instead of name
-    nick_name = models.CharField(default="",blank=True,null=True,max_length=20)
-    type = models.CharField(default='Pvt',choices=(CLIENT_TYPE),max_length=20) # add choices like private, service, eap, supervisee
-    fee = models.IntegerField(default=50,validators=(MinValueValidator(1),MaxValueValidator(100)))
+    code = models.CharField(blank=False,max_length=10,help_text="Add an Identifier code") #Create a code instead of name
+    nick_name = models.CharField(default="",blank=True,null=True,max_length=20,help_text="Give it a memorable nickname")
+    type = models.CharField(default='Pvt',choices=(CLIENT_TYPE),max_length=20,help_text="Select a type of client") # add choices like private, service, eap, supervisee
+    fee = models.IntegerField(default=50,validators=(MinValueValidator(1),MaxValueValidator(100)),help_text="Whats your agreed fee")
     #client base info(delete after 7 yeas?)(I am thinking to only erase the fields as the admin is yours)
-    motive = models.CharField(default='',max_length=200) # what broght them
-    rel = models.TextField(default='') # for a relationship description
-    goal = models.TextField(default='') # Things you agree to work
-    strategy = models.TextField(default='') # what you are thinking you could do
-    active = models.BooleanField(default=True)
+    motive = models.CharField(default='',blank=True,max_length=200,help_text="Add client's reason for consulting") # what broght them
+    rel = models.TextField(default='',blank=True, help_text="Write a note about your client's relational context") # for a relationship description
+    goal = models.TextField(default='',blank=True,help_text="What's the original goal for therapy") # Things you agree to work
+    strategy = models.TextField(default='',blank=True,help_text="Your first idea on how to work") # what you are thinking you could do
+    active = models.BooleanField(default=True,help_text="Mark if its a current client")
 
     def __str__(self):
         return f"{self.code}"

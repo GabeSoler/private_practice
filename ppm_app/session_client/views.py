@@ -1,8 +1,9 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_list_or_404,get_object_or_404
 from .models import Client,Session
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from .forms import ClientForm, SessionForm
+from .forms import ClientForm, SessionForm,ClientSmallForm
+from django_htmx.http import retarget
 
 
 #Function to check owner when calling models without the user
@@ -31,18 +32,14 @@ def session_home_view(request):
 @login_required
 def client_view(request,client_pk):
     """show one client"""
-    try:
-        client = Client.objects.get(pk=client_pk)
-        check_owner(client.user,request.user)
-    except: raise Http404
+    client = get_object_or_404(Client,pk=client_pk,user=request.user)
     context = {'client':client}
     return render(request,'session_client/client_session/client.html',context)
 
 @login_required
 def session_view(request,session_pk):
     """show one session"""
-    session = Session.objects.get(pk=session_pk)
-    check_owner(session.user,request.user)
+    session = get_object_or_404(Session,pk=session_pk,user=request.user)
     context = {'session':session}
     return render(request,'session_client/client_session/session.html',context)
 
@@ -51,9 +48,26 @@ def session_view(request,session_pk):
 @login_required
 def clients_view(request):
     """show all clients"""
+    template = 'session_client/client_session/client_list.html'    
     clients = Client.objects.filter(user=request.user).order_by('code')
-    context = {'clients':clients}
-    return render(request,'session_client/client_session/client_list.html',context)
+    form = ClientSmallForm()
+    if request.htmx:
+        form_partial = ClientSmallForm(data=request.POST)
+        if form_partial.is_valid():
+            assert form_partial.cleaned_data["code"] is not None
+            instance = form.save(commit=False)
+            instance.user = request.user
+            instance.save()
+            clients = Client.objects.filter(user=request.user).order_by('code')
+            context = {'clients':clients}
+            template = template + "#client-list-partial"
+            response = render(request,template,context)
+            return retarget(response,"#client-list-wrapper")
+        template = template + '#client-form-partial'
+        context = {'form':form_partial}
+        return render(request,template,context)
+    context = {'clients':clients,'form':form}
+    return render(request,template,context)
 
 @login_required
 def sessions_view(request):
@@ -65,9 +79,8 @@ def sessions_view(request):
 @login_required
 def sessions_by_client_view(request,client_pk):
     """show all sessions"""
-    try:
-        sessions = Session.objects.filter(user=request.user,client=client_pk).order_by('created_at')
-    except: Http404
+    sessions = get_list_or_404(Session,user=request.user,client=client_pk)
+    sessions = sessions.order_by('created_at')
     client = Client.objects.get(pk=client_pk)
     context = {'sessions':sessions,"client":client}
     return render(request,'session_client/client_session/session_list_by_client.html',context)

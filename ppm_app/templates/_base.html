@@ -12,7 +12,7 @@
     {% load django_htmx %}
     {% load partials %}
 
-    <link rel="stylesheet" href="{% static "session_client/css/style.css" %}">
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
 
     <!--font icons bootstrap css-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -23,17 +23,19 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{% static "favicon_io/favicon-16x16.png"%}">
     <link rel="manifest" href="{% static 'favicon_io/site.webmanifest' %}">
 
-    <!-- HTMX -->
-    <script src="{% static 'htmx.min.js' %}" defer></script>
-    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/debug.js" defer></script>
+    <!-- dj htmx setup -->
+    <meta name="htmx-config" content='{"historyCacheSize": 15}'>
+    {% htmx_script %}
+    <script src="https://unpkg.com/htmx-ext-event-header@2.0.0/event-header.js" defer ></script>
+    <script src="https://unpkg.com/htmx-ext-debug@2.0.0/debug.js" defer ></script>
 
-    {% django_htmx_script %}
 
     <!-- Hyperscript -->
     <script src="https://unpkg.com/hyperscript.org@0.9.14" defer></script>
 </head>
 
-<body class='bg-light' hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<body class='bg-light' hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+hx-ext="debug, event-header">
 
   <nav class="navbar navbar-expand-lg bg-primary sticky-top start-0" data-bs-theme="dark">
     <div class='container-fluid'>
