@@ -11,11 +11,11 @@ testx:
     uv run python3 manage.py test --parallel
 
 # run migrate
-migrate:
+migrate: makemigrations
     uv run python3 manage.py migrate
 
 #rung migrate and makemigrations together
-makemigrations: migrate
+makemigrations:
     uv run python3 manage.py makemigrations
 
 #Allows commands passed to just manage (manage.py)

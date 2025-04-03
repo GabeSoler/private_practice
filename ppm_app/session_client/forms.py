@@ -1,28 +1,11 @@
-from django import forms 
+from django import forms
 from .models import Client,Session
 
 
 
 
+
 class ClientForm(forms.ModelForm):
-    class Meta:
-        model = Client
-        fields = ['code','nick_name','type','fee','motive','rel','goal','strategy']
-        labels = {'code':'Code',                  
-                  'nick_name':'Nickname',
-                  'type':'Type',
-                  'fee':'Fee',
-                  'motive':'Motive',
-                  'rel':'Relations',
-                  'goal':'Goal',
-                  'strategy':'Strategy'}
-        widgets = {'motive':forms.Textarea(attrs={'cols':80}),
-                   'rel':forms.Textarea(attrs={'cols':80}),
-                   'goal':forms.Textarea(attrs={'cols':80}),
-                   'strategy':forms.Textarea(attrs={'cols':80})}
-
-
-class ClientSmallForm(forms.ModelForm):
     class Meta:
         model = Client
         fields = ['code','nick_name','type','fee']
@@ -43,3 +26,15 @@ class SessionForm(forms.ModelForm):
                   'attended':'Record attendance'}
         widgets = {'notes':forms.Textarea(attrs={'cols':80})}
 
+class Switch(forms.Form):
+    show_archive = forms.BooleanField(required=False,
+                                label="Archived",
+                                help_text="Show Archived",
+                                widget=forms.CheckboxInput(attrs={
+                                      "hx-post":"{% url 'session_client:client_list_all' %}",
+                                        "hx-target":"#client-list-ul",
+                                        "hx-swap":"innerHTML",
+                                        "class":"form-check-input" 
+
+                                })
+                                )

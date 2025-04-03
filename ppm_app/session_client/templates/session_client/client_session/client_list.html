@@ -1,8 +1,9 @@
 {% extends '../../_base.html' %}
 
-{% block content %}
 {% load partials %}
 {% load django_bootstrap5 %}
+
+{% block content %}
 <h2>My Clients</h2>
 
 
@@ -15,33 +16,57 @@
   <div class"card bg-primary-subtle m-2 p-2 rounded">
   
     <form class="form bg-primary-subtle ps-3"
-    hx-post={% url 'session_client:client_list' %}
-    hx-target="#client-form-wrap"
-    hx-trigger="keyup[key=='Enter']"
-    hx-ext="debug"
-    hx-swap="innerHTML"
     >
-      <table class="table" id="client-form-table">
+    <table class="table" id="client-form-table">
+      <tbody>
       <tr>
         <td class="col bg-primary-subtle" id="form-td-code">
-      {% bootstrap_field form.code wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+          {% bootstrap_field form.code wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
         <td class="col bg-primary-subtle" id="form-td-nickname">
-      {% bootstrap_field form.nick_name wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+          {% bootstrap_field form.nick_name wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
-    </tr>
+      </tr>
       <tr>
         <td class="col bg-primary-subtle" id="form-td-type">
-      {% bootstrap_field form.type wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+          {% bootstrap_field form.type wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
         <td class="col bg-primary-subtle" id="form-td-fee">
-      {% bootstrap_field form.fee wrapper_class="col" layout="horizontal" label_class="text-primary" %}
+          {% bootstrap_field form.fee wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+      <td class="bg-primary-subtle">
+    <button class="btn btn-primary col-12"
+    type="submit"
+    hx-post={% url 'session_client:client_list' %}
+    hx-target="#client-form-wrap"
+    hx-swap="innerHTML"
+    hx-trigger="keyup=='Enter',click"
+    hx-exclude="#switchArchived"
+    >
+    New</button>
+      </td>
+      <!-- add the archived to the list-->
+      <td class=" bg-primary-subtle">
+        <a
+          name=""
+          id=""
+          class="btn btn-primary"
+          href={% url 'session_client:client_archived' %}
+          role="button"
+          >Archived</a
+        >
+        
+      </td>
     </tr>
-  </form>
-</table>
+    </tfoot>
+    </table>
+</form>
   </div>
-  {% endpartialdef %} <!-- end form partial -->
+  {% endpartialdef client-form-partial %} <!-- end form partial -->
   </div>
 
 <div id="client-list-wrapper">
@@ -51,6 +76,12 @@
     <li class="list-group-item list-group-item-success" id="{{client.code}}">
       <a href="{%url 'session_client:client' client.pk %}">{{client.code}}</a> - {{client.nick_name}} | {{client.created_at|date:'M d,Y'}}
         <small><a class="list-item text-secondary" href="{% url "session_client:session_list_by_client" client.pk %}">Sessions</a></small>
+        <i class="bi bi-archive-fill text-danger" 
+          hx-put={% url 'session_client:clients_edit' client.pk %}
+          hx-trigger="click"
+          hx-target="closest li"
+          hx-swap="outerHTML"
+          ></i>
     </li>
     {% empty %}
     <li>There are no clients yet. </li>

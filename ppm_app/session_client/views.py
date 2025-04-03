@@ -1,10 +1,11 @@
 from django.shortcuts import render,redirect, get_list_or_404,get_object_or_404
 from .models import Client,Session
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
-from .forms import ClientForm, SessionForm,ClientSmallForm
+from django.http import Http404,HttpResponse
+from .forms import ClientForm, SessionForm
 from django_htmx.http import retarget
-
+from django.utils import timezone
+from django.template.loader import render_to_string
 
 #Function to check owner when calling models without the user
 def check_owner(topic_owner,request_user):
@@ -49,16 +50,17 @@ def session_view(request,session_pk):
 def clients_view(request):
     """show all clients"""
     template = 'session_client/client_session/client_list.html'    
-    clients = Client.objects.filter(user=request.user).order_by('code')
-    form = ClientSmallForm()
+    clients = Client.objects.filter(user=request.user,active=True).order_by('code')
+    form = ClientForm()
     if request.htmx:
-        form_partial = ClientSmallForm(data=request.POST)
+        form_partial = ClientForm(data=request.POST)
         if form_partial.is_valid():
             assert form_partial.cleaned_data["code"] is not None
-            instance = form.save(commit=False)
+            instance = form_partial.save(commit=False)
             instance.user = request.user
             instance.save()
-            clients = Client.objects.filter(user=request.user).order_by('code')
+            assert form_partial.cleaned_data["code"] == instance.code,"Code is not passing when saved"
+            clients = Client.objects.filter(user=request.user,active=True).order_by('code')
             context = {'clients':clients}
             template = template + "#client-list-partial"
             response = render(request,template,context)
@@ -66,8 +68,29 @@ def clients_view(request):
         template = template + '#client-form-partial'
         context = {'form':form_partial}
         return render(request,template,context)
-    context = {'clients':clients,'form':form}
+    context = {'clients':clients,'form':form,"switch":"False"}
     return render(request,template,context)
+
+def clients_edit_view(request,client_pk):
+    """ manages clients htmx calls """
+    if request.method == 'PUT':
+        occurrence = Client.objects.get(pk=client_pk)
+        if occurrence.active is True:
+            occurrence.active = False
+        else:
+            occurrence.active = True
+        occurrence.archived_at = timezone.now()
+        occurrence.save()
+        return HttpResponse() # empty response that empties the li object
+
+def client_archived_view(request):
+        template = 'session_client/client_session/client_archived_list.html'    
+        clients = Client.objects.filter(user=request.user,active=False).order_by('code')
+        context = {'clients':clients}
+        return render(request,template,context)
+
+
+
 
 @login_required
 def sessions_view(request):
