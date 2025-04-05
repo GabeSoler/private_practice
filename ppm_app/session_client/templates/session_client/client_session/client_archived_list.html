@@ -4,18 +4,18 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<h2>Archived Clients</h2>
+<h2>Archived Clients
 
 <td class=" bg-primary-subtle">
   <a
     name=""
     id=""
-    class="btn btn-warning"
+    class="btn btn-primary"
     href={% url 'session_client:client_list' %}
     role="button"
-    >Active Clients</a
+    >Active</a
   >
-
+</h2>
 
 <div id="client-list-wrapper">
   {% partialdef client-list-partial inline %}

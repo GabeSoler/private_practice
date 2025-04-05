@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect, get_list_or_404,get_object_or_404
 from .models import Client,Session
 from django.contrib.auth.decorators import login_required
 from django.http import Http404,HttpResponse
-from .forms import ClientForm, SessionForm
+from .forms import ClientForm, SessionForm,SessionShortForm
 from django_htmx.http import retarget
 from django.utils import timezone
 from django.template.loader import render_to_string
@@ -74,7 +74,7 @@ def clients_view(request):
 def clients_edit_view(request,client_pk):
     """ manages clients htmx calls """
     if request.method == 'PUT':
-        occurrence = Client.objects.get(pk=client_pk)
+        occurrence = get_object_or_404(Client,pk=client_pk,user=request.user)
         if occurrence.active is True:
             occurrence.active = False
         else:
@@ -83,6 +83,7 @@ def clients_edit_view(request,client_pk):
         occurrence.save()
         return HttpResponse() # empty response that empties the li object
 
+@login_required
 def client_archived_view(request):
         template = 'session_client/client_session/client_archived_list.html'    
         clients = Client.objects.filter(user=request.user,active=False).order_by('code')
@@ -95,9 +96,53 @@ def client_archived_view(request):
 @login_required
 def sessions_view(request):
     """show all sessions"""
-    sessions = Session.objects.filter(user=request.user).order_by('created_at')
-    context = {'sessions':sessions}
-    return render(request,'session_client/client_session/session_list.html',context)
+    sessions = Session.objects.filter(user=request.user).order_by('-created_at')
+    template = 'session_client/client_session/session_list.html'
+    form = SessionShortForm()
+    if request.htmx:
+        form_partial = SessionShortForm(data=request.POST)
+        if form_partial.is_valid():
+            instance = form_partial.save(commit=False)
+            instance.user = request.user
+            instance.save()
+            context = {'sessions':sessions}
+            assert instance in sessions,"Instance not saved properly"
+            template_partial = template + '#session-list-partial'
+            response = render(request,template_partial,context)
+            return retarget(response,"#session-list-wrapper")
+        # render form errors
+        template_partial = template + '#session-form-partial'
+        context = {'form':form_partial}
+        return render(request,template_partial,context)
+    context = {'sessions':sessions,'form':form}
+    return render(request,template,context)
+
+def sessions_hx_edit_paid(request,session_pk):
+    """ manages clients htmx calls """
+    if request.method == 'PUT':
+        session = get_object_or_404(Session,pk=session_pk,user=request.user)
+        if session.paid is True:
+            session.paid = False
+        else:
+            session.paid = True
+        session.save()
+        template = 'session_client/client_session/session_list.html#session_paid'
+        context = {'session':session}
+        return render(request,template,context) # empty response that empties the li object
+
+def sessions_hx_edit_open(request,session_pk):
+    """ manages clients htmx calls """
+    if request.method == 'PUT':
+        session = get_object_or_404(Session,pk=session_pk,user=request.user)
+        if session.open is True:
+            session.open = False
+        else:
+            session.open = True
+        session.save()
+        template = 'session_client/client_session/session_list.html#session_open'
+        context = {'session':session}
+        return render(request,template,context) # empty response that empties the li object
+
 
 @login_required
 def sessions_by_client_view(request,client_pk):

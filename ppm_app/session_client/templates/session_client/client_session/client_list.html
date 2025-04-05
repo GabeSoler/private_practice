@@ -4,10 +4,18 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<h2>My Clients</h2>
+<h2>My Clients
+<a
+  name=""
+  id=""
+  class="btn btn-warning"
+  href={% url 'session_client:client_archived' %}
+  role="button"
+  >Archived</a
+>
+</h2>
 
-
-<!-- Add occurrence widget -->
+<!-- Add Client -->
 <div class="" id="client-form-wrap"> 
 
   {% partialdef client-form-partial inline %} <!-- Start form partial -->
@@ -23,46 +31,27 @@
         <td class="col bg-primary-subtle" id="form-td-code">
           {% bootstrap_field form.code wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
-        <td class="col bg-primary-subtle" id="form-td-nickname">
-          {% bootstrap_field form.nick_name wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
-        </td>
-      </tr>
-      <tr>
         <td class="col bg-primary-subtle" id="form-td-type">
           {% bootstrap_field form.type wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
+      </tr>
+      <tr>
         <td class="col bg-primary-subtle" id="form-td-fee">
           {% bootstrap_field form.fee wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
+        <td class="bg-primary-subtle">
+            <button class="btn btn-primary col-12"
+            type="submit"
+            hx-post={% url 'session_client:client_list' %}
+            hx-target="#client-form-wrap"
+            hx-swap="innerHTML"
+            hx-trigger="keyup=='Enter',click"
+            hx-exclude="#switchArchived"
+            >
+            New</button>
+        </td>
       </tr>
     </tbody>
-    <tfoot>
-      <tr>
-      <td class="bg-primary-subtle">
-    <button class="btn btn-primary col-12"
-    type="submit"
-    hx-post={% url 'session_client:client_list' %}
-    hx-target="#client-form-wrap"
-    hx-swap="innerHTML"
-    hx-trigger="keyup=='Enter',click"
-    hx-exclude="#switchArchived"
-    >
-    New</button>
-      </td>
-      <!-- add the archived to the list-->
-      <td class=" bg-primary-subtle">
-        <a
-          name=""
-          id=""
-          class="btn btn-primary"
-          href={% url 'session_client:client_archived' %}
-          role="button"
-          >Archived</a
-        >
-        
-      </td>
-    </tr>
-    </tfoot>
     </table>
 </form>
   </div>

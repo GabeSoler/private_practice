@@ -1,29 +1,106 @@
 
 
-{% extends '../../_base.html' %}
+{% extends '_base.html' %}
+{% load partials %}
+{% load django_bootstrap5 %}
 
 {% block content %}
 
-<h2>Sessions list</h2>
+<!-- Accordion form -->
+<div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button text-primary btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Sessions
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body p-0">
+        
 
-<p>
-  <a href="{%url 'session_client:add_session'%}">Add new Session</a>
-</p>
 
-<ul>
+
+<!-- Add Session -->
+<div class="" id="session-form-wrap"> 
+
+  {% partialdef session-form-partial inline %} <!-- Start form partial -->
+  
+  <div class"card bg-primary-subtle m-2 p-2 rounded">
+
+    {% if form.errors %}
+<div
+  class="alert alert-warning" role="alert">
+<p>{{form.errors}}</p>
+</div>
+{% endif %}
+  
+    <form class="form bg-primary-subtle ps-3"
+    >
+    <table class="table mb-0" id="client-form-table">
+      <tbody>
+      <tr>
+        <td class="col bg-primary-subtle" id="form-td-code">
+          {% bootstrap_field form.title wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
+        </td>
+        <td class="col bg-primary-subtle" id="form-td-type">
+          {% bootstrap_field form.client wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
+        </td>
+        <td class="bg-primary-subtle">
+            <button class="btn btn-primary col-12"
+            type="submit"
+            hx-post={% url 'session_client:session_list' %}
+            hx-target="#session-form-wrap"
+            hx-swap="innerHTML"
+            hx-trigger="keyup=='Enter',click"
+            hx-exclude="#switchArchived"
+            >
+            New</button>
+        </td>
+      </tr>
+    </tbody>
+    </table>
+</form>
+  </div>
+  {% endpartialdef session-form-partial%} <!-- end form partial -->
+  </div>
+</div>
+</div>
+</div> <!-- Ending of accordion -->
+
+
+<div id="session-list-wrapper">
+  {% partialdef session-list-partial inline %}
+<ul class="list-group">
   {% for session in sessions%}
-    <li>
-      <a href="{%url "session_client:session" session.pk %}">
-      {{session.created_at|date:'d, M,Y'}}</a> | {{session.client}} |
-      {{session.get_attended_display}}|
-      {{session.paid|yesno:"Paid,Not Paid"}}
-    </li>
+    <li class="list-group-item list-group-item-primary">
+      <div class="row">
+      <a href="{%url "session_client:session" session.pk %}" class="col">
+        {% if session.session_date %}{{session.session_date}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
+      <span class="col">{{session.client}}</span>
+        {% partialdef session_paid inline %}
+       <span
+          hx-put={% url "session_client:sessions_hx_edit_paid" session.pk %}
+          class="col {%if session.paid %}text-success {% else %}text-danger{% endif %}">
+          <i class="bi bi-coin"></i></span>
+          {% endpartialdef session_paid %}
+
+        {% partialdef session_open inline %}
+       <span
+          hx-put={% url "session_client:sessions_hx_edit_open" session.pk %}
+          class="col {%if session.open %}text-warning{% else %}text-success{% endif %}">
+          <i class="bi bi-circle-fill"></i></span>
+          {% endpartialdef session_open %}
+      </div>
+      </li>
 
     {% empty %}
-    <li>There are no Sessions Yet. </li>
+    <li class="list-group-item list-group-item-success">There are no Sessions Yet. </li>
   </ul>
   {% endfor %}
   
 </br>
   <a class="link" href="{% url "session_client:index" %}">Back to Index</a>
+
+{% endpartialdef session-list-partial  %}
+</div>
   {% endblock content %}

@@ -29,18 +29,19 @@ class Client(models.Model):
     
 class Session(models.Model):
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
-    client = models.ForeignKey(Client,on_delete=models.PROTECT)
+    client = models.ForeignKey(Client,on_delete=models.PROTECT,help_text="Link to a client")
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
+    session_date = models.DateTimeField(null=True,blank=True, editable=True)
     #Session labels(delete after 7 years?)
-    title = models.CharField(default='Session',max_length=200) #short description
-    notes = models.TextField(default='') #longher description
+    title = models.CharField(default='',max_length=200,help_text="Give the session a title") #short description
+    notes = models.TextField(default='',blank=True,help_text="Longer note of Session") #longher description
     #admin info
-    paid = models.BooleanField(default=False) #check payment
-    attended = models.CharField(default='attended',max_length=20,choices=(ATTENDANCE)) #record attendance
-    amount_paid = models.IntegerField(default=0,blank=True,null=True) #record attendance
-
+    paid = models.BooleanField(default=False,blank=True) #check payment
+    attended = models.CharField(default='',blank=True,max_length=20,choices=(ATTENDANCE)) #record attendance
+    amount_paid = models.IntegerField(default=0,blank=True) #record attendance
+    open = models.BooleanField(default=True,blank=True)
     def __str__(self):
         date = self.created_at.strftime("%m/%d/%Y")
         return f"Session: {date}"

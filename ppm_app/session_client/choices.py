@@ -1,7 +1,7 @@
 ATTENDANCE = [
     ("Att", "Attended"),
     ("LC", "Late Cancelled"),
-    ("Mssd", "Missed"),
+    ("Missed", "Missed"),
     ("Cll", "Cancelled"),
 ]
 
