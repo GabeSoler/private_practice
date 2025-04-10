@@ -72,6 +72,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-harlequin"
+version = "1.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a9/49/35a2dd00a6859083bb5bea6602b9aa7a78a11ae9fbbb5a7715793ca24805/django_harlequin-1.5.0.tar.gz", hash = "sha256:b761fa158b4833e6ac03b1926e0ec217a90a364d683af28228c786e04c1bc219", size = 7197 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8b/82/99610792b5dba62f748b8a7a16ad699490c211d0cd3b627e62215093b216/django_harlequin-1.5.0-py3-none-any.whl", hash = "sha256:31afff3c6560738907693d8f0bba70e0bba0041db26b32c51a5c61cf104a6b38", size = 5817 },
+]
+
+[[package]]
 name = "django-htmx"
 version = "1.23.0"
 source = { registry = "https://pypi.org/simple" }
@@ -396,6 +408,7 @@ dependencies = [
     { name = "django" },
     { name = "django-bootstrap5" },
     { name = "django-browser-reload" },
+    { name = "django-harlequin" },
     { name = "django-htmx" },
     { name = "django-template-partials" },
     { name = "harlequin", extra = ["postgres"] },
@@ -415,6 +428,7 @@ requires-dist = [
     { name = "django", specifier = ">=5.1.6,<6" },
     { name = "django-bootstrap5", specifier = ">=25.1" },
     { name = "django-browser-reload", specifier = ">=1.18.0" },
+    { name = "django-harlequin", specifier = ">=1.5.0" },
     { name = "django-htmx", specifier = ">=1.23.0" },
     { name = "django-template-partials", specifier = ">=24.4" },
     { name = "harlequin", extras = ["postgres"], specifier = ">=2.1.1" },

@@ -9,6 +9,7 @@ dependencies = [
     "Django>=5.1.6,<6",
     "django-bootstrap5>=25.1",
     "django-browser-reload>=1.18.0",
+    "django-harlequin>=1.5.0",
     "django-htmx>=1.23.0",
     "django-template-partials>=24.4",
     "harlequin[postgres]>=2.1.1",
