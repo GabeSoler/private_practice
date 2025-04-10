@@ -70,36 +70,73 @@
 
 <div id="session-list-wrapper">
   {% partialdef session-list-partial inline %}
-<ul class="list-group">
+<table class="table table-secondary">
+  <thead>
+    <tr>
+      <th scope="col">Date
+      </th>
+      <th scope="col">Title
+      </th>
+      <th scope="col">Paid
+      </th>
+      <th scope="col">Open
+      </th>
+    </tr>
+  </thead>
+<tbody>
   {% for session in sessions%}
-    <li class="list-group-item list-group-item-primary">
-      <div class="row">
-      <a href="{%url "session_client:session" session.pk %}" class="col">
+    <tr>
+      <th scope="row">
+      <a href="{%url "session_client:session" session.pk %}">
         {% if session.session_date %}{{session.session_date}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
-      <span class="col">{{session.client}}</span>
-        {% partialdef session_paid inline %}
-       <span
-          hx-put={% url "session_client:sessions_hx_edit_paid" session.pk %}
-          class="col {%if session.paid %}text-success {% else %}text-danger{% endif %}">
-          <i class="bi bi-coin"></i></span>
-          {% endpartialdef session_paid %}
+      </th>
 
+      <td>{{session.client}}</td>
+
+        <!-- paid/not paid partial -->
+        {% partialdef session_paid inline %}
+       <td hx-put={% url "session_client:sessions_hx_edit_paid" session.pk %}>
+
+          {%if session.paid %}
+          <i           
+          data-bs-toggle="tooltip" data-bs-title="Paid"
+          class="bi bi-currency-exchange text-success" ></i>
+          {% else %}
+          <i           
+          data-bs-toggle="tooltip" data-bs-title="Not Paid"
+          class="bi bi-currency-exchange text-danger" ></i>
+          {% endif %}
+        </td>
+          {% endpartialdef session_paid %}
+        
+          <!-- Session open/closed partial -->
         {% partialdef session_open inline %}
-       <span
-          hx-put={% url "session_client:sessions_hx_edit_open" session.pk %}
-          class="col {%if session.open %}text-warning{% else %}text-success{% endif %}">
-          <i class="bi bi-circle-fill"></i></span>
+       <td hx-put={% url "session_client:sessions_hx_edit_open" session.pk %}>
+        {%if session.open %}
+          <i           
+          data-bs-toggle="tooltip" data-bs-title="Open"
+          class="bi bi-circle-fill text-warning"></i>
+          {% else %}
+          <i           
+          data-bs-toggle="tooltip" data-bs-title="Done"
+          class="bi bi-check-circle-fill text-success"></i>
+          {% endif %}
+        </td>
           {% endpartialdef session_open %}
       </div>
-      </li>
+      </tr>
 
     {% empty %}
-    <li class="list-group-item list-group-item-success">There are no Sessions Yet. </li>
-  </ul>
+    <tr>
+    <th>
+      There are no Sessions Yet. </th>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  </tbody>
   {% endfor %}
-  
-</br>
-  <a class="link" href="{% url "session_client:index" %}">Back to Index</a>
+</table>
 
 {% endpartialdef session-list-partial  %}
 </div>

@@ -36,15 +36,15 @@ class Session(models.Model):
     session_date = models.DateTimeField(null=True,blank=True, editable=True)
     #Session labels(delete after 7 years?)
     title = models.CharField(default='',max_length=200,help_text="Give the session a title") #short description
-    notes = models.TextField(default='',blank=True,help_text="Longer note of Session") #longher description
+    notes = models.TextField(default='',blank=True,help_text="Longer note of Session") #longer description
     #admin info
     paid = models.BooleanField(default=False,blank=True) #check payment
     attended = models.CharField(default='',blank=True,max_length=20,choices=(ATTENDANCE)) #record attendance
     amount_paid = models.IntegerField(default=0,blank=True) #record attendance
     open = models.BooleanField(default=True,blank=True)
     def __str__(self):
-        date = self.created_at.strftime("%m/%d/%Y")
-        return f"Session: {date}"
+        title = self.title
+        return f"Session-{title[:10]}"
     
     def get_absolute_url(self):
         return reverse("session_client:session", kwargs={"session_pk":self.id})

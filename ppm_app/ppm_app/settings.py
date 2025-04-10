@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "template_partials",
     "django_htmx",
     "django_browser_reload",
+    "django_harlequin",
 
 
     #default
@@ -148,7 +149,7 @@ MEDIA_URL = 'media/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
-#config of bootstrap5, I added a theme called 'sandstone' from bootswatch
+#config of bootstrap5, I added a theme called 'sandstone' from 'bootswatch'
 BOOTSTRAP5 = {
 
     # The complete URL to the Bootstrap CSS file.
@@ -156,25 +157,21 @@ BOOTSTRAP5 = {
     # ("https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"),
     # or a dict with keys `url`, `integrity` and `crossorigin` like the default value below.
     "css_url": {
-        "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css",
-        "integrity": "sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx",
+        "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css",
+        "integrity": "sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7",
         "crossorigin": "anonymous",
     },
 
     # The complete URL to the Bootstrap bundle JavaScript file.
     "javascript_url": {
-        "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js",
-        "integrity": "sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa",
+        "url": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js",
+        "integrity": "sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq",
         "crossorigin": "anonymous",
     },
 
     # The complete URL to the Bootstrap CSS theme file (None means no theme).
-    "theme_url":"https://bootswatch.com/5/litera/bootstrap.min.css",
-
+    "theme_url":"https://cdn.jsdelivr.net/npm/bootswatch@5.3.5/dist/pulse/bootstrap.min.css",
     }
-
-
-
 
 USE_TZ = False #change to True when ready to deploy??
 
