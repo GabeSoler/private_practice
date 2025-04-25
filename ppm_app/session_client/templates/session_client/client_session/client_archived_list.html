@@ -21,9 +21,8 @@
   {% partialdef client-list-partial inline %}
 <ul class="list-group" id="client-list-ul">
   {% for client in clients%}
-    <li class="list-group-item list-group-item-warning" id="{{client.code}}">
+    <li class="list-group-item list-group-item-danger" id="{{client.code}}">
       <a href="{%url 'session_client:client' client.pk %}">{{client.code}}</a> - {{client.nick_name}} | archived: {{client.archived_at|date:'M d,Y'}}
-        <small><a class="list-item text-secondary" href="{% url "session_client:session_list_by_client" client.pk %}">Sessions</a></small>
         <i class="bi bi-skip-backward-circle-fill text-success" 
           hx-put={% url 'session_client:clients_edit' client.pk %}
           hx-trigger="click"

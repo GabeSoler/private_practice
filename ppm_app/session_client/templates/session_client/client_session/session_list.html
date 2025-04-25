@@ -1,14 +1,13 @@
 
 
-{% extends '_base.html' %}
+{% extends 'session_client/utils/session-nav.html' %}
 {% load partials %}
 {% load django_bootstrap5 %}
 
 {% block content %}
 
 
-<!-- Session nav for session_list: open, session_list_by_client: explore, and add session: add -->
-{% include 'session_client/utils/session-nav.html' %}
+<!-- Session nav for session_list: open, session_search: explore, and add session: add -->
 
 <!-- Accordion form -->
 <div class="accordion" id="accordionExample">

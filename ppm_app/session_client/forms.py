@@ -1,6 +1,6 @@
 from django import forms
 from .models import Client,Session
-
+from django.utils import timezone
 
 
 
@@ -33,15 +33,6 @@ class SessionShortForm(forms.ModelForm):
                   'client':'Client'
         }
 
-class Switch(forms.Form):
-    show_archive = forms.BooleanField(required=False,
-                                label="Archived",
-                                help_text="Show Archived",
-                                widget=forms.CheckboxInput(attrs={
-                                      "hx-post":"{% url 'session_client:client_list_all' %}",
-                                        "hx-target":"#client-list-ul",
-                                        "hx-swap":"innerHTML",
-                                        "class":"form-check-input" 
-
-                                })
-                                )
+class SearchSessionFrom(forms.Form):
+    date_reference = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=timezone.now())
+    client = forms.ModelChoiceField(queryset=Session.objects.all())

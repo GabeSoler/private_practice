@@ -2,10 +2,11 @@ from django.shortcuts import render,redirect, get_list_or_404,get_object_or_404
 from .models import Client,Session
 from django.contrib.auth.decorators import login_required
 from django.http import Http404,HttpResponse
-from .forms import ClientForm, SessionForm,SessionShortForm
+from .forms import ClientForm, SessionForm,SessionShortForm,SearchSessionFrom
 from django_htmx.http import retarget
 from django.utils import timezone
-from django.template.loader import render_to_string
+import pendulum as p
+
 
 #Function to check owner when calling models without the user
 def check_owner(topic_owner,request_user):
@@ -145,14 +146,36 @@ def sessions_hx_edit_open(request,session_pk):
 
 
 @login_required
-def sessions_by_client_view(request,client_pk):
+def sessions_search(request):
     """show all sessions"""
-    sessions = get_list_or_404(Session,user=request.user,client=client_pk)
-    sessions = sessions.order_by('created_at')
-    client = Client.objects.get(pk=client_pk)
-    context = {'sessions':sessions,"client":client}
-    return render(request,'session_client/client_session/session_list_by_client.html',context)
-
+    template = "session_client/client_session/session_search.html"
+    clients_user = Client.objects.filter(user=request.user) or None
+    if request.htmx:
+        form_partial = SearchSessionFrom(data=request.POST)
+        if form_partial.is_valid():
+            date = form_partial.cleaned_data['date_reference']
+            assert date is not None, "date should be something"
+            ref_date_partial = p.datetime(date.year,date.month,date.day)
+            if form_partial.cleaned_data['client']:
+                sessions = Session.objects.filter(session_date__week=ref_date_partial.week_of_year,
+                                                            client=form_partial.cleaned_data['client'])
+            else:
+                sessions = Session.objects.filter(event__user=request.user,
+                                                 session_date__week=ref_date_partial.week_of_year)
+            template_calendar = template + "#session-view-partial"
+            context = {'sessions':sessions}
+            return render(request,template_calendar,context)
+        # There should not be errors here but just in case
+        form_partial_template = template + "#form-partial"
+        form_partial.fields['client'].queryset = clients_user
+        context = {'form':form_partial}
+        response = render(request,form_partial_template,context)
+        return retarget(response,"#client-form-tr") # retarget if not valid switch week table (edge cases)
+    sessions = Session.objects.none() #? loaded by htmx after load
+    form = SearchSessionFrom()
+    form.fields['client'].queryset = clients_user
+    context = {'sessions':sessions,'form':form}
+    return render(request,template,context)
 
 
 @login_required

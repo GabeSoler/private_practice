@@ -53,6 +53,7 @@ def week_view(request):
             template_calendar = template + "#calendar-view-partial"
             context = {'calendar':calendar_partial}
             return render(request,template_calendar,context)
+        # There should not be errors here but just in case
         form_partial_template = template + "#form-partial"
         form_partial.fields['calendar'].queryset = room_calendar_user
         context = {'form':form_partial}

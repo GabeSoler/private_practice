@@ -26,7 +26,7 @@ urlpatterns = [
     # lists
     path('client_list/', views.clients_view, name='client_list'),
     path('session_list/', views.sessions_view, name='session_list'),
-    path('session_list_by_client/<uuid:client_pk>/', views.sessions_by_client_view, name='session_list_by_client'),
+    path('session_search/', views.sessions_search, name='session_search'),
     path('client_archived/', views.client_archived_view, name='client_archived'),
 
     # edit

@@ -16,7 +16,6 @@
       <p class="card-text">Agreed Fee: {{client.fee}}</p>
       <p class="card-text">{{client.active|yesno:"Active,Archived"}}</p>
       <a href="{%url 'session_client:client_list' %}" class="card-link">Back to Clients</a>
-      <a href="{%url 'session_client:session_list_by_client' client.pk %}" class="card-link">Sessions</a>
       <p><a href="{%url 'session_client:edit_client' client.pk %}">
         Edit Client</a></p>
     </div>

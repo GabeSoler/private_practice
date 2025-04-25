@@ -1,7 +1,8 @@
 
 
-{% extends '../../_base.html' %}
-
+{% extends 'session_client/utils/session-nav.html' %}
+{% load django_bootstrap5 %}
+{% load partials %}
 {% block content %}
 
 
@@ -27,7 +28,7 @@ similar to events. needs custom form and view {% endcomment %}
           >{% bootstrap_field form.date_reference show_label='skip'  %}
         </td>
         <td id="cell-form-field-calendar"
-          >{% bootstrap_field form.calendar show_label='skip'  %}
+          >{% bootstrap_field form.client show_label='skip'  %}
         </td>
         <td id="cell-form-button">
           <div class="dropdown">
@@ -69,8 +70,5 @@ similar to events. needs custom form and view {% endcomment %}
     <li>There are no Sessions Yet. </li>
   </ul>
   {% endfor %}
-</br>
-<a class="link" href="{% url "session_client:index" %}">Back to Index</a>
-<a class="link" href="{% url "session_client:client" client.pk %}">Client's page</a>
 
   {% endblock content %}

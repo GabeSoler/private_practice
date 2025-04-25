@@ -1,50 +1,30 @@
-<div>
+{% extends '_base.html' %}
+
+{% block local_nav %}
 <!-- Sessions Nav -->
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item me-3" role="presentation">
-        <h4 class="text-primary m-2">Sessions</h4>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button
-        class="nav-link {% if request.path == session_list  %}active {% endif %}"
-        id="home-tab"
-        data-bs-toggle="tab"
-        data-bs-target="#home"
-        type="button"
-        role="tab"
-        aria-controls="home"
-        aria-selected="true"
-      >
-        Open
-      </button>
-    </li>
-    <li class="nav-item {% if request.path == session_list_by_client  %}active {% endif %}" role="presentation">
-      <button
-        class="nav-link"
-        id="profile-tab"
-        data-bs-toggle="tab"
-        data-bs-target="#profile"
-        type="button"
-        role="tab"
-        aria-controls="profile"
-        aria-selected="false"
-      >
-        Search
-      </button>
-    </li>
-    <li class="nav-item {% if request.path == add_session  %}active {% endif %}" role="presentation">
-      <button
-        class="nav-link"
-        id="messages-tab"
-        data-bs-toggle="tab"
-        data-bs-target="#messages"
-        type="button"
-        role="tab"
-        aria-controls="messages"
-        aria-selected="false"
-      >
-        Add
-      </button>
-    </li>
-  </ul>
-</div>
+<nav
+  class="nav nav-tabs"
+>
+  <h4 class="text-primary m-2">Sessions</h4>
+
+  <a class="nav-link {% if request.path == session_list  %}active {% endif %}" 
+      href="{% url "session_client:session_list" %}" aria-current="page"
+    >Open</a
+  >
+  <a class="nav-link {% if request.path == session_search  %}active {% endif %}" 
+      href="{% url "session_client:session_search" %}"
+      >Search</a>
+
+  <a class="nav-link {% if request.path == add_session  %}true{% else %}false{% endif %}" 
+      href="{% url "session_client:add_session" %}">Add</a>
+</nav>
+
+  
+  {% endblock local_nav %}
+
+  <div id="content_wrap">
+    {% block content %}
+
+    {% endblock content %}
+  </div>
+
