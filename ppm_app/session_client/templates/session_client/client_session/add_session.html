@@ -2,6 +2,10 @@
 
 {%block content%}
 {% load django_bootstrap5 %}
+
+{% include 'session_client/utils/session-nav.html' %}
+
+
   <h2>Add Session</h2>
   <a href={%url 'session_client:session_list' %}>Back to Sessions</a></br>
   <a href={%url 'session_client:add_client' %}>Add a Client First</a>

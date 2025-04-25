@@ -4,11 +4,57 @@
 
 {% block content %}
 
-<h2>{{client.nick_name}}'s Sessions</h2>
 
-<p>
-  <a href="{%url 'session_client:add_session'%}">Add new Session</a>
-</p>
+
+{% comment %} work to do: create a search widget to search by client and week. 
+similar to events. needs custom form and view {% endcomment %}
+
+<div id="wrapper">
+
+  <div id="form-table-wrapper">
+  {% partialdef form-partial inline %}
+  <form
+    hx-post={% url "room_calendar_app:week_view" %}
+    hx-target="#calendar-table-wrapper"
+    hx-trigger="change throttle:1s,load once"
+    >
+    <table
+    class="table table-primary table-striped-columns table-sm mb-0"
+    id="switch-table"
+    >
+    <tr class="" id="calendar-form-tr">
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form.date_reference show_label='skip'  %}
+        </td>
+        <td id="cell-form-field-calendar"
+          >{% bootstrap_field form.calendar show_label='skip'  %}
+        </td>
+        <td id="cell-form-button">
+          <div class="dropdown">
+            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-plus-square-fill text-primary fs-5"></i>
+            </button>
+            <ul class="dropdown-menu"
+            id="event-list-hx"
+            hx-get={% url "room_calendar_app:event_list_auxiliary" %}
+            hx-target="#event-list-hx"
+            hx-trigger="load"
+            hx-swap="outerHTML"
+            >
+          </ul>
+        </div>
+      </td>
+    </tr>
+  </table>
+</form>
+      {% endpartialdef %} <!-- end partial table -->
+      </div>
+
+
+
+
+
+
 
 <ul>
   {% for session in sessions %}

@@ -81,7 +81,7 @@ class Event(models.Model):
         
 
 class OccurrenceManager(models.Manager):
-    def create_unique(self,start_time:datetime,duration:datetime,event:Event,room=None):
+    def create_unique(self,start_time:datetime,duration:datetime,event:Event,room:RoomCalendarModel):
         """ creates an occurrence and checks if overlaps with others. 
             Returns (True,None) if it does not overlaps, and (False,Queryset) if it does  """
         end_time = start_time + duration
@@ -95,10 +95,11 @@ class OccurrenceManager(models.Manager):
         )
         overlaps = new_occ.overlap_set()
         if overlaps:
-            return False,overlaps
+            __bool__ = False
+            return overlaps
         else:
-            new_occ.save()
-            True,None
+            __bool__ = True
+            return None
 
 class OccurrenceModel(models.Model):
     """ sets an occurrence by having a start and end, and a event attached """
@@ -121,7 +122,7 @@ class OccurrenceModel(models.Model):
         return "{}: {}".format(self.event.title, self.start_time.isoformat())
 
     def get_absolute_url(self):
-        return reverse("room_calendar_app:edit_occurrence_list", args=[str(self.event.id), str(self.id)])
+        return reverse("room_calendar_app:edit_occurrence", args=[str(self.id)])
 
     def __lt__(self, other):
         return self.start_time < other.start_time
@@ -140,11 +141,12 @@ class OccurrenceModel(models.Model):
     def overlap_set(self):
         """
         Returns a queryset of for instances that have any overlap with a
-        particular day.
+        particular room and time frame.
         """
         start = self.start_time
         end = self.end_time
-        qs = OccurrenceModel.objects.filter(
+        calendar = self.calendar
+        qs = OccurrenceModel.objects.filter(room_calendar=self.room_calendar).filter(
             models.Q(
                 start_time__gte=start,
                 start_time__lte=end,
@@ -161,9 +163,6 @@ class OccurrenceModel(models.Model):
     def event_title(self):
         return self.event.title
 
-    @property
-    def room_calendar(self):
-        return self.event.room_calendar
     @property
     def week_day(self):
         return self.start_time.day

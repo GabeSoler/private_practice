@@ -141,6 +141,7 @@ def event_occurrence_view(request,event_pk):
     return render(request,template,context)
 
 def edit_occurrence_list(request,occurrence_pk):
+    """ a proxy function to respond to HTMX call delete"""
     if request.method == 'DELETE':
         occurrence = OccurrenceModel.objects.get(pk=occurrence_pk)
         occurrence.delete()
