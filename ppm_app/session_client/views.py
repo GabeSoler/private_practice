@@ -3,10 +3,10 @@ from .models import Client,Session
 from django.contrib.auth.decorators import login_required
 from django.http import Http404,HttpResponse
 from .forms import ClientForm, SessionForm,SessionShortForm,SearchSessionFrom
-from django_htmx.http import retarget
+from django_htmx.http import retarget,reswap
 from django.utils import timezone
 import pendulum as p
-
+from django.contrib import messages
 
 #Function to check owner when calling models without the user
 def check_owner(topic_owner,request_user):
@@ -96,7 +96,7 @@ def client_archived_view(request):
 
 @login_required
 def sessions_view(request):
-    """show all sessions"""
+    """show open sessions, add new simple session, update pay status """
     sessions = Session.objects.filter(user=request.user).order_by('-created_at')
     template = 'session_client/client_session/session_list.html'
     form = SessionShortForm()
@@ -106,18 +106,21 @@ def sessions_view(request):
             instance = form_partial.save(commit=False)
             instance.user = request.user
             instance.save()
-            context = {'sessions':sessions}
+            context = {'session':instance}
             assert instance in sessions,"Instance not saved properly"
-            template_partial = template + '#session-list-partial'
+            messages.info(request,"Session added")
+            template_partial = template + '#row-instance'
             response = render(request,template_partial,context)
-            return retarget(response,"#session-list-wrapper")
+            return retarget(response,"#tableBody")
         # render form errors
         template_partial = template + '#session-form-partial'
         context = {'form':form_partial}
-        return render(request,template_partial,context)
+        response = render(request,template_partial,context)
+        return reswap(response,"innerHTML")
     context = {'sessions':sessions,'form':form}
     return render(request,template,context)
 
+@login_required
 def sessions_hx_edit_paid(request,session_pk):
     """ manages clients htmx calls """
     if request.method == 'PUT':
@@ -131,6 +134,7 @@ def sessions_hx_edit_paid(request,session_pk):
         context = {'session':session}
         return render(request,template,context) # empty response that empties the li object
 
+@login_required
 def sessions_hx_edit_open(request,session_pk):
     """ manages clients htmx calls """
     if request.method == 'PUT':
@@ -147,7 +151,7 @@ def sessions_hx_edit_open(request,session_pk):
 
 @login_required
 def sessions_search(request):
-    """show all sessions"""
+    """ Search sessions by date and client """
     template = "session_client/client_session/session_search.html"
     clients_user = Client.objects.filter(user=request.user) or None
     if request.htmx:

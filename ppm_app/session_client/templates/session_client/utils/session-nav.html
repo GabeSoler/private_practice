@@ -3,19 +3,19 @@
 {% block local_nav %}
 <!-- Sessions Nav -->
 <nav
-  class="nav nav-tabs"
+  class="nav mt-0 nav-tabs bg-secondary-subtle"
 >
   <h4 class="text-primary m-2">Sessions</h4>
 
-  <a class="nav-link {% if request.path == session_list  %}active {% endif %}" 
+  <a class="nav-link {% if request.path == "/session_list/"  %}active {% endif %}" 
       href="{% url "session_client:session_list" %}" aria-current="page"
     >Open</a
   >
-  <a class="nav-link {% if request.path == session_search  %}active {% endif %}" 
+  <a class="nav-link {% if request.path == "/session_search/"  %}active {% endif %}" 
       href="{% url "session_client:session_search" %}"
       >Search</a>
 
-  <a class="nav-link {% if request.path == add_session  %}true{% else %}false{% endif %}" 
+  <a class="nav-link {% if request.path == "/add_session/"  %}true{% else %}false{% endif %}" 
       href="{% url "session_client:add_session" %}">Add</a>
 </nav>
 

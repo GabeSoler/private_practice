@@ -152,7 +152,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 #config of bootstrap5, I added a theme called 'sandstone' from 'bootswatch'
 BOOTSTRAP5 = {
     # The complete URL to the Bootstrap CSS theme file (None means no theme).
-    "theme_url":"https://cdn.jsdelivr.net/npm/bootswatch@5.3.5/dist/zephyr/bootstrap.min.css",
+    "theme_url":"https://cdn.jsdelivr.net/npm/bootswatch@5.3.5/dist/pulse/bootstrap.min.css",
     }
 
 USE_TZ = False #change to True when ready to deploy??

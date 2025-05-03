@@ -1,20 +1,24 @@
-{% extends '../../_base.html' %}
+{% extends 'session_client/utils/session-nav.html' %}
 
 {%block content%}
 {% load django_bootstrap5 %}
 
-{% include 'session_client/utils/session-nav.html' %}
+<div class="card bg-secondary-subtle mb-5">
+  <div class="card-header m-0 bg-primary-subtle">
+    <div class="card-title fs-4 text-primary">
+      Full Session
+    </div>
+  </div>
+  <div class="mx-2">
+    <a class="card-link" href={%url 'session_client:add_client' %}>Add a Client First</a>
+  </div>
 
-
-  <h2>Add Session</h2>
-  <a href={%url 'session_client:session_list' %}>Back to Sessions</a></br>
-  <a href={%url 'session_client:add_client' %}>Add a Client First</a>
-
-
+<div class="card-body">
   <form action="{%url 'session_client:add_session' %}" method='post'>
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button button_type='submit' content='Add Session' %}
   </form>
-
-  {% endblock content %}
+</div>
+</div> <!-- end main card -->
+{% endblock content %}

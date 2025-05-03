@@ -17,13 +17,22 @@ class ClientForm(forms.ModelForm):
 class SessionForm(forms.ModelForm):
     class Meta:
         model = Session
-        fields = ['title','client','notes','paid','attended']
+        fields = ['title','session_date','client','notes','paid','attended']
         labels = {'title':'Title',
+                  'session_date':'Date',
                   'client':'Client',
                   'notes':'Session Note',
                   'paid':'Confirm payment',
                   'attended':'Record attendance'}
-        widgets = {'notes':forms.Textarea(attrs={'cols':80})}
+        field_classes = {
+            "session_date":forms.SplitDateTimeField,
+        }
+        widgets = {'notes':forms.Textarea(attrs={'cols':80}),
+                   'session_date':forms.SplitDateTimeWidget(date_attrs={'class':'form-select','type':'date'},
+                                                            time_attrs={'class':'form-select','type':'time'},
+                                                            date_format="%Y-%m-%d",
+                                                            time_format="%H:%M",
+                                                            )}
 
 class SessionShortForm(forms.ModelForm):
     class Meta:
