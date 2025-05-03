@@ -46,7 +46,7 @@
             type="submit"
             hx-post={% url 'session_client:session_list' %}
             hx-target="#session-form-wrap"
-            hx-swap="afterbegin"
+            hx-swap="afterbegin settle:1s"
             hx-trigger="keyup=='Enter',click"
             hx-exclude="#switchArchived"
             id="formButton"
@@ -86,7 +86,7 @@
     <tbody id="tableBody">
       {% for session in sessions%}
       {% partialdef row-instance inline %}
-      <tr class="slide-transition">
+      <tr class="fade-in">
         <th scope="row">
           <a href="{%url "session_client:session" session.pk %}">
             {% if session.session_date %}{{session.session_date|date:'d, M,Y'}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
