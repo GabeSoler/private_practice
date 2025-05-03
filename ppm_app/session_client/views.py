@@ -7,7 +7,7 @@ from django_htmx.http import retarget,reswap
 from django.utils import timezone
 import pendulum as p
 from django.contrib import messages
-
+from django.core.exceptions import FieldError
 #Function to check owner when calling models without the user
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
@@ -105,6 +105,7 @@ def sessions_view(request):
         if form_partial.is_valid():
             instance = form_partial.save(commit=False)
             instance.user = request.user
+            instance.session_date = instance.created_at
             instance.save()
             context = {'session':instance}
             template_partial = template + '#row-instance'
@@ -161,29 +162,59 @@ def sessions_search(request):
             start_ref = ref_date_partial.subtract(days=15)
             end_ref = ref_date_partial.add(days=15)
             if form_partial.cleaned_data['client']:
-                sessions = Session.objects.filter(created_at__gte=start_ref,
-                                                created_at__lte=end_ref,
+                sessions = Session.objects.filter(session_date__gte=start_ref,
+                                                session_date__lte=end_ref,
                                                 client=form_partial.cleaned_data['client'])
             else:
                 sessions = Session.objects.filter(user=request.user,
-                                                created_at__gte=start_ref,
-                                                created_at__lte=end_ref,)
+                                                session_date__gte=start_ref,
+                                                session_date__lte=end_ref,)
             template_calendar = template + "#session-list-partial"
             context = {'sessions':sessions}
             return render(request,template_calendar,context)
-        # There should not be errors here but just in case
-        assert form_partial.is_valid() is False,"here are errors with the Form"
-        form_partial_template = template + "#form-partial"
-        form_partial.fields['client'].queryset = clients_user
-        context = {'form':form_partial}
-        response = render(request,form_partial_template,context)
-        return retarget(response,"#form-table-wrapper") # retarget if not valid switch week table (edge cases)
+        else:
+            raise Http404(f"The form has errors: {form_partial.errors}")
     sessions = Session.objects.none() #? loaded by htmx after load
     form = SearchSessionFrom()
     form.fields['client'].queryset = clients_user
     context = {'sessions':sessions,'form':form}
     return render(request,template,context)
 
+@login_required
+def sessions_search_csv(request):
+    """ returns a csv file from a date and client post data"""
+    form_partial = SearchSessionFrom(data=request.POST)
+    if request.method == 'POST':
+        if form_partial.is_valid():
+            date = form_partial.cleaned_data['date_reference']
+            assert date is not None, "date should be something"
+            ref_date_partial = p.datetime(date.year,date.month,date.day)
+            start_ref = ref_date_partial.subtract(days=15)
+            end_ref = ref_date_partial.add(days=15)
+            client_ref = form_partial.cleaned_data['client'] or None
+            if client_ref:
+                sessions = Session.objects.filter(session_date__gte=start_ref,
+                                                session_date__lte=end_ref,
+                                                client=client_ref)
+            else:
+                sessions = Session.objects.filter(user=request.user,
+                                                session_date__gte=start_ref,
+                                                session_date__lte=end_ref,)
+            import csv
+            file_name = client_ref or ref_date_partial
+            response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="{file_name}.csv"'})
+            fieldnames = ["session_date","client","title","paid"]
+            writer = csv.writer(response) # response is the output
+            writer.writerow(fieldnames)
+            for row in sessions:
+                writer.writerow([row.session_date,row.client,row.title,row.paid])
+            return response
+        else:
+            raise Http404(f"The form has errors: {form_partial.errors}")
+    else:
+        raise Http404("Not a post method")
 
 @login_required
 def add_client_view(request):

@@ -14,11 +14,12 @@ similar to events. needs custom form and view {% endcomment %}
 
   <div id="form-table-wrapper">
   {% partialdef form-partial inline %}
-  <form
+  <form action={% url 'session_client:sessions_search_csv' %} method="post"
     hx-post={% url "session_client:session_search" %}
     hx-target="#session-list-wrapper"
     hx-trigger="change throttle:1s,load once"
     >
+    {% csrf_token %}
     <table
     class="table table-primary table-striped-columns table-sm mb-0"
     id="switch-table"
@@ -32,17 +33,9 @@ similar to events. needs custom form and view {% endcomment %}
         </td>
         <td id="cell-form-button">
           <div class="dropdown">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-plus-square-fill text-primary fs-5"></i>
+            <button class="btn link" type="submit" value="submit" >
+              <i class="bi bi-cloud-download text-primary fs-5"></i>
             </button>
-            <ul class="dropdown-menu"
-            id="event-list-hx"
-            hx-get={% url "room_calendar_app:event_list_auxiliary" %}
-            hx-target="#event-list-hx"
-            hx-trigger="load"
-            hx-swap="outerHTML"
-            >
-          </ul>
         </div>
       </td>
     </tr>
@@ -63,7 +56,7 @@ similar to events. needs custom form and view {% endcomment %}
   <li class="list-group-item list-group-item-primary text-primary">
     <a href="{%url "session_client:session" session.pk %}">
     {{session.created_at|date:'d,M,Y'}}</a> | {{session.client}} |
-    {{session.get_attended_display}}|
+    {{session.title|truncatechars:10}}|
     {{session.paid|yesno:"Paid,Not Paid"}}
   </li>
 

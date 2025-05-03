@@ -38,4 +38,9 @@ urlpatterns = [
     path('sessions_hx_edit_open/<uuid:session_pk>/', views.sessions_hx_edit_open, name='sessions_hx_edit_open'),
     path('sessions_hx_edit_paid/<uuid:session_pk>/', views.sessions_hx_edit_paid, name='sessions_hx_edit_paid'),
 
+# data
+    path('sessions_search_csv/', views.sessions_search_csv, name='sessions_search_csv'),
+
+
+
 ]

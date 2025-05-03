@@ -35,7 +35,7 @@ class Session(models.Model):
     updated_at = models.DateTimeField(auto_now=True, editable=False)
     session_date = models.DateTimeField(null=True,blank=True, editable=True,help_text="When was the session?")
     #Session labels(delete after 7 years?)
-    title = models.CharField(default='',max_length=200,help_text="Give the session a title") #short description
+    title = models.CharField(default='',blank=True,max_length=200,help_text="Give the session a title") #short description
     notes = models.TextField(default='',blank=True,help_text="Longer note of Session") #longer description
     #admin info
     paid = models.BooleanField(default=False,blank=True) #check payment
