@@ -105,7 +105,7 @@ hx-ext="debug, event-header">
 {% bootstrap_messages %}
 </div>
 {% endpartialdef %} {% endcomment %}
-
+{% if messages %}{% include '_toasts.html'%}{% endif %}
 
 
 <main class='container'>

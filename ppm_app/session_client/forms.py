@@ -44,4 +44,4 @@ class SessionShortForm(forms.ModelForm):
 
 class SearchSessionFrom(forms.Form):
     date_reference = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=timezone.now())
-    client = forms.ModelChoiceField(queryset=Session.objects.all())
+    client = forms.ModelChoiceField(queryset=Client.objects.all(),required=False)

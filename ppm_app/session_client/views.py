@@ -151,28 +151,33 @@ def sessions_hx_edit_open(request,session_pk):
 def sessions_search(request):
     """ Search sessions by date and client """
     template = "session_client/client_session/session_search.html"
-    clients_user = Client.objects.filter(user=request.user) or None
+    clients_user = Client.objects.filter(user=request.user) or None # for select
     if request.htmx:
         form_partial = SearchSessionFrom(data=request.POST)
         if form_partial.is_valid():
             date = form_partial.cleaned_data['date_reference']
             assert date is not None, "date should be something"
             ref_date_partial = p.datetime(date.year,date.month,date.day)
+            start_ref = ref_date_partial.subtract(days=15)
+            end_ref = ref_date_partial.add(days=15)
             if form_partial.cleaned_data['client']:
-                sessions = Session.objects.filter(session_date__week=ref_date_partial.week_of_year,
-                                                            client=form_partial.cleaned_data['client'])
+                sessions = Session.objects.filter(created_at__gte=start_ref,
+                                                created_at__lte=end_ref,
+                                                client=form_partial.cleaned_data['client'])
             else:
-                sessions = Session.objects.filter(event__user=request.user,
-                                                 session_date__week=ref_date_partial.week_of_year)
-            template_calendar = template + "#session-view-partial"
+                sessions = Session.objects.filter(user=request.user,
+                                                created_at__gte=start_ref,
+                                                created_at__lte=end_ref,)
+            template_calendar = template + "#session-list-partial"
             context = {'sessions':sessions}
             return render(request,template_calendar,context)
         # There should not be errors here but just in case
+        assert form_partial.is_valid() is False,"here are errors with the Form"
         form_partial_template = template + "#form-partial"
         form_partial.fields['client'].queryset = clients_user
         context = {'form':form_partial}
         response = render(request,form_partial_template,context)
-        return retarget(response,"#client-form-tr") # retarget if not valid switch week table (edge cases)
+        return retarget(response,"#form-table-wrapper") # retarget if not valid switch week table (edge cases)
     sessions = Session.objects.none() #? loaded by htmx after load
     form = SearchSessionFrom()
     form.fields['client'].queryset = clients_user

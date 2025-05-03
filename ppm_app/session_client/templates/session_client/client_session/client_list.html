@@ -4,29 +4,28 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<h2>My Clients
-<a
-  name=""
-  id=""
-  class="btn btn-warning"
-  href={% url 'session_client:client_archived' %}
-  role="button"
-  >Archived</a
->
-</h2>
+<div class="card">
+  <div class="card-header">
+  <h2 class="card-title position-relative">My Clients
+    <a
+      class="btn btn-warning position-absolute end-0"
+      href={% url 'session_client:client_archived' %}
+      role="button"
+      >Archived</a
+    >
+    </h2>
+    </div>
 
 <!-- Add Client -->
-<div class="" id="client-form-wrap"> 
 
-  {% partialdef client-form-partial inline %} <!-- Start form partial -->
+<div class"card bg-primary-subtle">
+<div class="" id="client-form-wrap">
+{% partialdef client-form-partial inline %} <!-- Start form partial -->
   
-  
-  <div class"card bg-primary-subtle m-2 p-2 rounded">
-  
-    <form class="form bg-primary-subtle ps-3"
+    <form class="form bg-primary-subtle ps-3 mb-0"
     >
-    <table class="table" id="client-form-table">
-      <tbody>
+    <table class="table mb-0" id="client-form-table">
+      <tbody class="mb-0">
       <tr>
         <td class="col bg-primary-subtle" id="form-td-code">
           {% bootstrap_field form.code wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
@@ -54,8 +53,8 @@
     </tbody>
     </table>
 </form>
-  </div>
-  {% endpartialdef client-form-partial %} <!-- end form partial -->
+</div>
+{% endpartialdef client-form-partial %} <!-- end form partial -->
   </div>
 
 <div id="client-list-wrapper">
@@ -78,5 +77,5 @@
   </ul>
   {% endpartialdef %}
 </div>
-
+</div>
   {% endblock content %}

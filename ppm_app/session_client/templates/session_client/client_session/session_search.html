@@ -15,8 +15,8 @@ similar to events. needs custom form and view {% endcomment %}
   <div id="form-table-wrapper">
   {% partialdef form-partial inline %}
   <form
-    hx-post={% url "room_calendar_app:week_view" %}
-    hx-target="#calendar-table-wrapper"
+    hx-post={% url "session_client:session_search" %}
+    hx-target="#session-list-wrapper"
     hx-trigger="change throttle:1s,load once"
     >
     <table
@@ -56,10 +56,11 @@ similar to events. needs custom form and view {% endcomment %}
 
 
 
-
-<ul>
+<div id="session-list-wrapper">
+  {% partialdef session-list-partial inline %}
+<ul class="list-group fade-in">
   {% for session in sessions %}
-  <li>
+  <li class="list-group-item list-group-item-primary text-primary">
     <a href="{%url "session_client:session" session.pk %}">
     {{session.created_at|date:'d,M,Y'}}</a> | {{session.client}} |
     {{session.get_attended_display}}|
@@ -67,8 +68,11 @@ similar to events. needs custom form and view {% endcomment %}
   </li>
 
     {% empty %}
-    <li>There are no Sessions Yet. </li>
-  </ul>
-  {% endfor %}
+    <li class="list-group-item list-group-item-primary text-primary">
+      There are no Sessions Yet. </li>
+      {% endfor %}
+    </ul>
+{% endpartialdef %}
+</div>
 
   {% endblock content %}
