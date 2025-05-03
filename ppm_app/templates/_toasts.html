@@ -1,24 +1,18 @@
+{% if messages %}
 <div class="toast-container position-fixed top-0 end-0">
 
-{% if messages %}
-
-{% for message in messages %}
-
-<div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toastMessages"
-_="init call bootstrap.Toast.getOrCreateInstance(me).show()">
-
-    <div class="toast-header">
-      <img src="..." class="rounded me-2 {% if messages.tags %} bg-{{message.tags}}"{% endif %} 
-      alt="...">
-      {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}<strong class="me-auto">Important: 
-    </strong>{% endif %}
-      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toastMessages"
+    _="init call bootstrap.Toast.getOrCreateInstance(me).show()">
+    <div class="d-flex">
+        <div class="toast-body">
+            <button type="button" class="btn-close position-fixed end-0 mx-2" data-bs-dismiss="toast" aria-label="Close"></button>
+            {% for message in messages %}
+            <p><b class="text-{{message.tags|default:"primary"}}">{{message.tags|title}}</b>: {{message}}</p>
+            {% endfor %}
+        </div>
     </div>
-    <div class="toast-body">
-      {{message}}
-    </div>
-  </div>
-
-{% endfor %}
-{% endif %}
 </div>
+
+</div>
+{% endif %}

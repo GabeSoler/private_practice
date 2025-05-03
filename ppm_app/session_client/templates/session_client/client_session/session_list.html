@@ -86,12 +86,11 @@
     <tbody id="tableBody">
       {% for session in sessions%}
       {% partialdef row-instance inline %}
-      <tr>
-      {% if messages %}{% include '_toasts.html' %}{% endif %}{% comment %}trying to set a toast system for messages{% endcomment %}
-      <th scope="row">
-      <a href="{%url "session_client:session" session.pk %}">
-        {% if session.session_date %}{{session.session_date|date:'d, M,Y'}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
-      </th>
+      <tr class="slide-transition">
+        <th scope="row">
+          <a href="{%url "session_client:session" session.pk %}">
+            {% if session.session_date %}{{session.session_date|date:'d, M,Y'}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
+          </th>
 
       <td>{{session.title|truncatechars:10}}</td>
       <td>{{session.client}}</td>
@@ -125,6 +124,8 @@
           class="bi bi-check-circle-fill text-success"></i>
           {% endif %}
         </td>
+        {% if messages %}{% include '_toasts.html' %}{% endif %}{% comment %}trying to set a toast system for messages{% endcomment %}
+
           {% endpartialdef session_open %}
       </div>
       </tr>

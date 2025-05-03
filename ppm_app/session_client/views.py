@@ -97,7 +97,7 @@ def client_archived_view(request):
 @login_required
 def sessions_view(request):
     """show open sessions, add new simple session, update pay status """
-    sessions = Session.objects.filter(user=request.user).order_by('-created_at')
+    sessions = Session.objects.filter(user=request.user,open=False).order_by('-created_at')
     template = 'session_client/client_session/session_list.html'
     form = SessionShortForm()
     if request.htmx:
@@ -107,8 +107,6 @@ def sessions_view(request):
             instance.user = request.user
             instance.save()
             context = {'session':instance}
-            assert instance in sessions,"Instance not saved properly"
-            messages.info(request,"Session added")
             template_partial = template + '#row-instance'
             response = render(request,template_partial,context)
             return retarget(response,"#tableBody")
