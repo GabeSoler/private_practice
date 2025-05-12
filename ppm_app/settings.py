@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     "template_partials",
     "django_htmx",
     "django_browser_reload",
-    "django_harlequin",
 
 
     #default

@@ -146,7 +146,7 @@ class OccurrenceModel(models.Model):
         start = self.start_time
         end = self.end_time
         calendar = self.calendar
-        qs = OccurrenceModel.objects.filter(room_calendar=self.room_calendar).filter(
+        qs = OccurrenceModel.objects.filter(room_calendar=calendar).filter(
             models.Q(
                 start_time__gte=start,
                 start_time__lte=end,
