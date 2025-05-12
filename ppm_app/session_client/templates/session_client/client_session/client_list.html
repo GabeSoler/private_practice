@@ -1,20 +1,10 @@
-{% extends '../../_base.html' %}
+{% extends 'session_client/utils/client-nav.html' %}
 
 {% load partials %}
 {% load django_bootstrap5 %}
 
 {% block content %}
 <div class="card">
-  <div class="card-header">
-  <h2 class="card-title position-relative">My Clients
-    <a
-      class="btn btn-warning position-absolute end-0"
-      href={% url 'session_client:client_archived' %}
-      role="button"
-      >Archived</a
-    >
-    </h2>
-    </div>
 
 <!-- Add Client -->
 
@@ -44,7 +34,7 @@
             hx-post={% url 'session_client:client_list' %}
             hx-target="#client-form-wrap"
             hx-swap="innerHTML"
-            hx-trigger="keyup=='Enter',click"
+            hx-trigger="keyup[key=='Enter'],click"
             hx-exclude="#switchArchived"
             >
             New</button>

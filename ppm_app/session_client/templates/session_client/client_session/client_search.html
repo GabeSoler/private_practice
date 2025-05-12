@@ -1,0 +1,73 @@
+
+
+{% extends 'session_client/utils/client-nav.html' %}
+{% load django_bootstrap5 %}
+{% load partials %}
+{% block content %}
+
+
+
+{% comment %} work to do: create a search widget to search by client and week. 
+similar to events. needs custom form and view {% endcomment %}
+
+<div id="wrapper">
+
+  <div id="form-table-wrapper">
+  {% partialdef form-partial inline %}
+  <form 
+    hx-post={% url "session_client:client_search" %}
+    hx-target="#client-list-wrapper"
+    hx-trigger="input changed delay:500ms throttle:1s,change delay:500ms,load once"
+    >
+    {% csrf_token %}
+    <table
+    class="table table-primary table-sm mb-0"
+    id="switch-table"
+    >
+    <tr class="" id="calendar-form-tr">
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form.search_input show_label='skip'  %}
+        </td>
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form.active label_class='form-check-label' wrapper_class='form-check form-switch' %}
+        </td>
+        <td id="cell-form-button">
+          <div class="dropdown">
+            <button class="btn link" type="submit" value="submit" >
+              <i class="bi bi-cloud-download text-primary fs-5"></i>
+            </button>
+        </div>
+      </td>
+    </tr>
+  </table>
+</form>
+      {% endpartialdef %} <!-- end partial table -->
+      </div>
+
+
+
+
+
+
+<div id="client-list-wrapper">
+  {% partialdef client-list-partial inline %}
+<ul class="list-group" id="client-list-ul">
+  {% for client in clients%}
+    <li class="list-group-item list-group-item-primary" id="{{client.code}}">
+      <a href="{%url 'session_client:client' client.pk %}">{{client.code}}</a> - {{client.nick_name}} | {{client.created_at|date:'M d,Y'}}
+        <i class="bi bi-archive-fill text-danger" 
+          hx-put={% url 'session_client:clients_edit' client.pk %}
+          hx-trigger="click"
+          hx-target="closest li"
+          hx-swap="outerHTML"
+          ></i>
+    </li>
+    {% empty %}
+    <li>There are no clients yet. </li>
+    
+    {% endfor %}
+  </ul>
+  {% endpartialdef %}
+</div>
+
+  {% endblock content %}

@@ -1,7 +1,7 @@
 from django import forms
 from .models import Client,Session
 from django.utils import timezone
-
+import pendulum as p
 
 
 
@@ -43,5 +43,11 @@ class SessionShortForm(forms.ModelForm):
         }
 
 class SearchSessionFrom(forms.Form):
-    date_reference = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=timezone.now())
+    date_ref_start = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now().subtract(months=1))
+    date_ref_end = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now())
     client = forms.ModelChoiceField(queryset=Client.objects.all(),required=False)
+
+class SearchClientForm(forms.Form):
+    search_input = forms.CharField(max_length=20,required=True,help_text="type client code")
+    active = forms.BooleanField(help_text="Search Archived",initial=True,required=False,
+                                widget=forms.CheckboxInput(attrs={'class':'form-check-input','type':"checkbox",'role':'switch'}))

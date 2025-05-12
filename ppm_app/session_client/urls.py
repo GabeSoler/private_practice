@@ -25,6 +25,7 @@ urlpatterns = [
 
     # lists
     path('client_list/', views.clients_view, name='client_list'),
+    path('client_search/', views.client_search_view, name='client_search'),
     path('session_list/', views.sessions_view, name='session_list'),
     path('session_search/', views.sessions_search, name='session_search'),
     path('client_archived/', views.client_archived_view, name='client_archived'),
@@ -34,7 +35,7 @@ urlpatterns = [
     path('edit_session/<uuid:session_pk>/', views.edit_session_view, name='edit_session'),
 
 # hx auxiliar 
-    path('clients_edit/<uuid:client_pk>/', views.clients_edit_view, name='clients_edit'),
+    path('clients_edit/<uuid:client_pk>/', views.clients_hx_edit, name='clients_edit'),
     path('sessions_hx_edit_open/<uuid:session_pk>/', views.sessions_hx_edit_open, name='sessions_hx_edit_open'),
     path('sessions_hx_edit_paid/<uuid:session_pk>/', views.sessions_hx_edit_paid, name='sessions_hx_edit_paid'),
 

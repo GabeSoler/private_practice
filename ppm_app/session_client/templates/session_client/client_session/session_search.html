@@ -21,12 +21,15 @@ similar to events. needs custom form and view {% endcomment %}
     >
     {% csrf_token %}
     <table
-    class="table table-primary table-striped-columns table-sm mb-0"
+    class="table table-primary table-sm mb-0"
     id="switch-table"
     >
     <tr class="" id="calendar-form-tr">
         <td id="cell-form-field-date"
-          >{% bootstrap_field form.date_reference show_label='skip'  %}
+          >{% bootstrap_field form.date_ref_start show_label='skip'  %}
+        </td>
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form.date_ref_end show_label='skip'  %}
         </td>
         <td id="cell-form-field-calendar"
           >{% bootstrap_field form.client show_label='skip'  %}
@@ -55,7 +58,7 @@ similar to events. needs custom form and view {% endcomment %}
   {% for session in sessions %}
   <li class="list-group-item list-group-item-primary text-primary">
     <a href="{%url "session_client:session" session.pk %}">
-    {{session.created_at|date:'d,M,Y'}}</a> | {{session.client}} |
+    {{session.session_date|date:'d,M,Y'}}</a> | {{session.client}} |
     {{session.title|truncatechars:10}}|
     {{session.paid|yesno:"Paid,Not Paid"}}
   </li>

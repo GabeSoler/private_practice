@@ -15,7 +15,7 @@
       href="{% url "session_client:session_search" %}"
       >Search</a>
 
-  <a class="nav-link {% if request.path == "/add_session/"  %}true{% else %}false{% endif %}" 
+  <a class="nav-link {% if request.path == "/add_session/"  %}active{% endif %}" 
       href="{% url "session_client:add_session" %}">Add</a>
 </nav>
 
