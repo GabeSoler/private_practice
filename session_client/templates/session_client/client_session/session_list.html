@@ -46,7 +46,7 @@
             type="submit"
             hx-post={% url 'session_client:session_list' %}
             hx-target="#session-form-wrap"
-            hx-swap="afterbegin settle:1s"
+            hx-swap="afterbegin settle:0.2s"
             hx-trigger="keyup=='Enter',click"
             hx-exclude="#switchArchived"
             id="formButton"

@@ -1,15 +1,63 @@
 /* styles.css */
-#animated-circle circle {
-    animation: rotate 2s linear infinite;
+#animated-circle {
+    animation: rotate 5s linear infinite;
   }
   
   @keyframes rotate {
     0% {
       transform: rotate(0deg);
       transform-origin: 50% 50%;
+      stroke: blue;
     }
     100% {
+      stroke:aquamarine;
       transform: rotate(360deg);
       transform-origin: 50% 50%;
+    }
+  }
+
+  
+  /* bottle */
+
+  #svg_bottle {
+    animation: bounce 5s linear infinite;
+  }
+
+  @keyframes bounce {
+    0% {
+      transform: translateX(0) translateY(0) rotate(0);
+      stroke: blue;
+    }
+    50% {
+      transform: translateX(100px) translateY(-20) rotate(5deg);
+      stroke: rgb(34, 255, 0);
+
+    }
+    100% {
+      transform: translateX(0) translateY(0) rotate(0);
+      stroke: rgb(255, 0, 200);
+
+    }
+  }
+
+  /* bubbles animations */
+  #svg_red_bubbles {
+    animation: rise_fade 5s linear infinite;
+  }
+
+  @keyframes bounce {
+    0% {
+      transform: translateX(0) translateY(0) rotate(0);
+      stroke: blue;
+    }
+    50% {
+      transform: translateX(100px) translateY(500px) rotate(2deg);
+      stroke: rgb(34, 255, 0);
+
+    }
+    100% {
+      transform: translateX(0) translateY(0) rotate(0);
+      stroke: rgb(255, 0, 200);
+
     }
   }
