@@ -18,6 +18,11 @@
     <!--font icons bootstrap css-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Love+Light&display=swap" rel="stylesheet">
+
     <!--favicons-->
     <link rel="apple-touch-icon" sizes="180x180" href="{% static "favicon_io/apple-touch-icon.png"%}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static "favicon_io/favicon-32x32.png"%}">
@@ -35,17 +40,17 @@
     <script src="https://unpkg.com/hyperscript.org@0.9.14" defer></script>
 </head>
 
-<body class='bg-light' hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-hx-ext="debug, event-header">
+<body class="{% block background %}bg-light {% endblock background %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+hx-ext="{% if debug %}debug{% endif %}, event-header">
 
   <nav class="navbar navbar-expand-lg bg-primary sticky-top start-0 py-2 mb-0" data-bs-theme="dark">
     <div class='container-fluid'>
       <span class="position-relative p-2" style="min-width:12rem;">
       <a class='navbar-brand position-relative' href="{% url 'session_client:index' %}">
-        <image src={% static 'alchemist/bubbles.min.svg'%} class="m-1 position-fixed" style="max-width:3rem;max-height:4rem;">
-        <span class="position-absolute bottom-50 start-50">Alchemist's</span><small class="text-secondary position-absolute top-0 start-100 p-2">
-        admin</small>
-      </a></span>
+        <image src={% static 'alchemist/bubbles.min.svg'%} class="m-1 position-absolute" style="max-width:3rem;max-height:4rem;">
+        <span class="position-absolute bottom-0 start-50 fs-2" style="font-family:Love Light,cursive;">Alchemist's</span>
+      </a><small class="text-secondary ms-5 p-2">
+        admin</small></span>
         
         <button class='navbar-toggler' type='button' data-bs-toggle='collapse'
         data-bs-target='#navbarCollapse' aria-controls='navbarCollapse'

@@ -1,116 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version= "1.1" width="1080px" height="2205px" viewBox="0 0 1080 2205">
-<style type="text/css">
-    <![CDATA[
 
-
-  #svg_bottle {
-    animation: bounce 5s linear infinite;
-    transform-origin: 50% 30%;
-
-  }
-
-  @keyframes bounce {
-    0% {
-      transform: translateX(0) translateY(0) rotate(0);
-    }
-    50% {
-      transform: translateX(200px) translateY(-20px) rotate(5deg);
-
-    }
-    100% {
-      transform: translateX(0) translateY(0) rotate(0);
-
-    }
-  }
-
-  /* bubbles animations */
-#svg_red_bubbles {
-    animation: rise_fade 3.2s ease-in infinite;
-    animation-direction: normal;
-    animation-fill-mode: both;
-  }
-
-  @keyframes rise_fade {
-    0% {
-      transform: translateX(0) translateY(25px) rotate(0);
-      opacity: 0;
-    }
-    25% {
-      transform: translateX(0) translateY(0) rotate(0);
-      opacity: 1;
-    }
-    50% {
-      transform: translateX(100px) translateY(-100px) rotate(2deg);
-      opacity: .5;
-
-    }
-    100% {
-      transform: translateX(0) translateY(-300px) rotate(0);
-      opacity: 0;
-
-    }
-  }
-
-
-#svg_green_bubbles, #svg_small_bubbles {
-    animation: rise_fade2 2.5s ease-in infinite;
-    animation-direction: normal;
-    animation-fill-mode: both;
-
-  }
-
-  @keyframes rise_fade2 {
-    0% {
-      transform: translateX(0) translateY(+25px) rotate(0);
-      opacity: 0;
-    }
-    25% {
-      transform: translateX(0) translateY(-0) rotate(0);
-      opacity: 1;
-    }
-    50% {
-      transform: translateX(50px) translateY(-200) rotate(0);
-      opacity: .5;
-    }
-    100% {
-      transform: translateX(100px) translateY(-500px) rotate(2deg);
-      opacity: 0;
-
-    }
-  }
-
-#svg_big_red_bubbles, #svg_purple_bubbles {
-    animation: rise_fade3 3s ease-in infinite;
-    animation-direction: normal;
-    animation-fill-mode: both;
-
-  }
-
-  @keyframes rise_fade3 {
-    0% {
-      transform: translateX(0) translateY(+30px) rotate(0);
-      opacity: 0;
-    }
-    25% {
-      transform: translateX(25) translateY(-0) rotate(0);
-      opacity: 1;
-    }
-    50% {
-      transform: translateX(-25px) translateY(-200) rotate(0);
-      opacity: .7;
-    }
-    100% {
-      transform: translateX(50px) translateY(-300px) rotate(2deg);
-      opacity: 0;
-      transform: scale(.8,.8);
-
-    }
-  }
-
-    ]]>
-
-    </style>
 
 <!-- Bottle Layer -->
 <g id="svg_bottle">
@@ -741,7 +631,7 @@
 </g>
 
 <!-- small bubbles 2 -->
-<g id="svg_big_red_bubbles">
+<g id="svg_small_bubbles_2">
 <g>
 <g style="fill:rgb(219,47,39); fill-opacity:1.0; stroke-linejoin: miter">
 <path d="M1062.8075,700.3689L1062.8075,700.3689C1062.8075,775.63007,1001.7963,836.64166,926.5348,836.64166L926.5348,836.64166C851.2734,836.64166,790.2621,775.63055,790.2621,700.3689L790.2621,700.3689C790.2621,625.1075,851.2734,564.09607,926.5348,564.09607L926.5348,564.09607C1001.7963,564.09607,1062.8075,625.1075,1062.8075,700.3689L1062.8075,700.3689 M1027.1595,700.3689L1027.1595,700.3689C1027.1595,644.79535,982.10834,599.74414,926.5348,599.74414L926.5348,599.74414C870.96124,599.74414,825.91016,644.79535,825.91016,700.3689L825.91016,700.3689C825.91016,755.9427,870.96124,800.9936,926.5348,800.9936L926.5348,800.9936C982.10834,800.9936,1027.1595,755.9422,1027.1595,700.3689 Z"/>
