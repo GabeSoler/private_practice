@@ -1,8 +1,8 @@
 ATTENDANCE = [
     ("Att", "Attended"),
-    ("LC", "Late Cancelled"),
+    ("LateC", "Late Cancelled"),
     ("Missed", "Missed"),
-    ("Cll", "Cancelled"),
+    ("Cancel", "Cancelled"),
 ]
 
 CLIENT_TYPE = [
@@ -10,6 +10,9 @@ CLIENT_TYPE = [
     ("Srv", "Service"),
     ("EAP", "EAP"),
     ("Sp", "Supervisee"),
+    ("Adm", "Other-Admin"),
+    ("Prss", "Other-Processing"),
+    ("CPD", "Other-CPD"),
     ("Other", "Other"),
 ]
 

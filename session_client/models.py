@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 import uuid
 from django.urls import reverse
 from .choices import ATTENDANCE,CLIENT_TYPE
+from room_calendar_app.models import RoomCalendarModel
 # Create your models here.
 
 class Client(models.Model):
@@ -12,6 +13,7 @@ class Client(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    room_calendar = models.ForeignKey(RoomCalendarModel,on_delete=models.SET_NULL,blank=True,null=True)
     #Client labels
     code = models.CharField(blank=False,max_length=10,help_text="Add an Identifier code") #Create a code instead of name
     nick_name = models.CharField(default="",blank=True,null=True,max_length=20,help_text="Give it a memorable nickname")
@@ -20,6 +22,23 @@ class Client(models.Model):
     #client base info(delete after 7 yeas?)(I am thinking to only erase the fields as the admin is yours)
     active = models.BooleanField(default=True,help_text="Change if your client is active or archived")
     archived_at = models.DateTimeField(blank=True,null=True)
+    
+    class Meta:
+        ordering = ("updated_at","code")
+
+    @property
+    def color_class(self): #to add a color class or other relative to event type
+        match self.type:
+            case 'Pvt':
+                return 'primary'
+            case 'Srv':
+                return 'secondary'
+            case 'EAP':
+                return 'danger'
+            case 'Sp':
+                return 'warning'
+            case 'CPD':
+                return 'info'
 
     def __str__(self):
         return f"{self.code}"

@@ -3,9 +3,7 @@ from django.utils.translation import gettext_lazy as _
 import pendulum as p
 
 def time_slot_options():
-    """
-Creats a list of time options from 8 to 22 every 15 min
-    """
+    """Creats a list tuples of time options from 8 to 22 every 15 min"""
 
     format = "%I:%M %p"
     options = []
@@ -46,6 +44,7 @@ def duration_times()->list:
 
 
 def duration_times_as_choices()->list:
+    """ creates a list of tuples of duration"""
     choices_list = []
     for t in duration_times():
         choices_list.append((t,t))
