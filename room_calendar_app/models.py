@@ -8,7 +8,6 @@ from .choices import EVENT_TYPE
 import uuid
 
 from django.urls import reverse
-from session_client.models import Client
 
 class TenantModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -49,7 +48,6 @@ class Event(models.Model):
     updated_at = models.DateTimeField(auto_now=True, editable=False)
 
     room_calendar = models.ForeignKey(RoomCalendarModel,on_delete=models.SET_NULL,blank=True,null=True)
-    client = models.ForeignKey(Client, on_delete=models.SET_NULL,blank=True,null=True)
     title = models.CharField(max_length=32,blank=True)
     description = models.CharField(max_length=100,blank=True)
     event_type = models.CharField(choices=EVENT_TYPE,max_length=20, verbose_name="event type")

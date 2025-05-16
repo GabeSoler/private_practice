@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect, get_list_or_404,get_object_or_404
-from .models import Client,Session
+from .models import ClientModel,SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404,HttpResponse
 from .forms import ClientForm, SessionForm,SessionShortForm,SearchSessionFrom,SearchClientForm
@@ -20,12 +20,12 @@ def index_view(request):
     return render(request,'session_client/index.html')
 
 
-#Session-Client
+#Home view
 @login_required
 def session_home_view(request):
     """show clients and sessions"""
-    clients = Client.objects.filter(user=request.user).order_by('code')
-    sessions = Session.objects.filter(user=request.user).order_by('created_at')[:20]
+    clients = ClientModel.objects.filter(user=request.user).order_by('code')
+    sessions = SessionModel.objects.filter(user=request.user).order_by('created_at')[:20]
     context = {'clients':clients,'sessions':sessions}
     return render(request,'session_client/client_session/home.html',context)
 
@@ -34,14 +34,14 @@ def session_home_view(request):
 @login_required
 def client_view(request,client_pk):
     """show one client"""
-    client = get_object_or_404(Client,pk=client_pk,user=request.user)
+    client = get_object_or_404(ClientModel,pk=client_pk,user=request.user)
     context = {'client':client}
     return render(request,'session_client/client_session/client.html',context)
 
 @login_required
 def session_view(request,session_pk):
     """show one session"""
-    session = get_object_or_404(Session,pk=session_pk,user=request.user)
+    session = get_object_or_404(SessionModel,pk=session_pk,user=request.user)
     context = {'session':session}
     return render(request,'session_client/client_session/session.html',context)
 
@@ -51,7 +51,7 @@ def session_view(request,session_pk):
 def clients_view(request):
     """show all clients"""
     template = 'session_client/client_session/client_list.html'    
-    clients = Client.objects.filter(user=request.user,active=True).order_by('code')
+    clients = ClientModel.objects.filter(user=request.user,active=True).order_by('code')
     form = ClientForm()
     if request.htmx:
         form_partial = ClientForm(data=request.POST)
@@ -61,7 +61,7 @@ def clients_view(request):
             instance.user = request.user
             instance.save()
             assert form_partial.cleaned_data["code"] == instance.code,"Code is not passing when saved"
-            clients = Client.objects.filter(user=request.user,active=True).order_by('code')
+            clients = ClientModel.objects.filter(user=request.user,active=True).order_by('code')
             context = {'clients':clients}
             template = template + "#client-list-partial"
             response = render(request,template,context)
@@ -76,7 +76,7 @@ def clients_view(request):
 def clients_hx_edit(request,client_pk):
     """ manages clients htmx calls """
     if request.method == 'PUT':
-        occurrence = get_object_or_404(Client,pk=client_pk,user=request.user)
+        occurrence = get_object_or_404(ClientModel,pk=client_pk,user=request.user)
         if occurrence.active is True:
             occurrence.active = False
         else:
@@ -93,7 +93,7 @@ def client_search_view(request):
         if form_partial.is_valid():
             search_input = form_partial.cleaned_data['search_input']
             active = form_partial.cleaned_data['active']
-            clients = Client.objects.filter(code__icontains=search_input,
+            clients = ClientModel.objects.filter(code__icontains=search_input,
                                                 active=active,
                                                 )
             template_calendar = template + "#client-list-partial"
@@ -101,7 +101,7 @@ def client_search_view(request):
             return render(request,template_calendar,context)
         else:
             raise Http404(f"The form has errors: {form_partial.errors}")
-    clients = Client.objects.none() #? loaded by htmx after load
+    clients = ClientModel.objects.none() #? loaded by htmx after load
     form = SearchClientForm()
     context = {'clients':clients,'form':form}
     return render(request,template,context)
@@ -112,7 +112,7 @@ def client_search_view(request):
 @login_required
 def client_archived_view(request):
         template = 'session_client/client_session/client_archived_list.html'    
-        clients = Client.objects.filter(user=request.user,active=False).order_by('code')
+        clients = ClientModel.objects.filter(user=request.user,active=False).order_by('code')
         context = {'clients':clients}
         return render(request,template,context)
 
@@ -122,7 +122,7 @@ def client_archived_view(request):
 @login_required
 def sessions_view(request):
     """show open sessions, add new simple session, update pay status """
-    sessions = Session.objects.filter(user=request.user,open=True).order_by('-created_at')
+    sessions = SessionModel.objects.filter(user=request.user,open=True).order_by('-created_at')
     template = 'session_client/client_session/session_list.html'
     form = SessionShortForm()
     if request.htmx:
@@ -130,7 +130,7 @@ def sessions_view(request):
         if form_partial.is_valid():
             instance = form_partial.save(commit=False)
             instance.user = request.user
-            instance.session_date = instance.created_at
+            instance.start_datetime = instance.created_at
             instance.save()
             context = {'session':instance}
             template_partial = template + '#row-instance'
@@ -148,7 +148,7 @@ def sessions_view(request):
 def sessions_hx_edit_paid(request,session_pk):
     """ manages clients htmx calls """
     if request.method == 'PUT':
-        session = get_object_or_404(Session,pk=session_pk,user=request.user)
+        session = get_object_or_404(SessionModel,pk=session_pk,user=request.user)
         if session.paid is True:
             session.paid = False
         else:
@@ -162,7 +162,7 @@ def sessions_hx_edit_paid(request,session_pk):
 def sessions_hx_edit_open(request,session_pk):
     """ manages clients htmx calls """
     if request.method == 'PUT':
-        session = get_object_or_404(Session,pk=session_pk,user=request.user)
+        session = get_object_or_404(SessionModel,pk=session_pk,user=request.user)
         if session.open is True:
             session.open = False
         else:
@@ -177,7 +177,7 @@ def sessions_hx_edit_open(request,session_pk):
 def sessions_search(request):
     """ Search sessions by date and client """
     template = "session_client/client_session/session_search.html"
-    clients_user = Client.objects.filter(user=request.user) or None # for select
+    clients_user = ClientModel.objects.filter(user=request.user) or None # for select
     if request.htmx:
         form_partial = SearchSessionFrom(data=request.POST)
         if form_partial.is_valid():
@@ -186,19 +186,19 @@ def sessions_search(request):
             client_ref = form_partial.cleaned_data['client'] or None
             if client_ref:
                 # using session date as reference. Added it automatically with quick add option.
-                sessions = Session.objects.filter(session_date__gte=start_ref,
+                sessions = SessionModel.objects.filter(session_date__gte=start_ref,
                                                 session_date__lte=end_ref,
-                                                client=client_ref).order_by('session_date')
+                                                client=client_ref).order_by('start_datetime')
             else:
-                sessions = Session.objects.filter(user=request.user,
+                sessions = SessionModel.objects.filter(user=request.user,
                                                 session_date__gte=start_ref,
-                                                session_date__lte=end_ref,).order_by('session_date')
+                                                session_date__lte=end_ref,).order_by('start_datetime')
             template_calendar = template + "#session-list-partial"
             context = {'sessions':sessions}
             return render(request,template_calendar,context)
         else:
             raise Http404(f"The form has errors: {form_partial.errors}")
-    sessions = Session.objects.none() #? loaded by htmx after load
+    sessions = SessionModel.objects.none() #? loaded by htmx after load
     form = SearchSessionFrom()
     form.fields['client'].queryset = clients_user
     context = {'sessions':sessions,'form':form}
@@ -214,13 +214,13 @@ def sessions_search_csv(request):
             end_ref = form_partial.cleaned_data['date_ref_end']
             client_ref = form_partial.cleaned_data['client'] or None
             if client_ref:
-                sessions = Session.objects.filter(session_date__gte=start_ref,
+                sessions = SessionModel.objects.filter(session_date__gte=start_ref,
                                                 session_date__lte=end_ref,
-                                                client=client_ref).order_by('session_date')
+                                                client=client_ref).order_by('start_datetime')
             else:
-                sessions = Session.objects.filter(user=request.user,
+                sessions = SessionModel.objects.filter(user=request.user,
                                                 session_date__gte=start_ref,
-                                                session_date__lte=end_ref,).order_by('session_date')
+                                                session_date__lte=end_ref,).order_by('start_datetime')
             import csv
             start_ref_str = p.instance(start_ref).to_formatted_date_string() #converting for easier formatting
             end_ref_str = p.instance(end_ref).to_formatted_date_string()
@@ -228,11 +228,11 @@ def sessions_search_csv(request):
             response = HttpResponse(
             content_type="text/csv",
             headers={"Content-Disposition": f'attachment; filename="{file_name}.csv"'})
-            fieldnames = ["session_date","client","title","paid"]
+            fieldnames = ["start_datetime","client","title","paid"]
             writer = csv.writer(response) # response is the output
             writer.writerow(fieldnames)
             for row in sessions:
-                writer.writerow([row.session_date,row.client,row.title,row.paid])
+                writer.writerow([row.start_datetime,row.client,row.title,row.paid])
             return response
         else:
             raise Http404(f"The form has errors: {form_partial.errors}")
@@ -278,7 +278,7 @@ def add_session_view(request):
 @login_required
 def edit_client_view(request,client_pk):
     """edit an existing entry"""
-    Client_i = Client.objects.get(pk=client_pk)
+    Client_i = ClientModel.objects.get(pk=client_pk)
     check_owner(Client_i.user,request.user)
     if request.method != 'POST':
         #initial request;pre-fill form with the current entry
@@ -296,7 +296,7 @@ def edit_client_view(request,client_pk):
 @login_required
 def edit_session_view(request,session_pk):
     """edit an existing Session"""
-    session = Session.objects.get(pk=session_pk)
+    session = SessionModel.objects.get(pk=session_pk)
     check_owner(session.user,request.user)
     if request.method != 'POST':
         #initial request;pre-fill form with the current entry

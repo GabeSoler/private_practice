@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Client,Session
+from .models import ClientModel,SessionModel
 
 
 
@@ -15,6 +15,6 @@ class ClientAdmin(admin.ModelAdmin):
 
 
 
-admin.site.register(Client, ClientAdmin)
-admin.site.register(Session, SessionAdmin)
+admin.site.register(ClientModel, ClientAdmin)
+admin.site.register(SessionModel, SessionAdmin)
 

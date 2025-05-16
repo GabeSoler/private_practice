@@ -3,11 +3,13 @@ from django.core.validators import MinValueValidator,MaxValueValidator
 from django.contrib.auth import get_user_model
 import uuid
 from django.urls import reverse
-from .choices import ATTENDANCE,CLIENT_TYPE
+from .choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices
 from room_calendar_app.models import RoomCalendarModel
+import datetime as dt
+import pendulum as p
 # Create your models here.
 
-class Client(models.Model):
+class ClientModel(models.Model):
     """a model to organise clients"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
@@ -22,9 +24,15 @@ class Client(models.Model):
     #client base info(delete after 7 yeas?)(I am thinking to only erase the fields as the admin is yours)
     active = models.BooleanField(default=True,help_text="Change if your client is active or archived")
     archived_at = models.DateTimeField(blank=True,null=True)
-    
+    day = models.IntegerField(choices=WEEKDAY_SHORT,default=1)
+    duration = models.DurationField(default='60 minutes',choices=duration_times_as_choices())
+
     class Meta:
         ordering = ("updated_at","code")
+        verbose_name ="Client"
+        verbose_name_plural = "Clients"
+        ordering = ("code","created_at")
+
 
     @property
     def color_class(self): #to add a color class or other relative to event type
@@ -45,15 +53,52 @@ class Client(models.Model):
     
     def get_absolute_url(self):
         return reverse("session_client:client", kwargs={"client_pk":self.pk})
-    
-class Session(models.Model):
+
+
+
+class SessionManager(models.Manager):
+    def create_unique(self,client:ClientModel,date:dt.date=None,time:dt.time=None,duration:dt.timedelta=None,room:RoomCalendarModel=None):
+        """ creates an Session and checks if overlaps with others. 
+            Returns (True,None) if it does not overlaps, and (False,Queryset) if it does  """
+        if date is None:
+            # deducing next's weeks appointment from defaults in ClientModel
+            now = p.now()
+            week_day = client.day
+            now_day_week = now.isoweekday()
+            if now_day_week < week_day:
+                diff = week_day - now_day_week
+                date = now.add(weeks=1,days=diff)
+            else:
+                diff = now_day_week - week_day
+                date = now.add(weeks=1).subtract(days=diff)
+        start_time = date + time
+        end_time = start_time + duration
+        calendar = room if room else client.room_calendar
+        new_occ = self.create(
+            start_time=start_time,
+            end_time=end_time,
+            client=client,
+            calendar=calendar,
+        )
+        overlaps = new_occ.overlap_set()
+        if overlaps:
+            __bool__ = False
+            return overlaps
+        else:
+            __bool__ = True
+            return None
+
+
+
+class SessionModel(models.Model):
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
-    client = models.ForeignKey(Client,on_delete=models.CASCADE,help_text="Link to a client")
+    client = models.ForeignKey(ClientModel,on_delete=models.CASCADE,help_text="Link to a client")
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
-    session_date = models.DateTimeField(null=True,blank=True, editable=True,help_text="When was the session?")
-    #Session labels(delete after 7 years?)
+    start_datetime = models.DateTimeField(null=True,blank=True, editable=True,help_text="Start of session?")
+    end_datetime = models.DateTimeField(null=True,blank=True, editable=True,help_text="End of session")
+   #Session labels(delete after 7 years?)
     title = models.CharField(default='',blank=True,max_length=200,help_text="Give the session a title") #short description
     notes = models.TextField(default='',blank=True,help_text="Longer note of Session") #longer description
     #admin info
@@ -61,6 +106,11 @@ class Session(models.Model):
     attended = models.CharField(default='',blank=True,max_length=20,choices=(ATTENDANCE)) #record attendance
     amount_paid = models.IntegerField(default=0,blank=True) #record attendance
     open = models.BooleanField(default=True,blank=True)
+    #manager
+    objects = SessionManager()
+    # Calendar connection
+    calendar = models.ForeignKey(RoomCalendarModel,null=True,blank=True,on_delete=models.SET_NULL)
+
     def __str__(self):
         title = self.title
         return f"Session-{title[:10]}"
@@ -68,3 +118,54 @@ class Session(models.Model):
     def get_absolute_url(self):
         return reverse("session_client:session", kwargs={"session_pk":self.id})
   
+
+
+    class Meta:
+        verbose_name ="session"
+        verbose_name_plural = "sessions"
+        ordering = ("start_datetime",)
+        base_manager_name = "objects"
+
+    def __str__(self):
+        return "{}: {}".format(self.client.title, self.start_datetime.isoformat())
+
+    def get_absolute_url(self):
+        return reverse("session_client:edit_session", args=[str(self.id)])
+
+    def __lt__(self, other):
+        return self.start_datetime < other.start_datetime
+    
+    def repeat_next_week(self,weeks=1):
+        start_time = self.start_datetime + dt.timedelta(weeks=weeks)
+        end_time = self.end_datetime + dt.timedelta(weeks=weeks)
+        created,set = self.manager.create_unique(start_datetime=start_time,
+                                  end_datetime=end_time,
+                                  event=self.client,
+                                  room_calendar=self.calendar
+                                  )
+        return created
+
+    def overlap_set(self):
+        """
+        Returns a queryset of for instances that have any overlap with a
+        particular room and time frame.
+        """
+        start = self.start_datetime
+        end = self.end_datetime
+        calendar = self.calendar
+        qs = SessionModel.objects.filter(room_calendar=calendar).filter(
+            models.Q(
+                start_time__gte=start,
+                start_time__lte=end,
+            )
+            | models.Q(
+                end_time__gte=start,
+                end_time__lte=end,
+            )
+            | models.Q(start_time__lt=start, end_time__gt=end)
+        )
+        return qs
+
+    @property
+    def week_day(self):
+        return self.start_datetime.day

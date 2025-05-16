@@ -89,7 +89,7 @@
       <tr class="fade-in">
         <th scope="row">
           <a href="{%url "session_client:session" session.pk %}">
-            {% if session.session_date %}{{session.session_date|date:'d, M,Y'}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
+            {% if session.start_datetime %}{{session.start_datetime|date:'d, M,Y'}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
           </th>
 
       <td>{{session.title|truncatechars:10}}</td>

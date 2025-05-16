@@ -1,5 +1,5 @@
 from django import forms
-from .models import Client,Session
+from .models import ClientModel,SessionModel
 from django.utils import timezone
 import pendulum as p
 
@@ -7,7 +7,7 @@ import pendulum as p
 
 class ClientForm(forms.ModelForm):
     class Meta:
-        model = Client
+        model = ClientModel
         fields = ['code','type','fee']
         labels = {'code':'Code',                  
                   'type':'Type',
@@ -16,19 +16,19 @@ class ClientForm(forms.ModelForm):
 
 class SessionForm(forms.ModelForm):
     class Meta:
-        model = Session
-        fields = ['title','session_date','client','notes','paid','attended']
+        model = SessionModel
+        fields = ['title','start_datetime','client','notes','paid','attended']
         labels = {'title':'Title',
-                  'session_date':'Date',
+                  'start_datetime':'Date',
                   'client':'Client',
                   'notes':'Session Note',
                   'paid':'Confirm payment',
                   'attended':'Record attendance'}
         field_classes = {
-            "session_date":forms.SplitDateTimeField,
+            "start_datetime":forms.SplitDateTimeField,
         }
         widgets = {'notes':forms.Textarea(attrs={'cols':80}),
-                   'session_date':forms.SplitDateTimeWidget(date_attrs={'class':'form-select','type':'date'},
+                   'start_datetime':forms.SplitDateTimeWidget(date_attrs={'class':'form-select','type':'date'},
                                                             time_attrs={'class':'form-select','type':'time'},
                                                             date_format="%Y-%m-%d",
                                                             time_format="%H:%M",
@@ -36,7 +36,7 @@ class SessionForm(forms.ModelForm):
 
 class SessionShortForm(forms.ModelForm):
     class Meta:
-        model = Session
+        model = SessionModel
         fields = ['title','client']
         labels = {'title':'Title',
                   'client':'Client'
@@ -45,7 +45,7 @@ class SessionShortForm(forms.ModelForm):
 class SearchSessionFrom(forms.Form):
     date_ref_start = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now().subtract(months=1))
     date_ref_end = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now())
-    client = forms.ModelChoiceField(queryset=Client.objects.all(),required=False)
+    client = forms.ModelChoiceField(queryset=ClientModel.objects.all(),required=False)
 
 class SearchClientForm(forms.Form):
     search_input = forms.CharField(max_length=20,required=True,help_text="type client code")

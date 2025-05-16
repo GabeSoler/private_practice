@@ -58,7 +58,7 @@ similar to events. needs custom form and view {% endcomment %}
   {% for session in sessions %}
   <li class="list-group-item list-group-item-primary text-primary">
     <a href="{%url "session_client:session" session.pk %}">
-    {{session.session_date|date:'d,M,Y'}}</a> | {{session.client}} |
+    {{session.start_datetime|date:'d,M,Y'}}</a> | {{session.client}} |
     {{session.title|truncatechars:10}}|
     {{session.paid|yesno:"Paid,Not Paid"}}
   </li>

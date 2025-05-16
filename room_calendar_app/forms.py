@@ -30,10 +30,9 @@ class EventForm(forms.ModelForm):
     """Event form"""
     class Meta:
         model = Event
-        fields = ("client","room_calendar",
+        fields = ("room_calendar",
                   "title","description","event_type",)
         labels = {
-            "client":"Client?",
             "room_calendar":"Room",
             "title":"Title",
             "description":"Note",

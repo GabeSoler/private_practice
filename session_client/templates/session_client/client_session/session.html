@@ -24,7 +24,7 @@
         </li>
       <li class="list-group-item text-info">
         <b>Date:</b>
-        {% if session.session_dat %}{{session.session_date|date:'M d,Y'}}{% else %} {{session.created_at|date:'M d,Y'}} {% endif %}
+        {% if session.session_dat %}{{session.start_datetime|date:'M d,Y'}}{% else %} {{session.created_at|date:'M d,Y'}} {% endif %}
       </li>
       <li class="list-group-item text-info">
         <b>Session Title:</b>
