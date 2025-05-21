@@ -27,7 +27,7 @@ def session_home_view(request):
     clients = ClientModel.objects.filter(user=request.user).order_by('code')
     sessions = SessionModel.objects.filter(user=request.user).order_by('created_at')[:20]
     context = {'clients':clients,'sessions':sessions}
-    return render(request,'session_client/client_session/home.html',context)
+    return render(request,'session_client/lists/home.html',context)
 
 
 
@@ -36,21 +36,21 @@ def client_view(request,client_pk):
     """show one client"""
     client = get_object_or_404(ClientModel,pk=client_pk,user=request.user)
     context = {'client':client}
-    return render(request,'session_client/client_session/client.html',context)
+    return render(request,'session_client/item/client.html',context)
 
 @login_required
 def session_view(request,session_pk):
     """show one session"""
     session = get_object_or_404(SessionModel,pk=session_pk,user=request.user)
     context = {'session':session}
-    return render(request,'session_client/client_session/session.html',context)
+    return render(request,'session_client/item/session.html',context)
 
 
 
 @login_required
 def clients_view(request):
     """show all clients"""
-    template = 'session_client/client_session/client_list.html'    
+    template = 'session_client/lists/client_list.html'    
     clients = ClientModel.objects.filter(user=request.user,active=True).order_by('code')
     form = ClientForm()
     if request.htmx:
@@ -87,7 +87,7 @@ def clients_hx_edit(request,client_pk):
 
 @login_required
 def client_search_view(request):
-    template = 'session_client/client_session/client_search.html'    
+    template = 'session_client/lists/client_search.html'    
     if request.htmx:
         form_partial = SearchClientForm(data=request.POST)
         if form_partial.is_valid():
@@ -111,7 +111,7 @@ def client_search_view(request):
 
 @login_required
 def client_archived_view(request):
-        template = 'session_client/client_session/client_archived_list.html'    
+        template = 'session_client/lists/client_archived_list.html'    
         clients = ClientModel.objects.filter(user=request.user,active=False).order_by('code')
         context = {'clients':clients}
         return render(request,template,context)
@@ -123,7 +123,7 @@ def client_archived_view(request):
 def sessions_view(request):
     """show open sessions, add new simple session, update pay status """
     sessions = SessionModel.objects.filter(user=request.user,open=True).order_by('-created_at')
-    template = 'session_client/client_session/session_list.html'
+    template = 'session_client/lists/session_list.html'
     form = SessionShortForm()
     if request.htmx:
         form_partial = SessionShortForm(data=request.POST)
@@ -154,7 +154,7 @@ def sessions_hx_edit_paid(request,session_pk):
         else:
             session.paid = True
         session.save()
-        template = 'session_client/client_session/session_list.html#session_paid'
+        template = 'session_client/lists/session_list.html#session_paid'
         context = {'session':session}
         return render(request,template,context) # empty response that empties the li object
 
@@ -168,7 +168,7 @@ def sessions_hx_edit_open(request,session_pk):
         else:
             session.open = True
         session.save()
-        template = 'session_client/client_session/session_list.html#session_open'
+        template = 'session_client/lists/session_list.html#session_open'
         context = {'session':session}
         return render(request,template,context) # empty response that empties the li object
 
@@ -176,7 +176,7 @@ def sessions_hx_edit_open(request,session_pk):
 @login_required
 def sessions_search(request):
     """ Search sessions by date and client """
-    template = "session_client/client_session/session_search.html"
+    template = "session_client/lists/session_search.html"
     clients_user = ClientModel.objects.filter(user=request.user) or None # for select
     if request.htmx:
         form_partial = SearchSessionFrom(data=request.POST)
@@ -255,7 +255,7 @@ def add_client_view(request):
             return redirect('session_client:client_list')
     #display a blank or invalid form
     context = {'form':form}
-    return render(request,'session_client/client_session/add_client.html',context)
+    return render(request,'session_client/input/add_client.html',context)
 
 @login_required
 def add_session_view(request):
@@ -273,7 +273,7 @@ def add_session_view(request):
             return redirect('session_client:index')
     #display a blank or invalid form
     context = {'form':form}
-    return render(request,'session_client/client_session/add_session.html',context)
+    return render(request,'session_client/input/add_session.html',context)
 
 @login_required
 def edit_client_view(request,client_pk):
@@ -290,7 +290,7 @@ def edit_client_view(request,client_pk):
             form.save()
             return redirect('session_client:client',client_pk=client_pk)
     context = {'client':Client_i,'form':form}
-    return render(request,'session_client/client_session/edit_client.html',context)
+    return render(request,'session_client/edit/edit_client.html',context)
 
 
 @login_required
@@ -308,4 +308,4 @@ def edit_session_view(request,session_pk):
             form.save()
             return redirect("session_client:session", session.pk)
     context = {'session':session,'form':form}
-    return render(request,'session_client/client_session/edit_session.html',context)
+    return render(request,'session_client/edit/edit_session.html',context)

@@ -12,6 +12,7 @@ from django_htmx.http import retarget
 from .calendar_utils import CalendarRender
 from django.contrib import messages
 import pendulum as p
+from session_client.models import SessionModel,ClientModel
 
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
@@ -44,12 +45,12 @@ def week_view(request):
             assert date is not None, "date should be something"
             ref_date_partial = p.datetime(date.year,date.month,date.day)
             if form_partial.cleaned_data['calendar']:
-                occurrences = OccurrenceModel.objects.filter(start_time__week=ref_date_partial.week_of_year,
+                sessions = SessionModel.objects.filter(start_datetime__week=ref_date_partial.week_of_year,
                                                             calendar=form_partial.cleaned_data['calendar'])
             else:
-                occurrences = OccurrenceModel.objects.filter(event__user=request.user,
-                                                 start_time__week=ref_date_partial.week_of_year)
-            calendar_partial = CalendarRender(occurrences=occurrences,date_ref=ref_date_partial)
+                sessions = SessionModel.objects.filter(client__user=request.user,
+                                                 start_datetime__week=ref_date_partial.week_of_year)
+            calendar_partial = CalendarRender(sessions=sessions,date_ref=ref_date_partial)
             template_calendar = template + "#calendar-view-partial"
             context = {'calendar':calendar_partial}
             return render(request,template_calendar,context)
@@ -59,17 +60,17 @@ def week_view(request):
         context = {'form':form_partial}
         response = render(request,form_partial_template,context)
         return retarget(response,"#calendar-form-tr") # retarget if not valid switch week table (edge cases)
-    occurrences = OccurrenceModel.objects.none() #? the content is loaded after page load by hmx
+    sessions = SessionModel.objects.none() #? the content is loaded after page load by hmx
     form = WeekCalendarForm()
     form.fields['calendar'].queryset = room_calendar_user
-    calendar = CalendarRender(occurrences=occurrences) # today by default
+    calendar = CalendarRender(sessions=sessions) # today by default
     context = {'calendar':calendar,'form':form}
     return render(request,template,context)
 
 def week_view_auxiliary(request):
-    events = Event.objects.filter(user=request.user)
+    sessions = ClientModel.objects.filter(user=request.user)
     template = "room_calendar_app/auxiliary/event_list_li.html"
-    context = {"events":events}
+    context = {"sessions":sessions}
     return render(request,template,context)
 
 def room_calendar_listing_view(request):
@@ -103,50 +104,7 @@ def room_calendar_view(request,calendar_pk):
     context = {"calendar": calendar,"tenants":tenants,'form':form}
     return render(request,template,context)
 
-@cache_control(max_age=300)
-@vary_on_headers("HX-Request")
-def event_occurrence_view(request,event_pk):
-    """ Explore an event next occurrences and add new ones"""
-    now = timezone.now()
-    template = 'room_calendar_app/dynamic/event.html'
-    event = get_object_or_404(Event, pk=event_pk)
-    occurrences = OccurrenceModel.objects.filter(event=event,start_time__gte=now).order_by('-start_time') #filter events to user
-    form = OccurrenceProxyForm()
-    if request.htmx:
-        #htmx request triggers save and refresh of occurrences and refreshes form when errors
-        form = OccurrenceProxyForm(data=request.POST)
-        form_template = template + "#occurrence-form"
-        if form.is_valid():
-            start_date_form  = form.cleaned_data['start_date'] #datetime
-            start_time_form  = form.cleaned_data['start_time'] #time object
-            duration_form  = form.cleaned_data['duration'] #time difference
-            start_time_add = dt.datetime.combine(start_date_form,start_time_form)
-            end_time_add = start_time_add + duration_form
-            occurrence,_ = OccurrenceModel.objects.get_or_create(
-                duration=duration_form,
-                start_time=start_time_add,
-                end_time=end_time_add,
-                event=event,
-                calendar = event.room_calendar  # I am spiting the room into two sources, 
-                                                # one by default from event and one editable for 'rare' cases
-                )
-            occurrence.save()
-            list_template = template + '#occurrence-list'
-            context = {"occurrences":occurrences}
-            response = render(request,list_template,context)
-            return retarget(response,'#occurrence-list-wrap') # target list if valid
-        context = {'form':form,'event':event}
-        return render(request,form_template,context) # change form if invalid
-    #else display full page
-    context = {'form':form,"event":event,"occurrences":occurrences}
-    return render(request,template,context)
 
-def edit_occurrence_list(request,occurrence_pk):
-    """ a proxy function to respond to HTMX call delete"""
-    if request.method == 'DELETE':
-        occurrence = OccurrenceModel.objects.get(pk=occurrence_pk)
-        occurrence.delete()
-        return HttpResponse() # empty response that empties the li object
 
 
 def tenant_view(request,tenant_pk):
@@ -161,29 +119,6 @@ def tenant_listing_view(request):
     context = {"tenant_list":tenant_list}
     return render(request, "room_calendar_app/display/tenant_list.html", context) #todo check template
 
-@cache_control(max_age=300)
-@vary_on_headers("HX-Request")
-def event_listing_view(request):
-    """View a list of user's events """
-    events = Event.objects.filter(user=request.user).order_by('-created_at')  #? I already changed this one
-    template =  "room_calendar_app/dynamic/event_list.html"
-    form = EventForm()
-    if request.htmx:
-        #htmx request triggers save and refresh of occurrences and refreshes form with errors
-        form = EventForm(data=request.POST)
-        form_event_template = template + "#event-form"
-        if form.is_valid():
-            occurrence = form.save(commit=False)
-            occurrence.user = request.user
-            occurrence.save()
-            list_template = template + '#event-list'
-            context = {"events":events} # context for valid form
-            response = render(request,list_template,context)
-            return retarget(response,'#event-list-wrap')
-        context = {'form':form} # context for invalid form
-        return render(request,form_event_template,context)
-    context = {"events":events,'form':form}     # context for empty form
-    return render(request, template, context) #todo check template
 
 def room_calendar_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
@@ -221,25 +156,6 @@ def tenant_add_view(request):
     context = {'form':form,"action":action}
     return render(request,'room_calendar_app/input/add_tenant.html',context)
 
-def occurrence_multiple_add_view(request,event_pk):
-    """ loads a multiple form and creates the events"""
-    event = Event.objects.get(pk=event_pk)
-    if request.method !='POST':
-        #no data submitted; create a blank form
-        form = OccurrenceProxyForm()
-    else:
-        #POST data submitted; process data
-        form = OccurrenceProxyForm(data=request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.user = request.user
-            instance.save()
-            multi = None #!change
-            multi.add_occurrences()
-            return redirect('room_calendar_app:events')
-    #display a blank or invalid form
-    context = {'form':form}
-    return render(request,"room_calendar_app/event_detail.html",context)
 
 def room_calendar_edit_view(request,room_calendar_pk):
     """edit the occurrence repetition erasing future events"""
@@ -259,43 +175,7 @@ def room_calendar_edit_view(request,room_calendar_pk):
     context = {'form':form,"action":action}
     return render(request,"room_calendar_app/input/add_calendar.html",context)
 
-def event_edit_view(request,event_pk):
-    """edit the occurrence repetition erasing future events"""
-    user = request.user
-    events = Event.objects.filter(user=user)
-    event = get_object_or_404(Event,pk=event_pk,user=user)
-    if request.method !='POST':
-        #no data submitted; create a blank form
-        form = EventForm(instance=event)
-    else:
-        #POST data submitted; process data
-        form = EventForm(data=request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.user = event.user
-            instance.save()
-            messages.info(request,"Event Updated")
-            return redirect('room_calendar_app:event_list')
-    #display a blank or invalid form
-    context = {'form':form,'event':event,'events':events}
-    return render(request,"room_calendar_app/dynamic/event_edit.html",context)
 
-def occurrence_edit_view(request,occurrence_pk):
-    """edit the occurrence repetition erasing future events"""
-    event = OccurrenceModel.objects.get(pk=occurrence_pk)
-    if request.method !='POST':
-        #no data submitted; create a blank form
-        form = OccurrenceForm(instance=event)
-    else:
-        #POST data submitted; process data
-        check_owner(event.user,request.user)
-        form = OccurrenceForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('room_calendar_app:occurrence_list')
-    #display a blank or invalid form
-    context = {'form':form}
-    return render(request,"room_calendar_app/input/add_occurrence.html",context)
 
 def tenant_edit_view(request,tenant_pk):
     """edit the occurrence repetition erasing future events"""
@@ -334,25 +214,6 @@ def tenant_link_view(request,calendar_pk):
     context = {'form':form,"calendar":calendar}
     return render(request,"room_calendar_app/input/link_tenant.html",context)
 
-def occurrence_multiple_edit_view(request,event_pk):
-    """edit the occurrence repetition erasing future events"""
-    event = Event.objects.get(pk=event_pk)
-    multiple = None  #!change
-    if request.method !='POST':
-        #no data submitted; create a blank form
-        form = OccurrenceProxyForm(instance=multiple)
-    else:
-        #POST data submitted; process data
-        form = OccurrenceProxyForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-            multi = None #!change
-            multi.clean_upcoming()
-            multi.add_occurrences()
-            return redirect('room_calendar_app:events')
-    #display a blank or invalid form
-    context = {'form':form}
-    return render(request,"room_calendar_app/event_detail.html",context)
 
 
 

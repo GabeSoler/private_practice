@@ -91,7 +91,6 @@ class SessionManager(models.Manager):
 
 
 class SessionModel(models.Model):
-    user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     client = models.ForeignKey(ClientModel,on_delete=models.CASCADE,help_text="Link to a client")
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)

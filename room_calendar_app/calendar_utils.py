@@ -6,8 +6,8 @@ from django.db.models import Q
 
 class CalendarRender:
     """ A class to create calendar dictionaries and render in template """
-    def __init__(self,occurrences,date_ref=None):
-        self.occurrences = occurrences
+    def __init__(self,sessions,date_ref=None):
+        self.sessions = sessions
         self.date = date_ref or p.today()
 
     @property
@@ -41,15 +41,15 @@ class CalendarRender:
     
     @property
     def week_dict(self)->dict:
-        """organises the dictionary by the occurrence, it cannot handle two in a slot (which is the idea)"""
+        """organises the dictionary by the session, it cannot handle two in a slot (which is the idea)"""
         week_dict = self.week_slot_dic
-        for occurrence in self.occurrences:
-            start_time = p.instance(occurrence.start_time)
-            end_time = p.instance(occurrence.end_time).subtract(minutes=30)
+        for session in self.sessions:
+            start_time = p.instance(session.start_datetime)
+            end_time = p.instance(session.end_datetime).subtract(minutes=30)
             time_range = p.interval(start_time,end_time)
             iso_day = start_time.isoweekday()
             for time in time_range.range('minutes',30):
                 slot = time.time()
-                week_dict[slot][iso_day] = occurrence
+                week_dict[slot][iso_day] = session
         return week_dict
 
