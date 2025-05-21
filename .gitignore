@@ -25,3 +25,4 @@ Dockerrun.aws.json
 /temp
 /docs/_build
 
+accounts.json
