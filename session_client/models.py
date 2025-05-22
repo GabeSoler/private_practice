@@ -28,14 +28,15 @@ class ClientModel(models.Model):
     duration = models.DurationField(default='60 minutes',choices=duration_times_as_choices())
 
     class Meta:
-        ordering = ("updated_at","code")
+        ordering = ("updated_at", "code")
         verbose_name ="Client"
         verbose_name_plural = "Clients"
-        ordering = ("code","created_at")
+        # noinspection PyRedeclaration
+        ordering = ("code", "created_at")
 
 
     @property
-    def color_class(self): #to add a color class or other relative to event type
+    def color_class(self): #to add a colour class or other relative to event type
         match self.type:
             case 'Pvt':
                 return 'primary'
@@ -47,6 +48,7 @@ class ClientModel(models.Model):
                 return 'warning'
             case 'CPD':
                 return 'info'
+        return None
 
     def __str__(self):
         return f"{self.code}"
@@ -57,13 +59,13 @@ class ClientModel(models.Model):
 
 
 class SessionManager(models.Manager):
-    def create_unique(self,client:ClientModel,date:dt.date=None,time:dt.time=None,duration:dt.timedelta=None,room:RoomCalendarModel=None):
+    def create_unique(self,client,date=None,time=None,duration=None,room=None):
         """ creates an Session and checks if overlaps with others. 
-            Returns (True,None) if it does not overlaps, and (False,Queryset) if it does  """
+            Returns (True, None) if it does not overlap, and (False,Queryset) if it does  """
         if date is None:
             # deducing next's weeks appointment from defaults in ClientModel
             now = p.now()
-            week_day = client.day
+            week_day:int = client.day
             now_day_week = now.isoweekday()
             if now_day_week < week_day:
                 diff = week_day - now_day_week
@@ -85,7 +87,7 @@ class SessionManager(models.Manager):
             __bool__ = False
             return overlaps
         else:
-            __bool__ = True
+            __bool__ = True  # noqa: F841
             return None
 
 
@@ -125,10 +127,11 @@ class SessionModel(models.Model):
         ordering = ("start_datetime",)
         base_manager_name = "objects"
 
-    def __str__(self):
-        return "{}: {}".format(self.client.title, self.start_datetime.isoformat())
+    def __str__(self):  # noqa: F811
+        display_date = p.instance(self.start_datetime)
+        return "{}: {}".format(self.title, display_date.isoformat())
 
-    def get_absolute_url(self):
+    def get_absolute_url(self):  # noqa: F811
         return reverse("session_client:edit_session", args=[str(self.id)])
 
     def __lt__(self, other):

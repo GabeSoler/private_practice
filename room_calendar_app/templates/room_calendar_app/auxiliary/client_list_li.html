@@ -1,0 +1,10 @@
+<ul class="dropdown-menu"
+id="client-list-hx"
+>
+{% for client in clients %}
+<li><a class="dropdown-item" href={% url "session_client:client" client.pk %}>{{client.title}}</a></li>
+{% empty %}
+<li><a class="dropdown-item" href={% url "session_client:client_list" %}>Add Clients</a></li>
+
+{% endfor %}
+</ul>

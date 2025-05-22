@@ -1,13 +1,9 @@
 from django.db import models
 
 # Create your models here.
-from datetime import datetime
-from datetime import timedelta
 from django.contrib.auth import get_user_model
-from .choices import EVENT_TYPE
 import uuid
 
-from django.urls import reverse
 
 class TenantModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

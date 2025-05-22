@@ -1,16 +1,13 @@
 from django.shortcuts import get_object_or_404, render,redirect
-from django.http import Http404,HttpResponse
+from django.http import Http404
 
-from .models import Event, OccurrenceModel,RoomCalendarModel,TenantModel
-from .forms import EventForm,RoomCalendarForm,TenantForm,LinkTenantForm,OccurrenceForm,OccurrenceProxyForm,WeekCalendarForm
+from .models import RoomCalendarModel,TenantModel
+from .forms import RoomCalendarForm,TenantForm,LinkTenantForm,WeekCalendarForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
 from django.views.decorators.vary import vary_on_headers
-import datetime as dt
-from django.utils import timezone
 from django_htmx.http import retarget
 from .calendar_utils import CalendarRender
-from django.contrib import messages
 import pendulum as p
 from session_client.models import SessionModel,ClientModel
 
@@ -18,14 +15,6 @@ def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
         raise Http404
     
-@login_required
-def index_view(request):
-    events = Event.objects.filter(user=request.user).order_by('-event_type')
-    event_form = EventForm()
-    context = {"events":events,'event_form':event_form}
-    return render(request,"room_calendar_app/index.html",context)
-
-
 
 @login_required
 @cache_control(max_age=300)
@@ -68,13 +57,12 @@ def week_view(request):
     return render(request,template,context)
 
 def week_view_auxiliary(request):
-    sessions = ClientModel.objects.filter(user=request.user)
-    template = "room_calendar_app/auxiliary/event_list_li.html"
-    context = {"sessions":sessions}
+    clients = ClientModel.objects.filter(user=request.user)
+    template = "room_calendar_app/auxiliary/client_list_li.html"
+    context = {"clients":clients}
     return render(request,template,context)
 
 def room_calendar_listing_view(request):
-    tenant = TenantModel.objects.filter(user=request.user)
     room_calendar_mine = RoomCalendarModel.objects.filter(user=request.user)
     room_calendar_tenant = RoomCalendarModel.objects.filter(tenants__user=request.user)
     context = {"calendar_mine": room_calendar_mine,"calendar_tenant": room_calendar_tenant}
@@ -199,7 +187,6 @@ def tenant_link_view(request,calendar_pk):
     """edit the occurrence repetition erasing future events"""
     calendar = RoomCalendarModel.objects.get(pk=calendar_pk)
     if request.method !='POST':
-        action = "Edit"
         #no data submitted; create a blank form
         form = LinkTenantForm()
     else:

@@ -1,23 +1,7 @@
 from django.contrib import admin
-from room_calendar_app.models import *
+from room_calendar_app.models import RoomCalendarModel,TenantModel
 
 
-
-
-class OccurrenceInline(admin.TabularInline):
-    model = OccurrenceModel
-    extra = 1
-
-
-class EventAdmin(admin.ModelAdmin):
-    list_display = ("title", "event_type", "user")
-    list_filter = ("event_type",)
-    search_fields = ("title", "description")
-    inlines = [OccurrenceInline]
-
-
-
-admin.site.register(Event, EventAdmin)
 
 
 

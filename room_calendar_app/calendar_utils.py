@@ -1,7 +1,6 @@
 """ A series of functions to deal with the calendar"""
 import pendulum as p
 from .choices import time_slots
-from django.db.models import Q
 
 
 class CalendarRender:

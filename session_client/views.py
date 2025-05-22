@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect, get_list_or_404,get_object_or_404
+from django.shortcuts import render,redirect,get_object_or_404
 from .models import ClientModel,SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404,HttpResponse
@@ -6,8 +6,6 @@ from .forms import ClientForm, SessionForm,SessionShortForm,SearchSessionFrom,Se
 from django_htmx.http import retarget,reswap
 from django.utils import timezone
 import pendulum as p
-from django.contrib import messages
-from django.core.exceptions import FieldError
 #Function to check owner when calling models without the user
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:

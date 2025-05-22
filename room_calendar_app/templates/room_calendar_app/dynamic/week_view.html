@@ -33,9 +33,9 @@
               <i class="bi bi-plus-square-fill text-primary fs-5"></i>
             </button>
             <ul class="dropdown-menu"
-            id="event-list-hx"
-            hx-get={% url "room_calendar_app:event_list_auxiliary" %}
-            hx-target="#event-list-hx"
+            id="client-list-hx"
+            hx-get={% url "room_calendar_app:client_list_auxiliary" %}
+            hx-target="#client-list-hx"
             hx-trigger="load"
             hx-swap="outerHTML"
             >
