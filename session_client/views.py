@@ -2,10 +2,13 @@ from django.shortcuts import render,redirect,get_object_or_404
 from .models import ClientModel,SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404,HttpResponse
-from .forms import ClientForm, SessionForm,SessionShortForm,SearchSessionFrom,SearchClientForm
+from .forms import ClientForm, SessionForm,SessionShortForm,SearchSessionFrom,SearchClientForm,ClientFormShort
 from django_htmx.http import retarget,reswap
 from django.utils import timezone
 import pendulum as p
+from django.contrib import messages
+from django.template.loader import render_to_string
+
 #Function to check owner when calling models without the user
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
@@ -50,25 +53,35 @@ def clients_view(request):
     """show all clients"""
     template = 'session_client/lists/client_list.html'    
     clients = ClientModel.objects.filter(user=request.user,active=True).order_by('code')
-    form = ClientForm()
+    form = ClientFormShort()
     if request.htmx:
-        form_partial = ClientForm(data=request.POST)
+        form_partial = ClientFormShort(data=request.POST)
         if form_partial.is_valid():
             assert form_partial.cleaned_data["code"] is not None
             instance = form_partial.save(commit=False)
             instance.user = request.user
             instance.save()
-            assert form_partial.cleaned_data["code"] == instance.code,"Code is not passing when saved"
-            clients = ClientModel.objects.filter(user=request.user,active=True).order_by('code')
-            context = {'clients':clients}
-            template = template + "#client-list-partial"
-            response = render(request,template,context)
-            return retarget(response,"#client-list-wrapper")
-        template = template + '#client-form-partial'
-        context = {'form':form_partial}
-        return render(request,template,context)
+            template_li = template + "#client-li-partial"
+            context = {'client':instance,'loading':True}
+            return render(request,template_li,context)
+        template_form = template + '#client-form-partial'
+        context_form = {'form':form_partial}
+        content = render(request,template_form,context_form)
+        content = reswap(content,"innerHTML")
+        return retarget(content,"#client-form-wrap")
     context = {'clients':clients,'form':form,"switch":"False"}
     return render(request,template,context)
+
+@login_required
+def hx_client_short_form(request):
+    if request.htmx:
+        form = ClientFormShort()
+        context = {'form':form}
+        template = 'session_client/lists/client_list.html#client-form-partial'
+        return render(request,template,context)
+
+    
+
 
 @login_required
 def clients_hx_edit(request,client_pk):
@@ -82,6 +95,13 @@ def clients_hx_edit(request,client_pk):
         occurrence.archived_at = timezone.now()
         occurrence.save()
         return HttpResponse() # empty response that empties the li object
+@login_required
+def client_hx_item(request,client_pk):
+    if request.method == 'GET':
+        client = get_object_or_404(ClientModel,user=request.user,pk=client_pk)
+        template = 'session_client/item/client_modal.html'
+        context = {'client':client}
+        return render(request,template,context)
 
 @login_required
 def client_search_view(request):
@@ -170,6 +190,14 @@ def sessions_hx_edit_open(request,session_pk):
         context = {'session':session}
         return render(request,template,context) # empty response that empties the li object
 
+def session_hx_item(request,session_pk):
+    if request.method == 'GET':
+        session = get_object_or_404(SessionModel,user=request.user,pk=session_pk)
+        template = 'session_client/item/session_modal.html'
+        context = {'session':session}
+        return render(request,template,context)
+
+
 
 @login_required
 def sessions_search(request):
@@ -184,13 +212,13 @@ def sessions_search(request):
             client_ref = form_partial.cleaned_data['client'] or None
             if client_ref:
                 # using session date as reference. Added it automatically with quick add option.
-                sessions = SessionModel.objects.filter(session_date__gte=start_ref,
-                                                session_date__lte=end_ref,
+                sessions = SessionModel.objects.filter(start_datetime__gte=start_ref,
+                                                start_datetime__lte=end_ref,
                                                 client=client_ref).order_by('start_datetime')
             else:
                 sessions = SessionModel.objects.filter(user=request.user,
-                                                session_date__gte=start_ref,
-                                                session_date__lte=end_ref,).order_by('start_datetime')
+                                                start_datetime__gte=start_ref,
+                                                start_datetime__lte=end_ref,).order_by('start_datetime')
             template_calendar = template + "#session-list-partial"
             context = {'sessions':sessions}
             return render(request,template_calendar,context)
@@ -276,18 +304,19 @@ def add_session_view(request):
 @login_required
 def edit_client_view(request,client_pk):
     """edit an existing entry"""
-    Client_i = ClientModel.objects.get(pk=client_pk)
-    check_owner(Client_i.user,request.user)
+    client = ClientModel.objects.get(pk=client_pk)
+    check_owner(client.user,request.user)
     if request.method != 'POST':
         #initial request;pre-fill form with the current entry
-        form = ClientForm(instance=Client_i)
+        form = ClientForm(instance=client)
     else:
         #POST data submitted; process data
-        form = ClientForm(instance=Client_i,data=request.POST)
+        form = ClientForm(instance=client,data=request.POST)
         if form.is_valid():
             form.save()
-            return redirect('session_client:client',client_pk=client_pk)
-    context = {'client':Client_i,'form':form}
+            messages.info(request,f"Client '{client.code}' updated")
+            return redirect('session_client:client_list')
+    context = {'client':client,'form':form}
     return render(request,'session_client/edit/edit_client.html',context)
 
 
@@ -304,6 +333,7 @@ def edit_session_view(request,session_pk):
         form = SessionForm(instance=session,data=request.POST)
         if form.is_valid():
             form.save()
-            return redirect("session_client:session", session.pk)
+            messages.info(request,f"Session '{session.title}' updated")
+            return redirect("session_client:session_list")
     context = {'session':session,'form':form}
     return render(request,'session_client/edit/edit_session.html',context)

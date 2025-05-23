@@ -1,0 +1,24 @@
+{% extends '_modal.html' %}
+
+
+{% block modal_title %}{{client.code}}{%if client.nick_name %}-{{client.nick_name}}{%endif%}&nbsp;
+<a href="{%url 'session_client:edit_client' client.pk %}" class="card-link small" style="font-size:.9rem;">Edit</a></small>
+{% endblock modal_title%}
+
+{% block modal_body %}
+<div class="card">
+    <div class="card-body">
+      <h5 class="card-title">{{client.nick_name}}</h5>
+      <h6 class="card-subtitle mb-2 text-body-secondary">Started on: {{client.created_at|date}}</h6>
+      <p class="card-text">Type: {{client.get_type_display}}</p>
+      <p class="card-text">Agreed Fee: {{client.fee}}</p>
+      <p class="card-text">{{client.active|yesno:"Active,Archived"}}</p>
+    </div>
+  </div>
+{%endblock modal_body%}
+
+{% block modal_footer %}
+
+      <a href="{%url 'session_client:edit_client' client.pk %}">
+        Edit Client</a></p>
+{% endblock %}

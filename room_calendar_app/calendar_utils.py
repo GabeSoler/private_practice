@@ -1,6 +1,6 @@
 """ A series of functions to deal with the calendar"""
 import pendulum as p
-from .choices import time_slots
+from session_client.choices import time_slots
 
 
 class CalendarRender:

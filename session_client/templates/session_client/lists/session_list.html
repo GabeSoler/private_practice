@@ -36,7 +36,7 @@
       <tbody>
       <tr>
         <td class="col bg-primary-subtle" id="form-td-code">
-          {% bootstrap_field form.title wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
+          {% bootstrap_field form.start_datetime wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
         <td class="col bg-primary-subtle" id="form-td-type">
           {% bootstrap_field form.client wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
@@ -50,7 +50,7 @@
             hx-trigger="keyup=='Enter',click"
             hx-exclude="#switchArchived"
             id="formButton"
-            _="js preventDefault(me) end"
+            _="call preventDefault() on me"
             >
             New</button>
         </td>
@@ -59,6 +59,7 @@
     </table>
 </form>
   </div>
+  {% if messages %}{% include '_toasts.html' %}{% endif %}
   {% endpartialdef session-form-partial%} <!-- end form partial -->
   </div>
 </div>
@@ -88,8 +89,13 @@
       {% partialdef row-instance inline %}
       <tr class="fade-in">
         <th scope="row">
-          <a href="{%url "session_client:session" session.pk %}">
+          <a href="{%url "session_client:edit_session" session.pk %}">
             {% if session.start_datetime %}{{session.start_datetime|date:'d, M,Y'}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
+            &nbsp;<i class="bi bi-eye-fill text-primary"
+              hx-get={% url 'session_client:session_hx_item' session.pk %}
+              hx-trigger="click"
+              hx-target="#modal-wrap"
+              ></i>
           </th>
 
       <td>{{session.title|truncatechars:10}}</td>
@@ -131,18 +137,10 @@
       </tr>
       {% endpartialdef %}
 
-    {% empty %}
-    <tr>
-    <th>
-      There are no Sessions Yet. </th>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
   </tbody>
   {% endfor %}
 </table>
-
 {% endpartialdef session-list-partial  %}
 </div>
+<div id="modal-wrap"></div>
   {% endblock content %}

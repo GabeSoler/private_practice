@@ -3,7 +3,7 @@ from django.core.validators import MinValueValidator,MaxValueValidator
 from django.contrib.auth import get_user_model
 import uuid
 from django.urls import reverse
-from .choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices
+from .choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices,time_slot_options
 from room_calendar_app.models import RoomCalendarModel
 import datetime as dt
 import pendulum as p
@@ -24,8 +24,9 @@ class ClientModel(models.Model):
     #client base info(delete after 7 yeas?)(I am thinking to only erase the fields as the admin is yours)
     active = models.BooleanField(default=True,help_text="Change if your client is active or archived")
     archived_at = models.DateTimeField(blank=True,null=True)
-    day = models.IntegerField(choices=WEEKDAY_SHORT,default=1)
-    duration = models.DurationField(default='60 minutes',choices=duration_times_as_choices())
+    day = models.IntegerField(choices=WEEKDAY_SHORT,default=1,help_text="Default day of week")
+    time = models.TimeField(choices=time_slot_options,blank=True,default='08:00',help_text='default time')
+    duration = models.DurationField(default='60 minutes',choices=duration_times_as_choices(),help_text='default duration')
 
     class Meta:
         ordering = ("updated_at", "code")
@@ -93,6 +94,7 @@ class SessionManager(models.Manager):
 
 
 class SessionModel(models.Model):
+    user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     client = models.ForeignKey(ClientModel,on_delete=models.CASCADE,help_text="Link to a client")
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
@@ -128,8 +130,8 @@ class SessionModel(models.Model):
         base_manager_name = "objects"
 
     def __str__(self):  # noqa: F811
-        display_date = p.instance(self.start_datetime)
-        return "{}: {}".format(self.title, display_date.isoformat())
+        ref_date = self.start_datetime or ""
+        return f"{self.title}: {ref_date}"
 
     def get_absolute_url(self):  # noqa: F811
         return reverse("session_client:edit_session", args=[str(self.id)])

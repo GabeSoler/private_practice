@@ -21,21 +21,22 @@
           {% bootstrap_field form.code wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
         <td class="col bg-primary-subtle" id="form-td-type">
-          {% bootstrap_field form.type wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
+          {% bootstrap_field form.day wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
-      </tr>
-      <tr>
+        <td class="col bg-primary-subtle" id="form-td-type">
+          {% bootstrap_field form.time wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
+        </td>
         <td class="col bg-primary-subtle" id="form-td-fee">
-          {% bootstrap_field form.fee wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
+          {% bootstrap_field form.duration wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
         <td class="bg-primary-subtle">
             <button class="btn btn-primary col-12"
             type="submit"
             hx-post={% url 'session_client:client_list' %}
-            hx-target="#client-form-wrap"
-            hx-swap="innerHTML"
+            hx-target="#client-list-ul"
+            hx-swap="afterbegin settle:0.2s"
             hx-trigger="keyup[key=='Enter'],click"
-            hx-exclude="#switchArchived"
+            _="init call preventDefault on me"
             >
             New</button>
         </td>
@@ -44,6 +45,7 @@
     </table>
 </form>
 </div>
+  {% if messages %}{% include '_toasts.html' %}{% endif %}
 {% endpartialdef client-form-partial %} <!-- end form partial -->
   </div>
 
@@ -51,21 +53,34 @@
   {% partialdef client-list-partial inline %}
 <ul class="list-group" id="client-list-ul">
   {% for client in clients%}
-    <li class="list-group-item list-group-item-primary fade-out" id="{{client.code}}">
-      <a href="{%url 'session_client:client' client.pk %}">{{client.code}}</a> - {{client.nick_name}} | {{client.created_at|date:'M d,Y'}}
-        <i class="bi bi-archive-fill text-danger" 
+
+  {% partialdef client-li-partial inline %}
+    <li class="list-group-item list-group-item-primary fade-out fade-in" id="{{client.code}}"
+    {% if loading %}hx-get={% url 'session_client:hx_client_short_form'%} hx-swap="#client-form-wrap" hx-trigger="load once"{% endif %}>
+      <a href="{%url 'session_client:edit_client' client.pk %}">{{client.code}}</a> {% if client.nick_name %}<span>{{client.nick_name|title}}</span>{% endif %}
+      &nbsp;<i class="bi bi-eye-fill text-primary"
+          hx-get={% url 'session_client:client_hx_item' client.pk %}
+          hx-trigger="click"
+          hx-target="#modal-wrap"
+      ></i> &nbsp;
+      
+      <i class="bi bi-archive-fill text-warning" 
           hx-put={% url 'session_client:clients_edit' client.pk %}
           hx-trigger="click"
           hx-target="closest li"
           hx-swap="outerHTML"
           ></i>
     </li>
+    {% endpartialdef client-li-partial %}
     {% empty %}
     <li>There are no clients yet. </li>
     
     {% endfor %}
   </ul>
-  {% endpartialdef %}
+  {% endpartialdef client-list-partial %}
 </div>
 </div>
+
+<div id="modal-wrap"></div>
+
   {% endblock content %}

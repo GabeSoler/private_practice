@@ -1,15 +1,19 @@
 {% extends '_base.html' %}
 {% block content %}
 {% load django_bootstrap5 %}
-<p><a href="{%url 'session_client:client' client.pk %}">{{topic}}</a></p>
 
-<p>Edit Client</p>
 
+<div class="card mt-2 mb-5 bg-primary-subtle p-2">
+    <div class="card-header bg-secondary-subtle">
+    <H4>Edit Client</h4>
+        <a href={% url 'session_client:session_list'%}>Back to Sessions</a>
+</div>
+<div class="card-body ">
 <form action="{%url 'session_client:edit_client' client.pk %}" method='post'>
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button button_type='submit' content='Update Client' %}
 </form>
-
+</div>
 
 {%endblock content%}

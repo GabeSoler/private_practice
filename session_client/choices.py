@@ -1,4 +1,4 @@
-from datetime import datetime, date, time, timedelta
+from datetime import time, timedelta
 from django.utils.translation import gettext_lazy as _
 import pendulum as p
 
@@ -12,12 +12,9 @@ ATTENDANCE = [
 
 CLIENT_TYPE = [
     ("Pvt", "Private"),
-    ("Srv", "Service"),
+    ("Srv", "Agency"),
     ("EAP", "EAP"),
     ("Sp", "Supervisee"),
-    ("Adm", "Other-Admin"),
-    ("Prss", "Other-Processing"),
-    ("CPD", "Other-CPD"),
     ("Other", "Other"),
 ]
 
@@ -30,12 +27,10 @@ def time_slot_options():
     today = p.now()
     interval = p.interval(today.at(8),today.at(22))
     for dt in interval.range('minutes',30):
-        options.append((str(dt.time()), dt.strftime(format)))
+        options.append((dt.time(), dt.strftime(format)))
     return options
 
 
-
-default_timeslot_options = time_slot_options()
 
 
 def time_slots()->list:
@@ -54,12 +49,12 @@ def time_slots()->list:
 def duration_times()->list:
     """ Creates a list of durations """
     return (
-            str(timedelta(minutes=30)),
-            str(timedelta(hours=1)),
-            str(timedelta(minutes=90)),
-            str(timedelta(hours=2)),
-            str(timedelta(hours=3)),
-            str(timedelta(hours=4)),
+            (timedelta(minutes=30)),
+            (timedelta(hours=1)),
+            (timedelta(minutes=90)),
+            (timedelta(hours=2)),
+            (timedelta(hours=3)),
+            (timedelta(hours=4)),
             )
 
 
@@ -67,7 +62,7 @@ def duration_times_as_choices()->list:
     """ creates a list of tuples of duration"""
     choices_list = []
     for t in duration_times():
-        choices_list.append((t,t))
+        choices_list.append((t,str(t)))
     return choices_list
         
 

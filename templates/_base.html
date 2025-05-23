@@ -138,7 +138,34 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
       </span>
     </a>
   </li>
-    <!--Add Topic -->
+    <!--Clients page -->
+    <li class="nav-item">
+      <a class="nav-link fw-light link-secondary fs-4" 
+      data-bs-toggle="tooltip" data-bs-title="Go To Theory Page"
+      data-bs-custom-class="custom-tooltip"
+      href="{% url "session_client:client_list" %}"
+      >
+      <i class="bi bi-journal-medical"></i>
+      <span class="d-none d-md-inline fs-5">
+        Clients
+      </span>
+    </a>
+  </li>
+    <!--Sessions page -->
+    <li class="nav-item">
+      <a class="nav-link fw-light link-secondary fs-4" 
+      data-bs-toggle="tooltip" data-bs-title="Go To Theory Page"
+      data-bs-custom-class="custom-tooltip"
+      href="{% url "session_client:session_list" %}"
+      >
+      <i class="bi bi-list-check"></i>
+      <span class="d-none d-md-inline fs-5">
+        Sessions
+      </span>
+    </a>
+  </li>
+
+      <!-- Week View  -->
     <li class="nav-item">
       <a class="nav-link fw-light link-secondary fs-4 {% if request.path == '/learning/' %}active{% endif %}" 
       data-bs-toggle="tooltip" data-bs-title="My Journal"
@@ -150,20 +177,8 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
         </span>
   </a>
     </li>
-    <!--Theory page -->
-    <li class="nav-item">
-      <a class="nav-link fw-light link-secondary fs-4" 
-      data-bs-toggle="tooltip" data-bs-title="Go To Theory Page"
-      data-bs-custom-class="custom-tooltip"
-      href="{% url "session_client:client_list" %}"
-      >
-      <i class="bi bi-journal-medical"></i>
-      <span class="d-none d-md-inline fs-5">
-        Clients
-      </span>
-      
-    </a>
-  </li>
+
+
   </ul>
 
 
