@@ -10,11 +10,11 @@
     </div>
   </div>
   <div class="mx-2">
-    <a class="card-link" href={%url 'session_client:add_client' %}>Add a Client First</a>
+    <a class="card-link" href="{% url 'session_client:add_client' %}">Add a Client First</a>
   </div>
 
 <div class="card-body">
-  <form action="{%url 'session_client:add_session' %}" method='post'>
+  <form action="{% url 'session_client:add_session' %}" method='post'>
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button button_type='submit' content='Add Session' %}

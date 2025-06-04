@@ -1,7 +1,7 @@
 from datetime import time, timedelta
 from django.utils.translation import gettext_lazy as _
 import pendulum as p
-
+from typing import Tuple,Any,Iterable
 
 ATTENDANCE = [
     ("Att", "Attended"),
@@ -19,15 +19,15 @@ CLIENT_TYPE = [
 ]
 
 
-def time_slot_options():
-    """Creats a list tuples of time options from 8 to 22 every 15 min"""
+def time_slot_options()->Iterable[Tuple[Any,Any]]:
+    """Creates a list tuples of time options from 8 to 22 every 15 min"""
 
-    format = "%I:%M %p"
+    date_format = "%I:%M %p"
     options = []
     today = p.now()
     interval = p.interval(today.at(8),today.at(22))
     for dt in interval.range('minutes',30):
-        options.append((dt.time(), dt.strftime(format)))
+        options.append((dt.time(), dt.strftime(date_format)))
     return options
 
 
@@ -35,26 +35,26 @@ def time_slot_options():
 
 def time_slots()->list:
     """ Creates a list with time slots from 8 am to 10 pm every 15 minutes """
-    time_slots = []
+    slots = []
     for x in range(80,220,5):# 80 == 8:00 am
         hour = x//10 #division without residual
         minute = x%10*6 #residual for steps ending in 5 times 6 == 30
         slot = time(hour=hour,minute=minute) #creates multiple choices for a time select
-        time_slots.append(slot)
-    return time_slots
+        slots.append(slot)
+    return slots
 
 
 
 
-def duration_times()->list:
+def duration_times()->tuple[timedelta,timedelta,timedelta,timedelta,timedelta,timedelta]:
     """ Creates a list of durations """
     return (
-            (timedelta(minutes=30)),
-            (timedelta(hours=1)),
-            (timedelta(minutes=90)),
-            (timedelta(hours=2)),
-            (timedelta(hours=3)),
-            (timedelta(hours=4)),
+            timedelta(minutes=30),
+            timedelta(hours=1),
+            timedelta(minutes=90),
+            timedelta(hours=2),
+            timedelta(hours=3),
+            timedelta(hours=4),
             )
 
 

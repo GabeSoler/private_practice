@@ -5,7 +5,6 @@ import uuid
 from django.urls import reverse
 from .choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices,time_slot_options
 from room_calendar_app.models import RoomCalendarModel
-import datetime as dt
 import pendulum as p
 # Create your models here.
 
@@ -19,13 +18,13 @@ class ClientModel(models.Model):
     #Client labels
     code = models.CharField(blank=False,max_length=10,help_text="Add an Identifier code") #Create a code instead of name
     nick_name = models.CharField(default="",blank=True,null=True,max_length=20,help_text="Give it a memorable nickname")
-    type = models.CharField(default='Pvt',choices=(CLIENT_TYPE),max_length=20,help_text="Select a type of client") # add choices like private, service, eap, supervisee
+    type = models.CharField(default='Pvt', choices=CLIENT_TYPE, max_length=20, help_text="Select a type of client") # add choices like private, service, eap, supervisee
     fee = models.IntegerField(default=50,validators=(MinValueValidator(1),MaxValueValidator(100)),help_text="Whats your agreed fee")
     #client base info(delete after 7 yeas?)(I am thinking to only erase the fields as the admin is yours)
     active = models.BooleanField(default=True,help_text="Change if your client is active or archived")
     archived_at = models.DateTimeField(blank=True,null=True)
     day = models.IntegerField(choices=WEEKDAY_SHORT,default=1,help_text="Default day of week")
-    time = models.TimeField(choices=time_slot_options,blank=True,default='08:00',help_text='default time')
+    time = models.TimeField(choices=time_slot_options(),help_text='default time')
     duration = models.DurationField(default='60 minutes',choices=duration_times_as_choices(),help_text='default duration')
 
     class Meta:
@@ -138,16 +137,6 @@ class SessionModel(models.Model):
 
     def __lt__(self, other):
         return self.start_datetime < other.start_datetime
-    
-    def repeat_next_week(self,weeks=1):
-        start_time = self.start_datetime + dt.timedelta(weeks=weeks)
-        end_time = self.end_datetime + dt.timedelta(weeks=weeks)
-        created,set = self.manager.create_unique(start_datetime=start_time,
-                                  end_datetime=end_time,
-                                  event=self.client,
-                                  room_calendar=self.calendar
-                                  )
-        return created
 
     def overlap_set(self):
         """
