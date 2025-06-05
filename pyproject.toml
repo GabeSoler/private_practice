@@ -20,4 +20,5 @@ dependencies = [
     "six>=1.17.0,<2",
     "sqlparse>=0.5.3,<1",
     "tzdata>=2025.2",
+    "whitenoise>=6.9.0",
 ]

@@ -71,6 +71,9 @@ MIDDLEWARE = [
     "django_htmx.middleware.HtmxMiddleware", # django-htmx middleware
     "django_browser_reload.middleware.BrowserReloadMiddleware", # django reload (browser experience)
 
+    "django.middleware.security.SecurityMiddleware", # white noise
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+
 ]
 
 ROOT_URLCONF = "ppm_app.urls"
@@ -109,6 +112,14 @@ DATABASES = {
     }
 }
 
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -143,7 +154,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "assets/"
+STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -152,7 +163,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 STATIC_ROOT = "assets/" #change when knowing the real address, plus change url patterns
 MEDIA_URL = 'media/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "staticfiles"]
 
 
 #config of bootstrap5, I added a theme called 'sandstone' from 'bootswatch'

@@ -1114,7 +1114,7 @@ XRegExp.prototype = /(?:)/; // ==--------------------------==
  * The XRegExp version number as a string containing three dot-separated parts. For example,
  * '2.0.0-beta-3'.
  *
- * @static
+ * @staticfiles
  * @memberOf XRegExp
  * @type String
  */
@@ -3577,7 +3577,7 @@ var wrapConstructor = function (NativeConstructor) {
 /*
   options.target      - name of the target object
   options.global      - target is the global object
-  options.stat        - export as static methods of target
+  options.stat        - export as staticfiles methods of target
   options.proto       - export as prototype methods of target
   options.real        - real prototype method for the `pure` version
   options.forced      - export even if the native feature is available
@@ -3624,7 +3624,7 @@ module.exports = function (options, source) {
     if (options.bind && USE_NATIVE) resultProperty = bind(sourceProperty, global);
     // wrap global constructors for prevent changs in this version
     else if (options.wrap && USE_NATIVE) resultProperty = wrapConstructor(sourceProperty);
-    // make static versions for prototype methods
+    // make staticfiles versions for prototype methods
     else if (PROTO && isCallable(sourceProperty)) resultProperty = uncurryThis(sourceProperty);
     // default case
     else resultProperty = sourceProperty;
