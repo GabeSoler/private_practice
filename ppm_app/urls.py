@@ -11,4 +11,5 @@ urlpatterns = [
     path('calendar/',include('room_calendar_app.urls')),
     path("__reload__/", include("django_browser_reload.urls")), # to use django reload
     static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
 ]
