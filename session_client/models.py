@@ -60,7 +60,7 @@ class ClientModel(models.Model):
 
 class SessionManager(models.Manager):
     def create_unique(self,client,date=None,time=None,duration=None,room=None):
-        """ creates an Session and checks if overlaps with others. 
+        """ creates a Session and checks if overlaps with others.
             Returns (True, None) if it does not overlap, and (False,Queryset) if it does  """
         if date is None:
             # deducing next's weeks appointment from defaults in ClientModel

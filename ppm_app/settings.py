@@ -26,7 +26,12 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+HOST_URL = config("HOST_URL",default="")
+
+ALLOWED_HOSTS = [HOST_URL]
+CSRF_TRUSTED_ORIGINS = [
+     "https://www"+HOST_URL,
+]
 
 
 # Application definition
@@ -90,17 +95,17 @@ WSGI_APPLICATION = "ppm_app.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ppm_db',
-        'USER': 'gsole',
+        'NAME': config('POSTGRESS_NAME'),
+        'USER': config('POSTGRESS_USER'),
         'PASSWORD': config('POSTGRESS_KEY'),
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'HOST': config('POSTGRESS_HOST'),
+        'PORT': config('POSTGRESS_PORT'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
