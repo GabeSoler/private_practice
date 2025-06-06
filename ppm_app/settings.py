@@ -172,7 +172,8 @@ BOOTSTRAP5 = {
     "theme_url":"https://cdn.jsdelivr.net/npm/bootswatch@5.3.5/dist/pulse/bootstrap.min.css",
     }
 
-USE_TZ = False #change to True when ready to deploy??
+# noinspection PyRedeclaration
+USE_TZ = True #change to True when ready to deploy??
 
 
 

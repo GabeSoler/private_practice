@@ -1,0 +1,102 @@
+/* styles.css */
+#animated-circle {
+    animation: rotate 5s linear infinite;
+  }
+  
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+      transform-origin: 0% 0%;
+      stroke: blue;
+    }
+    50% {
+      transform: rotate(360deg);
+      transform-origin: 50% 50%;
+      stroke:rgb(255, 127, 214);
+    }
+    100% {
+      transform: rotate(360deg);
+      transform-origin: 0% 0%;
+      stroke:rgb(127, 255, 138);
+    }
+  }
+
+  
+  /* bottle */
+
+  #svg_bottle {
+    animation: bounce 5s linear infinite;
+    transform-origin: 0% 30%;
+
+  }
+
+  @keyframes bounce {
+    0% {
+      transform: translateX(0) translateY(0) rotate(0);
+    }
+    50% {
+      transform: translateX(100px) translateY(-20px) rotate(5deg);
+
+    }
+    100% {
+      transform: translateX(0) translateY(0) rotate(0);
+
+    }
+  }
+
+  /* bubbles animations */
+  #svg_red_bubbles {
+    animation: rise_fade 3s ease-in infinite;
+    animation-direction: normal;
+    animation-fill-mode: both;
+
+  }
+
+  @keyframes rise_fade {
+    0% {
+      transform: translateX(0) translateY(0) rotate(0);
+      opacity: 1;
+    }
+    50% {
+      transform: translateX(100px) translateY(-100px) rotate(2deg);
+      opacity: .5;
+
+    }
+    100% {
+      transform: translateX(0) translateY(-300px) rotate(0);
+      opacity: 0;
+
+    }
+  }
+
+  #svg_green_bubbles {
+    animation: rise_fade2 2s linear infinite;
+  }
+
+  @keyframes rise_fade2 {
+    0% {
+      transform: translateX(0) translateY(0) rotate(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(100px) translateY(-500px) rotate(2deg);
+      opacity: 0;
+
+    }
+  }
+
+  .bubbling {
+    animation: rise_fade2 2s linear infinite;
+  }
+
+  @keyframes rise_fade2 {
+    0% {
+      transform: translateX(0) translateY(0) rotate(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(100px) translateY(-500px) rotate(2deg);
+      opacity: 0;
+
+    }
+  }
