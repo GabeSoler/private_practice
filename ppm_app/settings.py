@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'session_client',
     'accounts',
     'room_calendar_app',
+    "payments",
 
     #third party
     'django_bootstrap5',
@@ -96,7 +97,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ppm_app.wsgi.application"
 
-
+AUTH_USER_MODEL = "accounts.CustomUser"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -219,3 +220,16 @@ LOGGING = {
 INTERNAL_IPS = (
     '127.0.0.1',
 )
+
+
+# This can be a string or callable, and should return a base host that
+# will be used when receiving callbacks and notifications from payment
+# providers.
+#
+# Keep in mind that if you use `localhost`, external servers won't be
+# able to reach you for webhook notifications.
+PAYMENT_HOST = 'localhost:8000'
+
+# Whether to use TLS (HTTPS). If false, will use plain-text HTTP.
+# Defaults to ``not settings.DEBUG``.
+PAYMENT_USES_SSL = False

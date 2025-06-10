@@ -10,6 +10,7 @@ dependencies = [
     "django-bootstrap5>=25.1",
     "django-browser-reload>=1.18.0",
     "django-htmx>=1.23.0",
+    "django-payments[stripe]>=3.0.1",
     "django-template-partials>=24.4",
     "greenlet==3.2.2",
     "gunicorn>=23.0.0",
