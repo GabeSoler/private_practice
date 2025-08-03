@@ -51,10 +51,10 @@ def week_view(request):
         response = render(request,form_partial_template,context)
         return retarget(response,"#calendar-form-tr") # retarget if not valid, switch week table (edge cases)
     #default GET response
-    sessions = SessionModel.objects.filter(client__user=request.user,
-                                           start_datetime__week=p.now().week_of_year).select_related('client','client__user')
     form = WeekCalendarForm()
     form.fields['calendar'].queryset = room_calendar_user
+    sessions = SessionModel.objects.filter(client__user=request.user,
+                                           start_datetime__week=p.now().week_of_year).select_related('client','client__user')
     calendar = CalendarRender(sessions=sessions) # today by default
     context = {'calendar':calendar,'form':form}
     return render(request,template,context)

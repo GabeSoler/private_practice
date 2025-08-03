@@ -41,6 +41,7 @@ class CalendarOccurrenceTest(TestCase):
         )
         cls.room_2.tenants.add(cls.tenant)
         cls.room_2.save()
+        cls.room_default = RoomCalendarModel.objects.get(user=cls.user,name="Base Room")
 
         # Create a client (equivalent to event)
         cls.client = ClientModel.objects.create(
@@ -114,7 +115,7 @@ class CalendarOccurrenceTest(TestCase):
     def test_week_view_today_render(self):
         self.client.force_login(self.user)
         response = self.client.get('/calendar/week-view/')
-        expected_string = self.user.username
+        expected_string = self.session_1.start_datetime.strftime("%H:%M")
         self.assertContains(response,expected_string)
 
     def test_week_view_today_render_htmx(self):
@@ -134,19 +135,11 @@ class CalendarOccurrenceTest(TestCase):
         week_day = session.start_datetime.isoweekday()
         self.assertEqual(calendar_render.week_dict[start_time][week_day],session)
 
+    def test_base_room_tenant(self):
+        self.client.force_login(self.user)
+        room = self.room_default
+        self.assertEqual(room.tenants.count(),1)
 
-
-    # Week View
-    def week_view_display(self):
-        ...
-    
-    def week_view_switch(self):
-        ...
-
-
-    # Day View
-
-    # Month select?
 
 
 class TenantCalendarTest(TestCase):
