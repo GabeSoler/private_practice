@@ -1,4 +1,6 @@
 """ A series of functions to deal with the calendar"""
+from asyncio import TaskGroup
+import time
 import pendulum as p
 from session_client.choices import time_slots
 
@@ -8,6 +10,7 @@ class CalendarRender:
     def __init__(self,sessions,date_ref=None):
         self.sessions = sessions
         self.date = date_ref or p.today()
+        self.cal_dict = self.week_slot_dic
 
     @property
     def week_days(self)->list:
@@ -37,18 +40,29 @@ class CalendarRender:
             day_dict[slot] = {}
         return day_dict
 
-    
     @property
     def week_dict(self)->dict:
         """organises the dictionary by the session, it cannot handle two in a slot (which is the idea)"""
         week_dict = self.week_slot_dic
+        time_1 = time.perf_counter()
         for session in self.sessions:
             start_time = p.instance(session.start_datetime)
             end_time = p.instance(session.end_datetime).subtract(minutes=30)
             time_range = p.interval(start_time,end_time)
             iso_day = start_time.isoweekday()
-            for time in time_range.range('minutes',30):
-                slot = time.time()
+            for time_slot in time_range.range('minutes',30):
+                slot = time_slot.time()
                 week_dict[slot][iso_day] = session
+        time_2 = time.perf_counter()
+        print("time week allocation", time_2-time_1)
         return week_dict
 
+
+    def _session_allocation(self,session):
+            start_time = p.instance(session.start_datetime)
+            end_time = p.instance(session.end_datetime).subtract(minutes=30)
+            time_range = p.interval(start_time,end_time)
+            iso_day = start_time.isoweekday()
+            for time_slot in time_range.range('minutes',30):
+                slot = time_slot.time()
+                self.cal_dict[slot][iso_day] = session

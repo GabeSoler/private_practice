@@ -25,6 +25,9 @@ urlpatterns = [
 
     path("hx-client-list/", views.week_view_auxiliary, name="client_list_auxiliary"),
 
+#todo create a htmx response that sends back a modal with forms to add a quick sessin reference
+    path("hx-week_view_add_session_client/<str:date_ref>/<int:week_day>/<int:time>/", views.week_view_add_session_client, name="week_view_add_session_client"),
+    path("hx-week_view_add_session_date/<str:date_ref>/<uuid:client_ref>/", views.week_view_add_session_date, name="week_view_add_session_date"),
 
 
 ]

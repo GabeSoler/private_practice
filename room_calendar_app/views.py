@@ -5,11 +5,12 @@ from .models import RoomCalendarModel,TenantModel
 from .forms import RoomCalendarForm,TenantForm,LinkTenantForm,WeekCalendarForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
-from django.views.decorators.vary import vary_on_headers
 from django_htmx.http import retarget
 from .calendar_utils import CalendarRender
 import pendulum as p
 from session_client.models import SessionModel,ClientModel
+from session_client.forms import ClientSessionForm,StartDateSessionForm
+from django.contrib import messages
 
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
@@ -17,15 +18,14 @@ def check_owner(topic_owner,request_user):
     
 
 @login_required
-@cache_control(max_age=300)
-@vary_on_headers("HX-Request")
+@cache_control(private=True)
 def week_view(request):
     """ Displays a calendar table with occurrences
         You can change the week to display or select a specific room calendar
        """
     template = "room_calendar_app/dynamic/week_view.html"
     room_calendar_user = RoomCalendarModel.objects.filter(tenants__user=request.user) #filter room_calendars options
-    if request.htmx:
+    if request.POST and request.htmx:
         form_partial = WeekCalendarForm(data=request.POST)
         if form_partial.is_valid():
             """ main functionality changing content by date or calendar, 
@@ -35,10 +35,10 @@ def week_view(request):
             ref_date_partial = p.datetime(date.year,date.month,date.day)
             if form_partial.cleaned_data['calendar']:
                 sessions = SessionModel.objects.filter(start_datetime__week=ref_date_partial.week_of_year,
-                                                            calendar=form_partial.cleaned_data['calendar'])
+                                                            calendar=form_partial.cleaned_data['calendar']).select_related('client','client__user')
             else:
                 sessions = SessionModel.objects.filter(client__user=request.user,
-                                                 start_datetime__week=ref_date_partial.week_of_year)
+                                                 start_datetime__week=ref_date_partial.week_of_year).select_related('client','client__user')
             calendar_partial = CalendarRender(sessions=sessions,date_ref=ref_date_partial)
             template_calendar = template + "#calendar-view-partial"
             context = {'calendar':calendar_partial}
@@ -48,8 +48,9 @@ def week_view(request):
         form_partial.fields['calendar'].queryset = room_calendar_user
         context = {'form':form_partial}
         response = render(request,form_partial_template,context)
-        return retarget(response,"#calendar-form-tr") # retarget if not valid switch week table (edge cases)
-    sessions = SessionModel.objects.none() #? the content is loaded after page load by hmx
+        return retarget(response,"#calendar-form-tr") # retarget if not valid, switch week table (edge cases)
+    sessions = SessionModel.objects.filter(client__user=request.user,
+                                           start_datetime__week=p.now().week_of_year) #? the content is loaded after page load by hmx
     form = WeekCalendarForm()
     form.fields['calendar'].queryset = room_calendar_user
     calendar = CalendarRender(sessions=sessions) # today by default
@@ -62,14 +63,38 @@ def week_view_auxiliary(request):
     context = {"clients":clients}
     return render(request,template,context)
 
+def week_view_add_session_client(request,date_ref,day,time):
+    if request.POST:
+        form = ClientSessionForm(data=request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            week_year = p.instance(date_ref).week_of_year()
+            start_datetime = p.now().replace(day=day,hour=time,week=week_year)
+            instance.start_datetime = start_datetime
+            instance.end_datetime = instance.client.duration + start_datetime
+            instance.user = request.user
+            instance.save()
+            messages.info(request,f"Session added for {instance.client.name}")
+            return render(request,'_toasts.html')
+        form = ClientSessionForm(data=request.POST)
+        context = {'form':form}
+        return render(request,'room_calendar_app/input/session_form_client.html',context)
+        return None
+    else:
+        form = ClientSessionForm()
+        context = {'form':form}
+        return render(request,'room_calendar_app/input/session_form_client.html',context)
+
+def week_view_add_session_date(request,date_ref,client_ref):
+    if request.POST:
+        form = StartDateSessionForm(data=request.POST)
+
 def room_calendar_listing_view(request):
     room_calendar_mine = RoomCalendarModel.objects.filter(user=request.user)
     room_calendar_tenant = RoomCalendarModel.objects.filter(tenants__user=request.user)
     context = {"calendar_mine": room_calendar_mine,"calendar_tenant": room_calendar_tenant}
     return render(request,"room_calendar_app/display/room_calendar_list.html",context)
 
-@cache_control(max_age=300)
-@vary_on_headers("HX-Request")
 def room_calendar_view(request,calendar_pk):
     calendar = get_object_or_404(RoomCalendarModel, pk=calendar_pk,user=request.user)
     tenants = calendar.tenants.all()

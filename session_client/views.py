@@ -140,7 +140,7 @@ def client_archived_view(request):
 @login_required
 def sessions_view(request):
     """show open sessions, add new simple session, update pay status """
-    sessions = SessionModel.objects.filter(user=request.user,open=True).order_by('-created_at')
+    sessions = SessionModel.objects.filter(client__user=request.user,open=True).order_by('-created_at')
     template = 'session_client/lists/session_list.html'
     form = SessionShortForm()
     if request.htmx:

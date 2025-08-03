@@ -12,7 +12,7 @@
   <div id="form-table-wrapper">
   {% partialdef form-partial inline %}
   <form
-    hx-post={% url "room_calendar_app:week_view" %}
+    hx-post="{% url "room_calendar_app:week_view" %}"
     hx-target="#calendar-table-wrapper"
     hx-trigger="change throttle:1s,load once"
     >
@@ -73,16 +73,17 @@
             >{{slot|time:"H:i"}}</th>
       
               {% for weekday,occurrence in data.items %}
-              {% if occurrence.start_time %}
+              {% if occurrence.start_datetime %}
                   <td class="table-info" 
                   style="font-size:.6rem;"
                   id="{{slot}}"
-                  >{{occurrence.event.user}}-
-                    {{occurrence.start_time|time:"H:i"}}-
-                    {{occurrence.end_time|time:"H:i"}}</td>
+                  >{{occurrence.client.user}}-
+                    {{occurrence.start_datetime|time:"H:i"}}-
+                    {{occurrence.end_datetime|time:"H:i"}}</td>
                     {% else %}
+                    <td>
                     {% comment %} Empty cells, possible link to create event here {% endcomment %}
-                    <td>-
+                    <a class="small" hx-get="">add(todo)</a>
                     </td>
                     {% endif %}
               {% endfor %}

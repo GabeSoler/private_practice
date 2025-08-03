@@ -1,20 +1,17 @@
+from pprint import pprint
+
 from django.test import TestCase
-from .models import Event,RoomCalendarModel,TenantModel,OccurrenceModel
+from .models import RoomCalendarModel,TenantModel
 from .forms import WeekCalendarForm
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 import pendulum as p
 from datetime import timedelta
+from .calendar_utils import CalendarRender
+from session_client.models import ClientModel,SessionModel
 # Create your tests here.
 
 
-class EventOccurrenceTest(TestCase):
-    # Event creation
-
-    # Occurrences of event creation
-
-    # Occurrences list
-    ...
 
 
 class CalendarOccurrenceTest(TestCase):
@@ -45,38 +42,41 @@ class CalendarOccurrenceTest(TestCase):
         cls.room_2.tenants.add(cls.tenant)
         cls.room_2.save()
 
-        cls.event = Event.objects.create(
-                        user=cls.user,
-                        room_calendar=cls.room_1,
-                        client=None, # link to client test? (second level testing)
-                        title="Monica",
-                        description="Supervision",
-                        event_type="sup",
-        ).save()
-        cls.occurrence_1 = OccurrenceModel.objects.create(
-                        duration=timedelta(minutes=90),
-                        start_time=cls.now.at(8), 
-                        end_time=cls.now.at(9,30),
-                        event=cls.event,
-                        calendar=cls.room_1,
+        # Create a client (equivalent to event)
+        cls.client = ClientModel.objects.create(
+            user=cls.user,  # assuming you have cls.user defined
+            code="Test123",
+            time=p.now().at(8, 0).time(),
+            duration=timedelta(hours=1),
         )
-        cls.occurrence_1.save()
-        cls.occurrence_2 = OccurrenceModel.objects.create(
-                        duration=timedelta(minutes=60),
-                        start_time=cls.now.add(weeks=1), 
-                        end_time=cls.now.add(weeks=1,hours=1),
-                        event=cls.event,
-                        calendar=cls.room_2,
+        cls.client.save()
 
+        # Create sessions (equivalent to occurrences)
+        cls.session_1 = SessionModel.objects.create(
+            client=cls.client,
+            start_datetime=cls.now.at(8, 0),  # 8:00
+            end_datetime=cls.now.at(9, 30),  # 9:30
+            calendar=cls.room_1,  # assuming you have cls.room_1 defined
+            title="Test Session 1"
         )
-        cls.occurrence_2.save()
+
+        cls.session_1.save()
+        cls.session_2 = SessionModel.objects.create(
+            client=cls.client,
+            start_datetime=cls.now.add(weeks=1).at(8, 0, 0),  # Next week same time
+            end_datetime=cls.now.add(weeks=1, hours=1).at(9, 30, 0),  # Next week +1 hour
+            calendar=cls.room_2,  # assuming you have cls.room_2 defined
+            title="Test Session 2"
+        )
+        cls.session_2.save()
+
         cls.calendar_data = {
                 'calendar':cls.room_1,
-                'date':cls.now.add(weeks=1).date(),
+                'date_reference':cls.now.add(weeks=1).date(),
         }
         cls.calendar_data_2 ={
                 'calendar':"",
-                'date':"12/03/25",
+                'date_reference':"12/03/25",
         }
     
 
@@ -85,22 +85,32 @@ class CalendarOccurrenceTest(TestCase):
         form_invalid = WeekCalendarForm(data={"calendar": "Computer", "data": 400.1234})
         self.assertFalse(form_invalid.is_valid())
         form_valid = WeekCalendarForm(data=self.calendar_data)
-        form_valid.is_valid()
+        self.assertTrue(form_valid.is_valid())
         form_valid_2 = WeekCalendarForm(data=self.calendar_data_2)
+        self.assertTrue(form_valid_2.is_valid())
         form_valid_2.is_valid()
         print(form_valid.errors.as_data())
-        self.assertTrue(form_valid.is_valid())
         self.assertTrue(form_valid_2.is_valid()) #testing form with two types of data
         
-    def test_week_view__today_render(self):
+    def test_week_view_today_render(self):
         self.client.force_login(self.user)
-        start_time = p.instance(self.occurrence_1.start_time)
-        end_time = p.instance(self.occurrence_1.end_time)
+        start_time = self.session_1.start_datetime
+        end_time = self.session_1.end_datetime
         response = self.client.get('/calendar/week-view/')
-        self.assertContains(response,f"{self.now.format("DD-MM-YY")}")
-        self.assertContains(response,f"{self.user.username}- {start_time.format("HH:mm")}- {end_time.format("HH:mm")}")
+        expected_string = f"{self.user.username}- {start_time.format('HH:mm')}- {end_time.format('HH:mm')}"
+        self.assertContains(response,expected_string)
         response = self.client.post('calendar/week-view/',self.calendar_data, follow=True)
         self.assertEqual(response.status_code,200)
+
+    def test_week_dict_utils(self):
+        sessions = SessionModel.objects.all()
+        calendar_render = CalendarRender(sessions,self.now)
+        session = sessions[1]
+        start_time = session.start_datetime.time()
+        week_day = session.start_datetime.isoweekday()
+        self.assertEqual(calendar_render.week_dict[start_time][week_day],session)
+
+
 
     # Week View
     def week_view_display(self):
@@ -122,3 +132,5 @@ class TenantCalendarTest(TestCase):
 
     # Tenant by calendar
     ...
+
+

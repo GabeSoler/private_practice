@@ -72,15 +72,18 @@ class SessionShortForm(forms.ModelForm):
                                                             date_format="%Y-%m-%d",
                                                             time_choices=time_slot_options
                                                             )}
+class ClientSessionForm(forms.ModelForm):
+    class Meta:
+        model = SessionModel
+        fields = ['client']
+
+class StartDateSessionForm(forms.ModelForm):
+    class Meta:
+        model = SessionModel
+        fields = ['start_datetime']
+        labels = {'start_datetime':'Day and Time'}
 
 
-# class SessionShortForm(forms.ModelForm):
-#     class Meta:
-#         model = SessionModel
-#         fields = ['title','client']
-#         labels = {'title':'Title',
-#                   'client':'Client'
-#         }
 
 class SearchSessionFrom(forms.Form):
     date_ref_start = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now().subtract(months=1))

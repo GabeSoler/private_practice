@@ -29,6 +29,7 @@ class LinkTenantForm(forms.Form):
 
 class WeekCalendarForm(forms.Form):
     """calendar switch form"""
-    date_reference = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=timezone.now())
-    calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all(),required=False)
+    date_reference = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=timezone.now(),
+                                     help_text='Select week reference')
+    calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all(),required=False, help_text='Select the calendar to search')
 
