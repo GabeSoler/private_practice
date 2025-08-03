@@ -47,10 +47,12 @@ def week_view(request):
         form_partial_template = template + "#form-partial"
         form_partial.fields['calendar'].queryset = room_calendar_user
         context = {'form':form_partial}
+        #response for form error
         response = render(request,form_partial_template,context)
         return retarget(response,"#calendar-form-tr") # retarget if not valid, switch week table (edge cases)
+    #default GET response
     sessions = SessionModel.objects.filter(client__user=request.user,
-                                           start_datetime__week=p.now().week_of_year) #? the content is loaded after page load by hmx
+                                           start_datetime__week=p.now().week_of_year).select_related('client','client__user')
     form = WeekCalendarForm()
     form.fields['calendar'].queryset = room_calendar_user
     calendar = CalendarRender(sessions=sessions) # today by default

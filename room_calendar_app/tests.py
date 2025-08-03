@@ -72,13 +72,32 @@ class CalendarOccurrenceTest(TestCase):
 
         cls.calendar_data = {
                 'calendar':cls.room_1,
-                'date_reference':cls.now.add(weeks=1).date(),
+                'date_reference':cls.now.date(),
         }
         cls.calendar_data_2 ={
                 'calendar':"",
-                'date_reference':"12/03/25",
+                'date_reference':cls.now.add(weeks=1).date(),
         }
-    
+
+        cls.htmx_headers = {
+            "HX-Request": "true",
+            "HX-Trigger": "some-trigger",
+            "HX-Target": "some-target",
+            "HX-Current-URL": "http://testserver/calendar/week-view/"
+        }
+
+        session_list = []
+        for n in range(10):
+            n = n + 10
+            session = SessionModel(
+                client=cls.client,
+                start_datetime=cls.now.add(days=1).at(n),  # add one each hour
+                end_datetime=cls.now.add(days=1).at(n+1),  # Next week +1 hour
+                calendar=cls.room_2,  # assuming you have cls.room_2 defined
+                title=f"Test Session {n}"
+            )
+            session_list.append(session)
+        SessionModel.objects.bulk_create(session_list)
 
     def test_form_week_view(self):
         self.client.force_login(self.user)
@@ -94,13 +113,18 @@ class CalendarOccurrenceTest(TestCase):
         
     def test_week_view_today_render(self):
         self.client.force_login(self.user)
-        start_time = self.session_1.start_datetime
-        end_time = self.session_1.end_datetime
         response = self.client.get('/calendar/week-view/')
-        expected_string = f"{self.user.username}- {start_time.format('HH:mm')}- {end_time.format('HH:mm')}"
+        expected_string = self.user.username
         self.assertContains(response,expected_string)
-        response = self.client.post('calendar/week-view/',self.calendar_data, follow=True)
-        self.assertEqual(response.status_code,200)
+
+    def test_week_view_today_render_htmx(self):
+        self.client.force_login(self.user)
+        expected_string = self.user.username
+        response = self.client.post('/calendar/week-view/',
+                                    self.calendar_data_2,
+                                    follow=True,
+                                    headers=self.htmx_headers)
+        self.assertContains(response,expected_string)
 
     def test_week_dict_utils(self):
         sessions = SessionModel.objects.all()

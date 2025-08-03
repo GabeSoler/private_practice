@@ -6,7 +6,11 @@ from session_client.choices import time_slots
 
 
 class CalendarRender:
-    """ A class to create calendar dictionaries and render in template """
+    """ A class to create calendar dictionaries and render in template
+    date_ref default is now
+   week_days, gives you the weekdays in a list,
+   week_dict organises the sessions in a dictionary by time slot and day
+    """
     def __init__(self,sessions,date_ref=None):
         self.sessions = sessions
         self.date = date_ref or p.today()
@@ -56,13 +60,3 @@ class CalendarRender:
         time_2 = time.perf_counter()
         print("time week allocation", time_2-time_1)
         return week_dict
-
-
-    def _session_allocation(self,session):
-            start_time = p.instance(session.start_datetime)
-            end_time = p.instance(session.end_datetime).subtract(minutes=30)
-            time_range = p.interval(start_time,end_time)
-            iso_day = start_time.isoweekday()
-            for time_slot in time_range.range('minutes',30):
-                slot = time_slot.time()
-                self.cal_dict[slot][iso_day] = session

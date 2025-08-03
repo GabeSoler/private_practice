@@ -14,7 +14,7 @@
   <form
     hx-post="{% url "room_calendar_app:week_view" %}"
     hx-target="#calendar-table-wrapper"
-    hx-trigger="change throttle:1s,load once"
+    hx-trigger="change throttle:1s"
     >
     <table
     class="table table-primary table-striped-columns table-sm mb-0"
@@ -81,9 +81,10 @@
                     {{occurrence.start_datetime|time:"H:i"}}-
                     {{occurrence.end_datetime|time:"H:i"}}</td>
                     {% else %}
-                    <td>
+                    <td
+                    style="font-size:.6rem;">
                     {% comment %} Empty cells, possible link to create event here {% endcomment %}
-                    <a class="small" hx-get="">add(todo)</a>
+                    <a class="small float-end" hx-get="">+</a>
                     </td>
                     {% endif %}
               {% endfor %}

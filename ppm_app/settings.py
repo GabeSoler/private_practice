@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     "django_htmx",
     "django_browser_reload",
 
+    # dj extras
+    "django.contrib.admindocs",
 
     #default
     "django.contrib.admin",
