@@ -14,7 +14,6 @@ class CalendarRender:
     def __init__(self,sessions,date_ref=None):
         self.sessions = sessions
         self.date = date_ref or p.today()
-        self.cal_dict = self.week_slot_dic
 
     @property
     def week_days(self)->list:
@@ -46,10 +45,11 @@ class CalendarRender:
 
     @property
     def week_dict(self)->dict:
-        """organises the dictionary by the session, it cannot handle two in a slot (which is the idea)"""
+        """organizes the dictionary by the session, it cannot handle two in a slot (which is the idea)"""
         week_dict = self.week_slot_dic
         time_1 = time.perf_counter()
         for session in self.sessions:
+            assert session.start_datetime is not None, "start_datetime should not be None"
             start_time = p.instance(session.start_datetime)
             end_time = p.instance(session.end_datetime).subtract(minutes=30)
             time_range = p.interval(start_time,end_time)

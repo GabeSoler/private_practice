@@ -3,9 +3,12 @@ from django.core.validators import MinValueValidator,MaxValueValidator
 from django.contrib.auth import get_user_model
 import uuid
 from django.urls import reverse
+
 from .choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices,time_slot_options
 from room_calendar_app.models import RoomCalendarModel
 import pendulum as p
+from pgvector.django import VectorField
+
 # Create your models here.
 
 class ClientModel(models.Model):
@@ -36,7 +39,8 @@ class ClientModel(models.Model):
 
 
     @property
-    def color_class(self): #to add a colour class or other relative to event type
+    def color_class(self):
+        """ Property to add a colour class when listing clients """
         match self.type:
             case 'Pvt':
                 return 'primary'
@@ -57,51 +61,35 @@ class ClientModel(models.Model):
         return reverse("session_client:client", kwargs={"client_pk":self.pk})
 
 
+    def deduce_next_datetime(self,add_weeks=1,ref_date=p.now(),set_time=None):
+        """deduces the next week's appointment from defaults in ClientModel"""
+        if add_weeks:
+            ref_date = ref_date.add(weeks=add_weeks)
+        week_start = ref_date.start_of('week')
+        day_of_week:int = self.day
+        target_date = week_start.add(days=day_of_week - 1)
+        time = set_time or self.time
+        return target_date.at(time.hour,time.minute)
+
+
+
+
 
 class SessionManager(models.Manager):
-    def create_unique(self,client,date=None,time=None,duration=None,room=None):
-        """ creates a Session and checks if overlaps with others.
-            Returns (True, None) if it does not overlap, and (False,Queryset) if it does  """
-        if date is None:
-            # deducing next's weeks appointment from defaults in ClientModel
-            now = p.now()
-            week_day:int = client.day
-            now_day_week = now.isoweekday()
-            if now_day_week < week_day:
-                diff = week_day - now_day_week
-                date = now.add(weeks=1,days=diff)
-            else:
-                diff = now_day_week - week_day
-                date = now.add(weeks=1).subtract(days=diff)
-        start_time = date + time
-        end_time = start_time + duration
-        calendar = room if room else client.room_calendar
-        new_occ = self.create(
-            start_time=start_time,
-            end_time=end_time,
-            client=client,
-            calendar=calendar,
-        )
-        overlaps = new_occ.overlap_set()
-        if overlaps:
-            __bool__ = False
-            return overlaps
-        else:
-            __bool__ = True  # noqa: F841
-            return None
-
+    pass
 
 
 class SessionModel(models.Model):
-    client = models.ForeignKey(ClientModel,on_delete=models.CASCADE,help_text="Link to a client")
+    client = models.ForeignKey(ClientModel,null=True,on_delete=models.CASCADE,help_text="Link to a client")
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
+    # datetime fields
     start_datetime = models.DateTimeField(null=True,blank=True, editable=True,help_text="Start of session?")
     end_datetime = models.DateTimeField(null=True,blank=True, editable=True,help_text="End of session")
-   #Session labels(delete after 7 years?)
-    title = models.CharField(default='',blank=True,max_length=200,help_text="Give the session a title") #short description
-    notes = models.TextField(default='',blank=True,help_text="Longer note of Session") #longer description
+   #Session notes and vector(delete after 7 years?)
+    brief = models.CharField(default='',blank=True,max_length=250,help_text="250 characters note") #short description
+    brief_vector = VectorField(dimensions=3,null=True) #for vector search
     #admin info
     paid = models.BooleanField(default=False,blank=True) #check payment
     attended = models.CharField(default='',blank=True,max_length=20,choices=(ATTENDANCE)) #record attendance
@@ -113,8 +101,8 @@ class SessionModel(models.Model):
     calendar = models.ForeignKey(RoomCalendarModel,null=True,blank=True,on_delete=models.SET_NULL)
 
     def __str__(self):
-        title = self.title
-        return f"Session-{title[:10]}"
+        brief = self.brief
+        return f"Session-{brief[:10]}"
     
     def get_absolute_url(self):
         return reverse("session_client:session", kwargs={"session_pk":self.id})
@@ -129,10 +117,8 @@ class SessionModel(models.Model):
 
     def __str__(self):  # noqa: F811
         ref_date = self.start_datetime or ""
-        return f"{self.title}: {ref_date}"
+        return f"{self.brief[:8]}:{ref_date}"
 
-    def get_absolute_url(self):  # noqa: F811
-        return reverse("session_client:edit_session", args=[str(self.id)])
 
     def __lt__(self, other):
         return self.start_datetime < other.start_datetime
@@ -157,6 +143,41 @@ class SessionModel(models.Model):
             | models.Q(start_time__lt=start, end_time__gt=end)
         )
         return qs
+
+    def is_unique(self):
+        """ takes a Session and checks if overlaps with others.
+            Returns (True, None) if it does not overlap, and (False,Queryset) if it does  """
+
+        overlaps = self.overlap_set()
+        if overlaps:
+            __bool__ = False
+            return False, overlaps
+        else:
+            __bool__ = True  # noqa: F841
+            return True, None
+
+    def deduce_from_client(self,start_datetime=None,room=None,add_weeks:int=None,ref_date=None):
+        """ takes a Session with a client, and deduces from it its room, and extra information about when it happens
+        args:
+            start_datetime: if you want to set a with clear datetime object. If present it blocks next args.
+            room : to override the room of the client
+            add_weeks : to deduce nex week or more weeks ahead when it should be a session
+            ref date: allows to set session from a reference date. If added week, it will use the date and add to it.
+        returns: empty
+
+        """
+        assert self.client is not None
+        client = self.client
+        self.room_calendar = room or client.room_calendar
+        if start_datetime:
+            self.start_datetime = start_datetime
+            self.end_datetime = start_datetime + client.duration
+            return
+        start = client.deduce_next_datetime(add_weeks=add_weeks,ref_date=ref_date)
+        self.start_datetime = start
+        self.end_datetime = start + client.duration
+        return
+
 
     @property
     def week_day(self):

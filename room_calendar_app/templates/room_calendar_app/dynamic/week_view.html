@@ -83,8 +83,7 @@
                     {% else %}
                     <td
                     style="font-size:.6rem;">
-                    {% comment %} Empty cells, possible link to create event here {% endcomment %}
-                    <a class="small float-end" hx-get="">+</a>
+                    <a class="small float-end stretched-link" hx-get="">+</a>
                     </td>
                     {% endif %}
               {% endfor %}
@@ -105,5 +104,8 @@
     
     
     </div>
-    
+    {{ calendar.week_dict.items }}
+    <h3>sessions</h3>
+    {{ sessions }}
+    <p>error is in the saving of Sessions and clients!!</p>
     {% endblock content %}

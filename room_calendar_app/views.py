@@ -56,7 +56,7 @@ def week_view(request):
     sessions = SessionModel.objects.filter(client__user=request.user,
                                            start_datetime__week=p.now().week_of_year).select_related('client','client__user')
     calendar = CalendarRender(sessions=sessions) # today by default
-    context = {'calendar':calendar,'form':form}
+    context = {'calendar':calendar,'form':form,'sessions':sessions}
     return render(request,template,context)
 
 def week_view_auxiliary(request):

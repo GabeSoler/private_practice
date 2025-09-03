@@ -32,11 +32,10 @@ class ClientFormShort(forms.ModelForm):
 class SessionForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['title','start_datetime','client','notes','paid','amount_paid','attended']
-        labels = {'title':'Title',
+        fields = ['brief','start_datetime','client','paid','amount_paid','attended']
+        labels = {'brief':'Brief',
                   'start_datetime':'Date',
                   'client':'Client',
-                  'notes':'Session Note',
                   'paid':'Confirm payment',
                   'amount_paid':'Confirm amount',
                   'attended':'Record attendance'}
@@ -45,8 +44,7 @@ class SessionForm(forms.ModelForm):
             "start_datetime":forms.SplitDateTimeField,
         }
         # I custom made Select split datetime, so I can restrict time options for then rendering the calendar
-        widgets = {'notes':forms.Textarea(attrs={'cols':80}),
-                   'start_datetime':SelectSplitDateTime(date_attrs={'class':'form-select','type':'date'},
+        widgets = {'start_datetime':SelectSplitDateTime(date_attrs={'class':'form-select','type':'date'},
                                                             time_attrs={'class':'form-select','type':'time'},
                                                             date_format="%Y-%m-%d",
                                                             time_choices=time_slot_options
@@ -66,8 +64,7 @@ class SessionShortForm(forms.ModelForm):
             "start_datetime":forms.SplitDateTimeField,
         }
         # I custom made Select split datetime, so I can restrict time options for then rendering the calendar
-        widgets = {'notes':forms.Textarea(attrs={'cols':80}),
-                   'start_datetime':SelectSplitDateTime(date_attrs={'class':'form-select','type':'date'},
+        widgets = {'start_datetime':SelectSplitDateTime(date_attrs={'class':'form-select','type':'date'},
                                                             time_attrs={'class':'form-select','type':'time'},
                                                             date_format="%Y-%m-%d",
                                                             time_choices=time_slot_options

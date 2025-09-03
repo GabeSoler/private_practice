@@ -8,35 +8,35 @@
 
 <!-- Add Client -->
 
-<div class="card bg-primary-subtle">
+<div class="card bg-primary">
 <div class="" id="client-form-wrap">
 {% partialdef client-form-partial inline %} <!-- Start form partial -->
   
-    <form class="form bg-primary-subtle ps-3 mb-0"
+    <form class="form bg-primary ps-3 mb-0"
     >
     <table class="table mb-0" id="client-form-table">
       <tbody class="mb-0">
       <tr>
-        <td class="col bg-primary-subtle" id="form-td-code">
+        <td class="col bg-primary" id="form-td-code">
           {% bootstrap_field form.code wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
-        <td class="col bg-primary-subtle" id="form-td-day">
+        <td class="col bg-primary" id="form-td-day">
           {% bootstrap_field form.day wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
-        <td class="col bg-primary-subtle" id="form-td-time">
+        <td class="col bg-primary" id="form-td-time">
           {% bootstrap_field form.time wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
-        <td class="col bg-primary-subtle" id="form-td-fee">
+        <td class="col bg-primary" id="form-td-fee">
           {% bootstrap_field form.duration wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
-        <td class="bg-primary-subtle">
+        <td class="bg-primary">
             <button class="btn btn-primary col-12"
             type="submit"
             hx-post="{% url 'session_client:client_list' %}"
             hx-target="#client-list-ul"
             hx-swap="afterbegin settle:0.2s"
             hx-trigger="keyup[key=='Enter'],click"
-            _="init call preventDefault on me"
+            _="on keyup[key=='Enter'] or click call event.preventDefault()"
             >
             New</button>
         </td>

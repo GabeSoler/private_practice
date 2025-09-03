@@ -4,9 +4,9 @@ from .models import ClientModel,SessionModel
 
 
 class SessionAdmin(admin.ModelAdmin):
-    list_display = ("updated_at", "client", "title")
+    list_display = ("updated_at", "client", "brief")
     list_filter = ("updated_at",)
-    search_fields = ("updated_at", "client","notes","title")
+    search_fields = ("updated_at", "client","brief")
 
 class ClientAdmin(admin.ModelAdmin):
     list_display = ("updated_at", "code", "type")

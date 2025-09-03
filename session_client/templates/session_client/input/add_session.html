@@ -3,9 +3,9 @@
 {%block content%}
 {% load django_bootstrap5 %}
 
-<div class="card bg-secondary-subtle mb-5">
-  <div class="card-header m-0 bg-primary-subtle">
-    <div class="card-title fs-4 text-primary">
+<div class="card bg-secondary mb-5">
+  <div class="card-header m-0 bg-primary">
+    <div class="card-title fs-4 text-secondary">
       Full Session
     </div>
   </div>
@@ -13,7 +13,7 @@
     <a class="card-link" href="{% url 'session_client:add_client' %}">Add a Client First</a>
   </div>
 
-<div class="card-body">
+<div class="card-body text-primary">
   <form action="{% url 'session_client:add_session' %}" method='post'>
     {% csrf_token %}
     {% bootstrap_form form %}

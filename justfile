@@ -18,10 +18,27 @@ migrate: makemigrations
 makemigrations:
     uv run python3 manage.py makemigrations
 
+#run collect static
+static:
+    uv run python3 manage.py collectstatic
+
 #Allows commands passed to just manage (manage.py)
 manage *arg:
     uv run python3 manage.py {{arg}}
 
 # alias for full migrations to 'just db'
 alias db := makemigrations
+
+redis:
+    brew services start redis
+
+alias r := redis
+
+r_info:
+    brew services info redis
+
+r_stop:
+    brew services stop redis
+
+
 

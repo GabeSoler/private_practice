@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from django.conf.global_settings import STATIC_ROOT
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -73,7 +74,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware", # django-htmx middleware
     "django_browser_reload.middleware.BrowserReloadMiddleware", # django reload (browser experience)
-
+    "django.contrib.admindocs.middleware.XViewMiddleware", # django documentation view link
     "django.middleware.security.SecurityMiddleware", # white noise
     "whitenoise.middleware.WhiteNoiseMiddleware",
 
@@ -172,7 +173,7 @@ STATICFILES_DIRS = [BASE_DIR / "staticfiles"]
 #config of bootstrap5, I added a theme called 'sandstone' from 'bootswatch'
 BOOTSTRAP5 = {
     # The complete URL to the Bootstrap CSS theme file (None means no theme).
-    "theme_url":"https://cdn.jsdelivr.net/npm/bootswatch@5.3.5/dist/pulse/bootstrap.min.css",
+    "theme_url": "/" + STATIC_URL + "css/alky.css/",
     }
 
 # noinspection PyRedeclaration
@@ -235,3 +236,6 @@ PAYMENT_HOST = 'localhost:8000'
 # Whether to use TLS (HTTPS). If false, will use plain-text HTTP.
 # Defaults to ``not settings.DEBUG``.
 PAYMENT_USES_SSL = False
+
+
+OPENAI_API_KEY = config('OPENAI_API_KEY')

@@ -3,11 +3,11 @@
 {% block local_nav %}
 <!-- Sessions Nav -->
 <nav
-  class="nav mt-0 nav-tabs bg-secondary-subtle"
+  class="nav mt-0 nav-tabs bg-secondary"
 >
   <h4 class="text-primary m-2">Clients</h4>
 
-  <a class="nav-link {% if request.path == "/client_list/"  %}active {% endif %}" 
+  <a class="nav-link {% if request.path == "/client_list/"  %}active {% endif %}"
       href="{% url "session_client:client_list" %}" aria-current="page"
     >Current</a
   >

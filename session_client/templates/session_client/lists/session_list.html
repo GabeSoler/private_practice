@@ -13,7 +13,7 @@
 <div class="accordion" id="accordionExample">
   <div class="accordion-item">
     <h2 class="accordion-header">
-      <button class="accordion-button text-primary btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+      <button class="accordion-button text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
         Quick Add
       </button>
     </h2>
@@ -28,21 +28,21 @@
 
   {% partialdef session-form-partial inline %} <!-- Start form partial -->
   
-  <div class"card bg-primary-subtle m-2 p-2 rounded">
+  <div class="card bg-primary m-2 p-2 rounded">
   
-    <form class="form bg-primary-subtle ps-3"
+    <form class="form bg-primary ps-3"
     >
     <table class="table mb-0" id="client-form-table">
       <tbody>
       <tr>
-        <td class="col bg-primary-subtle" id="form-td-code">
+        <td class="col bg-primary" id="form-td-code">
           {% bootstrap_field form.start_datetime wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
-        <td class="col bg-primary-subtle" id="form-td-type">
+        <td class="col bg-primary" id="form-td-type">
           {% bootstrap_field form.client wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
         </td>
-        <td class="bg-primary-subtle">
-            <button class="btn btn-primary col-12"
+        <td class="bg-primary">
+            <button class="btn btn-secondary col-12"
             type="submit"
             hx-post={% url 'session_client:session_list' %}
             hx-target="#session-form-wrap"
@@ -69,7 +69,7 @@
 
 <div id="session-list-wrapper">
   {% partialdef session-list-partial inline %}
-  <table class="table table-secondary">
+  <table class="table">
     <thead>
       <tr>
         <th scope="col">Date
@@ -91,7 +91,7 @@
         <th scope="row">
           <a href="{%url "session_client:edit_session" session.pk %}">
             {% if session.start_datetime %}{{session.start_datetime|date:'d, M,Y'}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
-            &nbsp;<i class="bi bi-eye-fill text-primary"
+            &nbsp;<i class="bi bi-eye-fill text-secondary"
               hx-get={% url 'session_client:session_hx_item' session.pk %}
               hx-trigger="click"
               hx-target="#modal-wrap"

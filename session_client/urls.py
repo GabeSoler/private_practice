@@ -42,6 +42,7 @@ urlpatterns = [
     path('sessions_hx_edit_open/<uuid:session_pk>/', views.sessions_hx_edit_open, name='sessions_hx_edit_open'),
     path('sessions_hx_edit_paid/<uuid:session_pk>/', views.sessions_hx_edit_paid, name='sessions_hx_edit_paid'),
     path('hx_client_short_form/', views.hx_client_short_form, name='hx_client_short_form'),
+    path('hx_delete_session/<uuid:session_pk>/', views.hx_delete_session, name='hx_delete_session'),
 
 # data
     path('sessions_search_csv/', views.sessions_search_csv, name='sessions_search_csv'),

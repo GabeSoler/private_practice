@@ -48,9 +48,8 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
       <span class="position-relative p-2" style="min-width:12rem;">
       <a class='navbar-brand position-relative' href="{% url 'session_client:index' %}">
         <image src={% static 'alchemist/bubbles.min.svg'%} class="m-1 position-absolute" style="max-width:3rem;max-height:4rem;">
-        <span class="position-absolute bottom-0 start-50 fs-2" style="font-family:Love Light,cursive;">Alchemist's</span>
-      </a><small class="text-secondary ms-5 p-2">
-        admin</small></span>
+        <span class="position-absolute bottom-0 start-50 fs-2" style="font-family:'Love Light',cursive;">Alky</span>
+      </a><small class="text-secondary ms-5 p-2">admin</small></span>
         
         <button class='navbar-toggler' type='button' data-bs-toggle='collapse'
         data-bs-target='#navbarCollapse' aria-controls='navbarCollapse'
@@ -104,11 +103,7 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 
 <!-- Main section -->
 
-{% comment %} {% partialdef messages inline %}<!-- Dj messages-->
-<div id="messages_wrap">
-{% bootstrap_messages %}
-</div>
-{% endpartialdef %} {% endcomment %}
+
 {% if messages %}{% include '_toasts.html'%}{% endif %}
 
 

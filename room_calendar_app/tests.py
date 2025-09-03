@@ -12,9 +12,7 @@ from session_client.models import ClientModel,SessionModel
 # Create your tests here.
 
 
-
-
-class CalendarOccurrenceTest(TestCase):
+class MetaTestSetupMixin():
     @classmethod
     def setUpTestData(cls):
         cls.now = p.instance(timezone.now())
@@ -28,46 +26,46 @@ class CalendarOccurrenceTest(TestCase):
                         description="Testing tenancy")
         cls.tenant.save()
         cls.room_1 = RoomCalendarModel(
-                        user=cls.user_host, 
-                        name="Blue", 
-                        description="Testing Blue Room", 
+                        user=cls.user_host,
+                        name="Blue",
+                        description="Testing Blue Room",
         )
         cls.room_1.tenants.add(cls.tenant)
         cls.room_1.save()
         cls.room_2 = RoomCalendarModel(
-                        user=cls.user_host, 
-                        name="Green", 
-                        description="Testing Green Room", 
+                        user=cls.user_host,
+                        name="Green",
+                        description="Testing Green Room",
         )
         cls.room_2.tenants.add(cls.tenant)
         cls.room_2.save()
         cls.room_default = RoomCalendarModel.objects.get(user=cls.user,name="Base Room")
 
         # Create a client (equivalent to event)
-        cls.client = ClientModel.objects.create(
+        cls.client_model = ClientModel.objects.create(
             user=cls.user,  # assuming you have cls.user defined
             code="Test123",
             time=p.now().at(8, 0).time(),
             duration=timedelta(hours=1),
         )
-        cls.client.save()
+        cls.client_model.save()
 
         # Create sessions (equivalent to occurrences)
         cls.session_1 = SessionModel.objects.create(
-            client=cls.client,
+            client=cls.client_model,
             start_datetime=cls.now.at(8, 0),  # 8:00
             end_datetime=cls.now.at(9, 30),  # 9:30
             calendar=cls.room_1,  # assuming you have cls.room_1 defined
-            title="Test Session 1"
+            brief="Test Session 1"
         )
 
         cls.session_1.save()
         cls.session_2 = SessionModel.objects.create(
-            client=cls.client,
+            client=cls.client_model,
             start_datetime=cls.now.add(weeks=1).at(8, 0, 0),  # Next week same time
             end_datetime=cls.now.add(weeks=1, hours=1).at(9, 30, 0),  # Next week +1 hour
             calendar=cls.room_2,  # assuming you have cls.room_2 defined
-            title="Test Session 2"
+            brief="Test Session 2"
         )
         cls.session_2.save()
 
@@ -91,14 +89,18 @@ class CalendarOccurrenceTest(TestCase):
         for n in range(10):
             n = n + 10
             session = SessionModel(
-                client=cls.client,
+                client=cls.client_model,
                 start_datetime=cls.now.add(days=1).at(n),  # add one each hour
                 end_datetime=cls.now.add(days=1).at(n+1),  # Next week +1 hour
                 calendar=cls.room_2,  # assuming you have cls.room_2 defined
-                title=f"Test Session {n}"
+                brief=f"Test Session {n}"
             )
             session_list.append(session)
         SessionModel.objects.bulk_create(session_list)
+
+
+
+class CalendarOccurrenceTest(MetaTestSetupMixin,TestCase):
 
     def test_form_week_view(self):
         self.client.force_login(self.user)

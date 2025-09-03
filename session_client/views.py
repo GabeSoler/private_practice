@@ -1,13 +1,16 @@
+from urllib import request
+
 from django.shortcuts import render,redirect,get_object_or_404
+from django.urls import reverse
+
 from .models import ClientModel,SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404,HttpResponse
 from .forms import ClientForm, SessionForm,SessionShortForm,SearchSessionFrom,SearchClientForm,ClientFormShort
-from django_htmx.http import retarget,reswap
+from django_htmx.http import retarget,reswap,HttpResponseClientRedirect
 from django.utils import timezone
 import pendulum as p
 from django.contrib import messages
-from django.template.loader import render_to_string
 
 #Function to check owner when calling models without the user
 def check_owner(topic_owner,request_user):
@@ -79,6 +82,7 @@ def hx_client_short_form(request):
         context = {'form':form}
         template = 'session_client/lists/client_list.html#client-form-partial'
         return render(request,template,context)
+    raise Http404("Not a expected request")
 
     
 
@@ -102,6 +106,7 @@ def client_hx_item(request,client_pk):
         template = 'session_client/item/client_modal.html'
         context = {'client':client}
         return render(request,template,context)
+    raise Http404("Not a expected request")
 
 @login_required
 def client_search_view(request):
@@ -139,7 +144,7 @@ def client_archived_view(request):
 
 @login_required
 def sessions_view(request):
-    """show open sessions, add new simple session, update pay status """
+    """show open sessions, add a new simple session, update pay status with other hx-views """
     sessions = SessionModel.objects.filter(client__user=request.user,open=True).order_by('-created_at')
     template = 'session_client/lists/session_list.html'
     form = SessionShortForm()
@@ -148,12 +153,17 @@ def sessions_view(request):
         if form_partial.is_valid():
             instance = form_partial.save(commit=False)
             instance.user = request.user
-            instance.start_datetime = instance.created_at
-            instance.save()
-            context = {'session':instance}
-            template_partial = template + '#row-instance'
-            response = render(request,template_partial,context)
-            return retarget(response,"#tableBody")
+            instance.end_datetime = timezone.now()
+            unique,overlaps = instance.is_unique()
+            if unique:
+                instance.save()
+                context = {'session':instance}
+                template_partial = template + '#row-instance'
+                response = render(request,template_partial,context)
+                return retarget(response,"#tableBody")
+            else:
+                form_partial.add_error(None,"there are overlaping sessions")
+                return render(request,template,{'form':form_partial})
         # render form errors
         template_partial = template + '#session-form-partial'
         context = {'form':form_partial}
@@ -175,6 +185,7 @@ def sessions_hx_edit_paid(request,session_pk):
         template = 'session_client/lists/session_list.html#session_paid'
         context = {'session':session}
         return render(request,template,context) # empty response that empties the li object
+    raise Http404("Not a expected request")
 
 @login_required
 def sessions_hx_edit_open(request,session_pk):
@@ -189,6 +200,7 @@ def sessions_hx_edit_open(request,session_pk):
         template = 'session_client/lists/session_list.html#session_open'
         context = {'session':session}
         return render(request,template,context) # empty response that empties the li object
+    raise Http404("Not a expected request")
 
 def session_hx_item(request,session_pk):
     if request.method == 'GET':
@@ -196,7 +208,7 @@ def session_hx_item(request,session_pk):
         template = 'session_client/item/session_modal.html'
         context = {'session':session}
         return render(request,template,context)
-
+    raise Http404("Not a expected request")
 
 
 @login_required
@@ -337,3 +349,13 @@ def edit_session_view(request,session_pk):
             return redirect("session_client:session_list")
     context = {'session':session,'form':form}
     return render(request,'session_client/edit/edit_session.html',context)
+
+@login_required
+def hx_delete_session(request,session_pk):
+    session = get_object_or_404(SessionModel, pk=session_pk,user=request.user)
+    if request.method == 'DELETE':
+        session.delete()
+        messages.info(request,f"Session '{session.start_datetime.strftime('%d-%m-%y,%H:%M')}' deleted")
+        return HttpResponseClientRedirect(reverse("session_client:session_list"))
+    messages.error(request,f"Session '{session.start_datetime.strftime('%d-%m-%y, %H:%M')}' not deleted")
+    return render(request,'_toasts.html')

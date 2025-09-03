@@ -56,7 +56,7 @@ similar to events. needs custom form and view {% endcomment %}
   {% partialdef session-list-partial inline %}
 <ul class="list-group fade-in">
   {% for session in sessions %}
-  <li class="list-group-item list-group-item-primary text-primary">
+  <li class="list-group-item">
     <a href="{%url "session_client:session" session.pk %}">
     {{session.start_datetime|date:'d,M,Y'}}</a> | {{session.client}} |
     {{session.title|truncatechars:10}}|
@@ -64,7 +64,7 @@ similar to events. needs custom form and view {% endcomment %}
   </li>
 
     {% empty %}
-    <li class="list-group-item list-group-item-primary text-primary">
+    <li class="list-group-item">
       There are no Sessions Yet. </li>
       {% endfor %}
     </ul>
