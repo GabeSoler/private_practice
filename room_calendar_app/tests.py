@@ -13,9 +13,22 @@ from session_client.models import ClientModel,SessionModel
 
 
 class MetaTestSetupMixin():
+    """ **Sets up the whole ecosystem of models to be able to test**
+    self.user : a test user
+    self.user_host a second user
+    self.tenant a tenant account for user
+    self.room1 A room from user_host with user as tenant
+    self.room_default a default room for user
+    self.client_instance, a client for user
+    self.session_1 today 8 am to 8.30
+    self.session_2 next week 8-9 am
+    self.calendar_data for testing calendar form
+    self.htmx headers : to send data as htmx
+    self.session_list a list of sessions created for tomorrow
+    """
     @classmethod
     def setUpTestData(cls):
-        cls.now = p.instance(timezone.now())
+        cls.now = p.now()
         cls.user = get_user_model().objects.create(username="Gabriel",email="test@gabriel.cl")
         cls.user.save()
         cls.user_host = get_user_model().objects.create(username="John",email="test@john.cl")
@@ -39,35 +52,45 @@ class MetaTestSetupMixin():
         )
         cls.room_2.tenants.add(cls.tenant)
         cls.room_2.save()
-        cls.room_default = RoomCalendarModel.objects.get(user=cls.user,name="Base Room")
+        cls.room_default = RoomCalendarModel.objects.create(user=cls.user,name="Base Room",description="base room user")
 
         # Create a client (equivalent to event)
-        cls.client_model = ClientModel.objects.create(
+        cls.client_instance = ClientModel.objects.create(
             user=cls.user,  # assuming you have cls.user defined
             code="Test123",
             time=p.now().at(8, 0).time(),
             duration=timedelta(hours=1),
+            room_calendar=cls.room_default
         )
-        cls.client_model.save()
+        cls.client_instance.save()
 
         # Create sessions (equivalent to occurrences)
         cls.session_1 = SessionModel.objects.create(
-            client=cls.client_model,
+            client=cls.client_instance,
             start_datetime=cls.now.at(8, 0),  # 8:00
             end_datetime=cls.now.at(9, 30),  # 9:30
             calendar=cls.room_1,  # assuming you have cls.room_1 defined
-            brief="Test Session 1"
+            brief="Session1"
         )
 
         cls.session_1.save()
         cls.session_2 = SessionModel.objects.create(
-            client=cls.client_model,
+            client=cls.client_instance,
             start_datetime=cls.now.add(weeks=1).at(8, 0, 0),  # Next week same time
             end_datetime=cls.now.add(weeks=1, hours=1).at(9, 30, 0),  # Next week +1 hour
-            calendar=cls.room_2,  # assuming you have cls.room_2 defined
-            brief="Test Session 2"
+            calendar=cls.room_2,
+            brief="Session2"
         )
         cls.session_2.save()
+
+        cls.session_overlap_1 = SessionModel.objects.create(
+            client=cls.client_instance,
+            start_datetime=cls.now.at(9, 0, 0),
+            end_datetime=cls.now.at(10, 30, 0),
+            calendar=cls.room_1,
+            brief="Overlap 1"
+        )
+        cls.session_overlap_1.save()
 
         cls.calendar_data = {
                 'calendar':cls.room_1,
@@ -85,18 +108,17 @@ class MetaTestSetupMixin():
             "HX-Current-URL": "http://testserver/calendar/week-view/"
         }
 
-        session_list = []
-        for n in range(10):
-            n = n + 10
+        cls.session_list = []
+        for n in range(8,18):
             session = SessionModel(
-                client=cls.client_model,
+                client=cls.client_instance,
                 start_datetime=cls.now.add(days=1).at(n),  # add one each hour
                 end_datetime=cls.now.add(days=1).at(n+1),  # Next week +1 hour
                 calendar=cls.room_2,  # assuming you have cls.room_2 defined
                 brief=f"Test Session {n}"
             )
-            session_list.append(session)
-        SessionModel.objects.bulk_create(session_list)
+            cls.session_list.append(session)
+        SessionModel.objects.bulk_create(cls.session_list)
 
 
 

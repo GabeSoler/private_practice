@@ -61,15 +61,20 @@ class ClientModel(models.Model):
         return reverse("session_client:client", kwargs={"client_pk":self.pk})
 
 
-    def deduce_next_datetime(self,add_weeks=1,ref_date=p.now(),set_time=None):
-        """deduces the next week's appointment from defaults in ClientModel"""
+    def deduce_next_datetime(self,add_weeks=1,ref_date=None):
+        """deduces the next week's appointment from defaults in ClientModel
+        args
+            ref_date deduces a week
+             add_weeks : adds weeks to today or ref date
+             set_time: sets a new time to the deduction
+             """
+        ref_date = p.instance(ref_date) if ref_date else p.now()
         if add_weeks:
             ref_date = ref_date.add(weeks=add_weeks)
         week_start = ref_date.start_of('week')
         day_of_week:int = self.day
         target_date = week_start.add(days=day_of_week - 1)
-        time = set_time or self.time
-        return target_date.at(time.hour,time.minute)
+        return target_date.at(self.time.hour,self.time.minute)
 
 
 
@@ -131,17 +136,17 @@ class SessionModel(models.Model):
         start = self.start_datetime
         end = self.end_datetime
         calendar = self.calendar
-        qs = SessionModel.objects.filter(room_calendar=calendar).filter(
+        qs = SessionModel.objects.filter(calendar=calendar).filter(
             models.Q(
-                start_time__gte=start,
-                start_time__lte=end,
+                start_datetime__gte=start,
+                start_datetime__lte=end,
             )
             | models.Q(
-                end_time__gte=start,
-                end_time__lte=end,
+                end_datetime__gte=start,
+                end_datetime__lte=end,
             )
-            | models.Q(start_time__lt=start, end_time__gt=end)
-        )
+            | models.Q(start_datetime__lt=start, end_datetime__gt=end)
+        ).exclude(pk=self.pk)
         return qs
 
     def is_unique(self):
@@ -168,7 +173,15 @@ class SessionModel(models.Model):
         """
         assert self.client is not None
         client = self.client
-        self.room_calendar = room or client.room_calendar
+        if room:
+            """ deducing the appropriate room"""
+            self.calendar = room
+        else:
+            if client.room_calendar:
+                self.calendar = client.room_calendar
+            else:
+                base_cal,_ = RoomCalendarModel.objects.get_or_create(user=self.client.user,name="Base Room")
+                self.calendar = base_cal
         if start_datetime:
             self.start_datetime = start_datetime
             self.end_datetime = start_datetime + client.duration
