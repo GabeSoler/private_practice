@@ -1,10 +1,12 @@
+from pyexpat.errors import messages
+
 from django.db import models
 from django.core.validators import MinValueValidator,MaxValueValidator
 from django.contrib.auth import get_user_model
 import uuid
 from django.urls import reverse
 
-from .choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices,time_slot_options
+from .choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices,time_slot_options,SERIES_CHOICE
 from room_calendar_app.models import RoomCalendarModel
 import pendulum as p
 from pgvector.django import VectorField
@@ -12,6 +14,10 @@ from pgvector.django import VectorField
 # Create your models here.
 
 class ClientModel(models.Model):
+    class SeriesChoices(models.IntegerChoices):
+        WEEKLY = 1, "Every week"
+        FORTNIGHT = 2, "Every two weeks"
+
     """a model to organise clients"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
@@ -29,12 +35,11 @@ class ClientModel(models.Model):
     day = models.IntegerField(choices=WEEKDAY_SHORT,default=1,help_text="Default day of week")
     time = models.TimeField(choices=time_slot_options(),help_text='default time')
     duration = models.DurationField(default='60 minutes',choices=duration_times_as_choices(),help_text='default duration')
+    series = models.IntegerField(default=1,choices=SERIES_CHOICE)
 
     class Meta:
-        ordering = ("updated_at", "code")
         verbose_name ="Client"
         verbose_name_plural = "Clients"
-        # noinspection PyRedeclaration
         ordering = ("code", "created_at")
 
 
@@ -61,21 +66,96 @@ class ClientModel(models.Model):
         return reverse("session_client:client", kwargs={"client_pk":self.pk})
 
 
-    def deduce_next_datetime(self,add_weeks=1,ref_date=None):
+    def deduce_next_datetime(self,after_last=True):
         """deduces the next week's appointment from defaults in ClientModel
         args
-            ref_date deduces a week
-             add_weeks : adds weeks to today or ref date
-             set_time: sets a new time to the deduction
+            after_last : searches for the last session of this client in the database for reference
+            if false, adds for next week
              """
-        ref_date = p.instance(ref_date) if ref_date else p.now()
-        if add_weeks:
-            ref_date = ref_date.add(weeks=add_weeks)
+        if after_last:
+            last_session = SessionModel.objects.filter(user=self.user,client=self).latest()
+            ref_date = last_session.start_datetime or p.now()
+            add_weeks = self.series if last_session else 1
+            ref_date.add(weeks=add_weeks)
+        else:
+            ref_date = p.now()
+            ref_date.add(weeks=1)
         week_start = ref_date.start_of('week')
         day_of_week:int = self.day
-        target_date = week_start.add(days=day_of_week - 1)
+        target_date = week_start.add(days=day_of_week -1)
         return target_date.at(self.time.hour,self.time.minute)
 
+
+
+    def add_series(self,amount:int,room_switch=False):
+        """ Creates a series of sessions, based on the client defaults
+            calculates the last session created first and moves from there
+        args:
+            amount sets the number of series forwards
+        returns:
+            Bool,queryset
+            True if saved, false if not
+            queryset if there is overlap
+        """
+        next_date = self.deduce_next_datetime()
+        interval = p.interval(next_date,next_date.add(weeks=amount-1))
+        session_list = []
+        step = self.series
+        for date in interval.range('weeks',step):
+            """ creates a list of sessions to then bulk create"""
+            session_instance = SessionModel(
+                client=self.client,
+                start_datetime=date,
+                end_datetime=date+self.duration,
+                room=self.room_calendar
+            )
+
+            session_list.append(session_instance)
+        fortnight = True if self.series == 2 else False
+        possible_overlap = self.check_series_overlap(interval.start,interval.end,fortnight=fortnight)
+        if possible_overlap:
+            """ possible overlap is checking if there are sessions on the expected dates """
+            if room_switch:
+                saved, overlap = self.add_series(amount)
+                if saved:
+                    messages.warning("❗️Saved in Base Calendar")
+            messages.info("Thera is an overlap")
+            return False,possible_overlap
+        else:
+            SessionModel.objects.bulk_create(session_list)
+            messages.info(f"✅ {len(session_list)}Sessions Created")
+            return True,None
+
+    def check_series_overlap(self,start_range,end_range,fortnight=False):
+        """ checks if there are sessions on the same date range with the same times
+        args:
+            start range: when to start
+            end range: when to end
+            fortnight: if skip every other week
+        returns:
+            query of overlaps
+        """
+        start = self.time
+        end = self.time + self.duration
+        if fortnight:
+            exclude_int = p.interval(start_range.add(weeks=1),end_range)
+            exclude_range = [x for x in exclude_int.range('weeks',2)]
+        else:
+            exclude_range = None
+        possible_overlap = SessionModel.objects.filter(calendar=self.room_calendar,
+                                                       start_datetime__gt=start_range,
+                                                       start_datetime__week_day=self.day,
+                                                       end_datetime__lte=end_range
+                                                       ).filter(models.Q(
+            start_datetime__time__gte=start,
+            start_datetime__time__lte=end)
+            |models.Q(
+            end_datetime__time__gte=start,
+            end_datetime__time__lte=end,
+        )|models.Q(
+            start_datetime__lt=start, end_datetime__gt=end
+        )).exclude(exclude_range)
+        return possible_overlap
 
 
 
@@ -119,6 +199,8 @@ class SessionModel(models.Model):
         verbose_name_plural = "sessions"
         ordering = ("start_datetime",)
         base_manager_name = "objects"
+        get_latest_by = "start_datetime"
+
 
     def __str__(self):  # noqa: F811
         ref_date = self.start_datetime or ""
@@ -161,7 +243,7 @@ class SessionModel(models.Model):
             __bool__ = True  # noqa: F841
             return True, None
 
-    def deduce_from_client(self,start_datetime=None,room=None,add_weeks:int=None,ref_date=None):
+    def deduce_from_client(self,start_datetime=None,room=None):
         """ takes a Session with a client, and deduces from it its room, and extra information about when it happens
         args:
             start_datetime: if you want to set a with clear datetime object. If present it blocks next args.
@@ -186,7 +268,7 @@ class SessionModel(models.Model):
             self.start_datetime = start_datetime
             self.end_datetime = start_datetime + client.duration
             return
-        start = client.deduce_next_datetime(add_weeks=add_weeks,ref_date=ref_date)
+        start = client.deduce_next_datetime()
         self.start_datetime = start
         self.end_datetime = start + client.duration
         return
