@@ -11,13 +11,13 @@ class CalendarRender:
    week_days, gives you the weekdays in a list,
    week_dict organises the sessions in a dictionary by time slot and day
     """
-    def __init__(self,sessions,date_ref=None):
+    def __init__(self,sessions,date_ref:p.DateTime=None):
         self.sessions = sessions
-        self.date = date_ref or p.today()
+        self.datetime = p.instance(date_ref) if date_ref else p.today()
 
     @property
     def week_days(self)->list:
-        date_ref = self.date
+        date_ref = self.datetime
         week_start = date_ref.start_of("week")
         week_end = date_ref.end_of("week")
         iter_week = p.interval(week_start,week_end)
@@ -52,10 +52,10 @@ class CalendarRender:
             assert session.start_time is not None, "start_datetime should not be None"
             start_time = session.start_time
             end_time = p.time(session.end_time.hour,session.end_time.minute).subtract(minutes=30)
-            start_datetime = date_plus_time(self.date,start_time)
-            end_datetime = date_plus_time(self.date,end_time)
+            start_datetime = date_plus_time(session.date,start_time) # session date! not self.datetime!
+            end_datetime = date_plus_time(session.date,end_time)
             time_range = p.interval(start_datetime,end_datetime)
-            iso_day = self.date.isoweekday()
+            iso_day = session.date.isoweekday()
             for time_slot in time_range.range('minutes',30):
                 slot = time_slot.time()
                 week_dict[slot][iso_day] = session
