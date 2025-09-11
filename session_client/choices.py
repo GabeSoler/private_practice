@@ -60,7 +60,6 @@ def duration_times()->tuple[timedelta,timedelta,timedelta,timedelta,timedelta,ti
             timedelta(minutes=90),
             timedelta(hours=2),
             timedelta(hours=3),
-            timedelta(hours=4),
             )
 
 

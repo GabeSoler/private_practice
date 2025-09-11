@@ -144,8 +144,10 @@ def client_archived_view(request):
 
 @login_required
 def sessions_view(request):
-    """show open sessions, add a new simple session, update pay status with other hx-views """
-    sessions = SessionModel.objects.filter(client__user=request.user,open=True).order_by('-created_at')
+    """show open sessions, add a new simple session, update pay status with other hx-views
+    it filters sessions that are open and have already passed now() -1 hour as reference.
+    """
+    sessions = SessionModel.objects.filter(client__user=request.user,open=True,start_datetime__lte=p.now().subtract(hours=1)).order_by('-created_at')
     template = 'session_client/lists/session_list.html'
     form = SessionShortForm()
     if request.htmx:
@@ -226,11 +228,11 @@ def sessions_search(request):
                 # using session date as reference. Added it automatically with quick add option.
                 sessions = SessionModel.objects.filter(start_datetime__gte=start_ref,
                                                 start_datetime__lte=end_ref,
-                                                client=client_ref).order_by('start_datetime')
+                                                client=client_ref).order_by('start_time')
             else:
                 sessions = SessionModel.objects.filter(user=request.user,
                                                 start_datetime__gte=start_ref,
-                                                start_datetime__lte=end_ref,).order_by('start_datetime')
+                                                start_datetime__lte=end_ref,).order_by('start_time')
             template_calendar = template + "#session-list-partial"
             context = {'sessions':sessions}
             return render(request,template_calendar,context)
@@ -254,11 +256,11 @@ def sessions_search_csv(request):
             if client_ref:
                 sessions = SessionModel.objects.filter(session_date__gte=start_ref,
                                                 session_date__lte=end_ref,
-                                                client=client_ref).order_by('start_datetime')
+                                                client=client_ref).order_by('start_time')
             else:
                 sessions = SessionModel.objects.filter(user=request.user,
                                                 session_date__gte=start_ref,
-                                                session_date__lte=end_ref,).order_by('start_datetime')
+                                                session_date__lte=end_ref,).order_by('start_time')
             import csv
             start_ref_str = p.instance(start_ref).to_formatted_date_string() #converting for easier formatting
             end_ref_str = p.instance(end_ref).to_formatted_date_string()
@@ -270,7 +272,7 @@ def sessions_search_csv(request):
             writer = csv.writer(response) # response is the output
             writer.writerow(fieldnames)
             for row in sessions:
-                writer.writerow([row.start_datetime,row.client,row.title,row.paid])
+                writer.writerow([row.start_time, row.client, row.title, row.paid])
             return response
         else:
             raise Http404(f"The form has errors: {form_partial.errors}")
@@ -355,7 +357,7 @@ def hx_delete_session(request,session_pk):
     session = get_object_or_404(SessionModel, pk=session_pk,user=request.user)
     if request.method == 'DELETE':
         session.delete()
-        messages.info(request,f"Session '{session.start_datetime.strftime('%d-%m-%y,%H:%M')}' deleted")
+        messages.info(request,f"Session '{session.start_time.strftime('%d-%m-%y,%H:%M')}' deleted")
         return HttpResponseClientRedirect(reverse("session_client:session_list"))
-    messages.error(request,f"Session '{session.start_datetime.strftime('%d-%m-%y, %H:%M')}' not deleted")
+    messages.error(request,f"Session '{session.start_time.strftime('%d-%m-%y, %H:%M')}' not deleted")
     return render(request,'_toasts.html')

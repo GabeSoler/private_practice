@@ -3,7 +3,7 @@ from asyncio import TaskGroup
 import time
 import pendulum as p
 from session_client.choices import time_slots
-
+from session_client.utils import date_plus_time
 
 class CalendarRender:
     """ A class to create calendar dictionaries and render in template
@@ -45,15 +45,17 @@ class CalendarRender:
 
     @property
     def week_dict(self)->dict:
-        """organizes the dictionary by the session, it cannot handle two in a slot (which is the idea)"""
+        """organises the dictionary by the session, it cannot handle two in a slot (which is the idea)"""
         week_dict = self.week_slot_dic
         time_1 = time.perf_counter()
         for session in self.sessions:
-            assert session.start_datetime is not None, "start_datetime should not be None"
-            start_time = p.instance(session.start_datetime)
-            end_time = p.instance(session.end_datetime).subtract(minutes=30)
-            time_range = p.interval(start_time,end_time)
-            iso_day = start_time.isoweekday()
+            assert session.start_time is not None, "start_datetime should not be None"
+            start_time = session.start_time
+            end_time = p.time(session.end_time.hour,session.end_time.minute).subtract(minutes=30)
+            start_datetime = date_plus_time(self.date,start_time)
+            end_datetime = date_plus_time(self.date,end_time)
+            time_range = p.interval(start_datetime,end_datetime)
+            iso_day = self.date.isoweekday()
             for time_slot in time_range.range('minutes',30):
                 slot = time_slot.time()
                 week_dict[slot][iso_day] = session

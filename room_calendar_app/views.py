@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render,redirect
 from django.http import Http404
 
+from session_client.utils import date_plus_time, time_plus_duration
 from .models import RoomCalendarModel,TenantModel
 from .forms import RoomCalendarForm,TenantForm,LinkTenantForm,WeekCalendarForm
 from django.contrib.auth.decorators import login_required
@@ -9,7 +10,7 @@ from django_htmx.http import retarget
 from .calendar_utils import CalendarRender
 import pendulum as p
 from session_client.models import SessionModel,ClientModel
-from session_client.forms import ClientSessionForm,StartDateSessionForm
+from session_client.forms import SessionFromOnlyClientForm,StartDateSessionForm
 from django.contrib import messages
 
 def check_owner(topic_owner,request_user):
@@ -34,11 +35,11 @@ def week_view(request):
             assert date is not None, "date should be something"
             ref_date_partial = p.datetime(date.year,date.month,date.day)
             if form_partial.cleaned_data['calendar']:
-                sessions = SessionModel.objects.filter(start_datetime__week=ref_date_partial.week_of_year,
+                sessions = SessionModel.objects.filter(date__week=ref_date_partial.week_of_year,
                                                             calendar=form_partial.cleaned_data['calendar']).select_related('client','client__user')
             else:
                 sessions = SessionModel.objects.filter(client__user=request.user,
-                                                 start_datetime__week=ref_date_partial.week_of_year).select_related('client','client__user')
+                                                 date__week=ref_date_partial.week_of_year).select_related('client','client__user')
             calendar_partial = CalendarRender(sessions=sessions,date_ref=ref_date_partial)
             template_calendar = template + "#calendar-view-partial"
             context = {'calendar':calendar_partial}
@@ -54,7 +55,7 @@ def week_view(request):
     form = WeekCalendarForm()
     form.fields['calendar'].queryset = room_calendar_user
     sessions = SessionModel.objects.filter(client__user=request.user,
-                                           start_datetime__week=p.now().week_of_year).select_related('client','client__user')
+                                           date__week=p.now().week_of_year).select_related('client','client__user')
     calendar = CalendarRender(sessions=sessions) # today by default
     context = {'calendar':calendar,'form':form,'sessions':sessions}
     return render(request,template,context)
@@ -67,23 +68,23 @@ def week_view_auxiliary(request):
 
 def week_view_add_session_client(request,date_ref,day,time):
     if request.POST:
-        form = ClientSessionForm(data=request.POST)
+        form = SessionFromOnlyClientForm(data=request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             week_year = p.instance(date_ref).week_of_year()
-            start_datetime = p.now().replace(day=day,hour=time,week=week_year)
-            instance.start_datetime = start_datetime
-            instance.end_datetime = instance.client.duration + start_datetime
-            instance.user = request.user
+            session_reference_datetime = p.now().replace(day=day,hour=time,week=week_year)
+            instance.date = session_reference_datetime.date()
+            instance.start_time = session_reference_datetime.time()
+            instance.end_time = time_plus_duration(instance.start_time,instance.client.duration)
             instance.save()
             messages.info(request,f"Session added for {instance.client.name}")
             return render(request,'_toasts.html')
-        form = ClientSessionForm(data=request.POST)
+        form = SessionFromOnlyClientForm(data=request.POST)
         context = {'form':form}
         return render(request,'room_calendar_app/input/session_form_client.html',context)
         return None
     else:
-        form = ClientSessionForm()
+        form = SessionFromOnlyClientForm()
         context = {'form':form}
         return render(request,'room_calendar_app/input/session_form_client.html',context)
 

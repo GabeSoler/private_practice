@@ -8,16 +8,16 @@ from django.utils import timezone
 class ClientForm(forms.ModelForm):
     class Meta:
         model = ClientModel
-        fields = ['code','nick_name','type','fee','room_calendar','day','duration','active']
+        fields = ['code','nick_name','type','fee', 'calendar', 'day', 'duration', 'active']
         labels = {'code':'Code',                  
                   'type':'Type',
                   'fee':'Fee',
                   'nick_name':'Nickname',
-                  'room_calendar':'Room',
+                  'calendar': 'Room',
                   'day':'Default Day',
                   'duration':'Duration',
                   'active':'Active',
-        }
+                  }
 
 class ClientFormShort(forms.ModelForm):
     class Meta:
@@ -32,23 +32,23 @@ class ClientFormShort(forms.ModelForm):
 class SessionForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['brief','start_datetime','client','paid','amount_paid','attended']
+        fields = ['brief', 'start_time', 'client', 'paid', 'amount_paid', 'attended']
         labels = {'brief':'Brief',
-                  'start_datetime':'Date',
+                  'start_time': 'Date',
                   'client':'Client',
                   'paid':'Confirm payment',
                   'amount_paid':'Confirm amount',
                   'attended':'Record attendance'}
         # I needed to add the split field so it processes date and time before goes to DateTime
         field_classes = {
-            "start_datetime":forms.SplitDateTimeField,
+            "start_time":forms.SplitDateTimeField,
         }
         # I custom made Select split datetime, so I can restrict time options for then rendering the calendar
-        widgets = {'start_datetime':SelectSplitDateTime(date_attrs={'class':'form-select','type':'date'},
-                                                            time_attrs={'class':'form-select','type':'time'},
-                                                            date_format="%Y-%m-%d",
-                                                            time_choices=time_slot_options
-                                                            )}
+        widgets = {'start_time':SelectSplitDateTime(date_attrs={'class': 'form-select', 'type': 'date'},
+                                                    time_attrs={'class':'form-select','type':'time'},
+                                                    date_format="%Y-%m-%d",
+                                                    time_choices=time_slot_options
+                                                    )}
 
 
 
@@ -56,20 +56,20 @@ class SessionForm(forms.ModelForm):
 class SessionShortForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['start_datetime','client']
-        labels = {'start_datetime':'Day and Time',
+        fields = ['start_time', 'client']
+        labels = {'start_time': 'Day and Time',
                   'client':'Client'
-        }
+                  }
         field_classes = {
-            "start_datetime":forms.SplitDateTimeField,
+            "start_time":forms.SplitDateTimeField,
         }
         # I custom made Select split datetime, so I can restrict time options for then rendering the calendar
-        widgets = {'start_datetime':SelectSplitDateTime(date_attrs={'class':'form-select','type':'date'},
-                                                            time_attrs={'class':'form-select','type':'time'},
-                                                            date_format="%Y-%m-%d",
-                                                            time_choices=time_slot_options
-                                                            )}
-class ClientSessionForm(forms.ModelForm):
+        widgets = {'start_time':SelectSplitDateTime(date_attrs={'class': 'form-select', 'type': 'date'},
+                                                    time_attrs={'class':'form-select','type':'time'},
+                                                    date_format="%Y-%m-%d",
+                                                    time_choices=time_slot_options
+                                                    )}
+class SessionFromOnlyClientForm(forms.ModelForm):
     class Meta:
         model = SessionModel
         fields = ['client']
@@ -77,8 +77,8 @@ class ClientSessionForm(forms.ModelForm):
 class StartDateSessionForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['start_datetime']
-        labels = {'start_datetime':'Day and Time'}
+        fields = ['start_time']
+        labels = {'start_time': 'Day and Time'}
 
 
 

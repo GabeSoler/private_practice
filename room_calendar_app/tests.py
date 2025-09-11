@@ -28,7 +28,7 @@ class MetaTestSetupMixin():
     """
     @classmethod
     def setUpTestData(cls):
-        cls.now = p.now()
+        cls.now = p.now("UTC")
         cls.user = get_user_model().objects.create(username="Gabriel",email="test@gabriel.cl")
         cls.user.save()
         cls.user_host = get_user_model().objects.create(username="John",email="test@john.cl")
@@ -60,24 +60,26 @@ class MetaTestSetupMixin():
             code="Test123",
             time=p.now().at(8, 0).time(),
             duration=timedelta(hours=1),
-            room_calendar=cls.room_default
+            calendar=cls.room_1
         )
         cls.client_instance.save()
 
         # Create sessions (equivalent to occurrences)
         cls.session_1 = SessionModel.objects.create(
             client=cls.client_instance,
-            start_datetime=cls.now.at(8, 0),  # 8:00
-            end_datetime=cls.now.at(9, 30),  # 9:30
+            date= p.now().date(),
+            start_time=p.time(8, 0),  # 8:00
+            end_time=p.time(9, 30),  # 9:30
             calendar=cls.room_1,  # assuming you have cls.room_1 defined
             brief="Session1"
         )
-
         cls.session_1.save()
+
         cls.session_2 = SessionModel.objects.create(
             client=cls.client_instance,
-            start_datetime=cls.now.add(weeks=1).at(8, 0, 0),  # Next week same time
-            end_datetime=cls.now.add(weeks=1, hours=1).at(9, 30, 0),  # Next week +1 hour
+            date= p.now().add(weeks=1).date(),
+            start_time=p.time(8,00,00),  # Next week same time
+            end_time=p.time(9,30),
             calendar=cls.room_2,
             brief="Session2"
         )
@@ -85,12 +87,23 @@ class MetaTestSetupMixin():
 
         cls.session_overlap_1 = SessionModel.objects.create(
             client=cls.client_instance,
-            start_datetime=cls.now.at(9, 0, 0),
-            end_datetime=cls.now.at(10, 30, 0),
+            date=p.now().subtract(weeks=1).date(),
+            start_time=p.time(8, 00, 00),  # Next week same time
+            end_time=p.time(9, 30),
             calendar=cls.room_1,
-            brief="Overlap 1"
+            brief="Overlap1"
         )
         cls.session_overlap_1.save()
+
+        cls.session_overlap_2 = SessionModel.objects.create(
+            client=cls.client_instance,
+            date=p.now().subtract(weeks=1).date(),
+            start_time=p.time(9, 00, 00),  # Next week same time
+            end_time=p.time(10, 30),
+            calendar=cls.room_1,
+            brief="Overlap2"
+        )
+        cls.session_overlap_2.save()
 
         cls.calendar_data = {
                 'calendar':cls.room_1,
@@ -112,10 +125,11 @@ class MetaTestSetupMixin():
         for n in range(8,18):
             session = SessionModel(
                 client=cls.client_instance,
-                start_datetime=cls.now.add(days=1).at(n),  # add one each hour
-                end_datetime=cls.now.add(days=1).at(n+1),  # Next week +1 hour
+                date=cls.now.add(days=1).date(),
+                start_time=p.time(n,0),  # add one each hour
+                end_time=p.time(n+1,0),  # Next week +1 hour
                 calendar=cls.room_2,  # assuming you have cls.room_2 defined
-                brief=f"Test Session {n}"
+                brief=f"Test{n}"
             )
             cls.session_list.append(session)
         SessionModel.objects.bulk_create(cls.session_list)
@@ -139,7 +153,7 @@ class CalendarOccurrenceTest(MetaTestSetupMixin,TestCase):
     def test_week_view_today_render(self):
         self.client.force_login(self.user)
         response = self.client.get('/calendar/week-view/')
-        expected_string = self.session_1.start_datetime.strftime("%H:%M")
+        expected_string = self.session_1.start_time.strftime("%H:%M")
         self.assertContains(response,expected_string)
 
     def test_week_view_today_render_htmx(self):
@@ -152,17 +166,18 @@ class CalendarOccurrenceTest(MetaTestSetupMixin,TestCase):
         self.assertContains(response,expected_string)
 
     def test_week_dict_utils(self):
-        sessions = SessionModel.objects.all()
+        sessions = SessionModel.objects.filter(date__week=self.now.week_of_year)
         calendar_render = CalendarRender(sessions,self.now)
-        session = sessions[1]
-        start_time = session.start_datetime.time()
-        week_day = session.start_datetime.isoweekday()
+        session = sessions[0]
+        start_time = session.start_time
+        week_day = session.date.isoweekday()
         self.assertEqual(calendar_render.week_dict[start_time][week_day],session)
 
-    def test_base_room_tenant(self):
-        self.client.force_login(self.user)
-        room = self.room_default
-        self.assertEqual(room.tenants.count(),1)
+    def test_base_room_tenant_save(self):
+        room_default = self.room_default
+        self.assertEqual(room_default.tenants.count(),0)
+        room_1 = self.room_1
+        self.assertEqual(room_1.tenants.count(),1)
 
 
 
