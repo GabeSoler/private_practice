@@ -2,19 +2,15 @@
 
 {% extends 'session_client/utils/session-nav.html' %}
 {% load django_bootstrap5 %}
-{% load partials %}
 {% block content %}
 
 
-
-{% comment %} work to do: create a search widget to search by client and week. 
-similar to events. needs custom form and view {% endcomment %}
 
 <div id="wrapper">
 
   <div id="form-table-wrapper">
   {% partialdef form-partial inline %}
-  <form action={% url 'session_client:sessions_search_csv' %} method="post"
+  <form action={% url 'session_client:session_search' %} method="post"
     hx-post={% url "session_client:session_search" %}
     hx-target="#session-list-wrapper"
     hx-trigger="change throttle:1s,load once"
@@ -54,21 +50,81 @@ similar to events. needs custom form and view {% endcomment %}
 
 <div id="session-list-wrapper">
   {% partialdef session-list-partial inline %}
-<ul class="list-group fade-in">
-  {% for session in sessions %}
-  <li class="list-group-item">
-    <a href="{%url "session_client:session" session.pk %}">
-    {{session.start_datetime|date:'d,M,Y'}}</a> | {{session.client}} |
-    {{session.title|truncatechars:10}}|
-    {{session.paid|yesno:"Paid,Not Paid"}}
-  </li>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Date
+        </th>
+        <th scope="col">Time
+        </th>
+        <th scope="col">Title
+        </th>
+        <th scope="col">Client
+        </th>
+        <th scope="col">Paid
+        </th>
+        <th scope="col">Open
+        </th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      {% for session in sessions%}
+      {% partialdef row-instance inline %}
+      <tr class="fade-in">
+        <th scope="row">
+          <a href="{%url "session_client:edit_session" session.pk %}">
+            {% if session.date %}{{session.date}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
+            &nbsp;<i class="bi bi-eye-fill text-secondary"
+              hx-get={% url 'session_client:session_hx_item' session.pk %}
+              hx-trigger="click"
+              hx-target="#modal-wrap"
+              ></i>
+          </th>
 
-    {% empty %}
-    <li class="list-group-item">
-      There are no Sessions Yet. </li>
-      {% endfor %}
-    </ul>
-{% endpartialdef %}
+      <td>{{session.start_time}}</td>
+      <td>{{session.client}}</td>
+      <td>{{session.brief|truncatechars:10}}</td>
+
+        <!-- paid/not paid partial -->
+        {% partialdef session_paid inline %}
+       <td hx-put={% url "session_client:sessions_hx_edit_paid" session.pk %}>
+
+          {%if session.paid %}
+          <i
+          data-bs-toggle="tooltip" data-bs-title="Paid"
+          class="bi bi-currency-exchange text-success" ></i>
+          {% else %}
+          <i
+          data-bs-toggle="tooltip" data-bs-title="Not Paid"
+          class="bi bi-currency-exchange text-danger" ></i>
+          {% endif %}
+        </td>
+          {% endpartialdef session_paid %}
+
+          <!-- Session open/closed partial -->
+        {% partialdef session_open inline %}
+       <td hx-put={% url "session_client:sessions_hx_edit_open" session.pk %}>
+        {%if session.open %}
+          <i
+          data-bs-toggle="tooltip" data-bs-title="Open"
+          class="bi bi-circle-fill text-warning"></i>
+          {% else %}
+          <i
+          data-bs-toggle="tooltip" data-bs-title="Done"
+          class="bi bi-check-circle-fill text-success"></i>
+          {% endif %}
+        </td>
+        {% if messages %}{% include '_toasts.html' %}{% endif %}{% comment %}trying to set a toast system for messages{% endcomment %}
+
+          {% endpartialdef session_open %}
+      </div>
+      </tr>
+      {% endpartialdef %}
+
+  </tbody>
+  {% endfor %}
+</table>
+{% endpartialdef session-list-partial  %}
 </div>
-
+<div id="modal-wrap"></div>
   {% endblock content %}

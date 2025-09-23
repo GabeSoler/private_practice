@@ -1,7 +1,7 @@
 from datetime import time, timedelta
 from django.utils.translation import gettext_lazy as _
 import pendulum as p
-from typing import Tuple,Any
+from typing import Tuple,Any,List
 from django.db import models
 
 ATTENDANCE = [
@@ -26,14 +26,14 @@ SERIES_CHOICE = [
 ]
 
 
-def time_slot_options()->list[Tuple[Any,Any]]:
+def time_slot_options()->List[Tuple[Any,Any]]:
     """Creates a list tuples of time options from 8 to 22 every 15 min"""
     date_format = "%I:%M %p"
     options = []
     today = p.now()
     interval = p.interval(today.at(8),today.at(22))
     for dt in interval.range('minutes',30):
-        options.append((dt.time(), dt.strftime(date_format)))
+        options.append((dt.time(),dt.strftime(date_format)))
     return options
 
 

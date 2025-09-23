@@ -44,11 +44,9 @@ INSTALLED_APPS = [
     'session_client',
     'accounts',
     'room_calendar_app',
-    "payments",
 
     #third party
     'django_bootstrap5',
-    "template_partials",
     "django_htmx",
     "django_browser_reload",
 
@@ -225,17 +223,6 @@ INTERNAL_IPS = (
 )
 
 
-# This can be a string or callable, and should return a base host that
-# will be used when receiving callbacks and notifications from payment
-# providers.
-#
-# Keep in mind that if you use `localhost`, external servers won't be
-# able to reach you for webhook notifications.
-PAYMENT_HOST = 'localhost:8000'
-
-# Whether to use TLS (HTTPS). If false, will use plain-text HTTP.
-# Defaults to ``not settings.DEBUG``.
-PAYMENT_USES_SSL = False
 
 
 OPENAI_API_KEY = config('OPENAI_API_KEY')

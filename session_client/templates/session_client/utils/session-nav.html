@@ -9,11 +9,11 @@
 
   <a class="nav-link {% if request.path == "/session_list/"  %}active {% endif %}" 
       href="{% url "session_client:session_list" %}" aria-current="page"
-    >Open</a
+    ><i class="bi bi-folder2-open"></i> Open</a
   >
   <a class="nav-link {% if request.path == "/session_search/"  %}active {% endif %}" 
       href="{% url "session_client:session_search" %}"
-      >Search</a>
+      ><i class="bi bi-calendar-date"></i> Search</a>
 
   <a class="nav-link {% if request.path == "/add_session/"  %}active{% endif %}" 
       href="{% url "session_client:add_session" %}">Add</a>

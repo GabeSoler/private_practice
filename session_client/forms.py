@@ -3,7 +3,7 @@ from .models import ClientModel,SessionModel
 import pendulum as p
 from session_client.widgets import SelectSplitDateTime
 from session_client.choices import time_slot_options
-from django.utils import timezone
+from django.forms.widgets import DateInput,Select
 
 class ClientForm(forms.ModelForm):
     class Meta:
@@ -32,23 +32,23 @@ class ClientFormShort(forms.ModelForm):
 class SessionForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['brief', 'start_time', 'client', 'paid', 'amount_paid', 'attended']
+        fields = ['brief','date','start_time', 'client', 'paid', 'amount_paid', 'attended']
         labels = {'brief':'Brief',
-                  'start_time': 'Date',
+                  'date': 'Date',
+                  'start_time': 'time',
                   'client':'Client',
-                  'paid':'Confirm payment',
-                  'amount_paid':'Confirm amount',
-                  'attended':'Record attendance'}
+                  'paid':'Paid?',
+                  'amount_paid':'Amount',
+                  'attended':'Attendance'}
         # I needed to add the split field so it processes date and time before goes to DateTime
-        field_classes = {
-            "start_time":forms.SplitDateTimeField,
-        }
-        # I custom made Select split datetime, so I can restrict time options for then rendering the calendar
-        widgets = {'start_time':SelectSplitDateTime(date_attrs={'class': 'form-select', 'type': 'date'},
-                                                    time_attrs={'class':'form-select','type':'time'},
-                                                    date_format="%Y-%m-%d",
-                                                    time_choices=time_slot_options
-                                                    )}
+        widgets = {'date':forms.DateInput(attrs={'class': 'form-select', 'type': 'date'},
+                                                    format="%Y-%m-%d"),
+                   'start_time':forms.Select(attrs={'class':'form-select'},
+                                                    choices=time_slot_options,
+                                             ),
+                   'brief':forms.Textarea(attrs={'class':'form-control','rows':3})
+                   }
+
 
 
 
@@ -56,19 +56,14 @@ class SessionForm(forms.ModelForm):
 class SessionShortForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['start_time', 'client']
+        fields = ['date','start_time', 'client']
         labels = {'start_time': 'Day and Time',
                   'client':'Client'
                   }
-        field_classes = {
-            "start_time":forms.SplitDateTimeField,
-        }
-        # I custom made Select split datetime, so I can restrict time options for then rendering the calendar
-        widgets = {'start_time':SelectSplitDateTime(date_attrs={'class': 'form-select', 'type': 'date'},
-                                                    time_attrs={'class':'form-select','type':'time'},
-                                                    date_format="%Y-%m-%d",
-                                                    time_choices=time_slot_options
-                                                    )}
+        widgets = {'date':DateInput(attrs={'class': 'form-select', 'type': 'date'},
+                                                    format="%Y-%m-%d"),
+                   'start_time':Select(attrs={'class':'form-select','type':'time'},
+                                                    choices=time_slot_options)}
 class SessionFromOnlyClientForm(forms.ModelForm):
     class Meta:
         model = SessionModel
@@ -80,7 +75,10 @@ class StartDateSessionForm(forms.ModelForm):
         fields = ['start_time']
         labels = {'start_time': 'Day and Time'}
 
-
+class SessionSelectGroupForm(forms.Form):
+    only_unpaid = forms.BooleanField(required=False,label="Only Unpaid")
+    include_next = forms.BooleanField(required=False,label="Include Next")
+    client = forms.ModelChoiceField(queryset=ClientModel.objects.all(),required=False,label="Client")
 
 class SearchSessionFrom(forms.Form):
     date_ref_start = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now().subtract(months=1))

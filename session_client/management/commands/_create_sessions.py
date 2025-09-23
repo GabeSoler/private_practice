@@ -14,10 +14,10 @@ def create_sessions(day=0):
                                                       duration=p.duration(hours=1))
     for i in range(9,21):
         session = models.SessionModel(
-            user=user,
             client=client,
-            start_datetime=today.at(i),
-            end_datetime=today.at(i+1),
+            date=today.date(),
+            start_time=today.at(i).time(),
+            end_time=today.at(i+1).time(),
             brief=f"Test Session {i}",
             calendar=room
         )

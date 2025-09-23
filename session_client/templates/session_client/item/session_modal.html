@@ -5,26 +5,22 @@
 
 {% block modal_body %}
 
-<div class="card bg-secondary-subtle mb-5">
+<div class="card bg-secondary mb-5">
   
   <div class="card-body">
 
-    <ul class="list-group list-group-item-success">
+    <ul class="list-group">
       <li class="list-group-item text-info">
         <b>Client:</b>
-          {{session.client}}</p>
+          {{session.client}}
         </li>
       <li class="list-group-item text-info">
         <b>Date:</b>
-        {% if session.session_dat %}{{session.start_datetime|date:'M d,Y'}}{% else %} {{session.created_at|date:'M d,Y'}} {% endif %}
+        {% if session.date %}{{session.date}},{{session.start_time}}{% else %} {{session.created_at|date:'M d,Y'}} {% endif %}
       </li>
       <li class="list-group-item text-info">
         <b>Session Title:</b>
-        {{session.title}}
-      </li>
-      <li class="list-group-item text-info">
-        <b>Notes:</b></br>
-        {{session.notes|linebreaks}}
+        {{session.brief}}
       </li>
       <li class="list-group-item text-info">
         <b>Attendance:</b></br>

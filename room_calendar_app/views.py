@@ -66,6 +66,7 @@ def week_view_auxiliary(request):
     context = {"clients":clients}
     return render(request,template,context)
 
+@login_required
 def week_view_add_session_client(request,date_ref,day,time):
     if request.POST:
         form = SessionFromOnlyClientForm(data=request.POST)
@@ -88,16 +89,18 @@ def week_view_add_session_client(request,date_ref,day,time):
         context = {'form':form}
         return render(request,'room_calendar_app/input/session_form_client.html',context)
 
+@login_required
 def week_view_add_session_date(request,date_ref,client_ref):
     if request.POST:
         form = StartDateSessionForm(data=request.POST)
-
+@login_required
 def room_calendar_listing_view(request):
     room_calendar_mine = RoomCalendarModel.objects.filter(user=request.user)
     room_calendar_tenant = RoomCalendarModel.objects.filter(tenants__user=request.user)
     context = {"calendar_mine": room_calendar_mine,"calendar_tenant": room_calendar_tenant}
     return render(request,"room_calendar_app/display/room_calendar_list.html",context)
 
+@login_required
 def room_calendar_view(request,calendar_pk):
     calendar = get_object_or_404(RoomCalendarModel, pk=calendar_pk,user=request.user)
     tenants = calendar.tenants.all()
@@ -122,20 +125,20 @@ def room_calendar_view(request,calendar_pk):
 
 
 
-
+@login_required
 def tenant_view(request,tenant_pk):
     tenant = get_object_or_404(TenantModel, pk=tenant_pk)
     context = {"tenant": tenant}
     return render(request,"room_calendar_app/display/tenant.html",context)
 
-
+@login_required
 def tenant_listing_view(request):
     """View a list of user's events """
     tenant_list = TenantModel.objects.filter(user=request.user)  #? I already changed this one
     context = {"tenant_list":tenant_list}
     return render(request, "room_calendar_app/display/tenant_list.html", context) #todo check template
 
-
+@login_required
 def room_calendar_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     if request.method !='POST':
@@ -154,6 +157,7 @@ def room_calendar_add_view(request):
     context = {'form':form,"action":action}
     return render(request,'room_calendar_app/input/add_calendar.html',context)
 
+@login_required
 def tenant_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     if request.method !='POST':
@@ -172,7 +176,7 @@ def tenant_add_view(request):
     context = {'form':form,"action":action}
     return render(request,'room_calendar_app/input/add_tenant.html',context)
 
-
+@login_required
 def room_calendar_edit_view(request,room_calendar_pk):
     """edit the occurrence repetition erasing future events"""
     room_calendar = RoomCalendarModel.objects.get(pk=room_calendar_pk)
@@ -192,7 +196,7 @@ def room_calendar_edit_view(request,room_calendar_pk):
     return render(request,"room_calendar_app/input/add_calendar.html",context)
 
 
-
+@login_required
 def tenant_edit_view(request,tenant_pk):
     """edit the occurrence repetition erasing future events"""
     tenant = TenantModel.objects.get(pk=tenant_pk)
@@ -211,6 +215,7 @@ def tenant_edit_view(request,tenant_pk):
     context = {'form':form,"action":action}
     return render(request,"room_calendar_app/input/add_tenant.html",context)
 
+@login_required
 def tenant_link_view(request,calendar_pk):
     """edit the occurrence repetition erasing future events"""
     calendar = RoomCalendarModel.objects.get(pk=calendar_pk)

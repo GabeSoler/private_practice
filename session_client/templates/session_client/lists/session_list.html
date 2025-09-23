@@ -1,7 +1,6 @@
 
 
 {% extends 'session_client/utils/session-nav.html' %}
-{% load partials %}
 {% load django_bootstrap5 %}
 
 {% block content %}
@@ -9,50 +8,42 @@
 
 <!-- Session nav for session_list: open, session_search: explore, and add session: add -->
 
-<!-- Accordion form -->
-<div class="accordion" id="accordionExample">
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-        Quick Add
-      </button>
-    </h2>
-    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-      <div class="accordion-body p-0">
-        
+
 
 
 
 <!-- Add Session -->
-<div class="" id="session-form-wrap"> 
+<div class="" id="session-form-wrap">
 
   {% partialdef session-form-partial inline %} <!-- Start form partial -->
-  
+
   <div class="card bg-primary m-2 p-2 rounded">
-  
-    <form class="form bg-primary ps-3"
-    >
+
+    <form class="form bg-primary ps-3">
     <table class="table mb-0" id="client-form-table">
       <tbody>
       <tr>
         <td class="col bg-primary" id="form-td-code">
-          {% bootstrap_field form.start_datetime wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
+          {% bootstrap_field form.only_unpaid wrapper_class="col py-1" layout="horizontal" label_class="text-secondary" %}
+        </td>
+          <td class="col bg-primary" id="form-td-code">
+          {% bootstrap_field form.include_next wrapper_class="col py-1" layout="horizontal" label_class="text-secondary" %}
         </td>
         <td class="col bg-primary" id="form-td-type">
-          {% bootstrap_field form.client wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
+          {% bootstrap_field form.client wrapper_class="col py-0" layout="horizontal" label_class="text-secondary" %}
         </td>
         <td class="bg-primary">
             <button class="btn btn-secondary col-12"
             type="submit"
             hx-post={% url 'session_client:session_list' %}
-            hx-target="#session-form-wrap"
-            hx-swap="afterbegin settle:0.2s"
+            hx-target="#session-list-wrapper"
+            hx-swap="innerHTML settle:0.2s"
             hx-trigger="keyup=='Enter',click"
             hx-exclude="#switchArchived"
             id="formButton"
             _="call preventDefault() on me"
             >
-            New</button>
+            <i class="bi bi-search"></i></button>
         </td>
       </tr>
     </tbody>
@@ -64,7 +55,6 @@
   </div>
 </div>
 </div>
-</div> <!-- Ending of accordion -->
 
 
 <div id="session-list-wrapper">
@@ -73,6 +63,8 @@
     <thead>
       <tr>
         <th scope="col">Date
+        </th>
+        <th scope="col">Time
         </th>
         <th scope="col">Title
         </th>
@@ -90,7 +82,7 @@
       <tr class="fade-in">
         <th scope="row">
           <a href="{%url "session_client:edit_session" session.pk %}">
-            {% if session.start_datetime %}{{session.start_datetime|date:'d, M,Y'}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
+            {% if session.date %}{{session.date}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
             &nbsp;<i class="bi bi-eye-fill text-secondary"
               hx-get={% url 'session_client:session_hx_item' session.pk %}
               hx-trigger="click"
@@ -98,8 +90,9 @@
               ></i>
           </th>
 
-      <td>{{session.title|truncatechars:10}}</td>
+      <td>{{session.start_time}}</td>
       <td>{{session.client}}</td>
+      <td>{{session.brief|truncatechars:10}}</td>
 
         <!-- paid/not paid partial -->
         {% partialdef session_paid inline %}
