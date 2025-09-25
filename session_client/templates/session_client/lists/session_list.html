@@ -6,18 +6,18 @@
 {% block content %}
 
 
-<!-- Session nav for session_list: open, session_search: explore, and add session: add -->
+<!-- Session nav for session_list extension -->
 
 
 
 
 
-<!-- Add Session -->
+<!-- Search open -->
 <div class="" id="session-form-wrap">
 
   {% partialdef session-form-partial inline %} <!-- Start form partial -->
 
-  <div class="card bg-primary m-2 p-2 rounded">
+  <div class="card bg-primary my-1 p-2 rounded">
 
     <form class="form bg-primary ps-3">
     <table class="table mb-0" id="client-form-table">
@@ -57,6 +57,7 @@
 </div>
 
 
+    <!-- Session list -->
 <div id="session-list-wrapper">
   {% partialdef session-list-partial inline %}
   <table class="table">
@@ -64,11 +65,11 @@
       <tr>
         <th scope="col">Date
         </th>
-        <th scope="col">Time
-        </th>
-        <th scope="col">Title
-        </th>
         <th scope="col">Client
+        </th>
+        <th scope="col">Attendance
+        </th>
+        <th scope="col">Brief
         </th>
         <th scope="col">Paid
         </th>
@@ -90,8 +91,8 @@
               ></i>
           </th>
 
-      <td>{{session.start_time}}</td>
       <td>{{session.client}}</td>
+      <td>{{session.get_attended_display|default:"--"}}</td>
       <td>{{session.brief|truncatechars:10}}</td>
 
         <!-- paid/not paid partial -->
@@ -126,7 +127,6 @@
         {% if messages %}{% include '_toasts.html' %}{% endif %}{% comment %}trying to set a toast system for messages{% endcomment %}
 
           {% endpartialdef session_open %}
-      </div>
       </tr>
       {% endpartialdef %}
 

@@ -1,8 +1,12 @@
 {% extends '_base.html' %}
 {% block content %}
 {% load django_bootstrap5 %}
-<p><a href="{%url 'session_client:session' session.pk %}">{{session}}</a></p>
-
+<p><a href="{%url 'session_client:session_hx_item' session.pk %}"
+hx-get="{%url 'session_client:session_hx_item' session.pk %}"
+      hx-target="#session-modal-render"
+       hx-push-url="/session_client/session_hx_item/{{session.pk}}"
+>{{session}}</a></p>
+<div id="session-modal-render"></div>
 <h2>Edit Entry</h2>
 
 
