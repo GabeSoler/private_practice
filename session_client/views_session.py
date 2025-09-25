@@ -159,7 +159,13 @@ def add_session_view(request):
 @login_required
 def edit_session_view(request,session_pk):
     """edit an existing Session"""
-    session = get_object_or_404(SessionModel,pk=session_pk,client__user=request.user)
+    session = get_object_or_404(SessionModel,
+                                pk=session_pk,
+                                client__user=request.user)
+    if request.htmx:
+        template = 'session_client/edit/edit_session_modal.html'
+    else:
+        template = 'session_client/edit/add_session.html'
     if request.method != 'POST':
         #initial request;pre-fill form with the current entry
         form = SessionForm(instance=session)
@@ -171,7 +177,8 @@ def edit_session_view(request,session_pk):
             messages.info(request,f"Session '{session.brief}' updated")
             return redirect("session_client:session_list")
     context = {'session':session,'form':form}
-    return render(request,'session_client/edit/edit_session.html',context)
+    return render(request,template,context)
+
 
 @login_required
 def hx_delete_session(request,session_pk):

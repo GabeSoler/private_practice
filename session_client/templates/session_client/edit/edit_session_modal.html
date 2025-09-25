@@ -1,5 +1,5 @@
 {% extends '_modal.html' %}
-
+{% load django_bootstrap5 %}
 
 {% block modal_title %}Session: <small class="fs-5">{{session.client}} - {{ session.date }}</small>
 <a href="{%url 'session_client:edit_session' session.pk %}" class="card-link small" style="font-size:.9rem;">Edit</a></small>{% endblock modal_title%}
@@ -7,6 +7,7 @@
 {% block modal_body %}
 
 <div class="card bg-dark mb-5 border border-secondary">
+<form data-bs-theme="dark">
   <div class="card-body">
 
   <!--- Session Title -->
@@ -14,11 +15,11 @@
   <div class="row align-items-center">
     <div class="col">
         <small>Client:</small>
-        <h5>{{session.client}}</h5>
+          {% bootstrap_field form.client layout="horizontal" show_label="skip" show_help=False %}
     </div>
     <div class="col">
         <small>Date:</small>
-        <h5>{% if session.date %}{{session.date}}{% else %} {{session.created_at|date:'M d,Y'}} {% endif %}</h5>
+          {% bootstrap_field form.date layout="horizontal" show_label="skip" show_help=False %}
     </div>
   </div>
 </div>
@@ -26,7 +27,7 @@
   <!--- Session Brief -->
 <div class="container text-center border-top border-secondary">
             <small>Session brief:</small>
-            <p>{{session.brief|linebreaksbr}}</p>
+          {% bootstrap_field form.brief layout="horizontal" show_label="skip" show_help=False %}
 </div>
 
   <!--- Session Attendance -->
@@ -35,11 +36,11 @@
   <div class="row align-items-center">
     <div class="col">
         <small>Attendance:</small>
-        <h5>{{session.get_attended_display|default:"--"}}</h5>
+          {% bootstrap_field form.attended layout="horizontal" show_label="skip" show_help=False %}
     </div>
     <div class="col">
         <small>Status:</small>
-        <h5>{{ session.open|yesno:"Open,Closed" }}</h5>
+        <p>{{ form.open.as_field_group }}</p>
     </div>
   </div>
 </div>
@@ -50,15 +51,16 @@
   <div class="row align-items-center">
     <div class="col">
         <small>Payment:</small>
-        <h5>{{session.paid|yesno:"Paid,Pending"}}</h5>
+        <p>{{ form.paid.as_field_group }}</p>
     </div>
     <div class="col">
         <small>Amount:</small>
-        <h5> {{session.amount|default:"--" }} </h5>
+          {% bootstrap_field form.amount_paid layout="horizontal" show_label="skip" show_help=False %}
     </div>
   </div>
 </div>
 
     </div>
+</form>
 </div>
     {% endblock modal_body %}

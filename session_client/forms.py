@@ -32,13 +32,14 @@ class ClientFormShort(forms.ModelForm):
 class SessionForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['brief','date','start_time', 'client', 'paid', 'amount_paid', 'attended']
+        fields = ['brief','date','start_time', 'client', 'paid', 'amount_paid', 'attended','open']
         labels = {'brief':'Brief',
                   'date': 'Date',
                   'start_time': 'time',
                   'client':'Client',
-                  'paid':'Paid?',
+                  'paid':'Paid',
                   'amount_paid':'Amount',
+                  'open':'Open',
                   'attended':'Attendance'}
         # I needed to add the split field so it processes date and time before goes to DateTime
         widgets = {'date':forms.DateInput(attrs={'class': 'form-select', 'type': 'date'},
@@ -46,7 +47,9 @@ class SessionForm(forms.ModelForm):
                    'start_time':forms.Select(attrs={'class':'form-select'},
                                                     choices=time_slot_options,
                                              ),
-                   'brief':forms.Textarea(attrs={'class':'form-control','rows':3})
+                   'brief':forms.Textarea(attrs={'class':'form-control','rows':3}),
+                   'paid':forms.CheckboxInput(attrs={'class':'form-check-input','type':"checkbox",'role':'switch'}),
+                   'open':forms.CheckboxInput(attrs={'class':'form-check-input','type':"checkbox",'role':'switch'}),
                    }
 
 

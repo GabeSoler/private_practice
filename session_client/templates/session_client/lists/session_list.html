@@ -82,7 +82,9 @@
       {% partialdef row-instance inline %}
       <tr class="fade-in">
         <th scope="row">
-          <a href="{%url "session_client:edit_session" session.pk %}">
+          <a href="{%url "session_client:edit_session" session.pk %}"
+          hx-get="{%url "session_client:edit_session" session.pk %}"
+          hx-target="#modal-wrap">
             {% if session.date %}{{session.date}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
             &nbsp;<i class="bi bi-eye-fill text-secondary"
               hx-get={% url 'session_client:session_hx_item' session.pk %}

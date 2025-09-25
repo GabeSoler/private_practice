@@ -50,11 +50,11 @@
   <div class="row align-items-center">
     <div class="col">
         <small>Payment:</small>
-        <h5>{{session.paid|yesno:"Paid,Pending"}}</h5>
+        <h5>{{session.paid|yesno:"Paid,--"}}</h5>
     </div>
     <div class="col">
         <small>Amount:</small>
-        <h5> {{session.amount|default:"--" }} </h5>
+        <h5> {{session.amount_paid|default:"--" }} </h5>
     </div>
   </div>
 </div>

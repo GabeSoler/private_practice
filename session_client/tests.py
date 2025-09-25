@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.urls import reverse
 
 from room_calendar_app.tests import MetaTestSetupMixin
 from session_client.models import SessionModel, ClientModel
@@ -91,3 +92,15 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
         client_count_after = SessionModel.objects.filter(client=self.client_instance).count()
         self.assertTrue(client_count<client_count_after)
         self.assertEqual(client_count_after-client_count,5)
+
+
+    def test_create_session(self):
+        ...
+    def test_session_instance_modal(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('session_client:session_hx_item',
+                                           args=(self.session_1.pk,)),
+                                   headers=self.htmx_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,self.session_1.client)
+        self.assertContains(response,self.session_1.brief)
