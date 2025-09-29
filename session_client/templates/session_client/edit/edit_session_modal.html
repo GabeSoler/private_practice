@@ -27,7 +27,7 @@
   <!--- Session Brief -->
 <div class="container text-center border-top border-secondary">
             <small>Session brief:</small>
-          {% bootstrap_field form.brief layout="horizontal" show_label="skip" show_help=False %}
+          {% bootstrap_field form.brief layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto"%}
 </div>
 
   <!--- Session Attendance -->
@@ -60,6 +60,7 @@
   </div>
 </div>
 
+    {% bootstrap_button "save" button_class="btn" extra_classes="float-end btn-outline-secondary m-2"%}
     </div>
 </form>
 </div>
