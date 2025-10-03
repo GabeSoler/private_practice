@@ -25,8 +25,9 @@ def week_view(request):
         You can change the week to display or select a specific room calendar
        """
     template = "room_calendar_app/dynamic/week_view.html"
-    room_calendar_user = RoomCalendarModel.objects.filter(tenants__user=request.user) #filter room_calendars options
-    if request.POST and request.htmx:
+    calendar_user = RoomCalendarModel.objects.filter(tenants__user=request.user) #filter room_calendars options
+    assert calendar_user is not None, "no room_calendars found"
+    if request.POST:
         form_partial = WeekCalendarForm(data=request.POST)
         if form_partial.is_valid():
             """ main functionality changing content by date or calendar, 
@@ -35,29 +36,39 @@ def week_view(request):
             assert date is not None, "date should be something"
             ref_date_partial = p.datetime(date.year,date.month,date.day)
             if form_partial.cleaned_data['calendar']:
-                sessions = SessionModel.objects.filter(date__week=ref_date_partial.week_of_year,
-                                                            calendar=form_partial.cleaned_data['calendar']).select_related('client','client__user')
+                sessions = (SessionModel.objects.
+                            filter(date__week=ref_date_partial.week_of_year,
+                                                            calendar=form_partial.cleaned_data['calendar'])
+                            .select_related('client','client__user'))
             else:
-                sessions = SessionModel.objects.filter(client__user=request.user,
-                                                 date__week=ref_date_partial.week_of_year).select_related('client','client__user')
+                sessions = (SessionModel.objects
+                            .filter(client__user=request.user,
+                                                 date__week=ref_date_partial.week_of_year)
+                            .select_related('client','client__user'))
             calendar_partial = CalendarRender(sessions=sessions,date_ref=ref_date_partial)
             template_calendar = template + "#calendar-view-partial"
             context = {'calendar':calendar_partial}
             return render(request,template_calendar,context)
         # There should not be errors here but just in case
         form_partial_template = template + "#form-partial"
-        form_partial.fields['calendar'].queryset = room_calendar_user
+        form_partial.fields['calendar'].queryset = calendar_user
         context = {'form':form_partial}
         #response for form error
         response = render(request,form_partial_template,context)
         return retarget(response,"#calendar-form-tr") # retarget if not valid, switch week table (edge cases)
     #default GET response
     form = WeekCalendarForm()
-    form.fields['calendar'].queryset = room_calendar_user
-    sessions = SessionModel.objects.filter(client__user=request.user,
-                                           date__week=p.now().week_of_year).select_related('client','client__user')
+    form.fields['calendar'].queryset = calendar_user
+    # sessions = (SessionModel.objects
+    #             .filter(client__user=request.user,
+    #                                        date__week=p.now().week_of_year)
+    #             .select_related('client','client__user'))
+    sessions = SessionModel.objects.filter(date__gt=p.now()).select_related(
+        'client', 'client__user'
+    )
+    assert sessions is not None, "no sessions found"
     calendar = CalendarRender(sessions=sessions) # today by default
-    context = {'calendar':calendar,'form':form,'sessions':sessions}
+    context = {'calendar':calendar,'form':form}
     return render(request,template,context)
 
 def week_view_auxiliary(request):
@@ -66,33 +77,7 @@ def week_view_auxiliary(request):
     context = {"clients":clients}
     return render(request,template,context)
 
-@login_required
-def week_view_add_session_client(request,date_ref,day,time):
-    if request.POST:
-        form = SessionFromOnlyClientForm(data=request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            week_year = p.instance(date_ref).week_of_year()
-            session_reference_datetime = p.now().replace(day=day,hour=time,week=week_year)
-            instance.date = session_reference_datetime.date()
-            instance.start_time = session_reference_datetime.time()
-            instance.end_time = time_plus_duration(instance.start_time,instance.client.duration)
-            instance.save()
-            messages.info(request,f"Session added for {instance.client.name}")
-            return render(request,'_toasts.html')
-        form = SessionFromOnlyClientForm(data=request.POST)
-        context = {'form':form}
-        return render(request,'room_calendar_app/input/session_form_client.html',context)
-        return None
-    else:
-        form = SessionFromOnlyClientForm()
-        context = {'form':form}
-        return render(request,'room_calendar_app/input/session_form_client.html',context)
 
-@login_required
-def week_view_add_session_date(request,date_ref,client_ref):
-    if request.POST:
-        form = StartDateSessionForm(data=request.POST)
 @login_required
 def room_calendar_listing_view(request):
     room_calendar_mine = RoomCalendarModel.objects.filter(user=request.user)
@@ -136,7 +121,7 @@ def tenant_listing_view(request):
     """View a list of user's events """
     tenant_list = TenantModel.objects.filter(user=request.user)  #? I already changed this one
     context = {"tenant_list":tenant_list}
-    return render(request, "room_calendar_app/display/tenant_list.html", context) #todo check template
+    return render(request, "room_calendar_app/dynamic/tenant_list.html", context) #todo check template
 
 @login_required
 def room_calendar_add_view(request):

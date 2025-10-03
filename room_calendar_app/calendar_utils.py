@@ -14,6 +14,7 @@ class CalendarRender:
     def __init__(self,sessions,date_ref:p.DateTime=None):
         self.sessions = sessions
         self.datetime = p.instance(date_ref) if date_ref else p.today()
+        self.week_ref = self.datetime.week_of_year
 
     @property
     def week_days(self)->list:
@@ -49,7 +50,7 @@ class CalendarRender:
         week_dict = self.week_slot_dic
         time_1 = time.perf_counter()
         for session in self.sessions:
-            assert session.start_time is not None, "start_datetime should not be None"
+            #assert session.start_time is not None, "Calendar UtilsL: start_datetime should not be None"
             start_time = session.start_time
             end_time = p.time(session.end_time.hour,session.end_time.minute).subtract(minutes=30)
             start_datetime = date_plus_time(session.date,start_time) # session date! not self.datetime!

@@ -16,7 +16,7 @@
         {% partialdef modal-body-partial inline %}
 
             <div class="card bg-dark mb-5 border border-secondary">
-                <form data-bs-theme="dark">
+                <form data-bs-theme="dark" action="{% url 'session_client:add_client' %}" method="post">
                 {% csrf_token %}
                     <div class="card-body">
 

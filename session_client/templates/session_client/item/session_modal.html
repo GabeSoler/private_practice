@@ -26,8 +26,7 @@
                         </div>
                         <div class="col">
                             <small>Date:</small>
-                            <h5>{% if session.date %}{{ session.date }}{% else %}
-                                {{ session.created_at|date:'M d,Y' }} {% endif %}</h5>
+                            <h5>{{ session.date }} - {{ session.start_time|time:"H:i" }}</h5>
                         </div>
                     </div>
                 </div>

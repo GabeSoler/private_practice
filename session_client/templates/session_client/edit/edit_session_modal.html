@@ -12,8 +12,14 @@
         {% partialdef modal-body-partial inline %}
 
             <div class="card bg-dark mb-5 border border-secondary">
-                <form data-bs-theme="dark">
-                {% csrf_token %}
+            {% if session %}
+                <form data-bs-theme="dark" action="{% url 'session_client:edit_session' session.pk %}" method="post"
+                hx-post="{% url 'session_client:edit_session' session.pk %}">
+                {% else %}
+                <form data-bs-theme="dark" action="{% url 'session_client:add_session' %}" method="post"
+                hx-post="{% url 'session_client:add_session' %}">
+                {% endif %}
+                    {% csrf_token %}
                     <div class="card-body">
 
                         <!--- Session Title -->
@@ -26,14 +32,22 @@
                                 <div class="col">
                                     <small>Date:</small>
                                     {% bootstrap_field form.date layout="horizontal" show_label="skip" show_help=False %}
+                                    {% bootstrap_field form.start_time layout="horizontal" show_label="skip" show_help=False %}
+
                                 </div>
                             </div>
                         </div>
 
                         <!--- Session Brief -->
-                        <div class="container text-center border-top border-secondary">
+                        <div class="container text-center border-top border-secondary m-1">
                             <small>Session brief:</small>
                             {% bootstrap_field form.brief layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
+                        </div>
+
+                        <!--- Session Calendar -->
+                        <div class="container text-center border-top border-secondary m-1">
+                            <small>Session Calendar:</small>
+                            {% bootstrap_field form.calendar layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                         </div>
 
                         <!--- Session Attendance -->

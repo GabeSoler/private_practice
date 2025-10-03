@@ -6,105 +6,94 @@
 
 {% block content %}
 
-<div id="wrapper">
+    <div id="page-wrapper">
 
-  <div id="form-table-wrapper">
-  {% partialdef form-partial inline %}
-  <form
-    hx-post="{% url "room_calendar_app:week_view" %}"
-    hx-target="#calendar-table-wrapper"
-    hx-trigger="change throttle:1s"
-    >
-    <table
-    class="table table-primary table-striped-columns table-sm mb-0"
-    id="switch-table"
-    >
-    <tr class="" id="calendar-form-tr">
-        <td id="cell-form-field-date"
-          >{% bootstrap_field form.date_reference show_label='skip'  %}
-        </td>
-        <td id="cell-form-field-calendar"
-          >{% bootstrap_field form.calendar show_label='skip'  %}
-        </td>
-        <td id="cell-form-button">
-          <div class="dropdown">
-            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-plus-square-fill text-primary fs-5"></i>
-            </button>
-            <ul class="dropdown-menu"
-            id="client-list-hx"
-            hx-get={% url "room_calendar_app:client_list_auxiliary" %}
-            hx-target="#client-list-hx"
-            hx-trigger="load"
-            hx-swap="outerHTML"
-            >
-          </ul>
+        <div id="form-table-wrapper">
+            {% partialdef form-partial inline %}
+                <form
+                        hx-post="{% url "room_calendar_app:week_view" %}"
+                        hx-target="#calendar-table-wrapper"
+                        hx-trigger="change throttle:1s"
+                >
+                    <table
+                            class="table table-primary table-striped-columns table-sm mb-0"
+                            id="switch-table"
+                    >
+                        <tr class="" id="calendar-form-tr">
+                            <td id="cell-form-field-date"
+                            >{% bootstrap_field form.date_reference show_label='skip' %}
+                            </td>
+                            <td id="cell-form-field-calendar"
+                            >{% bootstrap_field form.calendar show_label='skip' %}
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            {% endpartialdef %} <!-- end partial table -->
         </div>
-      </td>
-    </tr>
-  </table>
-</form>
-      {% endpartialdef %} <!-- end partial table -->
-      </div>
 
-      <!-- Partial def  week calendar -->
-      
-  <div id="calendar-table-wrapper">
-    {% partialdef calendar-view-partial inline  %}
-      <table class="table table-secondary table-striped-columns table-sm"
-      id="week-view-table">
-      <thead>
-          <tr>
-            <th scope="col">#</th>
-            {% for day in calendar.week_days %}
-      
-            <th scope="col"
-            style="font-size:.8rem;"            
-            >{{day|date:'d-m-y'}}</th>
-              {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            {% for slot,data in calendar.week_dict.items %}
-            <th scope="row" 
-            style="font-size:.6rem;"
-            >{{slot|time:"H:i"}}</th>
-      
-              {% for weekday,occurrence in data.items %}
-              {% if occurrence.start_datetime %}
-                  <td class="table-info" 
-                  style="font-size:.6rem;"
-                  id="{{slot}}"
-                  >{{occurrence.client.user}}-
-                    {{occurrence.start_datetime|time:"H:i"}}-
-                    {{occurrence.end_datetime|time:"H:i"}}</td>
-                    {% else %}
-                    <td
-                    style="font-size:.6rem;">
-                    <a class="small float-end stretched-link" hx-get="">+</a>
-                    </td>
-                    {% endif %}
-              {% endfor %}
-                </td>
-      
-              <tr>
-            {% empty %}
-              </tr>
-            {% endfor %}
-          </tr>
-        </tbody>
-      </table>      
-      {% endpartialdef %}
-    </div>
-      <!-- End partial def -->
+        <!-- Partial def  week calendar -->
 
-        
-    
-    
+        <div id="calendar-table-wrapper">
+            {% partialdef calendar-view-partial inline %}
+                <table class="table table-secondary table-striped-columns table-sm"
+                       id="week-view-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        {% for day in calendar.week_days %}
+
+                            <th scope="col"
+                                style="font-size:.8rem;"
+                            >{{ day|date:'d-m-y' }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for slot,data in calendar.week_dict.items %}
+                    <tr> <!-- row for time -->
+                            <th scope="row"
+                                style="font-size:.6rem;"
+                            >{{ slot|time:"H:i" }}</th>
+
+                            {% for weekday,occurrence in data.items %}
+                                {% if occurrence.date %}
+                                    <td class="table-info"
+                                        hx-get="{% url 'session_client:session_hx_item' occurrence.id %}"
+                                        hx-target="#modal-wrapper"
+                                        style="font-size:.6rem;"
+                                        id="{{ slot }}"
+                                    >{{ occurrence.client.user}}-
+                                        {{ occurrence.start_time }}-
+                                        {{ occurrence.end_time }}</td>
+                                {% else %}
+                                    <td
+                                            style="font-size:.6rem;">
+                                        <i  hx-get="{% url 'session_client:week_view_add_session_client' calendar.week_ref weekday slot|time:"H:i" %}"
+                                        hx-target="#modal-wrapper"class="bi bi-patch-plus"></i></a>
+                                    </td>
+                                {% endif %}
+                            {% endfor %}<!-- end of for weekday -->
+                        {% endfor %}<!-- end of for slot -->
+                    </tr>
+                    </tbody>
+                </table>
+            {% endpartialdef %}
+        </div>
+        <!-- End partial def -->
+
+        <div id="modal-wrapper"></div>
+
+
     </div>
     {{ calendar.week_dict.items }}
     <h3>sessions</h3>
-    {{ sessions }}
-    <p>error is in the saving of Sessions and clients!!</p>
-    {% endblock content %}
+        <ul>
+    {% for session in calendar.sessions %}
+        <li>{{ session }}</li>
+        {% empty %}
+        <li>No sessions yet</li>
+    {% endfor %}
+        </ul>
+{% endblock content %}

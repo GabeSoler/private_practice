@@ -153,12 +153,12 @@ class CalendarOccurrenceTest(MetaTestSetupMixin,TestCase):
     def test_week_view_today_render(self):
         self.client.force_login(self.user)
         response = self.client.get('/calendar/week-view/')
-        expected_string = self.session_1.start_time.strftime("%H:%M")
+        expected_string = self.session_1.start_time
         self.assertContains(response,expected_string)
 
     def test_week_view_today_render_htmx(self):
         self.client.force_login(self.user)
-        expected_string = self.user.username
+        expected_string = self.tenant.name
         response = self.client.post('/calendar/week-view/',
                                     self.calendar_data_2,
                                     follow=True,

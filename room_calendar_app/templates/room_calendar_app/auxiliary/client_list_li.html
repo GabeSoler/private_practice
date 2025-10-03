@@ -1,10 +1,12 @@
 <ul class="dropdown-menu"
-id="client-list-hx"
+    id="client-list-hx"
 >
-{% for client in clients %}
-<li><a class="dropdown-item" href={% url "session_client:client" client.pk %}>{{client.code}}</a></li>
-{% empty %}
-<li><a class="dropdown-item" href={% url "session_client:client_list" %}>Add Clients</a></li>
+    {% for client in clients %}
+        <li><a class="dropdown-item" href="{% url "session_client:client_hx_item" client.pk %}"
+                hx-get="{% url 'session_client:client_hx_item' client.pk %}"
+               hx-target="#modal-wrapper">{{ client.code }}</a></li>
+    {% empty %}
+        <li><a class="dropdown-item" href={% url "session_client:add_client" %}>Add Clients</a></li>
 
-{% endfor %}
+    {% endfor %}
 </ul>

@@ -190,9 +190,9 @@ class SessionModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
     # datetime fields
-    date = models.DateField(null=True,blank=True,help_text="Date of session")
-    start_time = models.TimeField(null=True, blank=True, editable=True, help_text="Start of session?")
-    end_time = models.TimeField(null=True, blank=True, editable=True, help_text="End of session")
+    date = models.DateField(blank=True,default="2025-10-3",help_text="Date of session")
+    start_time = models.TimeField(editable=True, default="09:00:00", help_text="Start of session?")
+    end_time = models.TimeField(default="10:00:00",blank=True,editable=True, help_text="End of session")
    #Session notes and vector (delete after 7 years?)
     brief = models.CharField(default='',blank=True,max_length=250,help_text="250 characters note") #short description
     brief_vector = VectorField(dimensions=3,null=True) #for vector search

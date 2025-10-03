@@ -121,9 +121,11 @@ def add_client_view(request):
         #POST data submitted; process data
         form = ClientForm(data=request.POST)
         if form.is_valid():
-            isinstance = form.save(commit=False)
-            isinstance.user = request.user
-            isinstance.save()
+            instance = form.save(commit=False)
+            instance.user = request.user
+            instance.save()
+            if request.htmx:
+                return HttpResponseClientRedirect(request.htmx.current_url)
             return redirect('session_client:client_list')
     #display a blank or invalid form
     context = {'form':form}
@@ -150,6 +152,8 @@ def edit_client_view(request,client_pk):
         if form.is_valid():
             form.save()
             messages.info(request,f"Client '{client.code}' updated")
+            if request.htmx:
+                return HttpResponseClientRedirect(request.htmx.current_url)
             return redirect('session_client:client_list')
     context = {'client':client,'form':form}
     return render(request,template,context)

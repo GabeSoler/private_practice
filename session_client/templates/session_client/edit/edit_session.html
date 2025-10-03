@@ -15,7 +15,7 @@
         {% partialdef modal-body-partial inline %}
 
             <div class="card bg-dark mb-5 border border-secondary">
-                <form data-bs-theme="dark">
+                <form data-bs-theme="dark" action="{% url 'session_client:add_session' %}" method="post">
                 {% csrf_token %}
                     <div class="card-body">
 
@@ -29,6 +29,8 @@
                                 <div class="col">
                                     <small>Date:</small>
                                     {% bootstrap_field form.date layout="horizontal" show_label="skip" show_help=False %}
+                                    {% bootstrap_field form.start_time layout="horizontal" show_label="skip" show_help=False %}
+
                                 </div>
                             </div>
                         </div>
@@ -68,7 +70,7 @@
                                 </div>
                             </div>
                         </div>
-
+    {{ form.errors }}
                         {% bootstrap_button "save" button_type="submit" button_class="btn" extra_classes="float-end btn-outline-secondary m-2" %}
                     </div>
                     {% if session %}

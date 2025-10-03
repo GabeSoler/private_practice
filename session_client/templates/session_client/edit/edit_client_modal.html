@@ -13,8 +13,15 @@
         {% partialdef modal-body-partial inline %}
 
             <div class="card bg-dark mb-5 border border-secondary">
-                <form data-bs-theme="dark">
-                {% csrf_token %}
+            {% if client %}
+                <form data-bs-theme="dark" action="{% url 'session_client:edit_client' client.pk %}" method="post"
+                hx-post="{% url 'session_client:edit_client' client.pk %}">
+                {%  else %}
+                <form data-bs-theme="dark" action="{% url 'session_client:add_client' %}" method="post"
+                hx-post="{% url 'session_client:add_client' %}">
+                {% endif %}
+
+                    {% csrf_token %}
                     <div class="card-body">
 
                         <!--- Client Title -->

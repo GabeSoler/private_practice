@@ -49,5 +49,9 @@ urlpatterns = [
          views_session.hx_delete_session, name='hx_delete_session'),
 
 
+# create a htmx response that sends back a modal with forms to add a quick sessin reference
+    path("hx-week_view_add_session_client/<str:date_ref>/<int:week_day>/<str:time>/",
+         views_session.week_view_add_session_client, name="week_view_add_session_client"),
+
 
 ]

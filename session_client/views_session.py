@@ -4,7 +4,7 @@ from django.urls import reverse
 from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
-from .forms import SessionForm, SessionSelectGroupForm, SearchSessionFrom
+from .forms import SessionForm, SessionSelectGroupForm, SearchSessionFrom,SessionFromOnlyClientForm
 from django_htmx.http import retarget, HttpResponseClientRedirect
 import pendulum as p
 from django.contrib import messages
@@ -158,9 +158,11 @@ def add_session_view(request):
         form = SessionForm(data=request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
-            instance.user = request.user
+            instance.deduce_from_client()
             instance.save()
-            return redirect('session_client:index')
+            if request.htmx:
+                return HttpResponseClientRedirect(request.htmx.current_url)
+            return redirect('session_client:session_list')
     # display a blank or invalid form
     context = {'form': form}
     return render(request, template, context)
@@ -187,6 +189,8 @@ def edit_session_view(request, session_pk):
         if form.is_valid():
             form.save()
             messages.info(request, f"Session '{session.brief}' updated")
+            if request.htmx:
+                return HttpResponseClientRedirect(request.htmx.current_url)
             return redirect("session_client:session_list")
     context = {'session': session, 'form': form}
     return render(request, template, context)
@@ -201,3 +205,28 @@ def hx_delete_session(request, session_pk):
         return HttpResponseClientRedirect(reverse("session_client:session_list"))
     messages.error(request, f"Session '{session.start_time.strftime('%d-%m-%y, %H:%M')}' not deleted")
     return render(request, '_toasts.html')
+
+
+
+@login_required
+def week_view_add_session_client(request,date_ref,day,time):
+    if request.POST:
+        form = SessionFromOnlyClientForm(data=request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            week_year = p.instance(date_ref).week_of_year()
+            session_reference_datetime = p.now().replace(day=day,hour=time,week=week_year)
+            instance.date = session_reference_datetime.date()
+            instance.start_time = session_reference_datetime.time()
+            instance.end_time = time_plus_duration(instance.start_time,instance.client.duration)
+            instance.save()
+            messages.info(request,f"Session added for {instance.client.name}")
+            return render(request,'_toasts.html')
+        form = SessionFromOnlyClientForm(data=request.POST)
+        context = {'form':form}
+        return render(request,'room_calendar_app/input/session_form_client.html',context)
+    else:
+        form = SessionFromOnlyClientForm()
+        context = {'form':form}
+        return render(request,'room_calendar_app/input/session_form_client.html',context)
+
