@@ -46,7 +46,7 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
     <div class='container-fluid'>
       <span class="position-relative p-2" style="min-width:12rem;">
       <a class='navbar-brand position-relative' href="{% url 'session_client:index' %}">
-        <image src={% static 'alchemist/bubbles.svg'%} class="m-1 position-absolute" style="max-width:3rem;max-height:4rem;">
+        <image src="{% static 'alchemist/bubbles.svg'%}" class="m-1 position-absolute" style="max-width:3rem;max-height:4rem;"/>
         <span class="position-absolute bottom-0 start-50 fs-2" style="font-family:'Love Light',cursive;">Dreamy</span>
       </a><small class="text-secondary ms-5 p-2">admin</small></span>
         
@@ -79,15 +79,15 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
             <!-- Account related links-->
             <ul class='navbar-nav ms-auto mb-2 mb-md-0'>
                 {% if user.is_authenticated %}
-                <class='nav-item'>
+                <li class='nav-item'>
                     <span class='navbar-text me-2'>Hello, {{user.username}}!
                     <form action="{% url 'accounts:logout' %}" method='post' style='display:inline;'>
                         {% csrf_token %}
                         <button name='submit' class='btn btn-outline-secondary btn-sm'>
                             Log out</button>
                         </form>
-                      </li>
                       </span>
+                      </li>
                     {% else %}
                 <li class='nav-item'>
                     <a class='nav-link' href="{% url 'accounts:register'%}">Signup</a></li>
@@ -109,8 +109,10 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 <main class='container'>
 
 
-    {% block local_nav %}
+    {% block local_nav %} {% comment %} for navigation by topic, like sessoin and client {% endcomment %}
     {% endblock local_nav %}
+{% block search_nav %} {% comment %} for search inside lists{% endcomment %}
+{% endblock search_nav %}
     <div> 
         {% block content %} {% endblock content %}      
     </div>

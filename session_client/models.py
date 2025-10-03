@@ -30,7 +30,7 @@ class ClientModel(models.Model):
     type = models.CharField(default='Pvt', choices=CLIENT_TYPE, max_length=20, help_text="Select a type of client") # add choices like private, service, eap, supervisee
     fee = models.IntegerField(default=50,validators=(MinValueValidator(1),MaxValueValidator(100)),help_text="Whats your agreed fee")
     #client base info (delete after 7 yeas?)(I am thinking to only erase the fields as the admin is yours)
-    active = models.BooleanField(default=True,help_text="Change if your client is active or archived")
+    active = models.BooleanField(default=True,help_text="Move from archive to active or viceversa")
     archived_at = models.DateTimeField(blank=True,null=True)
     day = models.IntegerField(choices=WEEKDAY_SHORT,default=1,help_text="Default day of week")
     time = models.TimeField(choices=time_slot_options(),help_text='default time')

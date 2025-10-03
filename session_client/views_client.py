@@ -108,6 +108,12 @@ def client_archived_view(request):
 @login_required
 def add_client_view(request):
     """add new client"""
+    if request.htmx:
+        template = 'session_client/edit/edit_client_modal.html'
+        if request.htmx.target == "modal-body-wrapper":
+            template = template + "#modal-body-partial"
+    else:
+        template = 'session_client/edit/edit_client.html'
     if request.method !='POST':
         #no data submitted; create a blank form
         form = ClientForm()
@@ -121,12 +127,20 @@ def add_client_view(request):
             return redirect('session_client:client_list')
     #display a blank or invalid form
     context = {'form':form}
-    return render(request,'session_client/input/add_client.html',context)
+    return render(request,template,context)
 
 @login_required
 def edit_client_view(request,client_pk):
     """edit an existing entry"""
-    client = get_object_or_404(ClientModel,pk=client_pk,user=request.user)
+    client = get_object_or_404(ClientModel,
+                               pk=client_pk,
+                               user=request.user)
+    if request.htmx:
+        template = 'session_client/edit/edit_client_modal.html'
+        if request.htmx.target == "modal-body-wrapper":
+            template = template + "#modal-body-partial"
+    else:
+        template = 'session_client/edit/edit_client.html'
     if request.method != 'POST':
         #initial request;pre-fill form with the current entry
         form = ClientForm(instance=client)
@@ -138,5 +152,5 @@ def edit_client_view(request,client_pk):
             messages.info(request,f"Client '{client.code}' updated")
             return redirect('session_client:client_list')
     context = {'client':client,'form':form}
-    return render(request,'session_client/edit/edit_client.html',context)
+    return render(request,template,context)
 

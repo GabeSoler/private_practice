@@ -26,7 +26,8 @@ urlpatterns = [
          views_client.edit_client_view, name='edit_client'),
     path('hx_client_short_form/',
          views_client.hx_client_short_form, name='hx_client_short_form'),
-    path('clients_edit/<uuid:client_pk>/', views_client.clients_hx_edit, name='clients_edit'),
+    path('clients_edit/<uuid:client_pk>/',
+         views_client.clients_hx_edit, name='clients_edit'),
 
     # Session Views
 

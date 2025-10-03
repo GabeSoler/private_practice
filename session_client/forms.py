@@ -8,7 +8,7 @@ from django.forms.widgets import DateInput,Select
 class ClientForm(forms.ModelForm):
     class Meta:
         model = ClientModel
-        fields = ['code','nick_name','type','fee', 'calendar', 'day', 'duration', 'active']
+        fields = ['code','nick_name','type','fee', 'calendar', 'day','time', 'duration','series', 'active']
         labels = {'code':'Code',                  
                   'type':'Type',
                   'fee':'Fee',
@@ -18,6 +18,8 @@ class ClientForm(forms.ModelForm):
                   'duration':'Duration',
                   'active':'Active',
                   }
+        widgets = {'active':forms.CheckboxInput(attrs={'class':'form-check-input',"type":"checkbox", "role":"switch", 'name':"radioDefault"}),
+                   }
 
 class ClientFormShort(forms.ModelForm):
     class Meta:

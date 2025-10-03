@@ -1,16 +1,13 @@
-{% extends '_base.html' %}
+{% extends '_modal.html' %}
 {% load django_bootstrap5 %}
-{% block background %}bg-dark{% endblock %}
 
-{% block content %}
-
+{% block modal_title %}
     {% if client %}
-        <div class="display-3">{{ client.code }}<small>{% if client.nick_name %}-{{ client.nick_name }}{% endif %}</small>
-   </div>
-        {% else %}
-        <div class="display-3">Add Client</div>
+    {{ client.code }}<small>{% if client.nick_name %}-{{ client.nick_name }}{% endif %}</small>
     {% endif %}
+{% endblock modal_title %}
 
+{% block modal_body %}
 
     <div id="modal-body-wrapper">
         {% partialdef modal-body-partial inline %}
@@ -104,4 +101,4 @@
     </div>
 
 
-{% endblock content %}
+{% endblock modal_body %}

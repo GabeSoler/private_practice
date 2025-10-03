@@ -1,6 +1,6 @@
 
 
-{% extends 'session_client/utils/client-nav.html' %}
+{% extends 'session_client/navs/client-nav.html' %}
 {% load django_bootstrap5 %}
 {% block content %}
 
@@ -53,9 +53,9 @@ similar to events. needs custom form and view {% endcomment %}
 <ul class="list-group" id="client-list-ul">
   {% for client in clients%}
     <li class="list-group-item list-group-item-primary" id="{{client.code}}">
-      <a href="{%url 'session_client:client' client.pk %}">{{client.code}}</a> - {{client.nick_name}} | {{client.created_at|date:'M d,Y'}}
+      <a href="{%url 'session_client:client_hx_item' client.pk %}">{{client.code}}</a> - {{client.nick_name}} | {{client.created_at|date:'M d,Y'}}
         <i class="bi bi-archive-fill text-danger" 
-          hx-put={% url 'session_client:clients_edit' client.pk %}
+          hx-put={% url 'session_client:edit_client' client.pk %}
           hx-trigger="click"
           hx-target="closest li"
           hx-swap="outerHTML"

@@ -1,49 +1,40 @@
+{% extends '_base.html' %}
 
+{% block local_nav %}
+<!-- Sessions Nav -->
+<nav
+  class="nav mt-0 nav-tabs bg-secondary"
+>
+  <h4 class="text-primary m-2">Sessions</h4>
 
-{% extends 'session_client/utils/session-nav.html' %}
-{% load django_bootstrap5 %}
+  <a class="nav-link {% if request.path == "/session_list/"  %}active {% endif %}" 
+      href="{% url "session_client:session_list" %}" aria-current="page"
+    ><i class="bi bi-folder2-open"></i> Open</a
+  >
+  <a class="nav-link {% if request.path == "/session_search/"  %}active {% endif %}" 
+      href="{% url "session_client:session_search" %}"
+      ><i class="bi bi-calendar-date"></i> Search</a>
+
+  <a class="nav-link {% if request.path == "/add_session/"  %}active{% endif %}" 
+      href="{% url "session_client:add_session" %}"
+        hx-get="{% url "session_client:add_session" %}"
+       hx-target="#modal-wrap"
+  hx-push-url="true">Add</a>
+
+  {% comment %}
+    <a class="nav-link {% if request.path == "/add_session/"  %}active{% endif %}"
+      href="{% url "session_client:add_session" %}">Add</a>{% endcomment %}
+</nav>
+
+  
+  {% endblock local_nav %}
+
+  <div id="content_wrap">
+    {% block search-nav %}
+
+    {% endblock search-nav %}
 {% block content %}
-
-
-
-<div id="wrapper">
-
-  <div id="form-table-wrapper">
-  {% partialdef form-partial inline %}
-  <form action={% url 'session_client:session_search' %} method="post"
-    hx-post={% url "session_client:session_search" %}
-    hx-target="#session-list-wrapper"
-    hx-trigger="change throttle:1s,load once"
-    >
-    {% csrf_token %}
-    <table
-    class="table table-primary table-sm mb-0"
-    id="switch-table"
-    >
-    <tr class="" id="calendar-form-tr">
-        <td id="cell-form-field-date"
-          >{% bootstrap_field form.date_ref_start show_label='skip'  %}
-        </td>
-        <td id="cell-form-field-date"
-          >{% bootstrap_field form.date_ref_end show_label='skip'  %}
-        </td>
-        <td id="cell-form-field-calendar"
-          >{% bootstrap_field form.client show_label='skip'  %}
-        </td>
-        <td id="cell-form-button">
-          <div class="dropdown">
-            <button class="btn link btn-secondary" type="submit" value="submit" >
-              <i class="bi bi-cloud-download text-primary fs-5"></i>
-            </button>
-        </div>
-      </td>
-    </tr>
-  </table>
-</form>
-      {% endpartialdef %} <!-- end partial table -->
-      </div>
-
-
+    <!-- Session list -->
 <div id="session-list-wrapper">
   {% partialdef session-list-partial inline %}
   <table class="table">
@@ -51,11 +42,11 @@
       <tr>
         <th scope="col">Date
         </th>
-        <th scope="col">Time
-        </th>
-        <th scope="col">Title
-        </th>
         <th scope="col">Client
+        </th>
+        <th scope="col">Attendance
+        </th>
+        <th scope="col">Brief
         </th>
         <th scope="col">Paid
         </th>
@@ -68,17 +59,14 @@
       {% partialdef row-instance inline %}
       <tr class="fade-in">
         <th scope="row">
-          <a href="{%url "session_client:edit_session" session.pk %}">
+          <a href="{%url "session_client:session_hx_item" session.pk %}"
+          hx-get="{%url "session_client:session_hx_item" session.pk %}"
+          hx-target="#modal-wrap">
             {% if session.date %}{{session.date}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
-            &nbsp;<i class="bi bi-eye-fill text-secondary"
-              hx-get={% url 'session_client:session_hx_item' session.pk %}
-              hx-trigger="click"
-              hx-target="#modal-wrap"
-              ></i>
           </th>
 
-      <td>{{session.start_time}}</td>
       <td>{{session.client}}</td>
+      <td>{{session.get_attended_display|default:"--"}}</td>
       <td>{{session.brief|truncatechars:10}}</td>
 
         <!-- paid/not paid partial -->
@@ -113,7 +101,6 @@
         {% if messages %}{% include '_toasts.html' %}{% endif %}{% comment %}trying to set a toast system for messages{% endcomment %}
 
           {% endpartialdef session_open %}
-      </div>
       </tr>
       {% endpartialdef %}
 
@@ -121,6 +108,10 @@
   {% endfor %}
 </table>
 {% endpartialdef session-list-partial  %}
-</div>
-<div id="modal-wrap"></div>
-  {% endblock content %}
+</div> <!-- end session list -->
+
+  <div id="modal-wrap"></div> <!-- hx target for modals -->
+
+  </div>
+
+{% endblock content %}

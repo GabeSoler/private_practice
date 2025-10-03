@@ -1,4 +1,4 @@
-{% extends 'session_client/utils/client-nav.html' %}
+{% extends 'session_client/navs/client-nav.html' %}
 
 {% load django_bootstrap5 %}
 
@@ -56,12 +56,13 @@
   {% partialdef client-li-partial inline %}
     <li class="list-group-item list-group-item-primary fade-out fade-in" id="{{client.code}}"
     {% if loading %} hx-get="{% url 'session_client:hx_client_short_form'%}" hx-swap="innerHTML" hx-target="#client-form-wrap" hx-trigger="load once"{% endif %}>
-      <a href="{%url 'session_client:edit_client' client.pk %}">{{client.code}}</a> {% if client.nick_name %}<span>{{client.nick_name|title}}</span>{% endif %}
-      &nbsp;<i class="bi bi-eye-fill text-primary"
+      <a href="{%url 'session_client:client_hx_item' client.pk %}"
           hx-get="{% url 'session_client:client_hx_item' client.pk %}"
-          hx-trigger="click"
           hx-target="#modal-wrap"
-      ></i> &nbsp;
+          >{{client.code}}
+        </a>
+        {% if client.nick_name %}<span>{{client.nick_name|title}}</span>{% endif %}
+
       
       <i class="bi bi-archive-fill text-warning" 
           hx-put="{% url 'session_client:clients_edit' client.pk %}"

@@ -1,64 +1,76 @@
 {% extends '_modal.html' %}
 
 
-{% block modal_title %}Session: <small class="fs-5">{{session.client}} - {{ session.date }}</small>
-<a href="{%url 'session_client:edit_session' session.pk %}" class="card-link small" style="font-size:.9rem;">Edit</a></small>{% endblock modal_title%}
+{% block modal_title %}Session: <small class="fs-5">{{ session.client }} - {{ session.date }}</small>
+    <a href="{% url 'session_client:edit_session' session.pk %}"
+       hx-get="{% url 'session_client:edit_session' session.pk %}"
+       hx-target="#modal-body-wrapper"
+       _="on htmx:afterOnLoad remove me"
+       class="card-link small" style="font-size:.9rem;"><i class="bi bi-pencil-square"></i></a></small>{% endblock modal_title %}
 
-{% block modal_body %}
 
-<div class="card bg-dark mb-5 border border-secondary">
-  <div class="card-body">
+    {% block modal_body %}
 
-  <!--- Session Title -->
-<div class="container text-center">
-  <div class="row align-items-center">
-    <div class="col">
-        <small>Client:</small>
-        <h5>{{session.client}}</h5>
-    </div>
-    <div class="col">
-        <small>Date:</small>
-        <h5>{% if session.date %}{{session.date}}{% else %} {{session.created_at|date:'M d,Y'}} {% endif %}</h5>
-    </div>
-  </div>
-</div>
+<div id="modal-body-wrapper">
+{% partialdef modal-body-partial inline  %}
 
-  <!--- Session Brief -->
-<div class="container text-center border-top border-secondary">
-            <small>Session brief:</small>
-            <p>{{session.brief|linebreaksbr}}</p>
-</div>
+        <div class="card bg-dark mb-5 border border-secondary">
+            <div class="card-body">
 
-  <!--- Session Attendance -->
+                <!--- Session Title -->
+                <div class="container text-center">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small>Client:</small>
+                            <h5>{{ session.client }}</h5>
+                        </div>
+                        <div class="col">
+                            <small>Date:</small>
+                            <h5>{% if session.date %}{{ session.date }}{% else %}
+                                {{ session.created_at|date:'M d,Y' }} {% endif %}</h5>
+                        </div>
+                    </div>
+                </div>
 
-  <div class="container text-center border-top border-secondary">
-  <div class="row align-items-center">
-    <div class="col">
-        <small>Attendance:</small>
-        <h5>{{session.get_attended_display|default:"--"}}</h5>
-    </div>
-    <div class="col">
-        <small>Status:</small>
-        <h5>{{ session.open|yesno:"Open,Closed" }}</h5>
-    </div>
-  </div>
-</div>
+                <!--- Session Brief -->
+                <div class="container text-center border-top border-secondary">
+                    <small>Session brief:</small>
+                    <p>{{ session.brief|linebreaksbr }}</p>
+                </div>
 
-  <!--- Session Payment -->
+                <!--- Session Attendance -->
 
-  <div class="container text-center border-top border-secondary">
-  <div class="row align-items-center">
-    <div class="col">
-        <small>Payment:</small>
-        <h5>{{session.paid|yesno:"Paid,--"}}</h5>
-    </div>
-    <div class="col">
-        <small>Amount:</small>
-        <h5> {{session.amount_paid|default:"--" }} </h5>
-    </div>
-  </div>
-</div>
+                <div class="container text-center border-top border-secondary">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small>Attendance:</small>
+                            <h5>{{ session.get_attended_display|default:"--" }}</h5>
+                        </div>
+                        <div class="col">
+                            <small>Status:</small>
+                            <h5>{{ session.open|yesno:"Open,Closed" }}</h5>
+                        </div>
+                    </div>
+                </div>
 
-    </div>
+                <!--- Session Payment -->
+
+                <div class="container text-center border-top border-secondary">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small>Payment:</small>
+                            <h5>{{ session.paid|yesno:"Paid,--" }}</h5>
+                        </div>
+                        <div class="col">
+                            <small>Amount:</small>
+                            <h5> {{ session.amount_paid|default:"--" }} </h5>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+{% endpartialdef %}
 </div>
     {% endblock modal_body %}
+
