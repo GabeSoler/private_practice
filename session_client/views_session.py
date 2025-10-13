@@ -1,11 +1,12 @@
+from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
-from .forms import SessionForm, SessionSelectGroupForm, SearchSessionFrom,SessionFromOnlyClientForm
-from django_htmx.http import retarget, HttpResponseClientRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
+from .forms import SessionForm, SessionSelectGroupForm, SearchSessionFrom, SessionFromOnlyClientForm
+from django_htmx.http import retarget, HttpResponseClientRedirect, HttpResponseClientRefresh,trigger_client_event
 import pendulum as p
 from django.contrib import messages
 
@@ -142,6 +143,29 @@ def sessions_search(request):
     context = {'sessions': sessions, 'form': form}
     return render(request, template, context)
 
+@login_required()
+def session_list_modal(request, client_pk):
+    start_of_month = p.now().start_of('month')
+    template = "session_client/lists/session_list_modal.html"
+    sessions = SessionModel.objects.filter(
+        client=client_pk,
+        client__user=request.user,
+        date__gte=start_of_month).order_by('-date', '-start_time')
+    context = {'sessions': sessions}
+    return render(request, template, context)
+
+@login_required()
+def session_pending_list_modal(request, client_pk):
+    now = p.now()
+    template = "session_client/lists/session_list_modal.html"
+    sessions = SessionModel.objects.filter(
+        client=client_pk,
+        client__user=request.user,
+        date__lte=now.date(),
+        open=True).order_by('-date', '-start_time')
+    context = {'sessions': sessions}
+    return render(request, template, context)
+
 
 @login_required
 def add_session_view(request):
@@ -161,7 +185,7 @@ def add_session_view(request):
             instance.deduce_from_client()
             instance.save()
             if request.htmx:
-                return HttpResponseClientRedirect(request.htmx.current_url)
+                return HttpResponseClientRefresh()
             return redirect('session_client:session_list')
     # display a blank or invalid form
     context = {'form': form}
@@ -187,11 +211,12 @@ def edit_session_view(request, session_pk):
         # POST data submitted; process data
         form = SessionForm(instance=session, data=request.POST)
         if form.is_valid():
-            form.save()
+            session = form.save()
             messages.info(request, f"Session '{session.brief}' updated")
-            if request.htmx:
-                return HttpResponseClientRedirect(request.htmx.current_url)
-            return redirect("session_client:session_list")
+            return HttpResponseClientRefresh()
+        else:
+            messages.error(request, form.errors)
+            return render(request, template, {"form": form, "session": session})
     context = {'session': session, 'form': form}
     return render(request, template, context)
 
@@ -207,26 +232,42 @@ def hx_delete_session(request, session_pk):
     return render(request, '_toasts.html')
 
 
-
 @login_required
-def week_view_add_session_client(request,date_ref,day,time):
+def week_view_add_session_client(request, date_ref, day, time):
     if request.POST:
         form = SessionFromOnlyClientForm(data=request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             week_year = p.instance(date_ref).week_of_year()
-            session_reference_datetime = p.now().replace(day=day,hour=time,week=week_year)
+            session_reference_datetime = p.now().replace(day=day, hour=time, week=week_year)
             instance.date = session_reference_datetime.date()
             instance.start_time = session_reference_datetime.time()
-            instance.end_time = time_plus_duration(instance.start_time,instance.client.duration)
+            instance.end_time = time_plus_duration(instance.start_time, instance.client.duration)
             instance.save()
-            messages.info(request,f"Session added for {instance.client.name}")
-            return render(request,'_toasts.html')
+            messages.info(request, f"Session added for {instance.client.name}")
+            return render(request, '_toasts.html')
         form = SessionFromOnlyClientForm(data=request.POST)
-        context = {'form':form}
-        return render(request,'room_calendar_app/input/session_form_client.html',context)
+        context = {'form': form}
+        return render(request, 'room_calendar_app/input/session_form_client.html', context)
     else:
         form = SessionFromOnlyClientForm()
-        context = {'form':form}
-        return render(request,'room_calendar_app/input/session_form_client.html',context)
+        context = {'form': form}
+        return render(request, 'room_calendar_app/input/session_form_client.html', context)
+
+
+def add_series_view(request,client_pk,number):
+    """add new session"""
+    if request.htmx:
+        date_ref = p.now()
+        template = 'session_client/lists/client_list.html'+"#future_sessions_partial"
+        client = get_object_or_404(ClientModel,pk=client_pk,user=request.user)
+        success, sessions = client.add_series(number)
+        if success:
+            messages.info(request, f"✅{len(sessions)} Sessions added for {client.code}")
+        else:
+            messages.error(request, f"‼️{len(sessions)} overlying Sessions for {client.code}")
+        client_after = ClientModel.objects.filter(pk=client_pk,user=request.user).annotate(future_sessions_count=Count('sessionmodel',
+                                    filter=Q(sessionmodel__date__gt=date_ref.date()))).first()
+        return render(request,template,{"client":client_after,'add_toast':True})
+    return Http404("Not a expected request")
 

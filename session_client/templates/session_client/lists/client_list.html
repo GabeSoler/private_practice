@@ -3,84 +3,115 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-<div class="card">
+    <div class="container bg-primary">
+        <input class="form-control" type="text" placeholder="Search" id="client-search-input"
+_="on keyup
+   if the event's key is 'Escape'
+     set my value to ''
+     trigger keyup
+     halt
+   end
+   if the event's key is 'Enter'
+     call me.focus()
+     halt
+   end
+   for c in .card
+     set link to c.querySelector('a')
+     if link exists
+       set linkText to link.textContent.toLowerCase()
+       set searchValue to my value.toLowerCase()
+       if searchValue is '' or linkText contains searchValue
+         show c
+       else
+         hide c
+       end
+     end
+   end"
+        >
+    </div>
+    <div class="card mt-3 p-2">
 
-<!-- Add Client -->
+        <div id="client-list-wrapper" class="container text-center">
+            <div class="row row-cols-md-2 row-cols-lg-3 g-1" id="cards-row">
+                {% partialdef client-list-partial inline %}
 
-<div class="card bg-primary">
-<div class="" id="client-form-wrap">
-{% partialdef client-form-partial inline %} <!-- Start form partial -->
-  
-    <form class="form bg-primary ps-3 mb-0"
-    >
-    <table class="table mb-0" id="client-form-table">
-      <tbody class="mb-0">
-      <tr>
-        <td class="col bg-primary" id="form-td-code">
-          {% bootstrap_field form.code wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
-        </td>
-        <td class="col bg-primary" id="form-td-day">
-          {% bootstrap_field form.day wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
-        </td>
-        <td class="col bg-primary" id="form-td-time">
-          {% bootstrap_field form.time wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
-        </td>
-        <td class="col bg-primary" id="form-td-fee">
-          {% bootstrap_field form.duration wrapper_class="col" show_label="skip" layout="horizontal" label_class="text-primary" %}
-        </td>
-        <td class="bg-primary">
-            <button class="btn btn-primary col-12"
-            type="submit"
-            hx-post="{% url 'session_client:client_list' %}"
-            hx-target="#client-list-ul"
-            hx-swap="afterbegin settle:0.2s"
-            hx-trigger="keyup[key=='Enter'],click"
-            _="on keyup[key=='Enter'] or click call event.preventDefault()"
-            >
-            New</button>
-        </td>
-      </tr>
-    </tbody>
-    </table>
-</form>
-</div>
-  {% if messages %}{% include '_toasts.html' %}{% endif %}
-{% endpartialdef client-form-partial %} <!-- end form partial -->
-  </div>
+                    {% for client in clients %}
 
-<div id="client-list-wrapper">
-  {% partialdef client-list-partial inline %}
-<ul class="list-group" id="client-list-ul">
-  {% for client in clients%}
+                        {% partialdef client-card-partial inline %}
 
-  {% partialdef client-li-partial inline %}
-    <li class="list-group-item list-group-item-primary fade-out fade-in" id="{{client.code}}"
-    {% if loading %} hx-get="{% url 'session_client:hx_client_short_form'%}" hx-swap="innerHTML" hx-target="#client-form-wrap" hx-trigger="load once"{% endif %}>
-      <a href="{%url 'session_client:client_hx_item' client.pk %}"
-          hx-get="{% url 'session_client:client_hx_item' client.pk %}"
-          hx-target="#modal-wrap"
-          >{{client.code}}
-        </a>
-        {% if client.nick_name %}<span>{{client.nick_name|title}}</span>{% endif %}
+                            <div class="card col-auto fade-out fade-in
+                                    container text-center
+                                    border border-secondary
+                                    p-2"
+                                 id="{{ client.code }}">
+                                <div class="card-header d-flex justify-content-between align-items-center bg-primary">
+                                    <a class="col link-secondary link-client-code"
+                                       href="{% url 'session_client:client_hx_item' client.pk %}"
+                                       hx-get="{% url 'session_client:client_hx_item' client.pk %}"
+                                       hx-target="#modal-wrapper"
+                                    >{{ client.code }}{% if client.nick_name %} "{{ client.nick_name }}"{% endif %}
+                                    </a>
 
-      
-      <i class="bi bi-archive-fill text-warning" 
-          hx-put="{% url 'session_client:clients_edit' client.pk %}"
-          hx-trigger="click"
-          hx-target="closest li"
-          hx-swap="outerHTML"
-          ></i>
-    </li>
-    {% endpartialdef client-li-partial %}
-    {% empty %}
-    <li>There are no clients yet. </li>
-    
-    {% endfor %}
-  </ul>
-  {% endpartialdef client-list-partial %}
-</div>
-</div>
+                                    <!-- list month forward -->
+                                    <i class="bi bi-list-stars me-3"
+                                       hx-get="{% url 'session_client:session_list_modal' client.pk %}"
+                                       hx-target="#modal-wrapper"
+                                    ></i>
 
-<div id="modal-wrap"></div>
+                                    <!-- count of open before today -->
+                                    <div class="badge text-bg-info"
+                                         hx-get="{% url 'session_client:session_pending_list_modal' client.pk %}"
+                                         hx-target="#modal-wrapper"
+                                    >{{ client.pending_sort_sessions|default:0 }}</div>
+                                </div>
 
-  {% endblock content %}
+                                <div class="row"><!--first client card row -->
+
+                                    <div class="col"> <!-- day, time and room -->
+                                        <p class="lh-1"><span
+                                                class="small">{{ client.get_day_display }}-{{ client.time }}</span>
+                                            </br> <span class="small">{{ client.calendar }}</span></p>
+                                    </div>
+                                    <div class="col"> <!-- month back paid and expected pay -->
+                                        <span class="fs-5">£{{ client.month_sessions_paid }}</span>/<span
+                                                class="small">{{ client.month_sessions_expected }}</span>
+                                    </div>
+                                    <div class="col-auto">
+                                        <span class="fs-5">{{ client.attendance_percentage }}%</span>
+                                    </div>
+                                </div>
+
+                                <div class="row"><!--second client card row -->
+                                    <div class="col-4"
+                                         id="future-sessions-{{ client.pk }}">
+                                        {% partialdef future_sessions_partial inline %}
+                                            <i class="bi bi-fast-forward-fill"></i>
+                                            <span class="fs-5"
+                                            > {{ client.future_sessions_count }}</span>
+                                            {% if add_toast %}{% include '_toasts.html' %}{% endif %}
+                                        {% endpartialdef future_sessions_partial %}
+                                    </div>
+                                    <div class="col-4"> <!-- add 3 sessions forward -->
+                                        +<i class="bi bi-3-circle-fill"
+                                            hx-post="{% url 'session_client:add_series' client.pk '3' %}"
+                                            hx-target="#future-sessions-{{ client.pk }}"></i>
+                                    </div>
+                                    <div class="col-4"> <!-- add 6 sessions forward -->
+                                        +<i class="bi bi-6-circle-fill"
+                                            hx-post="{% url 'session_client:add_series' client.pk '6' %}"
+                                            hx-target="#future-sessions-{{ client.pk }}"></i>
+
+                                    </div>
+                                </div>
+                            </div>
+                        {% endpartialdef client-card-partial %}
+                    {% empty %}
+                        <div class="card">There are no clients yet.</div>
+
+                    {% endfor %}
+                {% endpartialdef client-list-partial %}
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

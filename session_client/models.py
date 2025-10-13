@@ -14,7 +14,6 @@ from pgvector.django import VectorField
 
 from .utils import time_plus_duration,date_plus_time,range_from_date
 
-
 # Create your models here.
 
 class ClientModel(models.Model):
@@ -71,7 +70,7 @@ class ClientModel(models.Model):
         if the session is later than tomorrow, use it as reference, else use today
         this is to avoid creating sessions in the past.
              """
-        last_session = SessionModel.objects.filter(client=self).latest() or None
+        last_session = SessionModel.objects.filter(client=self).latest() or p.now()
         last_date = p.date(last_session.date.year, last_session.date.month, last_session.date.day)
         if last_date >= p.now().add(days=1).date():
             # if it is more than now, use it as a reference date
@@ -145,19 +144,24 @@ class ClientModel(models.Model):
             query of overlaps
         """
         fortnight = fortnight
-        calendar_ref = calendar or self.calendar
+        if calendar:
+            calendar_ref = calendar
+        elif self.calendar:
+            calendar_ref = self.calendar
+        else:
+            calendar_ref = RoomCalendarModel.objects.get(user=self.user,name="Base Room")
         assert calendar_ref is not None, "calendar field is necessary"
         start_time = self.time
         end_time = time_plus_duration(self.time, self.duration)
         start_range_p = start_range
         end_range_p = end_range
-        assert isinstance(start_time, p.Time), "start time should be a datetime.time object"
-        assert isinstance(end_time, p.Time), "end time should be a datetime.time object"
+        assert isinstance(start_range_p, p.DateTime), "start_range should be a datetime object"
+        assert isinstance(end_range_p, p.DateTime), "end_range should be a datetime object"
         # base query sets the calendar, start and end of range, and day of week.
 
         filters = Q()
         if range_filter:
-            filters &=  Q(date__range=(start_range_p,end_range_p))
+            filters &= Q(date__range=(start_range_p,end_range_p))
         if calendar_filter:
             filters &= Q(calendar=calendar_ref)
         if iso_day_filter:
@@ -288,6 +292,8 @@ class SessionModel(models.Model):
                 self.calendar = base_cal
         if start_time:
             self.start_time = start_time
+        elif self.start_time:
+            start = self.start_time
         else:
             start = client.deduce_next_datetime()
         self.start_time = start

@@ -18,7 +18,7 @@
   <a class="nav-link {% if request.path == "/add_session/"  %}active{% endif %}" 
       href="{% url "session_client:add_session" %}"
         hx-get="{% url "session_client:add_session" %}"
-       hx-target="#modal-wrap"
+       hx-target="#modal-wrapper"
   hx-push-url="true">Add</a>
 
   {% comment %}
@@ -30,10 +30,13 @@
   {% endblock local_nav %}
 
   <div id="content_wrap">
-    {% block search-nav %}
+    {% block search-nav %} {% comment %} for local search of lists {% endcomment %}
 
     {% endblock search-nav %}
+
 {% block content %}
+
+    {% if sessions %} {% comment %} As i re use it its here, a bit messy :/ {% endcomment %}
     <!-- Session list -->
 <div id="session-list-wrapper">
   {% partialdef session-list-partial inline %}
@@ -61,7 +64,7 @@
         <th scope="row">
           <a href="{%url "session_client:session_hx_item" session.pk %}"
           hx-get="{%url "session_client:session_hx_item" session.pk %}"
-          hx-target="#modal-wrap">
+          hx-target="#modal-wrapper">
             {% if session.date %}{{session.date}}{% else %}{{session.created_at|date:'d, M,Y'}}{% endif %}</a>
           </th>
 
@@ -109,8 +112,7 @@
 </table>
 {% endpartialdef session-list-partial  %}
 </div> <!-- end session list -->
-
-  <div id="modal-wrap"></div> <!-- hx target for modals -->
+    {% endif %}
 
   </div>
 

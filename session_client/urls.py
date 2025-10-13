@@ -27,7 +27,7 @@ urlpatterns = [
     path('hx_client_short_form/',
          views_client.hx_client_short_form, name='hx_client_short_form'),
     path('clients_edit/<uuid:client_pk>/',
-         views_client.clients_hx_edit, name='clients_edit'),
+         views_client.clients_toggle_active, name='client_toggle_active'),
 
     # Session Views
 
@@ -39,6 +39,10 @@ urlpatterns = [
          views_session.sessions_view, name='session_list'),
     path('session_search/',
          views_session.sessions_search, name='session_search'),
+    path('session_list_modal/<uuid:client_pk>/',
+         views_session.session_list_modal, name='session_list_modal'),
+    path('session_pending_list_modal/<uuid:client_pk>/',
+         views_session.session_pending_list_modal, name='session_pending_list_modal'),
     path('edit_session/<uuid:session_pk>/',
          views_session.edit_session_view, name='edit_session'),
     path('sessions_hx_edit_open/<uuid:session_pk>/',
@@ -47,6 +51,8 @@ urlpatterns = [
          views_session.sessions_hx_edit_paid, name='sessions_hx_edit_paid'),
     path('hx_delete_session/<uuid:session_pk>/',
          views_session.hx_delete_session, name='hx_delete_session'),
+    path('add_series/<uuid:client_pk>/<int:number>/',
+         views_session.add_series_view, name='add_series'),
 
 
 # create a htmx response that sends back a modal with forms to add a quick sessin reference

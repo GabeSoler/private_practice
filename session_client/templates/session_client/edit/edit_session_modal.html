@@ -3,6 +3,8 @@
 
 {% block modal_title %}
     {% if session %}Session: <small class="fs-5">{{ session.client }} - {{ session.date }}</small>
+    {% else %}
+        <div class="display-4">Add Session</div>
     {% endif %}
 {% endblock modal_title %}
 
@@ -12,13 +14,17 @@
         {% partialdef modal-body-partial inline %}
 
             <div class="card bg-dark mb-5 border border-secondary">
-            {% if session %}
-                <form data-bs-theme="dark" action="{% url 'session_client:edit_session' session.pk %}" method="post"
-                hx-post="{% url 'session_client:edit_session' session.pk %}">
-                {% else %}
-                <form data-bs-theme="dark" action="{% url 'session_client:add_session' %}" method="post"
-                hx-post="{% url 'session_client:add_session' %}">
-                {% endif %}
+                <form data-bs-theme="dark"
+
+                        {% if session %}
+                      action="{% url 'session_client:edit_session' session.pk %}"
+                      hx-target="#modal-body-wrapper"
+                      hx-post="{% url 'session_client:edit_session' session.pk %}"
+                        {% else %}
+                      action="{% url 'session_client:add_session' %}"
+                        {% endif %}
+                      method="post">
+
                     {% csrf_token %}
                     <div class="card-body">
 
@@ -80,7 +86,7 @@
                             </div>
                         </div>
 
-                        {% bootstrap_button "save" button_type="submit" button_class="btn" extra_classes="float-end btn-outline-secondary m-2" %}
+                        {% bootstrap_button "Save" button_type="submit" button_class="btn" extra_classes="float-end btn-secondary m-3" %}
                     </div>
                     {% if session %}
                         <button

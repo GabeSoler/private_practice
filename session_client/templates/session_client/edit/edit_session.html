@@ -1,4 +1,4 @@
-{% extends '_base.html' %}
+{% extends 'session_client/navs/session-nav.html' %}
 {% load django_bootstrap5 %}
 
 {% block background %}bg-dark{% endblock %}
@@ -6,8 +6,8 @@
     {% if session %}
 
         <div class="display-3">Edit Session: <small class="fs-5">{{ session.client }} - {{ session.date }}</small>
-    </div>
-        {% else %}
+        </div>
+    {% else %}
         <div class="display-3">Add Session</div>
     {% endif %}
 
@@ -15,8 +15,14 @@
         {% partialdef modal-body-partial inline %}
 
             <div class="card bg-dark mb-5 border border-secondary">
-                <form data-bs-theme="dark" action="{% url 'session_client:add_session' %}" method="post">
-                {% csrf_token %}
+                <form data-bs-theme="dark"
+                        {% if session %}
+                      action="{% url 'session_client:edit_session' session.pk %}"
+                        {% else %}
+                      action="{% url 'session_client:add_session' %}"
+                        {% endif %}
+                      method="post">
+                    {% csrf_token %}
                     <div class="card-body">
 
                         <!--- Session Title -->
@@ -70,7 +76,7 @@
                                 </div>
                             </div>
                         </div>
-    {{ form.errors }}
+                        {{ form.errors }}
                         {% bootstrap_button "save" button_type="submit" button_class="btn" extra_classes="float-end btn-outline-secondary m-2" %}
                     </div>
                     {% if session %}

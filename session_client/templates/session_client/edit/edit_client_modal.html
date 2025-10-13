@@ -3,7 +3,9 @@
 
 {% block modal_title %}
     {% if client %}
-    {{ client.code }}<small>{% if client.nick_name %}-{{ client.nick_name }}{% endif %}</small>
+        {{ client.code }}<small>{% if client.nick_name %}-{{ client.nick_name }}{% endif %}</small>
+    {% else %}
+        <div class="display-4">Add Client</div>
     {% endif %}
 {% endblock modal_title %}
 
@@ -13,13 +15,15 @@
         {% partialdef modal-body-partial inline %}
 
             <div class="card bg-dark mb-5 border border-secondary">
-            {% if client %}
-                <form data-bs-theme="dark" action="{% url 'session_client:edit_client' client.pk %}" method="post"
-                hx-post="{% url 'session_client:edit_client' client.pk %}">
-                {%  else %}
-                <form data-bs-theme="dark" action="{% url 'session_client:add_client' %}" method="post"
-                hx-post="{% url 'session_client:add_client' %}">
-                {% endif %}
+                <form data-bs-theme="dark"
+                        {% if client %}
+                      action="{% url 'session_client:edit_client' client.pk %}" method="post"
+                      hx-post="{% url 'session_client:edit_client' client.pk %}">
+                        {% else %}
+                      action="{% url 'session_client:add_client' %}" method="post"
+                      hx-post="{% url 'session_client:add_client' %}">
+                        {% endif %}
+
 
                     {% csrf_token %}
                     <div class="card-body">
@@ -43,22 +47,27 @@
                             <small>Type:</small>
                             {% bootstrap_field form.type layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                         </div>
+                        <!--- Client calendar  -->
+                        <div class="container text-center border-top border-secondary">
+                            <small>Calendar:</small>
+                            {% bootstrap_field form.calendar layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
+                        </div>
 
-                        <!--- Client Attendance -->
+                        <!--- Client Fee -->
 
                         <div class="container text-center border-top border-secondary">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <small>Attendance:</small>
+                                    <small>Fee:</small>
                                     {% bootstrap_field form.fee layout="horizontal" show_label="skip" show_help=False %}
                                 </div>
                                 <div class="col mx-auto">
                                     <small>Active:</small>
                                     <div class="row">
                                         <div class="col"></div>
-                                    <div class="form-check form-switch col">
-                                        {{ form.active }}
-                                    </div>
+                                        <div class="form-check form-switch col">
+                                            {{ form.active }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -93,19 +102,25 @@
                                 </div>
                             </div>
 
-                            {% bootstrap_button "save" button_type="submit" button_class="btn" extra_classes="float-end btn-outline-secondary" %}
-                        {% if client %}
-                            <button
-                                    hx-confirm="Confirm client archive"
-                                    hx-delete="{% url 'session_client:clients_edit' client.pk %}"
-                                    class="btn btn-outline-danger start-0">Delete
-                            </button>
-                        {% endif %}
+                            {% bootstrap_button "Save" button_type="submit" button_class="btn" extra_classes="float-end btn-secondary m-3" %}
+
                         </div>
                 </form>
+    {% if client %}
+        <button
+                class="btn btn-outline-danger start-0"
+                hx-confirm="Confirm client archive"
+                hx-patch="{% url 'session_client:client_toggle_active' client.pk %}"
+                hx-target="#{{ client.code }}"
+                hx-swap="outerHTML"
+        >Archive
+        </button>
+    {% endif %}
             </div>
         {% endpartialdef %}
     </div>
 
 
 {% endblock modal_body %}
+{% block modal_footer %}
+{% endblock %}

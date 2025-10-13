@@ -22,8 +22,8 @@
   <a class="nav-link {% if request.path == "/add_client/"  %}active{% endif %}" 
     href="{% url "session_client:add_client" %}"
         hx-get="{% url "session_client:add_client" %}"
-       hx-target="#modal-wrap"
-  hx-push-url="true">Add</a>
+       hx-target="#modal-wrapper"
+  >Add</a>
 
 </nav>
 

@@ -1,4 +1,4 @@
-{% extends '_base.html' %}
+{% extends 'session_client/navs/client-nav.html' %}
 {% load django_bootstrap5 %}
 {% block background %}bg-dark{% endblock %}
 
@@ -16,7 +16,8 @@
         {% partialdef modal-body-partial inline %}
 
             <div class="card bg-dark mb-5 border border-secondary">
-                <form data-bs-theme="dark" action="{% url 'session_client:add_client' %}" method="post">
+                <form data-bs-theme="dark" action="{% url 'session_client:add_client' %}" method="post"
+                _="on htmx:afterOnLoad send closeModal to .modal end">
                 {% csrf_token %}
                     <div class="card-body">
 

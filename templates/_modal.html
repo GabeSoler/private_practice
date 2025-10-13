@@ -1,6 +1,7 @@
 <!-- Modal -->
-<div _="init call bootstrap.Modal.getOrCreateInstance(me).show()"
-class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div _="init call bootstrap.Modal.getOrCreateInstance(me).show() end
+on closeModal call bootstrap.Modal.getInstance(me).hide()"
+class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content bg-dark">
       <div class="modal-header bg-primary text-secondary">
@@ -12,7 +13,6 @@ class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModal
       </div>
       <div class="modal-footer">
         {% block modal_footer %}{% endblock %}
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
