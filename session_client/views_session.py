@@ -21,7 +21,7 @@ def index_view(request):
 # * session
 
 @login_required
-def sessions_view(request) -> HttpResponse:
+def sessions_view(request,client_pk=None,add_forward=False) -> HttpResponse:
     """show open sessions, add a new simple session, update pay status with other hx-views
     it filters sessions that are open and have already passed now() -1 hour as reference.
     """
@@ -34,12 +34,13 @@ def sessions_view(request) -> HttpResponse:
         if form_partial.is_valid():
             only_unpaid = form_partial.cleaned_data['only_unpaid']
             include_next = form_partial.cleaned_data['include_next']
-            sessions = SessionModel.objects.filter(client__user=request.user, open=True).order_by('-date',
-                                                                                                  '-start_time')
+            client = form_partial.cleaned_data['client']
             if only_unpaid:
                 sessions = sessions.filter(paid=False)
             if not include_next:
                 sessions = sessions.filter(date__lte=p.now().date())
+            if client:
+                sessions = sessions.filter(client=client)
             template_calendar = "session_client/navs/session-nav.html" + "#session-list-partial"
             context = {'sessions': sessions}
             return render(request, template_calendar, context)
@@ -48,8 +49,11 @@ def sessions_view(request) -> HttpResponse:
         context = {'form': form_partial}
         response = render(request, template_partial, context)
         return retarget(response, "session-form-partial")
-    sessions = sessions.filter(date__lte=p.now().date())
     form.fields['client'].queryset = clients_user
+    if client_pk:
+        sessions = sessions.filter(client__pk=client_pk)
+    if not add_forward:
+        sessions = sessions.filter(date__lte=p.now().date())
     context = {'sessions': sessions, 'form': form}
     return render(request, template, context)
 
@@ -144,14 +148,14 @@ def sessions_search(request):
     return render(request, template, context)
 
 @login_required()
-def session_list_modal(request, client_pk):
+def session_list_forward_modal(request, client_pk):
     now = p.now()
     template = "session_client/lists/session_list_modal.html"
     sessions = SessionModel.objects.filter(
         client=client_pk,
         client__user=request.user,
         date__gte=now).order_by('-date', '-start_time')
-    context = {'sessions': sessions}
+    context = {'sessions': sessions,"client_pk":client_pk,"forward":True}
     return render(request, template, context)
 
 @login_required()
@@ -163,7 +167,7 @@ def session_pending_list_modal(request, client_pk):
         client__user=request.user,
         date__lte=now.date(),
         open=True).order_by('-date', '-start_time')
-    context = {'sessions': sessions}
+    context = {'sessions': sessions,"client_pk":client_pk}
     return render(request, template, context)
 
 
