@@ -14,6 +14,8 @@ from django.utils import timezone
 from django.contrib import messages
 import pendulum as p
 
+from .querysets import annotate_client_list
+
 
 # Create your views here.
 
@@ -23,40 +25,7 @@ def clients_view(request):
     """show all clients"""
     template = 'session_client/lists/client_list.html'
     date_ref = p.instance(timezone.now())
-    clients = ClientModel.objects.filter(user=request.user, active=True).annotate(
-        total_payments=Sum('sessionmodel__amount_paid'),
-        total_sessions=Count('sessionmodel'),
-        month_sessions_paid=Sum('sessionmodel__amount_paid',
-                                filter=Q(sessionmodel__date__gte=date_ref.subtract(days=30).date(),
-                                         sessionmodel__date__lte=date_ref.date(),
-                                         sessionmodel__paid=True)),
-        month_sessions_expected=Sum('sessionmodel__amount_paid',
-                                    filter=Q(sessionmodel__date__gte=date_ref.subtract(days=30).date(),
-                                             sessionmodel__date__lte=date_ref.date(),
-                                             sessionmodel__attended__in=("Att", "LateC", "Missed"))),
-        pending_sort_sessions=Count('sessionmodel',
-                                    filter=Q(sessionmodel__date__lte=date_ref.date(),
-                                             sessionmodel__open=True)),
-        future_sessions_count=Count('sessionmodel',
-                                    filter=Q(sessionmodel__date__gt=date_ref.date())),
-        month_sessions_count=Count('sessionmodel',
-                                   filter=Q(sessionmodel__date__year=date_ref.year,
-                                            sessionmodel__date__month=date_ref.month, )),
-        attendance_rate=Avg(
-            Case(
-                When(sessionmodel__attended='Att', then=1),
-                When(sessionmodel__attended='', then=None),
-                default=0,
-                output_field=FloatField()
-            ),
-            filter=Q(sessionmodel__date__gte=date_ref.subtract(months=3).date())
-
-        ),
-        attendance_percentage=ExpressionWrapper(
-            F('attendance_rate') * 100,
-            output_field=FloatField()
-        )
-    ).order_by('code')
+    clients = annotate_client_list(request.user,active=True)
     context = {'clients': clients}
     return render(request, template, context)
 

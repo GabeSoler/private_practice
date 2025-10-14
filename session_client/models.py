@@ -202,7 +202,7 @@ class SessionModel(models.Model):
     brief_vector = VectorField(dimensions=3,null=True) #for vector search
     #admin info
     paid = models.BooleanField(default=False,blank=True) #check payment
-    attended = models.CharField(default='', blank=True, max_length=20, choices=ATTENDANCE) #record attendance
+    attendance = models.CharField(default='', blank=True, max_length=20, choices=ATTENDANCE) #record attendance
     amount_paid = models.IntegerField(default=0,blank=True) #record attendance
     open = models.BooleanField(default=True,blank=True)
     #manager

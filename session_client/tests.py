@@ -5,6 +5,9 @@ from room_calendar_app.tests import MetaTestSetupMixin
 from session_client.models import SessionModel, ClientModel
 import pendulum as p
 
+from session_client.querysets import annotate_client_list
+
+
 class TestClientSession(MetaTestSetupMixin,TestCase):
     def test_overlap_sessions(self):
         """ tests the first part of the system to check for overlaps """
@@ -104,3 +107,27 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response,self.session_1.client)
         self.assertContains(response,self.session_1.brief)
+
+
+    def test_annotate_client_list(self):
+        clients = annotate_client_list(self.user,active=True)
+        client = clients[0]
+        self.assertEqual(len(clients),1)
+        print("total_payments:",client.total_payments)
+        self.assertEqual(client.total_payments,840)
+        print("total_sessions:",client.total_sessions)
+        self.assertEqual(client.total_sessions,14)
+        print("month_sessions_paid:",client.month_sessions_paid)
+        self.assertEqual(client.month_sessions_paid,60)
+        print("month_sessions_expected:",client.month_sessions_expected)
+        self.assertEqual(client.month_sessions_expected,180)
+        print("pending_sort_sessions:",client.pending_sort_sessions)
+        self.assertEqual(client.pending_sort_sessions,3)
+        print("future_sessions_count:",client.future_sessions_count)
+        self.assertEqual(client.future_sessions_count,11)
+        print("month_sessions_count:",client.month_sessions_count)
+        self.assertEqual(client.month_sessions_count,14)
+        print("attendance_rate:",client.attendance_rate)
+        self.assertEqual(client.attendance_rate,4/client.month_sessions_count)
+        print("attendance_percentage:",client.attendance_percentage)
+        self.assertAlmostEqual(client.attendance_percentage,client.attendance_rate * 100)

@@ -145,12 +145,12 @@ def sessions_search(request):
 
 @login_required()
 def session_list_modal(request, client_pk):
-    start_of_month = p.now().start_of('month')
+    now = p.now()
     template = "session_client/lists/session_list_modal.html"
     sessions = SessionModel.objects.filter(
         client=client_pk,
         client__user=request.user,
-        date__gte=start_of_month).order_by('-date', '-start_time')
+        date__gte=now).order_by('-date', '-start_time')
     context = {'sessions': sessions}
     return render(request, template, context)
 
@@ -254,7 +254,7 @@ def week_view_add_session_client(request, date_ref, day, time):
         context = {'form': form}
         return render(request, 'room_calendar_app/input/session_form_client.html', context)
 
-
+@login_required()
 def add_series_view(request,client_pk,number):
     """add new session"""
     if request.htmx:
@@ -271,3 +271,11 @@ def add_series_view(request,client_pk,number):
         return render(request,template,{"client":client_after,'add_toast':True})
     return Http404("Not a expected request")
 
+@login_required()
+def sessions_hx_edit_attendance(request,session_pk,attendance):
+    session = get_object_or_404(SessionModel, pk=session_pk, client__user=request.user)
+    session.attendance = attendance
+    session.save()
+    messages.info(request, f"Session '{session.start_time.strftime('%d-%m-%y,%H:%M')}' updated")
+    template = 'session_client/navs/session-nav.html'+ "#attendance_partial"
+    return render(request, template, {"session": session})

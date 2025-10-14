@@ -5,7 +5,7 @@ from typing import Tuple,Any,List
 from django.db import models
 
 ATTENDANCE = [
-    ("Att", "Attended"),
+    ("Attended", "Attended"),
     ("LateC", "Late Cancelled"),
     ("Missed", "Missed"),
     ("Cancel", "Cancelled"),

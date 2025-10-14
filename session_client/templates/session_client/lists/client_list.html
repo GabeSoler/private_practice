@@ -4,8 +4,8 @@
 
 {% block content %}
     <div class="container bg-primary">
-        <input class="form-control" type="text" placeholder="Search" id="client-search-input"
-_="on keyup
+        <label for="client-search-input">Filter clients</label><input class="form-control" type="text" placeholder="Search" id="client-search-input"
+                                                        _="on keyup
    if the event's key is 'Escape'
      set my value to ''
      trigger keyup
@@ -53,11 +53,7 @@ _="on keyup
                                     </a>
 
                                     <!-- list month forward -->
-                                    <i class="bi bi-list-stars me-3"
-                                       hx-get="{% url 'session_client:session_list_modal' client.pk %}"
-                                       hx-target="#modal-wrapper"
-                                    ></i>
-
+                                    <span class="text-secondary small me-1" style="font-size:0.7rem">{{ client.created_at|timesince }}</span>
                                     <!-- count of open before today -->
                                     <div class="badge text-bg-info"
                                          hx-get="{% url 'session_client:session_pending_list_modal' client.pk %}"
@@ -77,12 +73,14 @@ _="on keyup
                                                 class="small">{{ client.month_sessions_expected }}</span>
                                     </div>
                                     <div class="col-auto">
-                                        <span class="fs-5">{{ client.attendance_percentage }}%</span>
+                                        <span class="fs-5">{{ client.attendance_percentage|floatformat }}%</span>
                                     </div>
                                 </div>
 
                                 <div class="row"><!--second client card row -->
                                     <div class="col-4"
+                                        hx-get="{% url 'session_client:session_list_modal' client.pk %}"
+                                        hx-target="#modal-wrapper"
                                          id="future-sessions-{{ client.pk }}">
                                         {% partialdef future_sessions_partial inline %}
                                             <i class="bi bi-fast-forward-fill"></i>
