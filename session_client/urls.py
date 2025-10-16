@@ -39,7 +39,7 @@ urlpatterns = [
          views_session.sessions_view, name='session_list'),
     path('session_list/<uuid:client_pk>/',
          views_session.sessions_view, name='session_list'),
-    path('session_list/<uuid:client_pk>/<str:add_forward>/>',
+    path('session_list/<uuid:client_pk>/<str:add_forward>/',
          views_session.sessions_view, name='session_list'),
     path('session_search/',
          views_session.sessions_search, name='session_search'),
@@ -62,7 +62,11 @@ urlpatterns = [
 
 
 # create a htmx response that sends back a modal with forms to add a quick sessin reference
-    path("hx-week_view_add_session_client/<str:date_ref>/<int:week_day>/<str:time>/",
+    path("hx-week_view_add_session_client/",
+         views_session.week_view_add_session_client, name="week_view_add_session_client"),
+    path("hx-week_view_add_session_client/<int:year>/<int:week>/<int:week_day>/<str:time>/",
+         views_session.week_view_add_session_client, name="week_view_add_session_client"),
+    path("hx-week_view_add_session_client/<int:year>/<int:week>/<int:week_day>/<str:time>/<uuid:calendar>",
          views_session.week_view_add_session_client, name="week_view_add_session_client"),
 
 

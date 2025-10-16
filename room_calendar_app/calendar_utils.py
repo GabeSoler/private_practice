@@ -2,6 +2,8 @@
 from asyncio import TaskGroup
 import time
 import pendulum as p
+
+from room_calendar_app.models import RoomCalendarModel
 from session_client.choices import time_slots
 from session_client.utils import date_plus_time
 
@@ -11,10 +13,12 @@ class CalendarRender:
    week_days, gives you the weekdays in a list,
    week_dict organises the sessions in a dictionary by time slot and day
     """
-    def __init__(self,sessions,date_ref:p.DateTime=None):
+    def __init__(self,sessions,date_ref:p.DateTime=None,room_cal=None):
         self.sessions = sessions
         self.datetime = p.instance(date_ref) if date_ref else p.today()
         self.week_ref = self.datetime.week_of_year
+        self.year_ref = self.datetime.year
+        self.room_calendar = room_cal
 
     @property
     def week_days(self)->list:

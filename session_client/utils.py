@@ -2,14 +2,12 @@ import pendulum as p
 
 
 def time_plus_duration(time_obj, duration_obj):
-    # Create a reference datetime with the time
-    reference = p.now().at(time_obj.hour, time_obj.minute, time_obj.second)
-
-    # Add the duration
-    result = reference.add(seconds=duration_obj.total_seconds())
-
-    # Return just the time
-    return result.time()
+    seconds_in_day = 24 * 60 * 60
+    total_seconds = (time_obj.hour * 3600 + time_obj.minute * 60 + time_obj.second +
+                     int(duration_obj.total_seconds())) % seconds_in_day
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return p.time(hours, minutes, seconds)
 
 def date_plus_time(date_obj, time_obj):
     return p.datetime(

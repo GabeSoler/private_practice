@@ -69,10 +69,12 @@ class SessionShortForm(forms.ModelForm):
                                                     format="%Y-%m-%d"),
                    'start_time':Select(attrs={'class':'form-select','type':'time'},
                                                     choices=time_slot_options)}
-class SessionFromOnlyClientForm(forms.ModelForm):
+class SessionFromCalendarForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['client']
+        fields = ['client','date','start_time','calendar']
+        widgets = {'date':forms.DateInput(attrs={'class': 'form-select', 'type': 'date'},
+                                                    )}
 
 class StartDateSessionForm(forms.ModelForm):
     class Meta:
@@ -81,16 +83,19 @@ class StartDateSessionForm(forms.ModelForm):
         labels = {'start_time': 'Day and Time'}
 
 class SessionSelectGroupForm(forms.Form):
+    """ for changin open sessions """
     only_unpaid = forms.BooleanField(required=False,label="Only Unpaid")
     include_next = forms.BooleanField(required=False,label="Include Next")
     client = forms.ModelChoiceField(queryset=ClientModel.objects.all(),required=False,label="Client")
 
 class SearchSessionFrom(forms.Form):
+    """ for session search by date and client """
     date_ref_start = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now().subtract(months=1))
     date_ref_end = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now())
     client = forms.ModelChoiceField(queryset=ClientModel.objects.all(),required=False)
 
 class SearchClientForm(forms.Form):
+    """ to search for clients """
     search_input = forms.CharField(max_length=20,required=True,help_text="type client code")
     active = forms.BooleanField(help_text="Search Archived",initial=True,required=False,
                                 widget=forms.CheckboxInput(attrs={'class':'form-check-input','type':"checkbox",'role':'switch'}))

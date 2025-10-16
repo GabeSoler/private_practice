@@ -51,31 +51,36 @@
                     </thead>
                     <tbody>
 
-                        {% for slot,data in calendar.week_dict.items %}
-                    <tr> <!-- row for time -->
-                            <th scope="row"
-                                style="font-size:.6rem;"
-                            >{{ slot|time:"H:i" }}</th>
+                    {% for slot,data in calendar.week_dict.items %}
+                        <tr> <!-- row for time -->
+                        <th scope="row"
+                            style="font-size:.6rem;"
+                        >{{ slot|time:"H:i" }}</th>
 
-                            {% for weekday,occurrence in data.items %}
-                                {% if occurrence.date %}
-                                    <td class="table-info"
-                                        hx-get="{% url 'session_client:session_hx_item' occurrence.id %}"
-                                        hx-target="#modal-wrapper"
-                                        style="font-size:.6rem;"
-                                        id="{{ slot }}"
-                                    >{{ occurrence.client.user}}-
-                                        {{ occurrence.start_time }}-
-                                        {{ occurrence.end_time }}</td>
-                                {% else %}
-                                    <td
-                                            style="font-size:.6rem;">
-                                        <i  hx-get="{% url 'session_client:week_view_add_session_client' calendar.week_ref weekday slot|time:"H:i" %}"
-                                        hx-target="#modal-wrapper"class="bi bi-patch-plus"></i></a>
-                                    </td>
-                                {% endif %}
-                            {% endfor %}<!-- end of for weekday -->
-                        {% endfor %}<!-- end of for slot -->
+                        {% for weekday,occurrence in data.items %}
+                            {% if occurrence.date %}
+                                <td class="table-info"
+                                    hx-get="{% url 'session_client:session_hx_item' occurrence.id %}"
+                                    hx-target="#modal-wrapper"
+                                    style="font-size:.6rem;"
+                                    id="{{ slot }}"
+                                >{{ occurrence.client.user }}-
+                                    {{ occurrence.start_time }}-
+                                    {{ occurrence.end_time }}</td>
+                            {% else %}
+                                <td
+                                        style="font-size:.6rem;">
+                                    <i
+                                            {% if calendar.room_calendar %}
+                                                hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" calendar.room_calendar.pk %}"
+                                            {% else %}
+                                                hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" %}"
+                                            {% endif %}
+                                                hx-target="#modal-wrapper" class="bi bi-patch-plus"></i></a>
+                                </td>
+                            {% endif %}
+                        {% endfor %}<!-- end of for weekday -->
+                    {% endfor %}<!-- end of for slot -->
                     </tr>
                     </tbody>
                 </table>
@@ -87,13 +92,4 @@
 
 
     </div>
-    {{ calendar.week_dict.items }}
-    <h3>sessions</h3>
-        <ul>
-    {% for session in calendar.sessions %}
-        <li>{{ session }}</li>
-        {% empty %}
-        <li>No sessions yet</li>
-    {% endfor %}
-        </ul>
 {% endblock content %}

@@ -2,7 +2,6 @@ from datetime import time, timedelta
 from django.utils.translation import gettext_lazy as _
 import pendulum as p
 from typing import Tuple,Any,List
-from django.db import models
 
 ATTENDANCE = [
     ("Attended", "Attended"),
@@ -12,10 +11,11 @@ ATTENDANCE = [
 ]
 
 CLIENT_TYPE = [
-    ("Pvt", "Private"),
-    ("Srv", "Agency"),
+    ("Private", "Private"),
+    ("RoomL", "Room-Linked"),
+    ("Agency", "Agency"),
     ("EAP", "EAP"),
-    ("Sp", "Supervisee"),
+    ("SuperV", "Supervisee"),
     ("Other", "Other"),
 ]
 

@@ -269,7 +269,11 @@ class SessionModel(models.Model):
             __bool__ = True  # noqa: F841
             return True, None
 
-    def deduce_from_client(self,start_time=None,date=None,room=None):
+    def deduce_from_client(self,
+                           date=True,
+                           start_time=True,
+                           end_time=True,
+                           calendar=True):
         """ takes a Session with a client, and deduces from it its room, and extra information about when it happens
         args:
             start_time: if you want to set a with clear datetime object. If present, it blocks the next args.
@@ -281,23 +285,18 @@ class SessionModel(models.Model):
         """
         assert self.client is not None
         client = self.client
-        if room:
-            """ deducing the appropriate room"""
-            self.calendar = room
-        else:
+        if calendar:
             if client.calendar:
                 self.calendar = client.calendar
             else:
                 base_cal,_ = RoomCalendarModel.objects.get_or_create(user=self.client.user,name="Base Room")
                 self.calendar = base_cal
+        if date:
+            self.date = client.deduce_next_datetime().date()
         if start_time:
-            self.start_time = start_time
-        elif self.start_time:
-            start = self.start_time
-        else:
-            start = client.deduce_next_datetime()
-        self.start_time = start
-        self.end_time = time_plus_duration(start, client.duration)
+            self.start_time = client.time
+        if end_time:
+            self.end_time = time_plus_duration(self.start_time, client.duration)
         return
 
 

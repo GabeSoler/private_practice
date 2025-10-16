@@ -1,4 +1,40 @@
+{% extends '_modal.html' %}
 {% load django_bootstrap5 %}
-<form>
-    {% bootstrap_form form %}
-</form>
+
+{% block modal_title %}
+    Add Session
+{% endblock modal_title %}
+
+{% block modal_body %}
+    <div id="session-form-wrapper">
+    {% partialdef session_calendar_form_partial inline %}
+        <form action="{% url 'session_client:week_view_add_session_client' %}"
+              method="post"
+              hx-post="{% url 'session_client:week_view_add_session_client' %}"
+              hx-target="#session-form-wrapper"
+        >
+            {% csrf_token %}
+
+
+            {% bootstrap_field form.client %}
+
+            <div class="row">
+                <div class="col">
+                    {% bootstrap_field form.date %}
+                </div>
+                <div class="col">
+                    {% bootstrap_field form.start_time %}
+                </div>
+
+            </div>
+            {% bootstrap_field form.calendar %}
+
+            <button type="submit"
+                    class="btn btn-outline-secondary float-end"
+            >Add Session
+            </button>
+
+        </form>
+        </div>
+    {% endpartialdef %}
+{% endblock %}

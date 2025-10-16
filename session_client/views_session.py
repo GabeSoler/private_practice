@@ -4,11 +4,13 @@ from django.urls import reverse
 
 from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse, HttpResponseRedirect
-from .forms import SessionForm, SessionSelectGroupForm, SearchSessionFrom, SessionFromOnlyClientForm
+from django.http import Http404, HttpResponse
+from .forms import SessionForm, SessionSelectGroupForm, SearchSessionFrom, SessionFromCalendarForm
 from django_htmx.http import retarget, HttpResponseClientRedirect, HttpResponseClientRefresh,trigger_client_event
 import pendulum as p
 from django.contrib import messages
+
+from .utils import time_plus_duration
 
 
 # Create your views here.
@@ -227,36 +229,49 @@ def edit_session_view(request, session_pk):
 
 @login_required
 def hx_delete_session(request, session_pk):
-    session = get_object_or_404(SessionModel, pk=session_pk, user=request.user)
+    session = get_object_or_404(SessionModel, pk=session_pk, client__user=request.user)
     if request.method == 'DELETE':
         session.delete()
         messages.info(request, f"Session '{session.start_time.strftime('%d-%m-%y,%H:%M')}' deleted")
-        return HttpResponseClientRedirect(reverse("session_client:session_list"))
+        return HttpResponseClientRefresh()
     messages.error(request, f"Session '{session.start_time.strftime('%d-%m-%y, %H:%M')}' not deleted")
     return render(request, '_toasts.html')
 
 
 @login_required
-def week_view_add_session_client(request, date_ref, day, time):
-    if request.POST:
-        form = SessionFromOnlyClientForm(data=request.POST)
+def week_view_add_session_client(request, year=None, week=None, week_day=None, time=None, calendar=None):
+    """ to create sessions from the calendar using calendar info as base """
+    template = 'room_calendar_app/input/session_form_client.html'
+    if request.method == 'POST':
+        form = SessionFromCalendarForm(data=request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
-            week_year = p.instance(date_ref).week_of_year()
-            session_reference_datetime = p.now().replace(day=day, hour=time, week=week_year)
-            instance.date = session_reference_datetime.date()
-            instance.start_time = session_reference_datetime.time()
-            instance.end_time = time_plus_duration(instance.start_time, instance.client.duration)
+            instance.deduce_from_client(date=False,
+                                        start_time=False,
+                                        calendar=False if instance.calendar else True)
             instance.save()
-            messages.info(request, f"Session added for {instance.client.name}")
-            return render(request, '_toasts.html')
-        form = SessionFromOnlyClientForm(data=request.POST)
+            messages.info(request, f"Session added for {instance.client.code}")
+            return HttpResponseClientRefresh()
+        # form errors
+        template = template + '#session_calendar_form_partial'
         context = {'form': form}
-        return render(request, 'room_calendar_app/input/session_form_client.html', context)
-    else:
-        form = SessionFromOnlyClientForm()
-        context = {'form': form}
-        return render(request, 'room_calendar_app/input/session_form_client.html', context)
+        return render(request, template, context)
+    # get response
+    assert year is not None, "Year is required for get calls"
+    assert week is not None, "Week is required for get calls"
+    assert week_day is not None, "Week_day is required for get calls"
+    assert time is not None, "Time is required for get calls"
+    iso_week = f"{year}-W{week}-{week_day}"
+    date_from_iso_week = p.parse(iso_week).date()
+    time_from_str = p.parse(time).time()
+    data = {
+        'date': date_from_iso_week,
+        'start_time': time_from_str,
+        'calendar': calendar or None,
+    }
+    form = SessionFromCalendarForm(data=data)
+    context = {'form': form}
+    return render(request, template, context)
 
 @login_required()
 def add_series_view(request,client_pk,number):

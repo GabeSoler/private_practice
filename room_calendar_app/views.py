@@ -10,8 +10,6 @@ from django_htmx.http import retarget
 from .calendar_utils import CalendarRender
 import pendulum as p
 from session_client.models import SessionModel,ClientModel
-from session_client.forms import SessionFromOnlyClientForm,StartDateSessionForm
-from django.contrib import messages
 
 def check_owner(topic_owner,request_user):
     if topic_owner != request_user:
@@ -35,17 +33,18 @@ def week_view(request):
             date = form_partial.cleaned_data['date_reference']
             assert date is not None, "date should be something"
             ref_date_partial = p.datetime(date.year,date.month,date.day)
+            room_calendar = None # To pass as info into the calendar object
+            sessions = (SessionModel.objects
+                        .filter(client__user=request.user,
+                                             date__week=ref_date_partial.week_of_year)
+                        .select_related('client','client__user'))
             if form_partial.cleaned_data['calendar']:
-                sessions = (SessionModel.objects.
-                            filter(date__week=ref_date_partial.week_of_year,
-                                                            calendar=form_partial.cleaned_data['calendar'])
-                            .select_related('client','client__user'))
-            else:
-                sessions = (SessionModel.objects
-                            .filter(client__user=request.user,
-                                                 date__week=ref_date_partial.week_of_year)
-                            .select_related('client','client__user'))
-            calendar_partial = CalendarRender(sessions=sessions,date_ref=ref_date_partial)
+                room_calendar = form_partial.cleaned_data['calendar']
+                sessions = sessions.filter(calendar=room_calendar)
+            calendar_partial = CalendarRender(sessions=sessions,
+                                              date_ref=ref_date_partial,
+                                              room_cal=room_calendar
+                                              )
             template_calendar = template + "#calendar-view-partial"
             context = {'calendar':calendar_partial}
             return render(request,template_calendar,context)
@@ -59,13 +58,10 @@ def week_view(request):
     #default GET response
     form = WeekCalendarForm()
     form.fields['calendar'].queryset = calendar_user
-    # sessions = (SessionModel.objects
-    #             .filter(client__user=request.user,
-    #                                        date__week=p.now().week_of_year)
-    #             .select_related('client','client__user'))
-    sessions = SessionModel.objects.filter(date__gt=p.now()).select_related(
-        'client', 'client__user'
-    )
+    sessions = (SessionModel.objects
+                .filter(client__user=request.user,
+                                           date__week=p.now().week_of_year)
+                .select_related('client','client__user'))
     assert sessions is not None, "no sessions found"
     calendar = CalendarRender(sessions=sessions) # today by default
     context = {'calendar':calendar,'form':form}

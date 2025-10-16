@@ -63,6 +63,7 @@ class MetaTestSetupMixin():
             user=cls.user,  # assuming you have cls.user defined
             code="Test123",
             time=p.now().at(8, 0).time(),
+            day=p.now().day,
             duration=timedelta(hours=1),
             calendar=cls.room_1,
             fee=60,

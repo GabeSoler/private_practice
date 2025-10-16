@@ -39,13 +39,14 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
     def test_deduce_from_client(self):
         """ check session can deduce room and dates from client info """
         building_session = SessionModel(client=self.client_instance)
-        self.assertFalse(building_session.start_time)
-        self.assertFalse(building_session.end_time)
+        self.assertTrue(building_session.start_time,"09:00:00") #defaults
+        self.assertTrue(building_session.end_time,"10:00:00") #defaults
         self.assertFalse(building_session.calendar)
         building_session.deduce_from_client()
-        self.assertTrue(building_session.start_time)
-        self.assertTrue(building_session.end_time)
-        self.assertTrue(building_session.calendar)
+        self.assertTrue(building_session.start_time,"08:00:00")
+        self.assertTrue(building_session.end_time,"09:00:00")
+        self.assertTrue(building_session.date,p.now().date())
+        self.assertTrue(building_session.calendar,self.room_1)
 
     def test_is_unique_session(self):
         """ tests the overlap system is picking up one above and one bellow"""
