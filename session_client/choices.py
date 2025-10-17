@@ -52,7 +52,7 @@ def time_slots()->list:
 
 
 
-def duration_times()->tuple[timedelta,timedelta,timedelta,timedelta,timedelta,timedelta]:
+def duration_times()->tuple[timedelta,timedelta,timedelta,timedelta,timedelta]:
     """ Creates a list of durations """
     return (
             timedelta(minutes=30),

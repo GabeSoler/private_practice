@@ -1,10 +1,7 @@
-from pprint import pprint
-
 from django.test import TestCase
 from .models import RoomCalendarModel, TenantModel
 from .forms import WeekCalendarForm
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 import pendulum as p
 from datetime import timedelta
 from .calendar_utils import CalendarRender
@@ -14,7 +11,7 @@ from session_client.models import ClientModel, SessionModel
 # Create your tests here.
 
 
-class MetaTestSetupMixin():
+class MetaTestSetupMixin:
     """ **Sets up the whole ecosystem of models to be able to test**
     self.user : a test user
     self.user_host a second user
@@ -89,7 +86,7 @@ class MetaTestSetupMixin():
         cls.session_2 = SessionModel.objects.create(
             client=cls.client_instance,
             date=p.now().add(weeks=1).date(),
-            start_time=p.time(8, 00, 00),  # Next week same time
+            start_time=p.time(8, 00, 00),  # Next week the same time
             end_time=p.time(9, 30),
             calendar=cls.room_2,
             brief="Session2",
@@ -103,7 +100,7 @@ class MetaTestSetupMixin():
         cls.session_overlap_1 = SessionModel.objects.create(
             client=cls.client_instance,
             date=p.now().subtract(weeks=1).date(),
-            start_time=p.time(8, 00, 00),  # Next week same time
+            start_time=p.time(8, 00, 00),  # Next week the same time
             end_time=p.time(9, 30),
             calendar=cls.room_1,
             brief="Overlap1",
@@ -117,7 +114,7 @@ class MetaTestSetupMixin():
         cls.session_overlap_2 = SessionModel.objects.create(
             client=cls.client_instance,
             date=p.now().subtract(weeks=1).date(),
-            start_time=p.time(9, 00, 00),  # Next week same time
+            start_time=p.time(9, 00, 00),  # Next week the same time
             end_time=p.time(10, 30),
             calendar=cls.room_1,
             brief="Overlap2",

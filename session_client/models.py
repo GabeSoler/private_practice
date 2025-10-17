@@ -1,6 +1,6 @@
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.core.validators import MinValueValidator,MaxValueValidator
 from django.contrib.auth import get_user_model
 import uuid
@@ -12,7 +12,7 @@ from room_calendar_app.models import RoomCalendarModel
 import pendulum as p
 from pgvector.django import VectorField
 
-from .utils import time_plus_duration,date_plus_time,range_from_date
+from .utils import time_plus_duration,range_from_date
 
 # Create your models here.
 
@@ -28,8 +28,8 @@ class ClientModel(models.Model):
     nick_name = models.CharField(default="",blank=True,null=True,max_length=20,help_text="Give it a memorable nickname")
     type = models.CharField(default='Pvt', choices=CLIENT_TYPE, max_length=20, help_text="Select a type of client") # add choices like private, service, eap, supervisee
     fee = models.IntegerField(default=50,validators=(MinValueValidator(1),MaxValueValidator(100)),help_text="Whats your agreed fee")
-    #client base info (delete after 7 yeas?)(I am thinking to only erase the fields as the admin is yours)
-    active = models.BooleanField(default=True,help_text="Move from archive to active or viceversa")
+    #client base info (delete after 7 years?) (I am thinking to only erase the fields as the admin is yours)
+    active = models.BooleanField(default=True,help_text="Move from archive to active or vice versa")
     archived_at = models.DateTimeField(blank=True,null=True)
     day = models.IntegerField(choices=WEEKDAY_SHORT,default=1,help_text="Default day of week")
     time = models.TimeField(choices=time_slot_options(),help_text='default time')
@@ -88,11 +88,11 @@ class ClientModel(models.Model):
 
 
     def add_series(self,amount:int,from_date=None, room_switch=False):
-        """ Creates a series of sessions, based on the client defaults
+        """ Creates a series of sessions, based on the client defaults,
             calculate the last session created first and move from there
         args:
             amount sets the number of series forwards
-            from_date: if you want to start from a specific date
+            from_date: if you want to start from a specific date,
             room switch tries with the base room. Handle from view to communicate with user messages
         returns:
             Bool,queryset
@@ -128,20 +128,28 @@ class ClientModel(models.Model):
             sessions = SessionModel.objects.bulk_create(session_list)
             return True,sessions
 
-    def check_series_overlap(self, start_range:p.Date, end_range:p.Date,
+    def check_series_overlap(self, start_range:p.Date,
+                             end_range:p.Date,
                              fortnight=False,
                              calendar=None,
                              range_filter=True,
                              calendar_filter=True,
                              iso_day_filter=True,
                              time_filter=True,):
-        """ checks if there are sessions on the same date range with the same times
+        """ checks if there are sessions on the same day/times in the range set
         args:
             start range: when to start
             end range: when to end
             fortnight: if skip every other week
+
+                        The filters are mostly for debugging
+
+            range_filter: if consider the range default True
+            calendar_filter: if consider the calendar default True
+            iso_day_filter: if consider the iso day default True
+            time_filter: if consider the time default True
         returns:
-            query of overlaps
+            query of overlaps, empty if none
         """
         fortnight = fortnight
         if calendar:
@@ -157,7 +165,7 @@ class ClientModel(models.Model):
         end_range_p = end_range
         assert isinstance(start_range_p, p.DateTime), "start_range should be a datetime object"
         assert isinstance(end_range_p, p.DateTime), "end_range should be a datetime object"
-        # base query sets the calendar, start and end of range, and day of week.
+        # base query sets the calendar, start and end of range, and day of a week.
 
         filters = Q()
         if range_filter:
@@ -176,7 +184,7 @@ class ClientModel(models.Model):
                      end_time__gt=end_time)) # starts before and finishes after
         possible_overlap = SessionModel.objects.filter(filters)
         if fortnight:
-            interval_exclude = range_from_date(start_range_p, end_range_p, fortnight, add_week=True)
+            interval_exclude = range_from_date(start_range_p, end_range_p, fortnight, add_week_start=True)
             exclude_range = [x.date() for x in interval_exclude.range('weeks',2)]
             possible_overlap = possible_overlap.exclude(start_date__in=exclude_range)
         return possible_overlap
@@ -186,6 +194,7 @@ class ClientModel(models.Model):
 
 class SessionManager(models.Manager):
     pass
+
 
 
 class SessionModel(models.Model):
@@ -297,9 +306,4 @@ class SessionModel(models.Model):
             self.start_time = client.time
         if end_time:
             self.end_time = time_plus_duration(self.start_time, client.duration)
-        return
-
-
-    @property
-    def week_day(self):
-        return self.start_time.day
+        return self
