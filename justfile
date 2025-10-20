@@ -40,5 +40,6 @@ r_info:
 r_stop:
     brew services stop redis
 
-
+clean:
+    uv cache clean
 

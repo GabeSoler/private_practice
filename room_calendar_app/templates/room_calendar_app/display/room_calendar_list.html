@@ -1,24 +1,44 @@
-{% extends '_base.html' %}
+{% extends 'room_calendar_app/navs/rooms-nav.html' %}
 
 {% block content %}
 
-<h2 class="text-primary">My Rooms</h2>
+    <ul class="list-group">
+        {% for calendar in calendar_tenant %}
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col">
+                        <span class="display-5"><a class="link-secondary"
+                                                   href="{% url 'room_calendar_app:room_calendar' calendar.pk %}">{{ calendar.name }}</a> | </span>
 
-<ul>
-  <li><a href="{%url 'room_calendar_app:tenant_list'%}">Tenant list</a></li>
-  <li><a href="{%url 'room_calendar_app:add_room_calendar'%}">Add new Room</a></li>
-</ul>
+                    </div>
+                    <div class="col">
 
-<ul class="list-group">
-  {% for calendar in calendar_mine%}
-    <li class="list-group-item">
-      <span>{{calendar.name}} | </span>
-      <a href="{% url 'room_calendar_app:room_calendar' calendar.pk %}"> manage </a>
-      <a href="{% url 'room_calendar_app:edit_room_calendar' calendar.pk %}"> | edit</a>
-    </li>
-    {% empty %}
-    <li class="list-group-item">There are no clients yet. </li>
-  </ul>
-  {% endfor %}
+                    </div>
 
-  {% endblock content %}
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <ul class="list-group">
+                            {% for tenant in  calendar.tenants.all %}
+                                <li class="list-group-item">
+                                    {% if tenant.user == user %}
+                                        <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
+                                           hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
+                                            hx-target="#modal-wrapper"
+                                        >- {{ tenant.name }}
+                                        (Me)</a>
+                                    {% else %}
+                                        <span>- {{ tenant.name }}</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </li>
+        {% empty %}
+            <li class="list-group-item">There are no clients yet.</li>
+            </ul>
+        {% endfor %}
+
+{% endblock content %}

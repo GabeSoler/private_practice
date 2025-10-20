@@ -1,23 +1,25 @@
-{% extends '_base.html' %}
-{% block title%}{{tenant.name}}{%endblock title%}
+{% extends '_modal.html' %}
+{% block modal_title %}Profile:{{ tenant.name }}{% endblock modal_title %}
 
-{% block page_header %}{{tenant.name}}{% endblock page_header%}
-
-{% block content %}
-<div class="card" style="width: 18rem;">
-    <div class="card-body">
-      <h5 class="card-title">{{tenant.name}}</h5>
-      <p class="card-text">Type: {{tenant.description}}</p>
-      <p class="card-text">Unique code: {{tenant.pk}}</p>
-      <p class="card-text">Give the code to a Room Calendar controller to link it</p>
-      
-      <a href="{% url 'room_calendar_app:tenant_list' %}" class="card-link">Back to tenants</a>
-      <p><a href="{%url 'room_calendar_app:edit_tenant' tenant.pk %}">
-        Edit tenant</a></p>
+{% block modal_body %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title display-4">{{ tenant.name }}</h5>
+            <p class="card-text">{{ tenant.description }}</p>
+            <p class="card-text"><span class="bg-primary border" id="code">{{ tenant.pk }}</span>
+                <button class="btn btn-outline-secondary"
+                        _="on click
+                    put innerHTML of previous <span/> into myText
+                    writeText(myText) into the navigator's clipboard
+                    end"
+                >copy
+                </button>
+            </p>
+            <p class="card-text small">Give the code to a Room Calendar controller to link it</p>
+        </div>
     </div>
-  </div>
 
 
 
 
-{%endblock content%}
+{% endblock modal_body %}

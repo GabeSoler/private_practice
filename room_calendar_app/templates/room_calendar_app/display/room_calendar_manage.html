@@ -1,0 +1,60 @@
+{% extends 'room_calendar_app/navs/rooms-nav.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+
+    <ul class="list-group">
+        {% for calendar in rooms %}
+            <li class="list-group-item">
+                <div class="row">
+                    <div class="col">
+                        <span class="display-5"><a class="link-secondary"
+                                                   href="{% url 'room_calendar_app:room_calendar' calendar.pk %}">{{ calendar.name }}</a> | </span>
+
+                    </div>
+                    <div class="col">
+
+                        {% partialdef form-partial inline %}
+                            <form class="" id="tenant-link-form">
+                                {% bootstrap_field form.tenant_id layout='horizontal' show_label='skip' %}
+                    </div>
+                <div class="col">
+                                <button
+                                        type="button"
+                                        class="btn btn-outline-secondary btn-md col-10"
+                                        hx-post={% url 'room_calendar_app:room_calendar' calendar.pk %}
+                                                hx-target="#tenant-link-form"
+                                        hx-swap="outerHTML"
+                                >
+                                    Link
+                                </button>
+                            </form>
+                        {% endpartialdef form-partial %}
+
+                </div>
+                    <div class="row">
+                        <div class="col">
+                            <ul class="list-group">
+                                {% for tenant in  calendar.tenants.all %}
+                                    <li class="list-group-item">
+                                        {% if tenant.name == "Default" %}
+                                            <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
+                                               hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
+                                               hx-target="#modal-wrapper"
+                                            >- {{ tenant.name }}
+                                                (Me)</a>
+                                        {% else %}
+                                            <p>{{ tenant.name }}</p>
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+            </li>
+        {% empty %}
+            <li class="list-group-item">There are no clients yet.</li>
+            </ul>
+        {% endfor %}
+
+{% endblock content %}

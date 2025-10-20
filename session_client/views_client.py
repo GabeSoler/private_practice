@@ -62,7 +62,7 @@ def clients_toggle_active(request, client_pk):
         occurrence.archived_at = timezone.now()
         occurrence.save()
         messages.info(request, f"Client '{occurrence.code}' toggled")
-        return HttpResponseClientRedirect(reverse("session_client:session_hx_item"), args=(client_pk,))
+        return HttpResponseClientRefresh()
     return HttpResponseClientRedirect(reverse("session_client:client_list"))
 
 

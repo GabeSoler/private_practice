@@ -4,33 +4,27 @@
 
 
 {% block hero_block %}
-    <div class="position-relative flex-container m-0" style="height: 30vh;width: 80vw;">
+    <div class="position-relative flex-container mb-5 bg-secondary" style="height: 30vh;width: 100vw;">
         <spam class="text-light display-1 position-absolute" style="font-size: 15rem;font-family:Love Light,cursive;"
         >Dreamy
         </spam>
         <span class="fs-2 text-primary position-absolute start-50 bottom-0"
         >Admin for therapists</span>
-        <image class="position-absolute start-0 bottom-0" id="bottle" src={% static 'alchemist/bubbles.svg' %} style="max-width:200px;">
+        <image class="position-absolute start-50 bottom-0" id="bottle" src={% static 'alchemist/bubbles.svg' %} style="max-width:100px;">
         </image>
     </div>
+<div class="position-relative flex-container p-4 mb-5 bg-primary" style="height: 38vh;width: 100vw;">
+
+    <h1 class="bg-primary">Clients</h1>
+    <h1 class="bg-primary">Sessions</h1>
+    <h1 class="bg-primary">Rooms</h1>
+    <p class="text-end fs-5">Therapists handle a lot of complexity</p>
+    <p class="text-end fs-5">Let's make it a bit easier to handle their admin</p>
+
+</div>
 {% endblock %}
 
 {% block content %}
-
-    <!-- Hover added -->
-
-    <div class="list-group">
-
-        <a class="list-item" href="{% url "session_client:client_list" %}">client_list</a>
-        <a class="list-item" href="{% url "session_client:session_list" %}">session_list</a>
-
-    </div>
-
-    <a class="list-item" href="{% url "session_client:add_client" %}">add_client</a> |
-    <a class="list-item" href="{% url "session_client:add_session" %}">add_session</a>
-
-    <a class="list-item" href="{% url "room_calendar_app:week_view" %}">calendar home</a>
-    </br>
 
 
 

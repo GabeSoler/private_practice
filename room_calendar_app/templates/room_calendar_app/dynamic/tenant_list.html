@@ -1,16 +1,19 @@
-{% extends '_base.html' %}
+{% extends 'room_calendar_app/navs/rooms-nav.html' %}
 
 {% block content %}
 
 <div class="card">
 <div class="card-header">
-  <h2 class="card-title">My Tenant Accounts</h2>
+  <h2 class="card-title">My Profiles</h2>
 </div>
 <div class="card-body">
   <ul class="list-group">
     {% for tenant in tenant_list %}
       <li class="list-group-item list-group-item-action list-group-item-primary">
-        <a href="{% url 'room_calendar_app:tenant' tenant.pk %}">{{tenant.name}}</a> | {{tenant.description}}
+        <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
+        hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
+           hx-target="#modal-wrapper"
+        >{{tenant.name}}</a> | {{tenant.description}}
       </li>
       {% empty %}
       <li class="list-group-item list-group-item-action list-group-item-primary">There are no tenants yet. </li>

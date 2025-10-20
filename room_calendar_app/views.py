@@ -76,10 +76,16 @@ def week_view_auxiliary(request):
 
 @login_required
 def room_calendar_listing_view(request):
-    room_calendar_mine = RoomCalendarModel.objects.filter(user=request.user)
-    room_calendar_tenant = RoomCalendarModel.objects.filter(tenants__user=request.user)
-    context = {"calendar_mine": room_calendar_mine,"calendar_tenant": room_calendar_tenant}
+    room_calendar_tenant = RoomCalendarModel.objects.filter(tenants__user=request.user).prefetch_related("tenants").distinct()
+    context = {"calendar_tenant": room_calendar_tenant}
     return render(request,"room_calendar_app/display/room_calendar_list.html",context)
+
+@login_required
+def room_calendar_manage_view(request):
+    my_rooms = RoomCalendarModel.objects.filter(user=request.user).prefetch_related("tenants")
+    form = LinkTenantForm()
+    context = {"rooms": my_rooms, "form": form}
+    return render(request,"room_calendar_app/display/room_calendar_manage.html",context)
 
 @login_required
 def room_calendar_view(request,calendar_pk):

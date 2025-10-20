@@ -1,0 +1,38 @@
+{% extends '_base.html' %}
+
+{% block local_nav %}
+<!-- Sessions Nav -->
+<nav
+  class="nav mt-0 nav-tabs bg-secondary"
+>
+  <h4 class="text-primary m-2">Rooms</h4>
+
+  <a class="nav-link {% if request.path == "/calendar/room-calendar-list/"  %}active {% endif %}"
+      href="{% url "room_calendar_app:room_calendar_list" %}" aria-current="page"
+    >Spaces</a
+  >
+  <a class="nav-link {% if request.path == "/calendar/profile-list/"  %}active {% endif %}"
+      href="{% url "room_calendar_app:tenant_list" %}"
+      >Profiles</a>
+
+    <a class="nav-link {% if request.path == "/calendar/room-calendar-manage/"  %}active {% endif %}"
+      href={% url 'room_calendar_app:room_calendar_manage' %}
+      >Manage</a>
+
+  <a class="nav-link {% if request.path == "/add_client/"  %}active{% endif %}" 
+    href="{% url "session_client:add_client" %}"
+        hx-get="{% url "session_client:add_client" %}"
+       hx-target="#modal-wrapper"
+  >Add</a>
+
+</nav>
+
+  
+  {% endblock local_nav %}
+
+  <div id="content_wrap">
+    {% block content %}
+
+    {% endblock content %}
+  </div>
+
