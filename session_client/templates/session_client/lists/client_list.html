@@ -4,30 +4,14 @@
 
 {% block content %}
     <div class="container bg-primary">
-        <label for="client-search-input">Filter clients</label><input class="form-control" type="text" placeholder="Search" id="client-search-input"
-                                                        _="on keyup
-   if the event's key is 'Escape'
-     set my value to ''
-     trigger keyup
-     halt
-   end
-   if the event's key is 'Enter'
-     call me.focus()
-     halt
-   end
-   for c in .card
-     set link to c.querySelector('a')
-     if link exists
-       set linkText to link.textContent.toLowerCase()
-       set searchValue to my value.toLowerCase()
-       if searchValue is '' or linkText contains searchValue
-         show c
-       else
-         hide c
-       end
-     end
-   end"
-        >
+        <label for="client-search-input">Filter clients</label>
+        <input class="form-control" type="text" placeholder="Search" id="client-search-input"
+                                                        _="on input
+                                                        tell <a/> in <div>.card/>
+                                                            show closest <div>.card/>
+                                                            when your textContent.toLowerCase()
+                                                            contains my value.toLowerCase()
+                                                        end">
     </div>
     <div class="card mt-3 p-2">
 
