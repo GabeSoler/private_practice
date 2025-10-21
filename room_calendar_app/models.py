@@ -26,6 +26,8 @@ class RoomCalendarModel(models.Model):
     name = models.CharField(default="",max_length=20)
     description = models.CharField(default="",max_length=200)
     tenants = models.ManyToManyField(TenantModel,related_query_name="tenants")
+    percentage = models.IntegerField(default=0)
+    cost = models.IntegerField(default=0)
     class Meta:
         verbose_name = "room calendar"
         verbose_name_plural = "room calendars"

@@ -6,7 +6,7 @@ from .models import RoomCalendarModel,TenantModel
 from .forms import RoomCalendarForm,TenantForm,LinkTenantForm,WeekCalendarForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
-from django_htmx.http import retarget
+from django_htmx.http import retarget, HttpResponseClientRefresh
 from .calendar_utils import CalendarRender
 import pendulum as p
 from session_client.models import SessionModel,ClientModel
@@ -116,7 +116,7 @@ def room_calendar_view(request,calendar_pk):
 def tenant_view(request,tenant_pk):
     tenant = get_object_or_404(TenantModel, pk=tenant_pk)
     context = {"tenant": tenant}
-    return render(request,"room_calendar_app/display/tenant.html",context)
+    return render(request, "room_calendar_app/display/tenant_modal.html", context)
 
 @login_required
 def tenant_listing_view(request):
@@ -128,10 +128,10 @@ def tenant_listing_view(request):
 @login_required
 def room_calendar_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
+    template = "room_calendar_app/input/edit_calendar_modal.html"
     if request.method !='POST':
         #no data submitted; create a blank form
         form = RoomCalendarForm()
-        action = "Add"
     else:
         #POST data submitted; process data
         form = RoomCalendarForm(data=request.POST)
@@ -141,8 +141,8 @@ def room_calendar_add_view(request):
             form.save()
             return redirect('room_calendar_app:room_calendar_list')
     #display a blank or invalid form
-    context = {'form':form,"action":action}
-    return render(request,'room_calendar_app/input/add_calendar.html',context)
+    context = {'form':form}
+    return render(request,template,context)
 
 @login_required
 def tenant_add_view(request):
@@ -166,21 +166,21 @@ def tenant_add_view(request):
 @login_required
 def room_calendar_edit_view(request,room_calendar_pk):
     """edit the occurrence repetition erasing future events"""
-    room_calendar = RoomCalendarModel.objects.get(pk=room_calendar_pk)
+    room_calendar = get_object_or_404(RoomCalendarModel,pk=room_calendar_pk,user=request.user)
+    template = "room_calendar_app/input/edit_calendar_modal.html"
     if request.method !='POST':
         action = "Edit"
         #no data submitted; create a blank form
         form = RoomCalendarForm(instance=room_calendar)
     else:
         #POST data submitted; process data
-        check_owner(room_calendar.user,request.user)
-        form = RoomCalendarForm(data=request.POST)
+        form = RoomCalendarForm(instance=room_calendar,data=request.POST)
         if form.is_valid():
             form.save()
-            return redirect('room_calendar_app:room_calendar_list')
+            return HttpResponseClientRefresh()
     #display a blank or invalid form
-    context = {'form':form,"action":action}
-    return render(request,"room_calendar_app/input/add_calendar.html",context)
+    context = {'form':form,"room":room_calendar}
+    return render(request,template,context)
 
 
 @login_required

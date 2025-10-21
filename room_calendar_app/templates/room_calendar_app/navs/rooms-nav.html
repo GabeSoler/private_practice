@@ -20,8 +20,8 @@
       >Manage</a>
 
   <a class="nav-link {% if request.path == "/add_client/"  %}active{% endif %}" 
-    href="{% url "session_client:add_client" %}"
-        hx-get="{% url "session_client:add_client" %}"
+    href="{% url "room_calendar_app:add_room_calendar" %}"
+        hx-get="{% url "room_calendar_app:add_room_calendar" %}"
        hx-target="#modal-wrapper"
   >Add</a>
 

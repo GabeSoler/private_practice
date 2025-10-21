@@ -12,7 +12,7 @@ ATTENDANCE = [
 
 CLIENT_TYPE = [
     ("Private", "Private"),
-    ("RoomL", "Room-Linked"),
+    ("RoomP", "Room Percentage"),
     ("Agency", "Agency"),
     ("EAP", "EAP"),
     ("SuperV", "Supervisee"),

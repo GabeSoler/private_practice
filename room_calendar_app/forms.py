@@ -7,10 +7,12 @@ from django.utils import timezone
 class RoomCalendarForm(forms.ModelForm):
     class Meta:
         model = RoomCalendarModel
-        fields = ("name","description")
+        fields = ("name","description","percentage","cost")
         labels = {
-        "name" : "Name of your Room Calendar",
-        "description" : "Describe your place",
+        "name" : "Name",
+        "description" : "Description",
+            "percentage" : "Percentage charge",
+            "cost" : "Cost of per session",
         }
 
 class TenantForm(forms.ModelForm):

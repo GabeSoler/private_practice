@@ -71,10 +71,9 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
                 <li class='nav-item'>
                     <a class='nav-link' href="{% url 'room_calendar_app:week_view' %}">
                         My Calendar</a></li>
-                {% if debug %}
-                        <li class='nav-item'><p class="text-dark">
-                      {% htmx_script %}</p></li>
-                        {% endif %}
+                <li class='nav-item'>
+                    <a class='nav-link' href="{% url 'room_calendar_app:week_view' %}">
+                        My Accounts</a></li>
             </ul><!-- End of links on left side of nvbar -->
             <!-- Account related links-->
             <ul class='navbar-nav ms-auto mb-2 mb-md-0'>

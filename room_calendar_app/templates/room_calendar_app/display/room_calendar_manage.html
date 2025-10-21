@@ -2,6 +2,19 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
+    {% if rooms|length > 2 %}
+        <div class="container bg-primary">
+            <label for="client-search-input">Filter clients</label>
+            <input class="form-control" type="text" placeholder="Search" id="client-search-input"
+                   _="on input
+                                                        tell <a/> in <div>.card/>
+                                                            show closest <div>.card/>
+                                                            when your textContent.toLowerCase()
+                                                            contains my value.toLowerCase()
+                                                        end">
+        </div>
+    {% endif %}
+
 
     <ul class="list-group">
         {% for calendar in rooms %}
@@ -9,7 +22,10 @@
                 <div class="row">
                     <div class="col">
                         <span class="display-5"><a class="link-secondary"
-                                                   href="{% url 'room_calendar_app:room_calendar' calendar.pk %}">{{ calendar.name }}</a> | </span>
+                                                   href="{% url 'room_calendar_app:edit_room_calendar' calendar.pk %}"
+                        hx-get="{% url 'room_calendar_app:edit_room_calendar' calendar.pk %}"
+                                                   hx-target="#modal-wrapper">
+                        {{ calendar.name }}</a> | </span>
 
                     </div>
                     <div class="col">
@@ -17,44 +33,71 @@
                         {% partialdef form-partial inline %}
                             <form class="" id="tenant-link-form">
                                 {% bootstrap_field form.tenant_id layout='horizontal' show_label='skip' %}
-                    </div>
-                <div class="col">
-                                <button
-                                        type="button"
-                                        class="btn btn-outline-secondary btn-md col-10"
-                                        hx-post={% url 'room_calendar_app:room_calendar' calendar.pk %}
-                                                hx-target="#tenant-link-form"
-                                        hx-swap="outerHTML"
-                                >
-                                    Link
-                                </button>
+                            </div>
+
+                            <div class="col">
+                            <button
+                                    type="button"
+                                    class="btn btn-outline-secondary btn-md col-10"
+                                    hx-post={% url 'room_calendar_app:room_calendar' calendar.pk %}
+                                            hx-target="#tenant-link-form"
+                                    hx-swap="outerHTML"
+                            >
+                                Link
+                            </button>
                             </form>
                         {% endpartialdef form-partial %}
-
-                </div>
-                    <div class="row">
-                        <div class="col">
-                            <ul class="list-group">
-                                {% for tenant in  calendar.tenants.all %}
-                                    <li class="list-group-item">
-                                        {% if tenant.name == "Default" %}
-                                            <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
-                                               hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
-                                               hx-target="#modal-wrapper"
-                                            >- {{ tenant.name }}
-                                                (Me)</a>
-                                        {% else %}
-                                            <p>{{ tenant.name }}</p>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
                         </div>
+
+                    <div class="row">
+
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Sessions</th>
+                                <th scope="col">Percentage</th>
+                                <th scope="col">Rent</th>
+                                <th scope="col">Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for tenant in  calendar.tenants.all %}
+                            <tr>
+                                <th scope="row">1
+                                    {% if tenant.user == user %}
+                                        <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
+                                           hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
+                                           hx-target="#modal-wrapper"
+                                        >- {{ tenant.name }}
+                                            (Me)</a>
+                                    {% else %}
+                                        <span>- {{ tenant.name }}</span>
+                                    {% endif %}
+                                </th>
+                                <td>
+                                <span class="placeholder col-1 bg-secondary"></span>
+                                </td>
+                                <td>
+                                <span class="placeholder col-1 bg-secondary"></span>
+                                </td>
+                                <td>
+                                <span class="placeholder col-1 bg-secondary"></span>
+                                </td>
+                                <td>
+                                <span class="placeholder col-1 bg-secondary"></span>
+                                </td>
+
+                            {% endfor %}
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
+
             </li>
         {% empty %}
             <li class="list-group-item">There are no clients yet.</li>
-            </ul>
         {% endfor %}
+    </ul>
 
 {% endblock content %}
