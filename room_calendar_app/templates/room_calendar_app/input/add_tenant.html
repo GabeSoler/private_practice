@@ -1,17 +1,44 @@
-{% extends '_base.html' %}
+{% extends '_modal.html' %}
 
-{%block content%}
+{% block modal_title %}
+    {% if tenant %}
+        <h2>Edit Tenant: {{ tenant.name }}</h2>
+    {% else %}
+        <h2>Add new Tenant</h2>
+    {% endif %}
+{% endblock modal_title %}
+{% block modal_body %}
 
-{% load django_bootstrap5 %}
-  <h2>{{action}} Tenant</h2>
-  <a href={% url 'room_calendar_app:tenant_list' %}>Back to Tenants</a></br>
-  <a href={% url 'room_calendar_app:add_room_calendar' %}>Add Calendar</a>
+    {% load django_bootstrap5 %}
+
+    <div class="card">
+        <div class="card-body">
+
+            {% partialdef tenant-form-partial inline %}
+                <form id="tenant-form"
+                        {% if tenant %}
+                      action="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
+                      hx-post="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
+                      hx-target="#tenant-form"
+                      hx-swap="outerHTML"
+                        {% else %}
+                      action="{% url 'room_calendar_app:add_tenant' %}"
+                      hx-post="{% url 'room_calendar_app:add_tenant' %}"
+                      hx-target="#tenant-form"
+                      hx-swap="outerHTML"
+                        {% endif %}
+                      method='post'>
+                    {% csrf_token %}
 
 
-  <form action="{% url 'room_calendar_app:add_tenant' %}" method='post'>
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% bootstrap_button button_type='submit' content='Add Tenant' %}
-  </form>
-
-  {% endblock content %}
+                    {% bootstrap_field form.name size="lg" %}
+                    {% bootstrap_field form.description size="sm" %}
+                    <button type="submit" class="btn btn-primary float-end">Submit</button>
+                    {% if tenant %}
+                        <button type="delete" class="btn btn-primary float-start">Delete</button>
+                    {% endif %}
+                </form>
+            {% endpartialdef tenant-form-partial %}
+        </div>
+    </div>
+{% endblock modal_body %}

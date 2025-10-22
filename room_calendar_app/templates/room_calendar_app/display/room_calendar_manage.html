@@ -21,17 +21,18 @@
             <li class="list-group-item">
                 <div class="row">
                     <div class="col">
-                        <span class="display-5"><a class="link-secondary"
-                                                   href="{% url 'room_calendar_app:edit_room_calendar' calendar.pk %}"
-                        hx-get="{% url 'room_calendar_app:edit_room_calendar' calendar.pk %}"
-                                                   hx-target="#modal-wrapper">
+                        <span class="display-5">
+                            <a class="link-secondary"
+                               href="{% url 'room_calendar_app:edit_room_calendar' calendar.pk %}"
+                               hx-get="{% url 'room_calendar_app:edit_room_calendar' calendar.pk %}"
+                               hx-target="#modal-wrapper">
                         {{ calendar.name }}</a> | </span>
 
                     </div>
                     <div class="col">
 
-                        {% partialdef form-partial inline %}
                             <form class="" id="tenant-link-form">
+                        {% partialdef form-partial inline %}
                                 {% bootstrap_field form.tenant_id layout='horizontal' show_label='skip' %}
                             </div>
 
@@ -39,14 +40,14 @@
                             <button
                                     type="button"
                                     class="btn btn-outline-secondary btn-md col-10"
-                                    hx-post={% url 'room_calendar_app:room_calendar' calendar.pk %}
-                                            hx-target="#tenant-link-form"
-                                    hx-swap="outerHTML"
+                                    hx-post="{% url 'room_calendar_app:room_calendar' calendar.pk %}"
+                                    hx-target="#tenant-table-body"
+
                             >
                                 Link
                             </button>
-                            </form>
                         {% endpartialdef form-partial %}
+                            </form>
                         </div>
 
                     <div class="row">
@@ -61,9 +62,11 @@
                                 <th scope="col">Total</th>
                             </tr>
                             </thead>
-                            <tbody>
+
+                            <tbody id="tenant-table-body">
+                        {% partialdef table-body-partial inline %}
                             {% for tenant in  calendar.tenants.all %}
-                            <tr>
+                                <tr>
                                 <th scope="row">1
                                     {% if tenant.user == user %}
                                         <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
@@ -76,20 +79,21 @@
                                     {% endif %}
                                 </th>
                                 <td>
-                                <span class="placeholder col-1 bg-secondary"></span>
+                                    <span class="placeholder col-1 bg-secondary"></span>
                                 </td>
                                 <td>
-                                <span class="placeholder col-1 bg-secondary"></span>
+                                    <span class="placeholder col-1 bg-secondary"></span>
                                 </td>
                                 <td>
-                                <span class="placeholder col-1 bg-secondary"></span>
+                                    <span class="placeholder col-1 bg-secondary"></span>
                                 </td>
                                 <td>
-                                <span class="placeholder col-1 bg-secondary"></span>
+                                    <span class="placeholder col-1 bg-secondary"></span>
                                 </td>
 
                             {% endfor %}
                             </tr>
+                        {% endpartialdef table-body-partial %}
                             </tbody>
                         </table>
                     </div>

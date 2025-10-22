@@ -22,6 +22,7 @@ urlpatterns = [
     path("week-view/", views.week_view, name="week_view"),#todo
 
     path("link-tenant/<uuid:calendar_pk>/", views.tenant_link_view, name="link_tenant"),
+    path("unlink-tenant/<uuid:tenant_pk>/", views.tenant_unlink_view, name="unlink_tenant"),
 
 
     path("hx-client-list/", views.week_view_auxiliary, name="client_list_auxiliary"),

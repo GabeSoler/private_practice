@@ -1,3 +1,5 @@
+from pyexpat.errors import messages
+
 from django.shortcuts import get_object_or_404, render,redirect
 from django.http import Http404
 
@@ -111,20 +113,6 @@ def room_calendar_view(request,calendar_pk):
     return render(request,template,context)
 
 
-
-@login_required
-def tenant_view(request,tenant_pk):
-    tenant = get_object_or_404(TenantModel, pk=tenant_pk)
-    context = {"tenant": tenant}
-    return render(request, "room_calendar_app/display/tenant_modal.html", context)
-
-@login_required
-def tenant_listing_view(request):
-    """View a list of user's events """
-    tenant_list = TenantModel.objects.filter(user=request.user)  #? I already changed this one
-    context = {"tenant_list":tenant_list}
-    return render(request, "room_calendar_app/dynamic/tenant_list.html", context) #todo check template
-
 @login_required
 def room_calendar_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
@@ -145,25 +133,6 @@ def room_calendar_add_view(request):
     return render(request,template,context)
 
 @login_required
-def tenant_add_view(request):
-    """ add an event, it needs to set occurrences to appear in the calendar"""
-    if request.method !='POST':
-        #no data submitted; create a blank form
-        form = TenantForm()
-        action = "Add"
-    else:
-        #POST data submitted; process data
-        form = TenantForm(data=request.POST)
-        if form.is_valid():
-            form = form.save(commit=False)
-            form.user = request.user
-            form.save()
-            return redirect('room_calendar_app:tenant_list')
-    #display a blank or invalid form
-    context = {'form':form,"action":action}
-    return render(request,'room_calendar_app/input/add_tenant.html',context)
-
-@login_required
 def room_calendar_edit_view(request,room_calendar_pk):
     """edit the occurrence repetition erasing future events"""
     room_calendar = get_object_or_404(RoomCalendarModel,pk=room_calendar_pk,user=request.user)
@@ -182,45 +151,95 @@ def room_calendar_edit_view(request,room_calendar_pk):
     context = {'form':form,"room":room_calendar}
     return render(request,template,context)
 
+@login_required
+def tenant_view(request,tenant_pk):
+    tenant = get_object_or_404(TenantModel, pk=tenant_pk)
+    context = {"tenant": tenant}
+    return render(request, "room_calendar_app/display/tenant_modal.html", context)
+
+@login_required
+def tenant_listing_view(request):
+    """View a list of user's events """
+    tenant_list = TenantModel.objects.filter(user=request.user)  #? I already changed this one
+    context = {"tenant_list":tenant_list}
+    return render(request, "room_calendar_app/dynamic/tenant_list.html", context) #todo check template
+
+@login_required
+def tenant_add_view(request):
+    """ add an event, it needs to set occurrences to appear in the calendar"""
+    if request.method !='POST':
+        #no data submitted; create a blank form
+        form = TenantForm()
+        action = "Add"
+    else:
+        #POST data submitted; process data
+        form = TenantForm(data=request.POST)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.user = request.user
+            form.save()
+            return redirect('room_calendar_app:tenant_list')
+    #display a blank or invalid form
+    context = {'form':form,"action":action}
+    return render(request,'room_calendar_app/input/add_tenant.html',context)
+
+
 
 @login_required
 def tenant_edit_view(request,tenant_pk):
     """edit the occurrence repetition erasing future events"""
     tenant = TenantModel.objects.get(pk=tenant_pk)
-    if request.method !='POST':
-        action = "Edit"
-        #no data submitted; create a blank form
-        form = TenantForm(instance=tenant)
-    else:
+    template = "room_calendar_app/input/add_tenant.html"
+    form = TenantForm(instance=tenant)
+    if request.method =='POST':
         #POST data submitted; process data
         check_owner(tenant.user,request.user)
-        form = TenantForm(data=request.POST)
+        form = TenantForm(instance=tenant,data=request.POST)
         if form.is_valid():
             form.save()
-            return redirect('room_calendar_app:tenants')
-    #display a blank or invalid form
-    context = {'form':form,"action":action}
-    return render(request,"room_calendar_app/input/add_tenant.html",context)
+            return HttpResponseClientRefresh()
+        form = TenantForm(instance=tenant)
+        template = template + '#form-partial'
+        context = {'form':form}
+        return render(request,template,context)
+    if request.htmx:
+        template = template + '#tenant-form-partial'
+    context = {'tenant':tenant,'form':form}
+    return render(request,template,context)
 
 @login_required
 def tenant_link_view(request,calendar_pk):
     """edit the occurrence repetition erasing future events"""
-    calendar = RoomCalendarModel.objects.get(pk=calendar_pk)
-    if request.method !='POST':
-        #no data submitted; create a blank form
-        form = LinkTenantForm()
-    else:
+    calendar = get_object_or_404(RoomCalendarModel,pk=calendar_pk,user=request.user)
+    template = "room_calendar_app/display/room_calendar_manage.html"
+    if request.method == "POST":
         #POST data submitted; process data
         form = LinkTenantForm(data=request.POST)
         if form.is_valid():
+            """ render the list of tenants of a calendar back to htmx"""
             tenant_uuid = form.cleaned_data["tenant_id"]
-            #calendar = RoomCalendarModel.objects.get(calendar)
             calendar.tenants.add(tenant_uuid)
-            return redirect('room_calendar_app:room_calendar_list')
-    #display a blank or invalid form
-    context = {'form':form,"calendar":calendar}
-    return render(request,"room_calendar_app/input/link_tenant.html",context)
+            template = template + "#table-body-partial"
+            return render(request,template,{"calendar":calendar})
+        response =  render(request,template,{"form":form})
+        return retarget(response,"tenant-link-form")
+    else:
+        return Http404
 
+
+def tenant_unlink_view(request,tenant_pk):
+    """edit the occurrence repetition erasing future events"""
+    calendar = get_object_or_404(RoomCalendarModel,tenants__pk=tenant_pk,user=request.user)
+    template = "room_calendar_app/display/room_calendar_manage.html"
+    if request.method == "PATCH":
+        #POST data submitted; process data
+        """ render the list of tenants of a calendar back to htmx"""
+        calendar.tenants.remove(tenant_pk)
+        template = template + "#table-body-partial"
+        return render(request,template,{"calendar":calendar})
+    messages.warning(request,"Error when updating tenant")
+    response = render(request)
+    return retarget(response,"modal-wrapper")
 
 
 

@@ -4,7 +4,11 @@
 
 <div class="card">
 <div class="card-header">
-  <h2 class="card-title">My Profiles</h2>
+  <h2 class="card-title">My Profiles
+      <i class="bi bi-plus-circle-fill"
+         hx-get="{% url 'room_calendar_app:add_tenant' %}"
+         hx-target="#modal-wrapper"
+      ></i></h2>
 </div>
 <div class="card-body">
   <ul class="list-group">
@@ -20,11 +24,7 @@
       {% endfor %}
     </ul>
 </div>
-<div class="card-footer">
-  <a class="card-link" href="{%url 'room_calendar_app:add_tenant'%}">Add new tenancy account</a>
-  <a class="card-link" href="{%url 'room_calendar_app:week_view'%}">back to calendar home</a>
-</div>
-  
+
 
 </div>
 

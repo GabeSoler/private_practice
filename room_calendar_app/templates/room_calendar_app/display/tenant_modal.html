@@ -1,21 +1,28 @@
 {% extends '_modal.html' %}
-{% block modal_title %}Profile:{{ tenant.name }}{% endblock modal_title %}
+{% block modal_title %}
+    Profile:{{ tenant.name }}<small> <i class="bi bi-pencil-square small"
+                                hx-get="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
+                                hx-target="#modalBody"></i></small>
+    </i>
+{% endblock modal_title %}
 
 {% block modal_body %}
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title display-4">{{ tenant.name }}</h5>
-            <p class="card-text">{{ tenant.description }}</p>
-            <p class="card-text"><span class="bg-primary border" id="code">{{ tenant.pk }}</span>
-                <button class="btn btn-outline-secondary"
-                        _="on click
+            {% partialdef tenant-partial inline %}
+                <h5 class="card-title display-4">{{ tenant.name }}</h5>
+                <p class="card-text">{{ tenant.description }}</p>
+                <p class="card-text"><span class="bg-primary border" id="code">{{ tenant.pk }}</span>
+                    <button class="btn btn-outline-secondary"
+                            _="on click
                     put innerHTML of previous <span/> into myText
                     writeText(myText) into the navigator's clipboard
                     end"
-                >copy
-                </button>
-            </p>
-            <p class="card-text small">Give the code to a Room Calendar controller to link it</p>
+                    >copy
+                    </button>
+                </p>
+                <p class="card-text small">Give the code to a Room Calendar controller to link it</p>
+            {% endpartialdef tenant-partial %}
         </div>
     </div>
 

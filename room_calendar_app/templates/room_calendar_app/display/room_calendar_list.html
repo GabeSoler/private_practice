@@ -34,7 +34,7 @@
                     <div class="col">
                         <ul class="list-group">
                             {% for tenant in  calendar.tenants.all %}
-                                <li class="list-group-item">
+                                <li class="list-group-item py-0">
                                     {% if tenant.user == user %}
                                         <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
                                            hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
