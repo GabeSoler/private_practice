@@ -162,7 +162,7 @@ def tenant_listing_view(request):
     """View a list of user's events """
     tenant_list = TenantModel.objects.filter(user=request.user)  #? I already changed this one
     context = {"tenant_list":tenant_list}
-    return render(request, "room_calendar_app/dynamic/tenant_list.html", context) #todo check template
+    return render(request, "room_calendar_app/dynamic/tenant_list.html", context)
 
 @login_required
 def tenant_add_view(request):
