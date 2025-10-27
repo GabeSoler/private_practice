@@ -8,12 +8,12 @@ from django.forms.widgets import DateInput,Select
 class ClientForm(forms.ModelForm):
     class Meta:
         model = ClientModel
-        fields = ['code','nick_name','type','fee', 'calendar', 'day','time', 'duration','series', 'active']
+        fields = ['code','nick_name','type','fee', 'tenant', 'day','time', 'duration','series', 'active']
         labels = {'code':'Code',                  
                   'type':'Type',
                   'fee':'Fee',
                   'nick_name':'Nickname',
-                  'calendar': 'Room',
+                  'tenant': 'Profile',
                   'day':'Default Day',
                   'duration':'Duration',
                   'active':'Active',
@@ -91,7 +91,7 @@ class SessionSelectGroupForm(forms.Form):
 class SearchSessionFrom(forms.Form):
     """ for session search by date and client """
     date_ref_start = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now().subtract(months=1))
-    date_ref_end = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now())
+    date_ref_end = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now().add(weeks=1))
     client = forms.ModelChoiceField(queryset=ClientModel.objects.all(),required=False)
 
 class SearchClientForm(forms.Form):

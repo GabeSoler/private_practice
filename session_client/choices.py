@@ -5,7 +5,7 @@ from typing import Tuple,Any,List
 
 ATTENDANCE = [
     ("Attended", "Attended"),
-    ("LateC", "Late Cancelled"),
+    ("LateC", "Late Cancel"),
     ("Missed", "Missed"),
     ("Cancel", "Cancelled"),
 ]

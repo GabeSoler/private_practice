@@ -5,6 +5,7 @@ import pendulum as p
 
 
 def create_sessions(day=0):
+    """ creates a full day of sessions """
     today = p.now().add(days=day)
     sessions = []
     user,_ = get_user_model().objects.get_or_create(username="Gabe")

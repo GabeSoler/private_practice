@@ -1,16 +1,14 @@
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse
 
 from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionFrom, SessionFromCalendarForm
-from django_htmx.http import retarget, HttpResponseClientRedirect, HttpResponseClientRefresh,trigger_client_event
+from django_htmx.http import retarget, HttpResponseClientRefresh
 import pendulum as p
 from django.contrib import messages
 
-from .utils import time_plus_duration
 
 
 # Create your views here.
@@ -28,9 +26,8 @@ def sessions_view(request,client_pk=None,add_forward=False) -> HttpResponse:
     it filters sessions that are open and have already passed now() -1 hour as reference.
     """
     sessions = SessionModel.objects.filter(client__user=request.user, open=True).order_by('-date', '-start_time')
-    clients_user = ClientModel.objects.filter(user=request.user) or None  # for select
+    clients_user = ClientModel.objects.filter(user=request.user) or ClientModel.objects.none()  # for select
     template = 'session_client/lists/session_open_list.html'
-    form = SessionSelectGroupForm()
     if request.htmx:
         form_partial = SessionSelectGroupForm(data=request.POST)
         if form_partial.is_valid():
@@ -44,6 +41,7 @@ def sessions_view(request,client_pk=None,add_forward=False) -> HttpResponse:
             if client:
                 sessions = sessions.filter(client=client)
             template_calendar = "session_client/navs/session-nav.html" + "#session-list-partial"
+            form_partial.fields['client'].queryset = clients_user
             context = {'sessions': sessions}
             return render(request, template_calendar, context)
         # render form errors
@@ -51,6 +49,7 @@ def sessions_view(request,client_pk=None,add_forward=False) -> HttpResponse:
         context = {'form': form_partial}
         response = render(request, template_partial, context)
         return retarget(response, "session-form-partial")
+    form = SessionSelectGroupForm()
     form.fields['client'].queryset = clients_user
     if client_pk:
         sessions = sessions.filter(client__pk=client_pk)
@@ -107,7 +106,7 @@ def session_hx_item(request, session_pk):
 def sessions_search(request):
     """ Search sessions by date and client """
     template = "session_client/lists/session_date_list.html"
-    clients_user = ClientModel.objects.filter(user=request.user) or None  # for select
+    clients_user = ClientModel.objects.filter(user=request.user) or ClientModel.objects.none()  # for select
     if request.POST:
         form_partial = SearchSessionFrom(data=request.POST)
         if form_partial.is_valid():
@@ -221,8 +220,7 @@ def edit_session_view(request, session_pk):
             messages.info(request, f"Session '{session.brief}' updated")
             return HttpResponseClientRefresh()
         else:
-            messages.error(request, form.errors)
-            return render(request, template, {"form": form, "session": session})
+            return render(request, template, {'form': form})
     context = {'session': session, 'form': form}
     return render(request, template, context)
 

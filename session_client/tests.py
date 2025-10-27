@@ -132,3 +132,25 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
         self.assertEqual(client.attendance_rate,4/client.month_sessions_count)
         print("attendance_percentage:",client.attendance_percentage)
         self.assertAlmostEqual(client.attendance_percentage,client.attendance_rate * 100)
+
+
+    def test_client_add_view(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('session_client:add_client'),headers=self.htmx_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,"<form")
+        self.assertContains(response,"<form")
+        self.assertContains(response,self.room_1.name) #Blue
+        self.assertContains(response,self.room_2.name) #Green
+        self.assertContains(response,self.room_default.name) #Base Room
+        self.client.logout()
+        self.client.force_login(self.user_host)
+        response = self.client.get(reverse('session_client:add_client'),headers=self.htmx_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,"<form")
+        self.assertContains(response,"<form")
+        self.assertNotContains(response,self.room_1.name) #Blue
+        self.assertNotContains(response,self.room_2.name) #Green
+        self.assertContains(response,self.room_default.name) #Base Room always needs to be there
+
+

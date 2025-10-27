@@ -38,6 +38,16 @@ class MetaTestSetupMixin:
             name="Testing",
             description="Testing tenancy")
         cls.tenant.save()
+
+        cls.tenant_host = TenantModel(
+            user=cls.user_host,
+            name="T Host",
+            description="Testing tenancy")
+        cls.tenant.save()
+
+        cls.tenant_default,_ = TenantModel.objects.get_or_create(user=cls.user,
+                                                     name="Default")
+
         cls.room_1 = RoomCalendarModel(
             user=cls.user_host,
             name="Blue",
@@ -53,7 +63,9 @@ class MetaTestSetupMixin:
         cls.room_2.tenants.add(cls.tenant)
         cls.room_2.save()
         cls.room_default = RoomCalendarModel.objects.create(user=cls.user, name="Base Room",
-                                                            description="base room user")
+                                                            description="base room user",
+                                                            )
+        cls.room_default.tenants.add(cls.tenant_default)
 
         # Create a client (equivalent to event)
         cls.client_instance = ClientModel.objects.create(
@@ -202,10 +214,3 @@ class CalendarOccurrenceTest(MetaTestSetupMixin, TestCase):
         self.assertEqual(room_1.tenants.count(), 1)
 
 
-class TenantCalendarTest(TestCase):
-    # Calendar create
-
-    # Tenant Create
-
-    # Tenant by calendar
-    ...

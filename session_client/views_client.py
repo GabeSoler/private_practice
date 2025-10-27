@@ -1,18 +1,14 @@
-from email.policy import default
-
-from django.db.models import Q, Avg, Case, When, FloatField, ExpressionWrapper, F
-from django.db.models.aggregates import Count, Sum
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
+from room_calendar_app.models import RoomCalendarModel
 from .models import ClientModel
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from .forms import ClientForm, SearchClientForm, ClientFormShort
 from django_htmx.http import HttpResponseClientRedirect, HttpResponseClientRefresh
 from django.utils import timezone
 from django.contrib import messages
-import pendulum as p
 
 from .querysets import annotate_client_list
 
@@ -24,7 +20,6 @@ from .querysets import annotate_client_list
 def clients_view(request):
     """show all clients"""
     template = 'session_client/lists/client_list.html'
-    date_ref = p.instance(timezone.now())
     clients = annotate_client_list(request.user,active=True)
     context = {'clients': clients}
     return render(request, template, context)
@@ -100,15 +95,15 @@ def client_archived_view(request):
 def add_client_view(request):
     """add a new client"""
     if request.htmx:
+        """ sets template to a modal or full page """
         template = 'session_client/edit/edit_client_modal.html'
         if request.htmx.target == "modal-body-wrapper":
             template = template + "#modal-body-partial"
     else:
         template = 'session_client/edit/edit_client.html'
-    if request.method != 'POST':
-        # no data submitted; create a blank form
-        form = ClientForm()
-    else:
+    form = ClientForm()
+    form.fields['calendar'].queryset = RoomCalendarModel.objects.filter(tenants__user=request.user).distinct()
+    if request.method == 'POST':
         # POST data submitted; process data
         form = ClientForm(data=request.POST)
         if form.is_valid():
@@ -116,7 +111,7 @@ def add_client_view(request):
             instance.user = request.user
             instance.save()
             if request.htmx:
-                return HttpResponseClientRedirect(request.htmx.current_url)
+                return HttpResponseClientRefresh()
             return redirect('session_client:client_list')
     # display a blank or invalid form
     context = {'form': form}
@@ -129,18 +124,19 @@ def edit_client_view(request, client_pk):
     client = get_object_or_404(ClientModel,
                                pk=client_pk,
                                user=request.user)
+    form = ClientForm(instance=client)
+    form.fields['calendar'].queryset = RoomCalendarModel.objects.filter(tenants__user=request.user).distinct()
     if request.htmx:
+        """ sets template to a modal or full page """
         template = 'session_client/edit/edit_client_modal.html'
         if request.htmx.target == "modal-body-wrapper":
             template = template + "#modal-body-partial"
     else:
         template = 'session_client/edit/edit_client.html'
-    if request.method != 'POST':
-        # initial request;pre-fill form with the current entry
-        form = ClientForm(instance=client)
-    else:
+
+    if request.method == 'POST':
         # POST data submitted; process data
-        form = ClientForm(instance=client, data=request.POST)
+        form = ClientForm(data=request.POST)
         if form.is_valid():
             form.save()
             messages.info(request, f"Client '{client.code}' updated")

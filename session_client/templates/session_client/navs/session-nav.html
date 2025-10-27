@@ -72,40 +72,46 @@
                                     <td>{{ session.client }}</td>
                                     {% partialdef attendance_partial inline %}
                                         <td>
-                                            {{ session.get_attendance_display|default:"--" }}
-                                            <div class="dropdown d-inline">
-                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+
+                                            <div class="dropup-center d-inline">
+                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                                                        type="button"
                                                         data-bs-toggle="dropdown" aria-expanded="false">
+                                                    {{ session.get_attendance_display|default:"--" }}
                                                 </button>
                                                 <ul class="dropdown-menu">
                                                     <li>
                                                         <a class="dropdown-item small
                                                         {% if 'Attended' == session.attendance %}
-                                                    disabled" aria-disabled="true"{% else %}"{% endif %}
+                                                        disabled{% endif %}"
                                                         hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'Attended' %}"
                                                         hx-target="closest <td/>"
-                                                        >Attended<i class="bi bi-play-fill"></i></a></li>
+                                                        >Attended</a>
+                                                    </li>
                                                     <li>
-                                                        <a class="dropdown-item
+                                                        <a class="dropdown-item small
                                                         {% if 'LateC' == session.attendance %}
-                                                    disabled" aria-disabled="true"{% else %}"{% endif %}
+                                                        disabled{% endif %}"
                                                         hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'LateC' %}"
                                                         hx-target="closest <td/>"
-                                                        >Late Cancelled<i class="bi bi-play-fill"></i></a></li>
+                                                        >Late Cancelled</a>
+                                                    </li>
                                                     <li>
                                                         <a class="dropdown-item small
                                                         {% if 'Missed' == session.attendance %}
-                                                    disabled" aria-disabled="true"{% else %}"{% endif %}
+                                                        disabled{% endif %}"
                                                         hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'Missed' %}"
                                                         hx-target="closest <td/>"
-                                                        >Missed<i class="bi bi-play-fill"></i></a></li>
+                                                        >Missed</a>
+                                                    </li>
                                                     <li>
                                                         <a class="dropdown-item small
                                                         {% if 'Cancel' == session.attendance %}
-                                                    disabled" aria-disabled="true"{% else %}"{% endif %}
+                                                        disabled{% endif %}"
                                                         hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'Cancel' %}"
                                                         hx-target="closest <td/>"
-                                                        >Cancelled<i class="bi bi-play-fill"></i></a></li>
+                                                        >Cancelled</a>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </td>

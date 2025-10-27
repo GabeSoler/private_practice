@@ -1,6 +1,6 @@
 
 from django.db import models
-from django.db.models import Q, QuerySet
+from django.db.models import Q
 from django.core.validators import MinValueValidator,MaxValueValidator
 from django.contrib.auth import get_user_model
 import uuid
@@ -8,9 +8,8 @@ import uuid
 from django.urls import reverse
 
 from .choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices,time_slot_options,SERIES_CHOICE
-from room_calendar_app.models import RoomCalendarModel
+from room_calendar_app.models import RoomCalendarModel, TenantModel
 import pendulum as p
-from pgvector.django import VectorField
 
 from .utils import time_plus_duration,range_from_date
 
@@ -22,7 +21,7 @@ class ClientModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
-    calendar = models.ForeignKey(RoomCalendarModel, on_delete=models.SET_NULL, blank=True, null=True)
+    tenant = models.ForeignKey(TenantModel, on_delete=models.SET_NULL, blank=True, null=True)
     #Client labels
     code = models.CharField(blank=False,max_length=10,help_text="Add an Identifier code") #Create a code instead of a name
     nick_name = models.CharField(default="",blank=True,null=True,max_length=20,help_text="Give it a memorable nickname")
@@ -105,9 +104,9 @@ class ClientModel(models.Model):
         session_list = []
         step = self.series or 1
         if room_switch:
-            room_cal = RoomCalendarModel.objects.get(user=self.user,name="Base Room")
+            profile = TenantModel.objects.get(user=self.user,name="Default")
         else:
-            room_cal = self.calendar
+            profile = self.tenant
         for date in interval.range('weeks',step):
             """ creates a list of sessions to then bulk create"""
             session_instance = SessionModel(
@@ -115,7 +114,7 @@ class ClientModel(models.Model):
                 date=date.date(),
                 start_time=self.time,
                 end_time=time_plus_duration(self.time, self.duration),
-                calendar=room_cal,
+                tenant=profile,
                 brief="Series"
             )
 
@@ -154,8 +153,8 @@ class ClientModel(models.Model):
         fortnight = fortnight
         if calendar:
             calendar_ref = calendar
-        elif self.calendar:
-            calendar_ref = self.calendar
+        elif self.tenant:
+            calendar_ref = self.tenant.calendar
         else:
             calendar_ref = RoomCalendarModel.objects.get(user=self.user,name="Base Room")
         assert calendar_ref is not None, "calendar field is necessary"
@@ -208,7 +207,6 @@ class SessionModel(models.Model):
     end_time = models.TimeField(default="10:00:00",blank=True,editable=True, help_text="End of session")
    #Session notes and vector (delete after 7 years?)
     brief = models.CharField(default='',blank=True,max_length=250,help_text="250 characters note") #short description
-    brief_vector = VectorField(dimensions=3,null=True) #for vector search
     #admin info
     paid = models.BooleanField(default=False,blank=True) #check payment
     attendance = models.CharField(default='', blank=True, max_length=20, choices=ATTENDANCE) #record attendance
@@ -295,8 +293,8 @@ class SessionModel(models.Model):
         assert self.client is not None
         client = self.client
         if calendar:
-            if client.calendar:
-                self.calendar = client.calendar
+            if client.tenant:
+                self.calendar = client.tenant.calendar
             else:
                 base_cal,_ = RoomCalendarModel.objects.get_or_create(user=self.client.user,name="Base Room")
                 self.calendar = base_cal

@@ -2,7 +2,9 @@
 {% block modal_title %}
     Profile:{{ tenant.name }}<small> <i class="bi bi-pencil-square small"
                                 hx-get="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
-                                hx-target="#modalBody"></i></small>
+                                hx-target="#modalBody"
+       _="on htmx:afterOnLoad remove me"
+></i></small>
     </i>
 {% endblock modal_title %}
 

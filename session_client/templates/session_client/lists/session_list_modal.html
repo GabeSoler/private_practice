@@ -3,9 +3,9 @@
 {% block modal_title %}
 <div class="fs-3">Client Sessions <a class="link-secondary ms-2" style="font-size:1rem;"
 {% if forward %}
-                                     href="{% url 'session_client:session_list' client_pk "add_forward" %}"
+                                     href="{% url 'session_client:session_list_with_client_and_forward' client_pk "add_forward" %}"
 {% else %}
-                                     href="{% url 'session_client:session_list' client_pk %}"
+                                     href="{% url 'session_client:session_list_with_client' client_pk %}"
 {% endif %}
 ><i class="bi bi-arrows-angle-expand"></i></a></div>
 {% endblock %}

@@ -5,14 +5,17 @@ from django.db.models.signals import post_save
 
 @receiver(post_save, sender=get_user_model())
 def signal_setup_room_calendar(sender, **kwargs):
-    created = True
-    while created is True:
-        base_tenant,created = TenantModel.objects.get_or_create(user=kwargs['instance'],name="Default")
-        base_room,created = RoomCalendarModel.objects.get_or_create(user=kwargs['instance'],
+    created:bool = True # if created is false in one of the bellow stops the process as it already happened
+    while created:
+        user = kwargs['instance']
+        base_room,created = RoomCalendarModel.objects.get_or_create(user=user,
                                                 name="Base Room",
                                                 description="Default room calendar"
                                                 )
-        base_room.tenants.add(base_tenant)
+        base_tenant,created = TenantModel.objects.get_or_create(user=user,
+                                                                name=user.username,
+                                                                display_name=user.username,
+                                                                calendar=base_room)
 
 
 
