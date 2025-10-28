@@ -26,6 +26,10 @@ static:
 manage *arg:
     uv run python3 manage.py {{arg}}
 
+shell:
+    uv run python3 manage.py shell -i ipython
+
+
 # alias for full migrations to 'just db'
 alias db := makemigrations
 
