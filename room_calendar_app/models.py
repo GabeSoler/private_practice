@@ -31,7 +31,7 @@ class TenantModel(models.Model):
     name = models.CharField(max_length=20)
     display_name = models.CharField(max_length=20)
     description = models.CharField(max_length=200,blank=True)
-    calendar = models.ForeignKey(RoomCalendarModel,on_delete=models.CASCADE)
+    calendar = models.ForeignKey(RoomCalendarModel,on_delete=models.SET_NULL,null=True)
 
     class Meta:
         verbose_name = "tenant"

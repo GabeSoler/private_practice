@@ -154,3 +154,36 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
         self.assertContains(response,self.room_default.name) #Base Room always needs to be there
 
 
+    def test_render_client_views(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('session_client:client_list'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:add_client'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:client_archived'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:client_search'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:edit_client',args=[self.client_instance.pk,]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:client_hx_item',args=[self.client_instance.pk,]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:session_list_with_client',args=[self.client_instance.pk,]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_render_session_views(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('session_client:session_view',args=[self.session_1.pk,]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:session_list_with_client',args=[self.client_instance.pk,]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:session_list'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:session_hx_item',args=[self.session_1.pk,]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:session_search'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:edit_session',args=[self.session_1.pk,]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('session_client:session_pending_list_modal',args=[self.client_instance.pk,]))
+        self.assertEqual(response.status_code, 200)

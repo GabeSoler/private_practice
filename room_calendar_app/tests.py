@@ -1,4 +1,6 @@
 from django.test import TestCase
+from django.urls import reverse
+
 from .models import RoomCalendarModel, TenantModel
 from .forms import WeekCalendarForm
 from django.contrib.auth import get_user_model
@@ -33,48 +35,49 @@ class MetaTestSetupMixin:
         cls.user.save()
         cls.user_host = get_user_model().objects.create(username="John", email="test@john.cl")
         cls.user_host.save()
-        cls.tenant = TenantModel(
-            user=cls.user,
-            name="Testing",
-            description="Testing tenancy")
-        cls.tenant.save()
-
-        cls.tenant_host = TenantModel(
-            user=cls.user_host,
-            name="T Host",
-            description="Testing tenancy")
-        cls.tenant.save()
-
-        cls.tenant_default,_ = TenantModel.objects.get_or_create(user=cls.user,
-                                                     name="Default")
-
         cls.room_1 = RoomCalendarModel(
             user=cls.user_host,
             name="Blue",
             description="Testing Blue Room",
         )
-        cls.room_1.tenants.add(cls.tenant)
         cls.room_1.save()
         cls.room_2 = RoomCalendarModel(
             user=cls.user_host,
             name="Green",
             description="Testing Green Room",
         )
-        cls.room_2.tenants.add(cls.tenant)
         cls.room_2.save()
         cls.room_default = RoomCalendarModel.objects.create(user=cls.user, name="Base Room",
                                                             description="base room user",
                                                             )
-        cls.room_default.tenants.add(cls.tenant_default)
+        cls.tenant = TenantModel(
+            user=cls.user,
+            name="Testing",
+            display_name="test",
+            description="Testing tenancy",
+            calendar=cls.room_1)
+        cls.tenant.save()
+
+        cls.tenant_host = TenantModel(
+            user=cls.user_host,
+            name="T Host",
+            display_name="test",
+            description="Testing tenancy",
+            calendar=cls.room_2)
+        cls.tenant.save()
+
+        cls.tenant_default,_ = TenantModel.objects.get_or_create(user=cls.user,
+                                                     name="Default")
+
 
         # Create a client (equivalent to event)
         cls.client_instance = ClientModel.objects.create(
-            user=cls.user,  # assuming you have cls.user defined
+            user=cls.user,
             code="Test123",
             time=p.now().at(8, 0).time(),
             day=p.now().day,
             duration=timedelta(hours=1),
-            calendar=cls.room_1,
+            tenant=cls.tenant,
             fee=60,
 
         )
@@ -214,3 +217,25 @@ class CalendarOccurrenceTest(MetaTestSetupMixin, TestCase):
         self.assertEqual(room_1.tenants.count(), 1)
 
 
+    def test_render_views(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('room_calendar_app:week_view'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('room_calendar_app:room_calendar',args=[self.room_default.pk,]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('room_calendar_app:room_calendar_list'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('room_calendar_app:room_calendar_manage'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('room_calendar_app:tenant',args=[self.tenant.pk,]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('room_calendar_app:tenant_list'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('room_calendar_app:add_room_calendar'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('room_calendar_app:add_tenant'))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('room_calendar_app:edit_room_calendar',args=[self.room_default.pk,]))
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(reverse('room_calendar_app:edit_tenant',args=[self.tenant.pk,]))
+        self.assertEqual(response.status_code, 200)

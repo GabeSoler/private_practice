@@ -155,7 +155,7 @@ def session_list_forward_modal(request, client_pk):
     sessions = SessionModel.objects.filter(
         client=client_pk,
         client__user=request.user,
-        date__gte=now).order_by('-date', '-start_time')
+        date__gt=now).order_by('-date', '-start_time')
     context = {'sessions': sessions,"client_pk":client_pk,"forward":True}
     return render(request, template, context)
 

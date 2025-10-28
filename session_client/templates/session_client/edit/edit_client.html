@@ -94,7 +94,7 @@
                         {% if client %}
                             <button
                                     hx-confirm="Confirm client archive"
-                                    hx-delete="{% url 'session_client:clients_edit' client.pk %}"
+                                    hx-delete="{% url 'session_client:edit_client' client.pk %}"
                                     class="btn btn-outline-danger start-0">Delete
                             </button>
                         {% endif %}

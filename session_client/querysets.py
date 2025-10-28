@@ -9,7 +9,7 @@ def annotate_client_list(user, active=True):
     Returns a queryset of clients with common annotations.
     The queryset is lazy and won't hit the database until evaluated.
     """
-    date_ref = p.instance(timezone.now())
+    date_ref = p.now()
     three_months_ago = date_ref.subtract(months=3).date()
 
     return ClientModel.objects.filter(

@@ -86,7 +86,7 @@ class ClientModel(models.Model):
 
 
 
-    def add_series(self,amount:int,from_date=None, room_switch=False):
+    def add_series(self,amount:int,from_date=None):
         """ Creates a series of sessions, based on the client defaults,
             calculate the last session created first and move from there
         args:
@@ -103,10 +103,10 @@ class ClientModel(models.Model):
         interval = p.interval(next_date,next_date.add(weeks=amount-1))
         session_list = []
         step = self.series or 1
-        if room_switch:
-            profile = TenantModel.objects.get(user=self.user,name="Default")
+        if self.tenant:
+            tenant = self.tenant
         else:
-            profile = self.tenant
+            tenant,_ = TenantModel.objects.get_or_create(user=self.user,name=self.user.username,display_name=self.user.username)
         for date in interval.range('weeks',step):
             """ creates a list of sessions to then bulk create"""
             session_instance = SessionModel(
@@ -114,7 +114,7 @@ class ClientModel(models.Model):
                 date=date.date(),
                 start_time=self.time,
                 end_time=time_plus_duration(self.time, self.duration),
-                tenant=profile,
+                calendar=tenant.calendar,
                 brief="Series"
             )
 

@@ -25,7 +25,7 @@ def week_view(request):
         You can change the week to display or select a specific room calendar
        """
     template = "room_calendar_app/dynamic/week_view.html"
-    calendar_user = RoomCalendarModel.objects.filter(tenants__user=request.user) #filter room_calendars options
+    calendar_user = RoomCalendarModel.objects.filter(tenantmodel__user=request.user) #filter room_calendars options
     assert calendar_user is not None, "no room_calendars found"
     if request.POST:
         form_partial = WeekCalendarForm(data=request.POST)
@@ -78,13 +78,13 @@ def week_view_auxiliary(request):
 
 @login_required
 def room_calendar_listing_view(request):
-    room_calendar_tenant = RoomCalendarModel.objects.filter(tenants__user=request.user).prefetch_related("tenants").distinct()
+    room_calendar_tenant = RoomCalendarModel.objects.filter(tenantmodel__user=request.user).prefetch_related("tenantmodel_set").distinct()
     context = {"calendar_tenant": room_calendar_tenant}
     return render(request,"room_calendar_app/display/room_calendar_list.html",context)
 
 @login_required
 def room_calendar_manage_view(request):
-    my_rooms = RoomCalendarModel.objects.filter(user=request.user).prefetch_related("tenants")
+    my_rooms = RoomCalendarModel.objects.filter(user=request.user).prefetch_related("tenantmodel_set")
     form = LinkTenantForm()
     context = {"rooms": my_rooms, "form": form}
     return render(request,"room_calendar_app/display/room_calendar_manage.html",context)
@@ -92,7 +92,7 @@ def room_calendar_manage_view(request):
 @login_required
 def room_calendar_view(request,calendar_pk):
     calendar = get_object_or_404(RoomCalendarModel, pk=calendar_pk,user=request.user)
-    tenants = calendar.tenants.all()
+    tenants = calendar.tenantmodel_set.all()
     form = LinkTenantForm()
     template = "room_calendar_app/dynamic/room_calendar.html"
     if request.htmx:
