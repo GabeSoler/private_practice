@@ -58,7 +58,7 @@ def annotate_client_list(user, active=True):
                 default=0,
                 output_field=FloatField()
             ),
-            filter=Q(sessionmodel__date__gte=three_months_ago)
+            filter=Q(sessionmodel__date__gte=three_months_ago,sessionmodel__date__lte=date_ref.date())
         ),
         attendance_percentage=ExpressionWrapper(
             F('attendance_rate') * 100,

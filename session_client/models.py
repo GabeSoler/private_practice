@@ -80,13 +80,13 @@ class ClientModel(models.Model):
         ref_date.add(weeks=add_weeks)
         week_start = ref_date.start_of('week')
         day_of_week:int = self.day
-        target_date = week_start.add(days=day_of_week)
-        assert target_date.day_of_week == self.day, f"{target_date.day_of_week} != {self.day}::Day of week does not match"
+        target_date = week_start.add(days=day_of_week -1)
+        assert target_date.isoweekday() is self.day, f"{target_date.day_of_week} != {self.day}::Day of week does not match"
         return target_date.at(self.time.hour,self.time.minute)
 
 
 
-    def add_series(self,amount:int,from_date=None):
+    def add_series(self,amount:int,from_date=None,overlap_check=True):
         """ Creates a series of sessions, based on the client defaults,
             calculate the last session created first and move from there
         args:
@@ -99,14 +99,20 @@ class ClientModel(models.Model):
             queryset, overlap or saved sessions
         """
         ref_date = from_date or self.deduce_next_datetime()
-        next_date = ref_date.at(self.time.hour,self.time.minute)
-        interval = p.interval(next_date,next_date.add(weeks=amount-1))
+        interval = p.interval(ref_date,ref_date.add(weeks=amount-1))
         session_list = []
         step = self.series or 1
         if self.tenant:
             tenant = self.tenant
         else:
             tenant,_ = TenantModel.objects.get_or_create(user=self.user,name=self.user.username,display_name=self.user.username)
+        fortnight = True if self.series == 2 else False
+        if overlap_check:
+            """ stops the process to check for overlaps and returns overlaps"""
+            possible_overlap = self.check_series_overlap(interval.start,interval.end,fortnight=fortnight)
+            if possible_overlap:
+                return False,possible_overlap
+
         for date in interval.range('weeks',step):
             """ creates a list of sessions to then bulk create"""
             session_instance = SessionModel(
@@ -119,16 +125,11 @@ class ClientModel(models.Model):
             )
 
             session_list.append(session_instance)
-        fortnight = True if self.series == 2 else False
-        possible_overlap = self.check_series_overlap(interval.start,interval.end,fortnight=fortnight)
-        if possible_overlap:
-            return False,possible_overlap
-        else:
-            sessions = SessionModel.objects.bulk_create(session_list)
-            return True,sessions
+        sessions = SessionModel.objects.bulk_create(session_list)
+        return True,sessions
 
-    def check_series_overlap(self, start_range:p.Date,
-                             end_range:p.Date,
+    def check_series_overlap(self, start_range:p.DateTime,
+                             end_range:p.DateTime,
                              fortnight=False,
                              calendar=None,
                              range_filter=True,
@@ -168,19 +169,19 @@ class ClientModel(models.Model):
 
         filters = Q()
         if range_filter:
-            filters &= Q(date__range=(start_range_p,end_range_p))
+            filters &= Q(date__range=(start_range_p.date(),end_range_p.date()))
         if calendar_filter:
             filters &= Q(calendar=calendar_ref)
         if iso_day_filter:
             filters &= Q(date__iso_week_day=self.day)
         if time_filter:
             filters &= Q(
-            Q(start_time__gt=start_time,
-                     start_time__lt=end_time)| # start between start and end
+            Q(start_time__gte=start_time,
+                     start_time__lt=end_time)| # starts on the same start (or more) inside the range
             Q(end_time__gt=start_time,
-                     end_time__lt=end_time)| # ends between start and end
+                     end_time__lte=end_time)| # ends between start and end
             Q(start_time__lt=start_time,
-                     end_time__gt=end_time)) # starts before and finishes after
+                     end_time__gt=end_time)) # starts before and finishes after the range
         possible_overlap = SessionModel.objects.filter(filters)
         if fortnight:
             interval_exclude = range_from_date(start_range_p, end_range_p, fortnight, add_week_start=True)

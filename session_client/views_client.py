@@ -101,8 +101,6 @@ def add_client_view(request):
             template = template + "#modal-body-partial"
     else:
         template = 'session_client/edit/edit_client.html'
-    form = ClientForm()
-    form.fields['tenant'].queryset = TenantModel.objects.filter(user=request.user)
     if request.method == 'POST':
         # POST data submitted; process data
         form = ClientForm(data=request.POST)
@@ -114,6 +112,8 @@ def add_client_view(request):
                 return HttpResponseClientRefresh()
             return redirect('session_client:client_list')
     # display a blank or invalid form
+    form = ClientForm()
+    form.fields['tenant'].queryset = TenantModel.objects.filter(user=request.user)
     context = {'form': form}
     return render(request, template, context)
 

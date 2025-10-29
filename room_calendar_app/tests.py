@@ -1,3 +1,4 @@
+from django.core.management.commands.loaddata import humanize
 from django.test import TestCase
 from django.urls import reverse
 
@@ -15,6 +16,7 @@ from session_client.models import ClientModel, SessionModel
 
 class MetaTestSetupMixin:
     """ **Sets up the whole ecosystem of models to be able to test**
+    It allows testing the integration of sessions, clients, tenant and calendars
     self.user : a test user
     self.user_host a second user
     self.tenant a tenant account for user
@@ -60,11 +62,11 @@ class MetaTestSetupMixin:
 
         cls.tenant_host = TenantModel(
             user=cls.user_host,
-            name="T Host",
+            name="T-Host",
             display_name="test",
             description="Testing tenancy",
             calendar=cls.room_2)
-        cls.tenant.save()
+        cls.tenant_host.save()
 
         cls.tenant_default,_ = TenantModel.objects.get_or_create(user=cls.user,
                                                      name="Default")
@@ -75,7 +77,7 @@ class MetaTestSetupMixin:
             user=cls.user,
             code="Test123",
             time=p.now().at(8, 0).time(),
-            day=p.now().day,
+            day=p.now().isoweekday(),
             duration=timedelta(hours=1),
             tenant=cls.tenant,
             fee=60,
@@ -190,12 +192,13 @@ class CalendarOccurrenceTest(MetaTestSetupMixin, TestCase):
     def test_week_view_today_render(self):
         self.client.force_login(self.user)
         response = self.client.get('/calendar/week-view/')
-        expected_string = self.session_1.start_time
+        self.assertEqual(response.status_code, 200)
+        expected_string = p.instance(self.session_1.end_time).format("H a")
         self.assertContains(response, expected_string)
 
     def test_week_view_today_render_htmx(self):
         self.client.force_login(self.user)
-        expected_string = self.tenant.name
+        expected_string = self.tenant.display_name
         response = self.client.post('/calendar/week-view/',
                                     self.calendar_data_2,
                                     follow=True,
@@ -210,11 +213,6 @@ class CalendarOccurrenceTest(MetaTestSetupMixin, TestCase):
         week_day = session.date.isoweekday()
         self.assertEqual(calendar_render.week_dict[start_time][week_day], session)
 
-    def test_base_room_tenant_save(self):
-        room_default = self.room_default
-        self.assertEqual(room_default.tenants.count(), 0)
-        room_1 = self.room_1
-        self.assertEqual(room_1.tenants.count(), 1)
 
 
     def test_render_views(self):

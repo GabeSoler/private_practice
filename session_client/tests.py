@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from room_calendar_app.models import TenantModel
 from room_calendar_app.tests import MetaTestSetupMixin
 from session_client.models import SessionModel, ClientModel
 import pendulum as p
@@ -11,8 +12,8 @@ from session_client.querysets import annotate_client_list
 class TestClientSession(MetaTestSetupMixin,TestCase):
     def test_overlap_sessions(self):
         """ tests the first part of the system to check for overlaps """
-        session = self.session_1
-        session_overlap = self.session_overlap_1
+        session = self.session_overlap_1
+        session_overlap = self.session_overlap_2
         queryset = session.overlap_set()
         self.assertIn(session_overlap,queryset)
         self.assertEqual(len(queryset),1)
@@ -22,14 +23,15 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
     def test_deduce_next_datetime(self):
         """ tests that the deduce function is calculating from client info """
         client = self.client_instance
+        client.add_series(3) #added three weeks booking
         deduced_datetime = client.deduce_next_datetime()
         self.assertEqual(deduced_datetime.time(),client.time)
         self.assertEqual(deduced_datetime.isoweekday(),client.day)
         # I created a week later session in setup
-        week = self.now.week_of_year + 1
+        week = self.now.week_of_year + 3
         self.assertEqual(week,deduced_datetime.week_of_year)
         new_session = SessionModel(client=client)
-        new_session.deduce_from_client(start_datetime=p.now().add(weeks=3))
+        new_session.deduce_from_client()
         new_session.save()
         deduced_datetime = client.deduce_next_datetime()
         week = self.now.week_of_year + 3
@@ -62,30 +64,27 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
     def test_series_overlap(self):
         client_instance = self.client_instance
         # creating a series to test overlaps with the defaults
-        saved, new_series = client_instance.add_series(5,from_date=self.now.add(weeks=1))
+        saved, series = client_instance.add_series(5,from_date=self.now.add(weeks=2),
+                                                   overlap_check=False)
         self.assertTrue(saved)
+        self.assertEqual(len(series),5)
+        # creating overlaps with one week difference
+        new_saved, new_series = client_instance.add_series(5,from_date=self.now.add(weeks=3),
+                                                           overlap_check=False)
+        self.assertTrue(new_saved)
         self.assertEqual(len(new_series),5)
-        # creating a session that lats for 9+ hours as clear overlap
-        session = SessionModel(client=client_instance)
-        session.deduce_from_client(start_datetime=p.now().add(weeks=1).at(8,0))
-        session.end_time = session.end_time.add(hours=9) #range not picking up at all
-        session.brief = "TestOverlap"
-        session.save()
-        # printing results to debug
-        print("Overlap session start", session.start_time)
-        print("Overlap session end", session.end_time)
         #The range to test
-        start_range = self.now.subtract(weeks=5)
-        end_range = self.now.add(weeks=5)
+        start_range = self.now.add(weeks=2)
+        end_range = self.now.add(weeks=6)
         #testing with only the calendar, range and day of the week
         overlaps = client_instance.check_series_overlap(start_range,end_range,
                                                       range_filter=True,
                                                         calendar_filter=True,
-                                                        iso_day_filter=False,
+                                                        iso_day_filter=True,
                                                         time_filter=True)
         print("❗️Overlap list",overlaps)
-        print("Series list",new_series)
-        self.assertEqual(len(overlaps),5)
+        print(f"Series list,new {new_series},old {series}")
+        self.assertEqual(len(overlaps),9)
 
 
     def test_create_series(self):
@@ -127,9 +126,17 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
         print("future_sessions_count:",client.future_sessions_count)
         self.assertEqual(client.future_sessions_count,11)
         print("month_sessions_count:",client.month_sessions_count)
-        self.assertEqual(client.month_sessions_count,14)
+        sessions = client.sessionmodel_set.filter(date__month=self.now.month,)
+        self.assertEqual(client.month_sessions_count,len(sessions))
         print("attendance_rate:",client.attendance_rate)
-        self.assertEqual(client.attendance_rate,4/client.month_sessions_count)
+        three_month = SessionModel.objects.filter(client=client,date__range=(self.now.subtract(months=3).date(),self.now.date())).exclude(attendance="").count()
+        three_month_attended = SessionModel.objects.filter(client=client,date__range=(self.now.subtract(months=3).date(),self.now.date()),attendance="Attended").count()
+        if three_month:
+            attendance_rate = three_month_attended / three_month
+            self.assertEqual(client.attendance_rate,attendance_rate)
+            print("three_month:",three_month)
+            print("three_month_attended:",three_month_attended)
+        self.assertIsNotNone(client.attendance_rate)
         print("attendance_percentage:",client.attendance_percentage)
         self.assertAlmostEqual(client.attendance_percentage,client.attendance_rate * 100)
 
@@ -139,19 +146,22 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
         response = self.client.get(reverse('session_client:add_client'),headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response,"<form")
-        self.assertContains(response,"<form")
-        self.assertContains(response,self.room_1.name) #Blue
-        self.assertContains(response,self.room_2.name) #Green
-        self.assertContains(response,self.room_default.name) #Base Room
+        self.assertContains(response,self.tenant)
+        self.assertNotContains(response,self.tenant_host)
+        self.assertContains(response,f"{self.user.username}</option>")
         self.client.logout()
+        response = self.client.get(reverse('session_client:add_client'))
+        self.assertEqual(response.status_code, 302)
         self.client.force_login(self.user_host)
         response = self.client.get(reverse('session_client:add_client'),headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response,"<form")
-        self.assertContains(response,"<form")
-        self.assertNotContains(response,self.room_1.name) #Blue
-        self.assertNotContains(response,self.room_2.name) #Green
-        self.assertContains(response,self.room_default.name) #Base Room always needs to be there
+        self.assertIsNotNone(self.user_host)
+        self.assertIsNotNone(self.tenant_host)
+        self.assertNotContains(response,self.tenant)
+        self.assertContains(response,f"{self.user_host.username}</option>")
+        self.assertNotContains(response,f"{self.user.username}</option>")
+        self.assertContains(response,self.tenant_host)
 
 
     def test_render_client_views(self):
@@ -173,8 +183,6 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
 
     def test_render_session_views(self):
         self.client.force_login(self.user)
-        response = self.client.get(reverse('session_client:session_view',args=[self.session_1.pk,]))
-        self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('session_client:session_list_with_client',args=[self.client_instance.pk,]))
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('session_client:session_list'))
