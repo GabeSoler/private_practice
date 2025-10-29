@@ -136,7 +136,7 @@ def edit_client_view(request, client_pk):
 
     if request.method == 'POST':
         # POST data submitted; process data
-        form = ClientForm(data=request.POST)
+        form = ClientForm(instance=client,data=request.POST)
         if form.is_valid():
             form.save()
             messages.info(request, f"Client '{client.code}' updated")

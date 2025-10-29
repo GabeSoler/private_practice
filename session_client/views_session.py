@@ -5,7 +5,7 @@ from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionFrom, SessionFromCalendarForm
-from django_htmx.http import retarget, HttpResponseClientRefresh
+from django_htmx.http import retarget, HttpResponseClientRefresh,trigger_client_event
 import pendulum as p
 from django.contrib import messages
 
@@ -188,7 +188,11 @@ def add_session_view(request):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.deduce_from_client()
-            instance.save()
+            saved,overlap = instance.save_with_checks()
+            if not saved:
+                template_overlap = "session_client/lists/session_overlap_modal.html"
+                response = render(request, template_overlap,{"sessions":overlap})
+                return retarget(response,"#modal-wrapper")
             if request.htmx:
                 return HttpResponseClientRefresh()
             return redirect('session_client:session_list')
@@ -216,7 +220,12 @@ def edit_session_view(request, session_pk):
         # POST data submitted; process data
         form = SessionForm(instance=session, data=request.POST)
         if form.is_valid():
-            session = form.save()
+            session = form.save(commit=False)
+            saved,overlap = session.save_with_checks()
+            if not saved:
+                template_overlap = "session_client/lists/session_overlap_modal.html"
+                response = render(request, template_overlap,{"sessions":overlap})
+                return retarget(response,"#modal-wrapper")
             messages.info(request, f"Session '{session.brief}' updated")
             return HttpResponseClientRefresh()
         else:
@@ -247,6 +256,11 @@ def week_view_add_session_client(request, year=None, week=None, week_day=None, t
             instance.deduce_from_client(date=False,
                                         start_time=False,
                                         calendar=False if instance.calendar else True)
+            saved,overlap = instance.save_with_checks()
+            if not saved:
+                template_overlap = "session_client/lists/session_overlap_modal.html"
+                response = render(request, template_overlap,{"sessions":overlap})
+                return retarget(response,"#modal-wrapper")
             instance.save()
             messages.info(request, f"Session added for {instance.client.code}")
             return HttpResponseClientRefresh()

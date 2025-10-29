@@ -251,22 +251,22 @@ class SessionModel(models.Model):
         start = self.start_time
         end = self.end_time
         calendar = self.calendar
-        qs = SessionModel.objects.filter(calendar=calendar).filter(
+        qs = SessionModel.objects.filter(calendar=calendar,date=self.date).filter(
             models.Q(
-                start_time__gt=start,
+                start_time__gte=start,
                 start_time__lt=end,
             )
             | models.Q(
                 end_time__gt=start,
-                end_time__lt=end,
+                end_time__lte=end,
             )
             | models.Q(start_time__lt=start,
                        end_time__gt=end)
-        ).exclude(pk=self.pk)
+        ).exclude(pk=self.pk).select_related("client","client__tenant")
         return qs
 
     def is_unique(self):
-        """ takes a Session and checks if overlaps with others.
+        """ checks individual session overlap.
             Returns (True, None) if it does not overlap, and (False, Queryset) if it does  """
 
         overlaps = self.overlap_set()
@@ -276,6 +276,16 @@ class SessionModel(models.Model):
         else:
             __bool__ = True  # noqa: F841
             return True, None
+
+    def save_with_checks(self):
+        unique,overlaps = self.is_unique()
+        if unique:
+            self.save()
+            return True, overlaps
+        else:
+            return False, overlaps
+
+
 
     def deduce_from_client(self,
                            date=True,
