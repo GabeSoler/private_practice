@@ -296,7 +296,9 @@ def add_series_view(request,client_pk,number):
         if success:
             messages.info(request, f"✅{len(sessions)} Sessions added for {client.code}")
         else:
-            messages.error(request, f"‼️{len(sessions)} overlying Sessions for {client.code}")
+            template_overlap = "session_client/lists/session_overlap_modal.html"
+            response = render(request, template_overlap, {'sessions': sessions})
+            return retarget(response,"#modal-wrapper")
         client_after = ClientModel.objects.filter(pk=client_pk,user=request.user).annotate(future_sessions_count=Count('sessionmodel',
                                     filter=Q(sessionmodel__date__gt=date_ref.date()))).first()
         return render(request,template,{"client":client_after,'add_toast':True})

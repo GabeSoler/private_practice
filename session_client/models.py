@@ -69,14 +69,17 @@ class ClientModel(models.Model):
         if the session is later than tomorrow, use it as reference, else use today
         this is to avoid creating sessions in the past.
              """
-        last_session = SessionModel.objects.filter(client=self).latest() or p.now()
-        last_date = p.date(last_session.date.year, last_session.date.month, last_session.date.day)
-        if last_date >= p.now().add(days=1).date():
-            # if it is more than now, use it as a reference date
-            ref_date = p.now().on(last_date.year, last_date.month, last_date.day).start_of('day')
+        last_session = self.sessionmodel_set.last()
+        if last_session:
+            last_date = p.now().on(last_session.date.year, last_session.date.month, last_session.date.day)
+            if last_date >= p.now().start_of('day'):
+                # if it is more than now, use it as a reference date
+                ref_date = last_date.start_of('day')
+            else:
+                ref_date = p.now().start_of('day')
         else:
-            ref_date = p.now()
-        add_weeks = self.series if last_session else 1
+            ref_date = p.now().start_of('day')
+        add_weeks = self.series if last_session else 1 # 1 or 2 (if fortnight)
         ref_date.add(weeks=add_weeks)
         week_start = ref_date.start_of('week')
         day_of_week:int = self.day
@@ -105,7 +108,9 @@ class ClientModel(models.Model):
         if self.tenant:
             tenant = self.tenant
         else:
-            tenant,_ = TenantModel.objects.get_or_create(user=self.user,name=self.user.username,display_name=self.user.username)
+            tenant,_ = TenantModel.objects.get_or_create(user=self.user,
+                                                         name=self.user.username,
+                                                         display_name=self.user.username)
         fortnight = True if self.series == 2 else False
         if overlap_check:
             """ stops the process to check for overlaps and returns overlaps"""
