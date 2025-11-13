@@ -193,8 +193,8 @@ class ClientModel(models.Model):
         if calendar_filter:
             filters &= Q(calendar=calendar_ref)
         if week_day_filter:
-            day_week = (self.day + 2)%7 or 7 # to convert from pendulum days system to django
-            filters &= Q(date__week_day=day_week)
+            day_week = self.day + 1 # to convert from a pendulum days system to iso
+            filters &= Q(date__iso_week_day=day_week)
         if time_filter:
             filters &= Q(
             Q(start_time__gte=start_time,
