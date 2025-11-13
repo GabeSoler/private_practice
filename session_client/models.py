@@ -112,7 +112,7 @@ class ClientModel(models.Model):
         range_weeks = amount * 2 if fortnight else amount -1 # double of weeks if fortnight,take one week as starts on day
         interval = p.interval(ref_date,ref_date.add(weeks=range_weeks))
         assert isinstance(ref_date,p.DateTime)
-        assert ref_date.day_of_week is self.day,f"The ref_date should be on the client.day, {ref_date.day_of_week} != {self.day}"
+        assert ref_date.day_of_week == self.day,f"The ref_date should be on the client.day, {ref_date.day_of_week} != {self.day}"
         session_list = []
         step = self.series or 1
         if self.tenant:
