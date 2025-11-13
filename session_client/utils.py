@@ -19,10 +19,10 @@ def date_plus_time(date_obj, time_obj):
         second=time_obj.second
     )
 
-def range_from_date(date_start, date_end, step=1, add_week_start=False,range_type='weeks'):
-    datetime_start = p.now().on(date_start.year,date_start.month,date_start.day).start_of('day')
-    if add_week_start:
-        datetime_start = datetime_start.add(weeks=1)
-    datetime_end = p.now().on(date_end.year,date_end.month,date_end.day).end_of('day')
+def range_from_date(date_start, date_end, step=1, add_weeks=None,range_type='weeks'):
+    datetime_start = p.datetime(date_start.year,date_start.month,date_start.day).start_of('day')
+    if add_weeks:
+        datetime_start = datetime_start.add(weeks=add_weeks)
+    datetime_end = p.datetime(date_end.year,date_end.month,date_end.day).end_of('day')
     return p.interval(datetime_start, datetime_end).range(range_type, step)
 

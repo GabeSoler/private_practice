@@ -1,4 +1,3 @@
-from django.core.management.commands.loaddata import humanize
 from django.test import TestCase
 from django.urls import reverse
 
@@ -77,11 +76,10 @@ class MetaTestSetupMixin:
             user=cls.user,
             code="Test123",
             time=p.now().at(8, 0).time(),
-            day=p.now().isoweekday(),
-            duration=timedelta(hours=1),
+            day=p.MONDAY,
+            duration=p.duration(hours=1),
             tenant=cls.tenant,
             fee=60,
-
         )
         cls.client_instance.save()
 

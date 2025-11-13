@@ -101,8 +101,11 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 
 <!-- Main section -->
 
+<div id="toast-wrapper">
+  {% if messages %}{% include '_toasts.html'%}{% endif %}
+  </div>
 
-{% if messages %}{% include '_toasts.html'%}{% endif %}
+
 
 {% block hero_block %}
   {% endblock %}

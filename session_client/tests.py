@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -7,6 +9,7 @@ from session_client.models import SessionModel, ClientModel
 import pendulum as p
 
 from session_client.querysets import annotate_client_list
+from session_client.utils import time_plus_duration
 
 
 class TestClientSession(MetaTestSetupMixin,TestCase):
@@ -19,23 +22,72 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
         self.assertEqual(len(queryset),1)
 
 
+    def test_get_last_date_or_now(self):
+        """create a fresh client to set a first session on the past
+            then create a session on the future to test the function
+        """
+        new_client = ClientModel.objects.create(
+            user=self.user,
+            code='test',
+            tenant=self.tenant_default,
+            day=1,
+            time="09,00",
+            duration=timedelta(hours=1)
+        )
+        SessionModel.objects.create(
+            client=new_client,
+            date=p.now().subtract(weeks=3).date(),
+            start_time=p.time(8, 0),
+            end_time=p.time(9, 30),
+            calendar=self.room_1,
+
+        )
+        gotten_date = new_client.get_last_date_or_now()
+        self.assertEqual(gotten_date.date(),self.now.date())
+
+        # setting last date in the future
+        future_session = SessionModel.objects.create(
+            client=new_client,
+            date=p.now().add(weeks=3).date(),
+            start_time=p.time(8, 0),
+            end_time=p.time(9, 30),
+            calendar=self.room_1,
+        )
+        gotten_date = new_client.get_last_date_or_now()
+        self.assertEqual(future_session.date,gotten_date.date())
 
     def test_deduce_next_datetime(self):
         """ tests that the deduce function is calculating from client info """
         client = self.client_instance
-        client.add_series(3) #added three weeks booking
+        session_date = self.now.add(weeks=20).next(p.FRIDAY).date()
+        session = SessionModel.objects.create(client=client,
+                                              calendar=self.room_default,
+                                              date=session_date,
+                                              start_time=client.time,
+                                              end_time=time_plus_duration(client.time,client.duration)
+                                              )
         deduced_datetime = client.deduce_next_datetime()
-        self.assertEqual(deduced_datetime.time(),client.time)
-        self.assertEqual(deduced_datetime.isoweekday(),client.day)
-        # I created a week later session in setup
-        week = self.now.week_of_year + 3
-        self.assertEqual(week,deduced_datetime.week_of_year)
-        new_session = SessionModel(client=client)
-        new_session.deduce_from_client()
-        new_session.save()
-        deduced_datetime = client.deduce_next_datetime()
-        week = self.now.week_of_year + 3
-        self.assertEqual(week,deduced_datetime.week_of_year)
+        self.assertEqual(deduced_datetime.day_of_week,client.day)
+        # the deduced time should be a week later
+        self.assertEqual(deduced_datetime.subtract(weeks=1).week_of_year,session_date.week_of_year)
+        session.date = p.instance(session.date).next(p.TUESDAY)
+        session.save()
+        self.assertEqual(deduced_datetime.subtract(weeks=1).week_of_year,session_date.week_of_year)
+        new_client = client
+        new_client.pk = None
+        new_client.day = p.FRIDAY
+        new_client.save()
+        session.client = new_client
+        session.date = p.instance(session.date).next(p.THURSDAY)
+        session.save()
+        deduced_datetime = new_client.deduce_next_datetime()
+        # the deduced day must mach the client day
+        self.assertEqual(deduced_datetime.day_of_week,new_client.day)
+        # the deduced time should be a week later
+        self.assertEqual(deduced_datetime.subtract(weeks=1).week_of_year,session_date.week_of_year)
+
+
+
 
 
     def test_deduce_from_client(self):
@@ -52,7 +104,7 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
 
     def test_is_unique_session(self):
         """ tests the overlap system is picking up one above and one bellow"""
-        session = self.session_1
+        session = self.session_overlap_1
         session_overlap = self.session_overlap_1
         ok, overlaps = session.is_unique()
         self.assertFalse(ok)
@@ -64,27 +116,37 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
     def test_series_overlap(self):
         client_instance = self.client_instance
         # creating a series to test overlaps with the defaults
-        saved, series = client_instance.add_series(5,from_date=self.now.add(weeks=2),
+        saved, series = client_instance.add_series(5,add_weeks=2,
                                                    overlap_check=False)
         self.assertTrue(saved)
         self.assertEqual(len(series),5)
-        # creating overlaps with one week difference
-        new_saved, new_series = client_instance.add_series(5,from_date=self.now.add(weeks=3),
+
+        # creating overlaps with a new client
+        new_client = ClientModel(tenant=self.tenant,
+                                 user=self.user,
+                                 time=p.time(8,30),
+                                 duration=p.duration(hours=1),
+                                 code="NewClient!",
+                                 day=p.MONDAY,
+                                 )
+        new_client.save()
+        new_saved, new_series = new_client.add_series(5,add_weeks=2,
                                                            overlap_check=False)
         self.assertTrue(new_saved)
         self.assertEqual(len(new_series),5)
+        date_of_new_session = p.instance(new_series[0].date)
+        self.assertEqual(date_of_new_session.day_of_week,client_instance.day)
         #The range to test
         start_range = self.now.add(weeks=2)
-        end_range = self.now.add(weeks=6)
+        end_range = self.now.add(weeks=9)
         #testing with only the calendar, range and day of the week
-        overlaps = client_instance.check_series_overlap(start_range,end_range,
-                                                      range_filter=True,
-                                                        calendar_filter=True,
-                                                        iso_day_filter=True,
-                                                        time_filter=True)
-        print("❗️Overlap list",overlaps)
-        print(f"Series list,new {new_series},old {series}")
-        self.assertEqual(len(overlaps),9)
+        overlaps = client_instance.check_series_overlap(start_range,end_range)
+        overlaps_2 = new_client.check_series_overlap(start_range,end_range)
+        print(f"* Series list,old {series}")
+        print(f"* Series list,new {new_series}")
+        print("* ❗️Overlap list",overlaps)
+        self.assertEqual(len(overlaps),10)
+        self.assertEqual(len(overlaps_2),10)
 
 
     def test_create_series(self):

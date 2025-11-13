@@ -78,12 +78,12 @@
                                     </div>
                                     <div class="col-4"> <!-- add 3 sessions forward -->
                                         +<i class="bi bi-3-circle-fill"
-                                            hx-post="{% url 'session_client:add_series' client.pk '3' %}"
+                                            hx-post="{% url 'session_client:add_series' client.pk 3 %}"
                                             hx-target="#future-sessions-{{ client.pk }}"></i>
                                     </div>
                                     <div class="col-4"> <!-- add 6 sessions forward -->
                                         +<i class="bi bi-6-circle-fill"
-                                            hx-post="{% url 'session_client:add_series' client.pk '6' %}"
+                                            hx-post="{% url 'session_client:add_series' client.pk 6 %}"
                                             hx-target="#future-sessions-{{ client.pk }}"></i>
 
                                     </div>

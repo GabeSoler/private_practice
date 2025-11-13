@@ -82,23 +82,23 @@ EVENT_TYPE = [
 
 
 WEEKDAY_SHORT = (
-    (7, _("Sun")),
-    (1, _("Mon")),
-    (2, _("Tue")),
-    (3, _("Wed")),
-    (4, _("Thu")),
-    (5, _("Fri")),
-    (6, _("Sat")),
+    (6, _("Sun")),
+    (0, _("Mon")),
+    (1, _("Tue")),
+    (2, _("Wed")),
+    (3, _("Thu")),
+    (4, _("Fri")),
+    (5, _("Sat")),
 )
 
 WEEKDAY_LONG = (
-    (7, _("Sunday")),
-    (1, _("Monday")),
-    (2, _("Tuesday")),
-    (3, _("Wednesday")),
-    (4, _("Thursday")),
-    (5, _("Friday")),
-    (6, _("Saturday")),
+    (6, _("Sunday")),
+    (0, _("Monday")),
+    (1, _("Tuesday")),
+    (2, _("Wednesday")),
+    (3, _("Thursday")),
+    (4, _("Friday")),
+    (5, _("Saturday")),
 )
 
 MONTH_LONG = (

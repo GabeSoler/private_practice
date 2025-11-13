@@ -12,6 +12,9 @@ from room_calendar_app.models import RoomCalendarModel, TenantModel
 import pendulum as p
 
 from .utils import time_plus_duration,range_from_date
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Create your models here.
 
@@ -63,33 +66,35 @@ class ClientModel(models.Model):
     def get_absolute_url(self):
         return reverse("session_client:client", kwargs={"client_pk":self.pk})
 
+    def get_last_date_or_now(self,get_session=False):
+        try:
+            last_session = self.sessionmodel_set.filter(date__gte=p.now()).latest('date','start_time')
+            last_date = last_session.date
+            ref_date = p.now().on(last_date.year,last_date.month,last_date.day)
+        except SessionModel.DoesNotExist:
+            ref_date = p.now()
+        if get_session:
+            return ref_date,last_session
+        return ref_date
 
-    def deduce_next_datetime(self):
+    def deduce_next_datetime(self,add_weeks=None):
         """deduces the next week's appointment from defaults in ClientModel
         if the session is later than tomorrow, use it as reference, else use today
         this is to avoid creating sessions in the past.
+        args:
+            get_session returns two arguments, the date and the session used to calculate it
              """
-        last_session = self.sessionmodel_set.last()
-        if last_session:
-            last_date = p.now().on(last_session.date.year, last_session.date.month, last_session.date.day)
-            if last_date >= p.now().start_of('day'):
-                # if it is more than now, use it as a reference date
-                ref_date = last_date.start_of('day')
-            else:
-                ref_date = p.now().start_of('day')
-        else:
-            ref_date = p.now().start_of('day')
-        add_weeks = self.series if last_session else 1 # 1 or 2 (if fortnight)
-        ref_date.add(weeks=add_weeks)
-        week_start = ref_date.start_of('week')
-        day_of_week:int = self.day
-        target_date = week_start.add(days=day_of_week -1)
-        assert target_date.isoweekday() is self.day, f"{target_date.day_of_week} != {self.day}::Day of week does not match"
-        return target_date.at(self.time.hour,self.time.minute)
+        ref_date = self.get_last_date_or_now()
+        target_date = ref_date.next(self.day)
+        if self.series is 2:
+            target_date = target_date.add(weeks=1)
+        if add_weeks:
+            target_date = target_date.add(weeks=add_weeks)
+        return target_date
 
 
 
-    def add_series(self,amount:int,from_date=None,overlap_check=True):
+    def add_series(self,amount:int,add_weeks=None,overlap_check=True):
         """ Creates a series of sessions, based on the client defaults,
             calculate the last session created first and move from there
         args:
@@ -101,21 +106,28 @@ class ClientModel(models.Model):
             True if saved, false if not
             queryset, overlap or saved sessions
         """
-        ref_date = from_date or self.deduce_next_datetime()
-        interval = p.interval(ref_date,ref_date.add(weeks=amount-1))
+        ref_date = self.deduce_next_datetime(add_weeks=add_weeks)
+        ref_date = ref_date
+        fortnight = True if self.series == 2 else False
+        range_weeks = amount * 2 if fortnight else amount -1 # double of weeks if fortnight,take one week as starts on day
+        interval = p.interval(ref_date,ref_date.add(weeks=range_weeks))
+        assert isinstance(ref_date,p.DateTime)
+        assert ref_date.day_of_week is self.day,f"The ref_date should be on the client.day, {ref_date.day_of_week} != {self.day}"
         session_list = []
         step = self.series or 1
         if self.tenant:
             tenant = self.tenant
         else:
+            logger.debug("Using base tenant to set a series")
             tenant,_ = TenantModel.objects.get_or_create(user=self.user,
                                                          name=self.user.username,
                                                          display_name=self.user.username)
-        fortnight = True if self.series == 2 else False
         if overlap_check:
             """ stops the process to check for overlaps and returns overlaps"""
             possible_overlap = self.check_series_overlap(interval.start,interval.end,fortnight=fortnight)
             if possible_overlap:
+                logger.warning(f"Overlap on series attempt, length: {len(possible_overlap)}")
+                __bool__=False
                 return False,possible_overlap
 
         for date in interval.range('weeks',step):
@@ -131,6 +143,10 @@ class ClientModel(models.Model):
 
             session_list.append(session_instance)
         sessions = SessionModel.objects.bulk_create(session_list)
+        sessions_len = len(sessions)
+        logger.debug("Sessions created, length: {}",sessions_len)
+        assert sessions_len is amount,f"sessions created must match amount, {sessions_len} != {amount}"
+        __bool__= True
         return True,sessions
 
     def check_series_overlap(self, start_range:p.DateTime,
@@ -139,7 +155,7 @@ class ClientModel(models.Model):
                              calendar=None,
                              range_filter=True,
                              calendar_filter=True,
-                             iso_day_filter=True,
+                             week_day_filter=True,
                              time_filter=True,):
         """ checks if there are sessions on the same day/times in the range set
         args:
@@ -156,14 +172,13 @@ class ClientModel(models.Model):
         returns:
             query of overlaps, empty if none
         """
-        fortnight = fortnight
         if calendar:
             calendar_ref = calendar
         elif self.tenant:
             calendar_ref = self.tenant.calendar
         else:
             calendar_ref = RoomCalendarModel.objects.get(user=self.user,name="Base Room")
-        assert calendar_ref is not None, "calendar field is necessary"
+        assert isinstance(calendar_ref,RoomCalendarModel),"calendar must be a RoomCalendarModel object"
         start_time = self.time
         end_time = time_plus_duration(self.time, self.duration)
         start_range_p = start_range
@@ -177,8 +192,9 @@ class ClientModel(models.Model):
             filters &= Q(date__range=(start_range_p.date(),end_range_p.date()))
         if calendar_filter:
             filters &= Q(calendar=calendar_ref)
-        if iso_day_filter:
-            filters &= Q(date__iso_week_day=self.day)
+        if week_day_filter:
+            day_week = (self.day + 2)%7 or 7 # to convert from pendulum days system to django
+            filters &= Q(date__week_day=day_week)
         if time_filter:
             filters &= Q(
             Q(start_time__gte=start_time,
@@ -189,9 +205,11 @@ class ClientModel(models.Model):
                      end_time__gt=end_time)) # starts before and finishes after the range
         possible_overlap = SessionModel.objects.filter(filters)
         if fortnight:
-            interval_exclude = range_from_date(start_range_p, end_range_p, fortnight, add_week_start=True)
+            interval_exclude = range_from_date(start_range_p, end_range_p, step=2, add_weeks=1)
             exclude_range = [x.date() for x in interval_exclude.range('weeks',2)]
-            possible_overlap = possible_overlap.exclude(start_date__in=exclude_range)
+            possible_overlap = possible_overlap.exclude(date__in=exclude_range)
+        if possible_overlap:
+            logger.debug("possible overlap function found overlap")
         return possible_overlap
 
 
@@ -223,10 +241,7 @@ class SessionModel(models.Model):
     # Calendar connection
     calendar = models.ForeignKey(RoomCalendarModel,null=True,blank=True,on_delete=models.SET_NULL)
 
-    def __str__(self):
-        brief = self.brief
-        return f"Session-{brief[:10]}"
-    
+
     def get_absolute_url(self):
         return reverse("session_client:session", kwargs={"session_pk":self.id})
   
@@ -242,7 +257,7 @@ class SessionModel(models.Model):
 
     def __str__(self):  # noqa: F811
         ref_date = self.start_time or ""
-        return f"{self.brief[:8]}:{ref_date}"
+        return f"{self.client}::{self.date},{ref_date}"
 
 
     def __lt__(self, other):
@@ -279,7 +294,7 @@ class SessionModel(models.Model):
             __bool__ = False
             return False, overlaps
         else:
-            __bool__ = True  # noqa: F841
+            __bool__ = True
             return True, None
 
     def save_with_checks(self):

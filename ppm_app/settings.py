@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 from decouple import config
 from django.conf.global_settings import STATIC_ROOT
@@ -215,8 +215,14 @@ LOGGING = {
         "handlers": ["console"],
         "level": "WARNING",
     },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
+        },
+    },
 }
-
 
 INTERNAL_IPS = (
     '127.0.0.1',
