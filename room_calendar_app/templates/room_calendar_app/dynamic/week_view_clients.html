@@ -1,0 +1,95 @@
+{% extends '_base.html' %}
+
+
+{% load django_bootstrap5 %}
+{% block title %}Week View{% endblock title %}
+
+{% block content %}
+
+    <div id="page-wrapper">
+
+        <div id="form-table-wrapper">
+            {% partialdef form-partial inline %}
+                <form
+                        hx-post="{% url "room_calendar_app:week_view" %}"
+                        hx-target="#calendar-table-wrapper"
+                        hx-trigger="change throttle:1s"
+                >
+                    <table
+                            class="table table-primary table-striped-columns table-sm mb-0"
+                            id="switch-table"
+                    >
+                        <tr class="" id="calendar-form-tr">
+                            <td id="cell-form-field-date"
+                            >{% bootstrap_field form.date_reference show_label='skip' %}
+                            </td>
+                            <td id="cell-form-field-calendar"
+                            >{% bootstrap_field form.calendar show_label='skip' %}
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            {% endpartialdef %} <!-- end partial table -->
+        </div>
+
+        <!-- Partial def  week calendar -->
+
+        <div id="calendar-table-wrapper">
+            {% partialdef calendar-view-partial inline %}
+                <table class="table table-secondary table-striped-columns table-sm"
+                       id="week-view-table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        {% for day in calendar.week_days %}
+
+                            <th scope="col"
+                                style="font-size:.8rem;"
+                            >{{ day|date:'d-m-y' }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    {% for slot,data in calendar.week_dict.items %}
+                        <tr> <!-- row for time -->
+                        <th scope="row"
+                            style="font-size:.6rem;"
+                        >{{ slot|time:"H:i" }}</th>
+
+                        {% for weekday,occurrence in data.items %}
+                            {% if occurrence.date %}
+                                <td class="table-info"
+                                    hx-get="{% url 'session_client:session_hx_item' occurrence.id %}"
+                                    hx-target="#modal-wrapper"
+                                    style="font-size:.6rem;"
+                                    id="{{ slot }}"
+                                >{{ occurrence.client.tenant.display_name }}-
+                                    {{ occurrence.start_time }}-
+                                    {{ occurrence.end_time }}</td>
+                            {% else %}
+                                <td
+                                        style="font-size:.6rem;">
+                                    <i
+                                            {% if calendar.room_calendar %}
+                                                hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" calendar.room_calendar.pk %}"
+                                            {% else %}
+                                                hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" %}"
+                                            {% endif %}
+                                                hx-target="#modal-wrapper" class="bi bi-patch-plus"></i></a>
+                                </td>
+                            {% endif %}
+                        {% endfor %}<!-- end of for weekday -->
+                    {% endfor %}<!-- end of for slot -->
+                    </tr>
+                    </tbody>
+                </table>
+            {% endpartialdef %}
+        </div>
+        <!-- End partial def -->
+
+        <div id="modal-wrapper"></div>
+
+
+    </div>
+{% endblock content %}

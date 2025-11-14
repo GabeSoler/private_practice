@@ -1,8 +1,7 @@
 from django.db import models
-
-# Create your models here.
 from django.contrib.auth import get_user_model
 import uuid
+from session_client.choices import duration_times_as_choices,WEEKDAY_SHORT
 
 
 
@@ -39,3 +38,9 @@ class TenantModel(models.Model):
         ordering = ("name",)
     def __str__(self):
         return self.name
+
+class BlocksModel(models.Model):
+    tenant = models.ForeignKey(TenantModel,on_delete=models.CASCADE)
+    day = models.IntegerField(choices=WEEKDAY_SHORT)
+    start_time = models.TimeField(choices=duration_times_as_choices())
+    end_time = models.TimeField(choices=duration_times_as_choices())
