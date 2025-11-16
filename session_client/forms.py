@@ -88,7 +88,7 @@ class SessionSelectGroupForm(forms.Form):
     include_next = forms.BooleanField(required=False,label="Include Next")
     client = forms.ModelChoiceField(queryset=ClientModel.objects.all(),required=False,label="Client")
 
-class SearchSessionFrom(forms.Form):
+class SearchSessionForm(forms.Form):
     """ for session search by date and client """
     date_ref_start = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now().subtract(months=1))
     date_ref_end = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=p.now().add(weeks=1))
@@ -96,6 +96,5 @@ class SearchSessionFrom(forms.Form):
 
 class SearchClientForm(forms.Form):
     """ to search for clients """
-    search_input = forms.CharField(max_length=20,required=True,help_text="type client code")
-    active = forms.BooleanField(help_text="Search Archived",initial=True,required=False,
-                                widget=forms.CheckboxInput(attrs={'class':'form-check-input','type':"checkbox",'role':'switch'}))
+    search_input = forms.CharField(max_length=100,required=True,help_text="type text search")
+    client = forms.ModelChoiceField(queryset=ClientModel.objects.all(),required=False,help_text="Select Client")

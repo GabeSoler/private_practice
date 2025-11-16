@@ -1,16 +1,21 @@
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
 from room_calendar_app.models import RoomCalendarModel, TenantModel
-from .models import ClientModel
+from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from .forms import ClientForm, SearchClientForm, ClientFormShort
-from django_htmx.http import HttpResponseClientRedirect, HttpResponseClientRefresh
+from .forms import ClientForm, SearchClientForm, ClientFormShort, SearchSessionForm
+from django_htmx.http import HttpResponseClientRedirect, HttpResponseClientRefresh, retarget
 from django.utils import timezone
 from django.contrib import messages
 
 from .querysets import annotate_client_list
+from django.contrib.postgres.search import (SearchHeadline,
+                                            SearchQuery,
+                                            SearchRank,
+                                            SearchVector)
 
 
 # Create your views here.
@@ -64,22 +69,46 @@ def clients_toggle_active(request, client_pk):
 @login_required
 def client_search_view(request):
     template = 'session_client/lists/client_search.html'
-    if request.htmx:
+    if request.method == 'POST':
         form_partial = SearchClientForm(data=request.POST)
         if form_partial.is_valid():
-            search_input = form_partial.cleaned_data['search_input']
-            active = form_partial.cleaned_data['active']
-            clients = ClientModel.objects.filter(code__icontains=search_input,
-                                                 active=active,
-                                                 )
-            template_calendar = template + "#client-list-partial"
-            context = {'clients': clients}
+            raw_query = form_partial.cleaned_data['search_input']
+            search_query = SearchQuery(raw_query)
+            vector_brief = SearchVector("brief",weight="A")
+            vector_calendar = SearchVector("calendar__name",weight="D")
+            vector_client = SearchVector("client__code",weight="C")
+            vector_nick = SearchVector("client__nick_name",weight="B")
+            vector = (vector_client + vector_calendar + vector_brief + vector_nick)
+            client = form_partial.cleaned_data['client']
+            sessions = (SessionModel.objects
+                        .filter(client__user=request.user)
+                        .annotate(
+                            search=vector,
+                            rank=SearchRank(vector,search_query),
+                            headline=SearchHeadline("brief",search_query),
+            ).filter(search=raw_query).order_by("-rank"))
+            if client:
+                sessions = sessions.filter(client=client)
+
+            if request.htmx:
+                """pagination of results"""
+                page_number = request.GET.get("page", 1)
+                paginator = Paginator(sessions, 10)
+                sessions = paginator.get_page(page_number)
+                template_calendar = template + "#client-list-partial"
+                context = {'sessions': sessions}
+            else:
+                template_calendar = template
+                context = {"form":form_partial,"sessions":sessions}
             return render(request, template_calendar, context)
         else:
-            raise Http404(f"The form has errors: {form_partial.errors}")
-    clients = ClientModel.objects.none()  # ? loaded by htmx after load
+            if request.htmx:
+                response = render(request,template,{"form":form_partial})
+                return retarget(response,"form-table-wrapper")
+            return render(request,template,{"form":form_partial})
     form = SearchClientForm()
-    context = {'clients': clients, 'form': form}
+    form.fields["client"].queryset = ClientModel.objects.filter(user=request.user)
+    context = {'form': form}
     return render(request, template, context)
 
 

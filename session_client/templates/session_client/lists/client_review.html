@@ -1,0 +1,77 @@
+
+
+{% extends 'session_client/navs/client-nav.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+
+
+<div id="wrapper">
+
+  <div id="form-table-wrapper">
+  {% partialdef form-partial inline %}
+  <form action="{% url 'session_client:client_review' %}" method="post"
+    hx-post="{% url "session_client:client_review" %}"
+    hx-target="#session-list-wrapper"
+    hx-trigger="change throttle:1s,load once"
+    >
+    {% csrf_token %}
+    <table
+    class="table table-primary table-sm mb-0"
+    id="switch-table"
+    >
+    <tr class="" id="calendar-form-tr">
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form.date_ref_start show_label='skip'  %}
+        </td>
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form.date_ref_end show_label='skip'  %}
+        </td>
+        <td id="cell-form-field-calendar"
+          >{% bootstrap_field form.client show_label='skip'  %}
+        </td>
+        <td id="cell-form-button">
+          <div class="dropdown">
+            <button class="btn link btn-secondary" type="submit" value="submit" >
+              <i class="bi bi-cloud-download text-primary fs-5"></i>
+            </button>
+        </div>
+      </td>
+    </tr>
+  </table>
+</form>
+      {% endpartialdef %} <!-- end partial table -->
+      </div>
+
+
+
+
+        <!-- Session list -->
+        <div id="session-list-wrapper">
+            {% if sessions %} {% comment %} As i re use it its here, a bit messy :/ {% endcomment %}
+                {% partialdef session-list-partial inline %}
+                    <ul class="list-group">
+                        {% for session in sessions %}
+                            {% partialdef row-instance inline %}
+                                <li class="list-group-item">
+                                    <div>
+                                        <a href="{% url "session_client:session_hx_item" session.pk %}"
+                                           hx-get="{% url "session_client:session_hx_item" session.pk %}"
+                                           hx-target="#modal-wrapper">
+                                            <span>{{ session.client }} --</span>
+                                            {% if session.date %}{{ session.date }}{% else %}
+                                                {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>
+                                    </div>
+
+                                    <td>{{ session.brief|linebreaks}}</td>
+
+                                </li>
+                            {% endpartialdef %}
+                        {% endfor %}
+                    </ul>
+                {% endpartialdef session-list-partial %}
+            {% endif %}
+        </div> <!-- end session list -->
+
+        </div>
+
+  {% endblock content %}

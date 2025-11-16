@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
-from .forms import SessionForm, SessionSelectGroupForm, SearchSessionFrom, SessionFromCalendarForm
+from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm
 from django_htmx.http import retarget, HttpResponseClientRefresh,trigger_client_event
 import pendulum as p
 from django.contrib import messages
@@ -103,12 +103,22 @@ def session_hx_item(request, session_pk):
 
 
 @login_required
-def sessions_search(request):
-    """ Search sessions by date and client """
-    template = "session_client/lists/session_date_list.html"
+def sessions_search(request,review=False):
+    """ Search sessions by date and client
+    Creates a SVG file from results
+    Also points to a second url and HTML for client reviews
+    """
+    template = "session_client/lists/"
+    if review:
+        """ there are two routes for same Form and data """
+        template += "client_review.html"
+        template_hx = template + "#session-list-partial"
+    else:
+        template += "session_date_list.html"
+        template_hx = "session_client/navs/session-nav.html" + "#session-list-partial"
     clients_user = ClientModel.objects.filter(user=request.user) or ClientModel.objects.none()  # for select
     if request.POST:
-        form_partial = SearchSessionFrom(data=request.POST)
+        form_partial = SearchSessionForm(data=request.POST)
         if form_partial.is_valid():
             start_ref = form_partial.cleaned_data['date_ref_start']
             end_ref = form_partial.cleaned_data['date_ref_end']
@@ -123,9 +133,8 @@ def sessions_search(request):
                                                        date__gte=start_ref,
                                                        date__lte=end_ref, ).order_by('date', 'start_time')
             if request.htmx:
-                template_calendar = "session_client/navs/session-nav.html" + "#session-list-partial"
                 context = {'sessions': sessions}
-                return render(request, template_calendar, context)
+                return render(request, template_hx, context)
             import csv
             start_ref_str = p.instance(start_ref).to_formatted_date_string()  # converting for easier formatting
             end_ref_str = p.instance(end_ref).to_formatted_date_string()
@@ -139,11 +148,10 @@ def sessions_search(request):
             for row in sessions:
                 writer.writerow([row.date, row.start_time, row.client, row.brief, row.paid])
             return response
-
         else:
             raise Http404(f"The form has errors: {form_partial.errors}")
     sessions = SessionModel.objects.none()  # ? loaded by htmx after load
-    form = SearchSessionFrom()
+    form = SearchSessionForm()
     form.fields['client'].queryset = clients_user
     context = {'sessions': sessions, 'form': form}
     return render(request, template, context)

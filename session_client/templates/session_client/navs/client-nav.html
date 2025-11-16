@@ -15,6 +15,10 @@
       href="{% url "session_client:client_search" %}"
       >Search</a>
 
+  <a class="nav-link {% if request.path == "/client_review/"  %}active {% endif %}"
+      href="{% url "session_client:client_review" %}"
+      >Review</a>
+
     <a class="nav-link {% if request.path == "/client_archived/"  %}active {% endif %}" 
       href={% url 'session_client:client_archived' %}
       >Archived</a>

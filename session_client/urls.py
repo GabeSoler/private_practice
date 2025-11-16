@@ -20,6 +20,9 @@ urlpatterns = [
          views_client.clients_view, name='client_list'),
     path('client_search/',
          views_client.client_search_view, name='client_search'),
+    path('client_review/',
+         views_session.sessions_search,{"review":True},
+         name='client_review'), #same view, different HTML
     path('client_archived/',
          views_client.client_archived_view, name='client_archived'),
     path('edit_client/<uuid:client_pk>/',
