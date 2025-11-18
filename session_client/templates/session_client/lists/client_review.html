@@ -3,7 +3,7 @@
 {% extends 'session_client/navs/client-nav.html' %}
 {% load django_bootstrap5 %}
 {% block content %}
-
+{% load clean_text %}
 
 <div id="wrapper">
 
@@ -54,15 +54,17 @@
                             {% partialdef row-instance inline %}
                                 <li class="list-group-item">
                                     <div>
-                                        <a href="{% url "session_client:session_hx_item" session.pk %}"
+                                        {% ifchanged %}<h3 class="border-bottom">{{ session.client }}</h3>{% endifchanged %}
+                                        <a class="ms-4"
+                                                href="{% url "session_client:session_hx_item" session.pk %}"
                                            hx-get="{% url "session_client:session_hx_item" session.pk %}"
                                            hx-target="#modal-wrapper">
-                                            <span>{{ session.client }} --</span>
+
                                             {% if session.date %}{{ session.date }}{% else %}
                                                 {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>
                                     </div>
 
-                                    <td>{{ session.brief|linebreaks}}</td>
+                                    <p class="ms-auto">{{ session.brief|markdown_emphasis|linebreaks}}</p>
 
                                 </li>
                             {% endpartialdef %}

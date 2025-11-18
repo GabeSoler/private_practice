@@ -5,10 +5,10 @@ from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm
-from django_htmx.http import retarget, HttpResponseClientRefresh,trigger_client_event
+from django_htmx.http import retarget, HttpResponseClientRefresh
 import pendulum as p
 from django.contrib import messages
-
+from .utils import csv_session_list_response
 
 
 # Create your views here.
@@ -105,7 +105,7 @@ def session_hx_item(request, session_pk):
 @login_required
 def sessions_search(request,review=False):
     """ Search sessions by date and client
-    Creates a SVG file from results
+    Creates a CSV file from results
     Also points to a second url and HTML for client reviews
     """
     template = "session_client/lists/"
@@ -123,31 +123,13 @@ def sessions_search(request,review=False):
             start_ref = form_partial.cleaned_data['date_ref_start']
             end_ref = form_partial.cleaned_data['date_ref_end']
             client_ref = form_partial.cleaned_data['client'] or None
-            if client_ref:
-                # using session date as reference and csv generation.
-                sessions = SessionModel.objects.filter(date__gte=start_ref,
-                                                       date__lte=end_ref,
-                                                       client=client_ref).order_by('date', 'start_time')
-            else:
-                sessions = SessionModel.objects.filter(client__user=request.user,
-                                                       date__gte=start_ref,
-                                                       date__lte=end_ref, ).order_by('date', 'start_time')
+            sessions = SessionModel.objects.filter(date__gte=start_ref,date__lte=end_ref)
+            sessions = sessions.filter(client=client_ref) if client_ref else sessions.filter(client__user=request.user)
+            sessions = sessions.order_by('client','date','start_time') if review else sessions.order_by('date',                                                                                                        'start_time')
             if request.htmx:
                 context = {'sessions': sessions}
                 return render(request, template_hx, context)
-            import csv
-            start_ref_str = p.instance(start_ref).to_formatted_date_string()  # converting for easier formatting
-            end_ref_str = p.instance(end_ref).to_formatted_date_string()
-            file_name = f"{client_ref}: {start_ref_str}-{end_ref_str}" if client_ref else f"{start_ref_str}-{end_ref_str}"
-            response = HttpResponse(
-                content_type="text/csv",
-                headers={"Content-Disposition": f'attachment; filename="{file_name}.csv"'})
-            fieldnames = ["date", "start_time", "client", "brief", "paid"]
-            writer = csv.writer(response)  # response is the output
-            writer.writerow(fieldnames)
-            for row in sessions:
-                writer.writerow([row.date, row.start_time, row.client, row.brief, row.paid])
-            return response
+            return csv_session_list_response(sessions,client_ref,start_ref,end_ref)
         else:
             raise Http404(f"The form has errors: {form_partial.errors}")
     sessions = SessionModel.objects.none()  # ? loaded by htmx after load
@@ -314,6 +296,15 @@ def add_series_view(request,client_pk,number):
 
 @login_required()
 def sessions_hx_edit_attendance(request,session_pk,attendance):
+    session = get_object_or_404(SessionModel, pk=session_pk, client__user=request.user)
+    session.attendance = attendance
+    session.save()
+    messages.info(request, f"Session '{session.start_time.strftime('%d-%m-%y,%H:%M')}' updated")
+    template = 'session_client/navs/session-nav.html'+ "#attendance_partial"
+    return render(request, template, {"session": session})
+
+@login_required()
+def sessions_patch_attendance(request,session_pk,attendance):
     session = get_object_or_404(SessionModel, pk=session_pk, client__user=request.user)
     session.attendance = attendance
     session.save()

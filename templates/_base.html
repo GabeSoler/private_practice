@@ -11,12 +11,12 @@
     {% load static %}
     {% load django_htmx %}
 
-    <link rel="stylesheet" href="{% static "css/styles.css" %}">
-    <link rel="stylesheet" href="{% static "css/animation.css" %}">
 
     <!--font icons bootstrap css-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+
+    <link rel="stylesheet" href="{% static "css/styles.css" %}">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,6 +37,9 @@
 
     <!-- Hyperscript -->
     <script src="https://unpkg.com/hyperscript.org@0.9.14" defer></script>
+
+    <!-- GSap -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
 </head>
 
 <body class="{% block background %}bg-light {% endblock background %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'

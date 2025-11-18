@@ -1,9 +1,10 @@
 from django import forms
 from .models import ClientModel,SessionModel
 import pendulum as p
-from session_client.widgets import SelectSplitDateTime
 from session_client.choices import time_slot_options
 from django.forms.widgets import DateInput,Select
+from .choices import ATTENDANCE
+from django.urls import reverse
 
 class ClientForm(forms.ModelForm):
     class Meta:
@@ -98,3 +99,6 @@ class SearchClientForm(forms.Form):
     """ to search for clients """
     search_input = forms.CharField(max_length=100,required=True,help_text="type text search")
     client = forms.ModelChoiceField(queryset=ClientModel.objects.all(),required=False,help_text="Select Client")
+
+class SelectAttendanceForm(forms.Form):
+    attendance = forms.Select(choices=ATTENDANCE)
