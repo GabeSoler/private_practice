@@ -1,5 +1,8 @@
+from random import choices
+
 from django import forms
 
+from session_client.choices import MONTH_SHORT, years_choices
 from .models import RoomCalendarModel,TenantModel
 from django.utils import timezone
 
@@ -18,9 +21,10 @@ class RoomCalendarForm(forms.ModelForm):
 class TenantForm(forms.ModelForm):
     class Meta:
         model = TenantModel
-        fields = ("name","description")
+        fields = ("display_name","name","description")
         labels = {
-            "name":"Your name to display",
+            "display_name":"Your name to display",
+            "name":"Name for your records",
             "description":"a description of the place you are linking to",
         }
 
@@ -35,3 +39,8 @@ class WeekCalendarForm(forms.Form):
                                      help_text='Select week reference')
     calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all(),required=False, help_text='Select the calendar to search')
 
+
+class RoomReportForm(forms.Form):
+    room = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all())
+    month = forms.ChoiceField(choices=MONTH_SHORT)
+    year = forms.ChoiceField(choices=years_choices())

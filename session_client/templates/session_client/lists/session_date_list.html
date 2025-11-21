@@ -12,7 +12,7 @@
   <div id="form-table-wrapper">
   {% partialdef form-partial inline %}
   <form action={% url 'session_client:session_search' %} method="post"
-    hx-post={% url "session_client:session_search" %}
+    hx-post="{% url "session_client:session_search" %}"
     hx-target="#session-list-wrapper"
     hx-trigger="change throttle:1s,load once"
     >
@@ -45,3 +45,4 @@
       </div>
 
   {% endblock search_nav %}
+

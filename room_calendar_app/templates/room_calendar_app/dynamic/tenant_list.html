@@ -13,12 +13,22 @@
 <div class="card-body">
   <ul class="list-group">
     {% for tenant in tenant_list %}
-      <li class="list-group-item list-group-item-action list-group-item-primary">
+        {% partialdef tenant_item_partial inline %}
+      <li class="list-group-item list-group-item-action list-group-item-primary  fade-out">
         <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
         hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
            hx-target="#modal-wrapper"
-        >{{tenant.name}}</a> | {{tenant.description}}
-      </li>
+        >{{tenant.name}}</a> | {{tenant.calendar}} |
+      <i class="bi bi-copy"
+      hx-post="{% url 'room_calendar_app:duplicate_tenant' tenant.pk %}"></i>
+      <i
+                class="bi bi-pencil-square ms-3"
+                                hx-get="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
+                                hx-target="#modal-wrapper"
+                                ></i>
+    </li>
+                {% endpartialdef tenant_item_partial %}
+
       {% empty %}
       <li class="list-group-item list-group-item-action list-group-item-primary">There are no tenants yet. </li>
       {% endfor %}

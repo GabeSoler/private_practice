@@ -13,13 +13,17 @@
   >
   <a class="nav-link {% if request.path == "/calendar/profile-list/"  %}active {% endif %}"
       href="{% url "room_calendar_app:tenant_list" %}"
-      >Profiles</a>
+      >Rentals</a>
 
     <a class="nav-link {% if request.path == "/calendar/room-calendar-manage/"  %}active {% endif %}"
       href={% url 'room_calendar_app:room_calendar_manage' %}
       >Manage</a>
 
-  <a class="nav-link {% if request.path == "/add_client/"  %}active{% endif %}" 
+  <a class="nav-link {% if request.path == "/calendar/room-calendar-report/"  %}active{% endif %}"
+    href="{% url "room_calendar_app:room_report" %}"
+  >Report</a>
+
+  <a class="nav-link {% if request.path == "/add_client/"  %}active{% endif %}"
     href="{% url "room_calendar_app:add_room_calendar" %}"
         hx-get="{% url "room_calendar_app:add_room_calendar" %}"
        hx-target="#modal-wrapper"

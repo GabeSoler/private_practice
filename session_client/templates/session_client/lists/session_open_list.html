@@ -10,9 +10,14 @@
 
   {% partialdef session-form-partial inline %} <!-- Start form partial -->
 
-  <div class="card bg-primary my-1 p-2 rounded">
+  <div class="card bg-primary p-1 rounded">
 
-    <form class="form bg-primary ps-3">
+    <form class="form bg-primary ps-3"
+          hx-post="{% url 'session_client:session_list' %}"
+            hx-target="#session-list-wrapper"
+            hx-swap="innerHTML settle:0.2s"
+            hx-trigger="change throttle:1s"
+>
     <table class="table mb-0" id="client-form-table">
       <tbody>
       <tr>
@@ -23,19 +28,7 @@
           {% bootstrap_field form.include_next wrapper_class="col py-1" layout="horizontal" label_class="text-secondary" %}
         </td>
         <td class="col bg-primary" id="form-td-type">
-          {% bootstrap_field form.client wrapper_class="col py-0" layout="horizontal" label_class="text-secondary" %}
-        </td>
-        <td class="bg-primary">
-            <button class="btn btn-secondary col-12"
-            type="submit"
-            hx-post={% url 'session_client:session_list' %}
-            hx-target="#session-list-wrapper"
-            hx-swap="innerHTML settle:0.2s"
-            hx-trigger="keyup=='Enter',click"
-            hx-exclude="#switchArchived"
-            id="formButton"
-            >
-            <i class="bi bi-search"></i></button>
+          {% bootstrap_field form.client wrapper_class="col py-0" layout="horizontal" label_class="text-secondary" show_label="skip" %}
         </td>
       </tr>
     </tbody>
@@ -50,3 +43,4 @@
 
 
   {% endblock search_nav %}
+

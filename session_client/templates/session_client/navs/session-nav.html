@@ -1,5 +1,5 @@
 {% extends '_base.html' %}
-
+{% load hx_helpers %}
 {% block local_nav %}
     <!-- Sessions Nav -->
     <nav
@@ -21,9 +21,6 @@
            hx-target="#modal-wrapper"
            hx-push-url="true">Add</a>
 
-        {% comment %}
-    <a class="nav-link {% if request.path == "/add_session/"  %}active{% endif %}"
-      href="{% url "session_client:add_session" %}">Add</a>{% endcomment %}
     </nav>
 
 
@@ -70,52 +67,18 @@
                                     </th>
 
                                     <td>{{ session.client }}</td>
-                                    {% partialdef attendance_partial inline %}
                                         <td>
+                                    {% partialdef attendance_partial inline %}
+                                            <select name="attendance" class="form-select"
+                                                    id="id_{{ session.pk }}"
+                                                    hx-post="{% url 'session_client:session_patch_attendance' session.pk %}"
+                                                    hx-swap="outerHTML">
+                                                <option value="{{ session.get_attendance_display }}" selected="">{{ session.get_attendance_display }}</option>
+                                            {% attendance_choices_as_html %}
 
-                                            <div class="dropup-center d-inline">
-                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle"
-                                                        type="button"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                    {{ session.get_attendance_display|default:"--" }}
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li>
-                                                        <a class="dropdown-item small
-                                                        {% if 'Attended' == session.attendance %}
-                                                        disabled{% endif %}"
-                                                        hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'Attended' %}"
-                                                        hx-target="closest <td/>"
-                                                        >Attended</a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item small
-                                                        {% if 'LateC' == session.attendance %}
-                                                        disabled{% endif %}"
-                                                        hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'LateC' %}"
-                                                        hx-target="closest <td/>"
-                                                        >Late Cancelled</a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item small
-                                                        {% if 'Missed' == session.attendance %}
-                                                        disabled{% endif %}"
-                                                        hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'Missed' %}"
-                                                        hx-target="closest <td/>"
-                                                        >Missed</a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item small
-                                                        {% if 'Cancel' == session.attendance %}
-                                                        disabled{% endif %}"
-                                                        hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'Cancel' %}"
-                                                        hx-target="closest <td/>"
-                                                        >Cancelled</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </td>
+                                            </select>
                                     {% endpartialdef attendance_partial %}
+                                        </td>
                                     <td>{{ session.brief|truncatechars:10 }}</td>
 
                                     <!-- paid/not paid partial -->
@@ -162,5 +125,6 @@
         </div> <!-- end session list -->
 
         </div>
+
 
     {% endblock content %}

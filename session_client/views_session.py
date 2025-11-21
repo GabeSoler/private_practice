@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
-from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm
+from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, SelectAttendanceForm
 from django_htmx.http import retarget, HttpResponseClientRefresh
 import pendulum as p
 from django.contrib import messages
@@ -55,7 +55,7 @@ def sessions_view(request,client_pk=None,add_forward=False) -> HttpResponse:
         sessions = sessions.filter(client__pk=client_pk)
     if not add_forward:
         sessions = sessions.filter(date__lte=p.now().date())
-    context = {'sessions': sessions, 'form': form}
+    context = {'sessions': sessions, 'form': form,'select':SelectAttendanceForm}
     return render(request, template, context)
 
 
@@ -304,10 +304,13 @@ def sessions_hx_edit_attendance(request,session_pk,attendance):
     return render(request, template, {"session": session})
 
 @login_required()
-def sessions_patch_attendance(request,session_pk,attendance):
+def sessions_patch_attendance(request,session_pk):
     session = get_object_or_404(SessionModel, pk=session_pk, client__user=request.user)
-    session.attendance = attendance
-    session.save()
-    messages.info(request, f"Session '{session.start_time.strftime('%d-%m-%y,%H:%M')}' updated")
-    template = 'session_client/navs/session-nav.html'+ "#attendance_partial"
-    return render(request, template, {"session": session})
+    if request.htmx:
+        form = SelectAttendanceForm(data=request.POST,instance=session)
+        if form.is_valid():
+            session = form.save()
+            messages.info(request, f"Session '{session.start_time.strftime('%d-%m-%y,%H:%M')}' updated")
+            template = 'session_client/navs/session-nav.html'+ "#attendance_partial"
+            return render(request, template, {"session": session})
+    return Http404("Error with attendance update")

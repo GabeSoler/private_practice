@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 import pendulum as p
 from typing import Tuple,Any,List
 
+
 ATTENDANCE = [
     ("Attended", "Attended"),
     ("LateC", "Late Cancel"),
@@ -156,3 +157,10 @@ REPEAT_CHOICES = (
 
 ON_EACH = (("on", _("On the")), 
            ("each", _("Each:")))
+
+def years_choices(n=15):
+    start_date = p.now()
+    end_date = start_date.subtract(years=n)
+    interval = p.interval(start_date,end_date)
+    year_choices = [(y.year,f"{y.year}") for y in interval.range('years')]
+    return year_choices
