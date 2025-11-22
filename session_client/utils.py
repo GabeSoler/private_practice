@@ -3,6 +3,8 @@ import csv
 import pendulum as p
 from django.http import HttpResponse
 
+from room_calendar_app.models import RoomCalendarModel
+
 
 def time_plus_duration(time_obj, duration_obj)->p.Time:
     seconds_in_day = 24 * 60 * 60
@@ -32,16 +34,32 @@ def range_from_date(date_start, date_end, step=1, add_weeks=None,range_type='wee
 def now_at_time(time)->p.DateTime:
     return p.now().at(time.hour,time.minute)
 
+def make_csv_response(file_name):
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{file_name}.csv"'})
+    return response
+
 def csv_session_list_response(sessions,client,date_start,date_end):
         start_ref_str = p.instance(date_start).to_formatted_date_string()  # converting for easier formatting
         end_ref_str = p.instance(date_end).to_formatted_date_string()
         file_name = f"{client}: {start_ref_str}-{end_ref_str}" if client else f"{start_ref_str}-{end_ref_str}"
-        response = HttpResponse(
-            content_type="text/csv",
-            headers={"Content-Disposition": f'attachment; filename="{file_name}.csv"'})
+        response = make_csv_response(file_name)
         fieldnames = ["date", "start_time", "client", "brief", "paid"]
         writer = csv.writer(response)  # response is the output
         writer.writerow(fieldnames)
         for row in sessions:
             writer.writerow([row.date, row.start_time, row.client, row.brief, row.paid])
+        return response
+
+def csv_room_report_response(sessions,room:RoomCalendarModel,year:int,month:int):
+        file_name = f"{room}: {year}-{month}"
+        response = HttpResponse(
+            content_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="{file_name}.csv"'})
+        fieldnames = ["date","client","attendance","pay"]
+        writer = csv.writer(response)  # response is the output
+        writer.writerow(fieldnames)
+        for row in sessions:
+            writer.writerow([row.date, row.client, row.attendance, row.pay])
         return response

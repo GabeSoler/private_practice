@@ -3,15 +3,18 @@ from django.shortcuts import get_object_or_404, render,redirect
 from django.http import Http404, HttpResponse
 from django.contrib import messages
 
+from session_client.utils import csv_room_report_response
 from .models import RoomCalendarModel,TenantModel
-from .forms import RoomCalendarForm, TenantForm, LinkTenantForm, WeekCalendarForm, RoomReportForm
+from .forms import RoomCalendarForm, TenantForm, LinkTenantForm, WeekCalendarForm, RoomReportForm, TenantReportForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
 from django_htmx.http import retarget, HttpResponseClientRefresh
 from .calendar_utils import CalendarRender
 import pendulum as p
 from session_client.models import SessionModel,ClientModel
+from django.db.models import Q, F, Case, When,FloatField,Prefetch,Count,Sum
 
+from .querysets import tenant_annotated_qs, get_tenant_qs_totals
 
 
 @login_required
@@ -74,17 +77,35 @@ def week_view_auxiliary(request):
 
 @login_required
 def room_calendar_listing_view(request):
-    room_calendar_tenant = RoomCalendarModel.objects.filter(tenantmodel__user=request.user).prefetch_related("tenantmodel_set").distinct()
+    room_calendar_tenant = RoomCalendarModel.objects.filter(Q(tenantmodel__user=request.user)|Q(user=request.user)).prefetch_related("tenantmodel_set").distinct()
     context = {"calendar_tenant": room_calendar_tenant}
     return render(request,"room_calendar_app/display/room_calendar_list.html",context)
 
 @login_required
 def room_calendar_manage_view(request):
-    my_rooms = RoomCalendarModel.objects.filter(user=request.user).prefetch_related("tenantmodel_set")
+    ref_date = p.now()
+    my_rooms = RoomCalendarModel.objects.filter(user=request.user)
     form = LinkTenantForm()
-    context = {"rooms": my_rooms, "form": form}
+    form_tenant = TenantReportForm(initial={"month":ref_date.month})
+    context = {"rooms": my_rooms, "form": form,"form_tenant":form_tenant}
     return render(request,"room_calendar_app/display/room_calendar_manage.html",context)
 
+@login_required()
+def room_manage_refresh_view(request,cal_pk):
+    if request.method == "POST":
+        form_tenant = TenantReportForm(initial={"month": p.now().month},
+                                       data=request.POST)
+        if form_tenant.is_valid():
+            year = form_tenant.cleaned_data['year']
+            month = form_tenant.cleaned_data['month']
+            tenants_qs = tenant_annotated_qs(year,month,cal=cal_pk)
+            totals = get_tenant_qs_totals(tenants_qs)
+            template = "room_calendar_app/display/room_calendar_manage.html"+"#table-body-partial"
+            context = {"tenants":tenants_qs,"totals":totals}
+            return render(request,template,context)
+
+        return Http404("Ups")
+    return Http404("Ups")
 
 
 @login_required
@@ -225,18 +246,33 @@ def room_report_view(request):
         if form.is_valid():
             year = form.cleaned_data['year']
             month = form.cleaned_data['month']
-            sessions = SessionModel.objects.filter(client__user=request.user, date__month=month, date__year=year)
-            room_pk = form.cleaned_data['room']
-            template_partial = template + ''
-            if room_pk:
-                room = RoomCalendarModel.objects.get(pk=room_pk)
-                sessions = sessions.filter(calendar=room)
-
-    form = RoomReportForm()
-    month = p.now().month
-    year = p.now().year
-    sessions = SessionModel.objects.filter(client__user=request.user,date__month=month,date__year=year)
-    form.fields['room'].queryset = RoomCalendarModel.objects.filter()
+            room = form.cleaned_data['room']
+            sessions = SessionModel.objects.filter(date__month=month,
+                                                   date__year=year,
+                                                   calendar=room,
+                                                   ).exclude(attendance__exact="Cancel")
+            template_partial = template + '#session-list-partial'
+            if room.user != request.user:
+                sessions.filter(client__user=request.user)
+            sessions = sessions.annotate(
+                pay=Case(
+                    When(client__type="RoomP",
+                         then=F("amount_paid") * room.percentage / 100),
+                    default=room.cost,
+                    output_field=FloatField()
+                                )
+                        )
+            if request.htmx:
+                totals = sessions.aggregate(session_count=Count("created_at"),
+                                            session_pay=Sum("pay"))
+                return render(request,template_partial,{'sessions':sessions,"totals":totals})
+            return csv_room_report_response(sessions,room,month,year)
+        template_form = template + '#form-partial'
+        response = render(request,template_form,{'form':form})
+        return retarget(response,'form-table-wrapper')
+    form = RoomReportForm(initial={"month":p.now().month})
+    sessions = SessionModel.objects.none()
+    form.fields['room'].queryset = RoomCalendarModel.objects.filter(Q(user=request.user)|Q(tenantmodel__user=request.user))
     context = {'form':form,'sessions':sessions}
     return render(request,template,context)
 

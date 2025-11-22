@@ -2,6 +2,8 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
+
+    <!-- search rooms when many  -->
     {% if rooms|length > 2 %}
         <div class="container bg-primary">
             <label for="client-search-input">Filter clients</label>
@@ -15,7 +17,7 @@
         </div>
     {% endif %}
 
-
+<!-- list of Room Calendars -->
     <ul class="list-group">
         {% for calendar in rooms %}
             <li class="list-group-item">
@@ -28,9 +30,36 @@
                                hx-target="#modal-wrapper">
                         {{ calendar.name }}</a> | </span>
 
-                    </div>
-                    <div class="col">
+                    <!-- form to change tenant report by month -->
+  <div id="form-table-wrapper">
+  {% partialdef form-tenant-partial inline %}
+  <form action="{% url 'room_calendar_app:room_manage_refresh' calendar.pk %}" method="post"
+    hx-post="{% url "room_calendar_app:room_manage_refresh" calendar.pk %}"
+    hx-target="next <tbody/>"
+    hx-trigger="change throttle:1s,load once"
+    >
+    {% csrf_token %}
+    <table
+    class="table table-sm mb-0"
+    id="switch-table"
+    >
+    <tr class="" id="calendar-form-tr">
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form_tenant.year show_label='skip' size="sm"  %}
+        </td>
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form_tenant.month show_label='skip' size="sm"  %}
+        </td>
+    </tr>
+  </table>
+</form>
+      {% endpartialdef %} <!-- end partial table -->
+      </div>
 
+                    </div>
+
+                <!-- form to add new tenants to the room -->
+                    <div class="col">
                             <form class="" id="tenant-link-form">
                         {% partialdef form-partial inline %}
                                 {% bootstrap_field form.tenant_id layout='horizontal' show_label='skip' %}
@@ -41,7 +70,7 @@
                                     type="button"
                                     class="btn btn-outline-secondary btn-md col-10"
                                     hx-post="{% url 'room_calendar_app:link_tenant' calendar.pk %}"
-                                    hx-target="#tenant-table-body"
+                                    hx-target="next <tbody/>"
 
                             >
                                 Link
@@ -50,53 +79,58 @@
                             </form>
                         </div>
 
+
+                <!-- list of tenants and their sessions  -->
                     <div class="row">
 
                         <table class="table">
                             <thead>
                             <tr>
-                                <th scope="col">#</th>
+                                <th scope="col">Tenant</th>
                                 <th scope="col">Sessions</th>
-                                <th scope="col">Percentage</th>
                                 <th scope="col">Rent</th>
-                                <th scope="col">Total</th>
                             </tr>
                             </thead>
 
                             <tbody id="tenant-table-body">
                         {% partialdef table-body-partial inline %}
-                            {% for tenant in  calendar.tenantmodel_set.all %}
+                            {% for tenant in  tenants %}
                                 <tr>
-                                <th scope="row">1
+                                <th scope="row">
                                     {% if tenant.user == user %}
                                         <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
                                            hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
                                            hx-target="#modal-wrapper"
-                                        >- {{ tenant.name }}
+                                        >{{ tenant.name }}
                                             (Me)</a>
                                     {% else %}
                                         <span>- {{ tenant.name }}</span>
                                     {% endif %}
-                                <i class="bi bi-slash-circle-fill text-danger"
+                                <i class="bi bi-slash-circle-fill text-danger ms-4"
                                         hx-post="{% url 'room_calendar_app:unlink_tenant' tenant.pk %}"
                                    hx-target="closest <tr/>"
                                    hx-swap="outerHTML"
                                 ></i>
                                 </th>
                                 <td>
-                                    <span class="placeholder col-1 bg-secondary"></span>
+                                    {{tenant.session_count}}
                                 </td>
                                 <td>
-                                    <span class="placeholder col-1 bg-secondary"></span>
-                                </td>
-                                <td>
-                                    <span class="placeholder col-1 bg-secondary"></span>
-                                </td>
-                                <td>
-                                    <span class="placeholder col-1 bg-secondary"></span>
+                                    {{tenant.session_pay}}
                                 </td>
 
                             {% endfor %}
+                            </tr>
+                            <tr class="text-info">
+                                <td class="text-info">
+                                    Total
+                                </td>
+                                <td class="text-info">
+                                    {{ totals.total_sessions }}
+                                </td>
+                                <td class="text-info">
+                                    {{ totals.total_pay }}
+                                </td>
                             </tr>
                         {% endpartialdef table-body-partial %}
                             </tbody>
@@ -105,8 +139,7 @@
 
             </li>
         {% empty %}
-            <li class="list-group-item">There are no clients yet.</li>
+            <li class="list-group-item">Add a new Room.</li>
         {% endfor %}
     </ul>
-
 {% endblock content %}

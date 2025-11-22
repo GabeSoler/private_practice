@@ -9,8 +9,8 @@
 
   <div id="form-table-wrapper">
   {% partialdef form-partial inline %}
-  <form action="{% url 'session_client:session_search' %}" method="post"
-    hx-post="{% url "session_client:session_search" %}"
+  <form action="{% url 'room_calendar_app:room_report' %}" method="post"
+    hx-post="{% url "room_calendar_app:room_report" %}"
     hx-target="#session-list-wrapper"
     hx-trigger="change throttle:1s,load once"
     >
@@ -47,6 +47,7 @@
         <div id="session-list-wrapper">
             {% if sessions %} {% comment %} As i re use it its here, a bit messy :/ {% endcomment %}
                 {% partialdef session-list-partial inline %}
+                    <p class="bg-secondary text-primary">Total Sessions: {{ totals.session_count }} - Expected pay: {{ totals.session_pay }}</p>
                     <table class="table">
                         <thead>
                         <tr>
@@ -56,11 +57,8 @@
                             </th>
                             <th scope="col">Attendance
                             </th>
-                            <th scope="col">Brief
+                            <th scope="col">Pay
                             </th>
-                            <th scope="col">Paid
-                            </th>
-                            <th scope="col">Open
                             </th>
                         </tr>
                         </thead>
@@ -77,6 +75,8 @@
                                     </th>
 
                                     <td>{{ session.client }}</td>
+                                    <td>{{ session.get_attendance_display }}</td>
+                                    <td class="text-info">{{ session.pay }}</td>
 
 
                                 </tr>
