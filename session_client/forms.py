@@ -104,3 +104,8 @@ class SelectAttendanceForm(forms.ModelForm):
     class Meta:
         model = SessionModel
         fields = ['attendance']
+
+class PatchBriefForm(forms.ModelForm):
+    class Meta:
+        model = SessionModel
+        fields = ['brief']

@@ -62,6 +62,8 @@ urlpatterns = [
          views_session.sessions_patch_attendance, name='session_patch_attendance'),
     path('hx_delete_session/<uuid:session_pk>/',
          views_session.hx_delete_session, name='hx_delete_session'),
+    path('patch_brief_session/<uuid:session_pk>/',
+         views_session.patch_brief_view, name='session_patch_brief'),
     path('add_series/<uuid:client_pk>/<int:number>/',
          views_session.add_series_view, name='add_series'),
 

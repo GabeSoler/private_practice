@@ -4,12 +4,15 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
-from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, SelectAttendanceForm
+from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, \
+    SelectAttendanceForm, PatchBriefForm
 from django_htmx.http import retarget, HttpResponseClientRefresh
 import pendulum as p
 from django.contrib import messages
 from .utils import csv_session_list_response
+import logging
 
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 
@@ -314,3 +317,18 @@ def sessions_patch_attendance(request,session_pk):
             template = 'session_client/navs/session-nav.html'+ "#attendance_partial"
             return render(request, template, {"session": session})
     return Http404("Error with attendance update")
+
+
+def patch_brief_view(request,session_pk):
+    session = get_object_or_404(SessionModel,pk=session_pk)
+    form = PatchBriefForm(instance=session)
+    if request.method == 'POST':
+        form = PatchBriefForm(data=request.POST,instance=session)
+        if form.is_valid():
+            form.save()
+            messages.debug(request,"Brief updated")
+            logger.info(f"session {session}, updated")
+            return HttpResponseClientRefresh()
+        logger.info("form not valid")
+    template = "session_client/hx/_brief.html"
+    return render(request,template,{"form":form,"session":session})

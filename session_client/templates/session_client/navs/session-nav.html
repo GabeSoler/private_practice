@@ -79,7 +79,13 @@
                                             </select>
                                     {% endpartialdef attendance_partial %}
                                         </td>
-                                    <td>{{ session.brief|truncatechars:10 }}</td>
+                                    <td>{% partialdef brief_partial inline %}
+                                        <i class="bi bi-pencil-fill text-{% if session.brief %}success{% else %}danger{% endif %}"
+                                        hx-get="{% url 'session_client:session_patch_brief' session.pk %}"
+                                        hx-target="#modal-wrapper"
+                                           hx-trigger="click"
+                                        ></i>
+                                        {% endpartialdef brief_partial %}</td>
 
                                     <!-- paid/not paid partial -->
                                     {% partialdef session_paid inline %}
