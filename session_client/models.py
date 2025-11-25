@@ -10,6 +10,7 @@ from django.urls import reverse
 from .choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices,time_slot_options,SERIES_CHOICE
 from room_calendar_app.models import RoomCalendarModel, TenantModel
 import pendulum as p
+from encrypted_fields.fields import EncryptedCharField
 
 from .utils import time_plus_duration,range_from_date
 import logging
@@ -230,7 +231,8 @@ class SessionModel(models.Model):
     start_time = models.TimeField(editable=True, default="09:00:00", help_text="Start of session?")
     end_time = models.TimeField(default="10:00:00",blank=True,editable=True, help_text="End of session")
    #Session notes and vector (delete after 7 years?)
-    brief = models.CharField(default='',blank=True,max_length=250,help_text="250 characters note") #short description
+    brief = EncryptedCharField(default='',blank=True,max_length=250,help_text="250 characters note") #short description
+    keywords = models.CharField(blank=True,max_length=25,help_text="words for search")
     #admin info
     paid = models.BooleanField(default=False,blank=True) #check payment
     attendance = models.CharField(default='', blank=True, max_length=20, choices=ATTENDANCE) #record attendance
