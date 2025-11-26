@@ -48,3 +48,6 @@ class RoomReportForm(forms.Form):
 class TenantReportForm(forms.Form):
     month = forms.ChoiceField(choices=MONTH_SHORT)
     year = forms.ChoiceField(choices=years_choices())
+
+class RoomSwitchForm(forms.Form):
+    room = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all())

@@ -8,7 +8,7 @@ from room_calendar_app.models import RoomCalendarModel, TenantModel
 from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from .forms import ClientForm, SearchClientForm, ClientFormShort, SearchSessionForm
+from .forms import ClientForm, SearchClientForm, ClientFormShort, SearchSessionForm, ClientFromCalendarForm
 from django_htmx.http import HttpResponseClientRedirect, HttpResponseClientRefresh, retarget
 from django.utils import timezone
 from django.contrib import messages
@@ -76,7 +76,7 @@ def client_search_view(request):
         if form_partial.is_valid():
             raw_query = form_partial.cleaned_data['search_input']
             search_query = SearchQuery(raw_query)
-            vector_brief = SearchVector("brief",weight="A")
+            vector_brief = SearchVector("keywords",weight="A")
             vector_calendar = SearchVector("calendar__name",weight="D")
             vector_client = SearchVector("client__code",weight="C")
             vector_nick = SearchVector("client__nick_name",weight="B")
@@ -87,7 +87,7 @@ def client_search_view(request):
                         .annotate(
                             search=vector,
                             rank=SearchRank(vector,search_query),
-                            headline=SearchHeadline("brief",search_query),
+                            headline=SearchHeadline("keywords",search_query),
             ).filter(search=raw_query).order_by("-rank"))
             if client:
                 sessions = sessions.filter(client=client)
@@ -175,4 +175,34 @@ def edit_client_view(request, client_pk):
                 return HttpResponseClientRefresh()
             return redirect('session_client:client_list')
     context = {'client': client, 'form': form}
+    return render(request, template, context)
+
+
+@login_required
+def week_view_add_client(request, weekday=None, time=None, calendar=None):
+    """ to create sessions from the calendar using calendar info as base """
+    template = 'room_calendar_app/input/client_calendar_form.html'
+    if request.method == 'POST':
+        form = ClientFromCalendarForm(data=request.POST)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.day = weekday
+            instance.time = time
+            if not instance.calendar:
+                instance.calendar=calendar
+            instance.save()
+            messages.info(request, f"Client added: {instance.code}")
+            return HttpResponseClientRefresh()
+        # form errors
+        template = template + '#client_calendar_form_partial'
+        context = {'form': form}
+        return render(request, template, context)
+    # get response
+    assert weekday is not None, "Week_day is required for get calls"
+    assert time is not None, "Time is required for get calls"
+    data = {
+        'calendar': calendar or None,
+    }
+    form = ClientFromCalendarForm(data=data)
+    context = {'form': form}
     return render(request, template, context)

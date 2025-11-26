@@ -73,18 +73,18 @@
   --bs-body-font-size: 1rem;
   --bs-body-font-weight: 400;
   --bs-body-line-height: 1.5;
-  --bs-body-color: rgb(242, 130, 130);
-  --bs-body-color-rgb: 242, 130, 130;
-  --bs-body-bg: #524659;
-  --bs-body-bg-rgb: 82, 70, 89;
+  --bs-body-color: rgb(91, 47, 104);
+  --bs-body-color-rgb: 91, 47, 104;
+  --bs-body-bg: rgb(213.6754966887, 183.3708609272, 222.6291390728);
+  --bs-body-bg-rgb: 214, 183, 223;
   --bs-emphasis-color: #1f1d22;
   --bs-emphasis-color-rgb: 31, 29, 34;
-  --bs-secondary-color: rgba(242, 130, 130, 0.75);
-  --bs-secondary-color-rgb: 242, 130, 130;
+  --bs-secondary-color: rgba(91, 47, 104, 0.75);
+  --bs-secondary-color-rgb: 91, 47, 104;
   --bs-secondary-bg: #bebac1;
   --bs-secondary-bg-rgb: 190, 186, 193;
-  --bs-tertiary-color: rgba(242, 130, 130, 0.5);
-  --bs-tertiary-color-rgb: 242, 130, 130;
+  --bs-tertiary-color: rgba(91, 47, 104, 0.5);
+  --bs-tertiary-color-rgb: 91, 47, 104;
   --bs-tertiary-bg: #d7d2dc;
   --bs-tertiary-bg-rgb: 215, 210, 220;
   --bs-heading-color: inherit;
@@ -94,7 +94,7 @@
   --bs-link-hover-color: rgb(110.4, 152.8, 116.8);
   --bs-link-hover-color-rgb: 110, 153, 117;
   --bs-code-color: rgb(191, 88, 156);
-  --bs-highlight-color: rgb(242, 130, 130);
+  --bs-highlight-color: rgb(91, 47, 104);
   --bs-highlight-bg: rgb(255, 250.2, 242.2);
   --bs-border-width: 1px;
   --bs-border-style: solid;
@@ -122,18 +122,18 @@
 
 [data-bs-theme=dark] {
   color-scheme: dark;
-  --bs-body-color: #a8a2a8;
-  --bs-body-color-rgb: 168, 162, 168;
-  --bs-body-bg: #303033;
-  --bs-body-bg-rgb: 48, 48, 51;
+  --bs-body-color: rgb(242, 130, 130);
+  --bs-body-color-rgb: 242, 130, 130;
+  --bs-body-bg: #38353c;
+  --bs-body-bg-rgb: 56, 53, 60;
   --bs-emphasis-color: #efe4f3;
   --bs-emphasis-color-rgb: 239, 228, 243;
-  --bs-secondary-color: rgba(168, 162, 168, 0.75);
-  --bs-secondary-color-rgb: 168, 162, 168;
+  --bs-secondary-color: rgba(242, 130, 130, 0.75);
+  --bs-secondary-color-rgb: 242, 130, 130;
   --bs-secondary-bg: #38353c;
   --bs-secondary-bg-rgb: 56, 53, 60;
-  --bs-tertiary-color: rgba(168, 162, 168, 0.5);
-  --bs-tertiary-color-rgb: 168, 162, 168;
+  --bs-tertiary-color: rgba(242, 130, 130, 0.5);
+  --bs-tertiary-color-rgb: 242, 130, 130;
   --bs-tertiary-bg: rgb(52, 50.5, 55.5);
   --bs-tertiary-bg-rgb: 52, 51, 56;
   --bs-primary-text-emphasis: rgb(156.6, 130.2, 164.4);
@@ -166,7 +166,7 @@
   --bs-link-color-rgb: 157, 130, 164;
   --bs-link-hover-color-rgb: 176, 155, 183;
   --bs-code-color: rgb(216.6, 154.8, 195.6);
-  --bs-highlight-color: #a8a2a8;
+  --bs-highlight-color: rgb(242, 130, 130);
   --bs-highlight-bg: rgb(102, 92.4, 76.4);
   --bs-border-color: #443d49;
   --bs-border-color-translucent: rgba(239, 228, 243, 0.15);
@@ -2657,7 +2657,7 @@ textarea.form-control-lg {
 }
 
 [data-bs-theme=dark] .form-select {
-  --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a8a2a8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+  --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='rgb%28242, 130, 130%29' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
 }
 
 .form-check {
@@ -2801,10 +2801,10 @@ textarea.form-control-lg {
   outline: 0;
 }
 .form-range:focus::-webkit-slider-thumb {
-  box-shadow: 0 0 0 1px #524659, 0 0 0 0.25rem rgba(91, 47, 104, 0.25);
+  box-shadow: 0 0 0 1px rgb(213.6754966887, 183.3708609272, 222.6291390728), 0 0 0 0.25rem rgba(91, 47, 104, 0.25);
 }
 .form-range:focus::-moz-range-thumb {
-  box-shadow: 0 0 0 1px #524659, 0 0 0 0.25rem rgba(91, 47, 104, 0.25);
+  box-shadow: 0 0 0 1px rgb(213.6754966887, 183.3708609272, 222.6291390728), 0 0 0 0.25rem rgba(91, 47, 104, 0.25);
 }
 .form-range::-moz-focus-outer {
   border: 0;
@@ -4834,7 +4834,7 @@ textarea.form-control-lg {
   --bs-accordion-btn-padding-y: 1rem;
   --bs-accordion-btn-color: var(--bs-body-color);
   --bs-accordion-btn-bg: var(--bs-accordion-bg);
-  --bs-accordion-btn-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='rgb%28242, 130, 130%29' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M2 5L8 11L14 5'/%3e%3c/svg%3e");
+  --bs-accordion-btn-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='rgb%2891, 47, 104%29' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M2 5L8 11L14 5'/%3e%3c/svg%3e");
   --bs-accordion-btn-icon-width: 1.25rem;
   --bs-accordion-btn-icon-transform: rotate(-180deg);
   --bs-accordion-btn-icon-transition: transform 0.2s ease-in-out;

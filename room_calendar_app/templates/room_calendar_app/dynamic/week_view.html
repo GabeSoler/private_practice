@@ -1,4 +1,4 @@
-{% extends '_base.html' %}
+{% extends 'room_calendar_app/navs/calendar-nav.html' %}
 
 
 {% load django_bootstrap5 %}
@@ -7,7 +7,6 @@
 {% block content %}
 
     <div id="page-wrapper">
-
         <div id="form-table-wrapper">
             {% partialdef form-partial inline %}
                 <form
@@ -58,15 +57,19 @@
                         >{{ slot|time:"H:i" }}</th>
 
                         {% for weekday,occurrence in data.items %}
-                            {% if occurrence.date %}
-                                <td class="table-info"
-                                    hx-get="{% url 'session_client:session_hx_item' occurrence.id %}"
+                            {% if occurrence.in_display %}
+                                <td class="table-info {% if occurrence.end_datetime_adjusted.time == slot %}border-warning-subtle border-bottom
+                                    {% endif %}"
+                                    hx-get="{% url 'session_client:session_hx_item' occurrence.pk %}"
                                     hx-target="#modal-wrapper"
                                     style="font-size:.6rem;"
                                     id="{{ slot }}"
-                                >{{ occurrence.client.tenant.display_name }}-
-                                    {{ occurrence.start_time }}-
-                                    {{ occurrence.end_time }}</td>
+                                >{% if occurrence.start_time == slot %}
+                                {{ occurrence.display }}
+                                    {% else %}
+                                    ***
+                                    {% endif %}
+                                    </td>
                             {% else %}
                                 <td
                                         style="font-size:.6rem;">
@@ -89,7 +92,6 @@
         <!-- End partial def -->
 
         <div id="modal-wrapper"></div>
-
 
     </div>
 {% endblock content %}

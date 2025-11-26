@@ -1,21 +1,26 @@
-
 from django.shortcuts import get_object_or_404, render,redirect
 from django.http import Http404, HttpResponse
 from django.contrib import messages
+from pygments.lexer import default
 
 from session_client.utils import csv_room_report_response
-from .models import RoomCalendarModel,TenantModel
-from .forms import RoomCalendarForm, TenantForm, LinkTenantForm, WeekCalendarForm, RoomReportForm, TenantReportForm
+from .models import RoomCalendarModel, TenantModel, BlocksModel
+from .forms import RoomCalendarForm, TenantForm, LinkTenantForm, WeekCalendarForm, RoomReportForm, TenantReportForm, \
+    RoomSwitchForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
 from django_htmx.http import retarget, HttpResponseClientRefresh
-from .calendar_utils import CalendarRender
+from .calendar_utils import CalendarRender, CalendarClientsRender, CalendarBlocksRender
 import pendulum as p
 from session_client.models import SessionModel,ClientModel
-from django.db.models import Q, F, Case, When,FloatField,Prefetch,Count,Sum
+from django.db.models import (Q, F, Case, When, FloatField, Count,
+                              Sum, CharField,
+                              Value, ExpressionWrapper,
+                              Func,DateTimeField)
+from django.db.models.functions import Concat,Cast
 
 from .querysets import tenant_annotated_qs, get_tenant_qs_totals
-
+from datetime import timedelta
 
 @login_required
 @cache_control(private=True)
@@ -23,6 +28,34 @@ def week_view(request):
     """ Displays a calendar table with occurrences
         You can change the week to display or select a specific room calendar
        """
+    sessions = (SessionModel.objects
+                .filter(client__user=request.user)
+                .select_related('client__user')
+                .annotate(
+                out_display=Concat(
+                    F("client__tenant__display_name"),
+                    Value("-"),
+                    Cast("start_time",output_field=CharField(max_length=5)),
+                    Value("-"),
+                    Cast("end_time",output_field=CharField(max_length=5)),
+                         output_field=CharField()),
+                in_display=Concat(
+                    F("client__code"),
+                    Value("-"),
+                    Cast("start_time",output_field=CharField(max_length=5)),
+                    Value("-"),
+                    Cast("end_time",output_field=CharField(max_length=5)),
+                         output_field=CharField()),
+                display=Case(When(client__user=request.user,then=F("in_display")),default=F("out_display")),
+                start_datetime=ExpressionWrapper(
+                    F("date")+F("start_time"),
+                    output_field=DateTimeField()),
+                end_datetime_adjusted=ExpressionWrapper(
+                    F("date")+ F("end_time") - p.duration(minutes=30),
+                    output_field=DateTimeField()),
+            )
+
+                )
     template = "room_calendar_app/dynamic/week_view.html"
     calendar_user = RoomCalendarModel.objects.filter(tenantmodel__user=request.user) #filter room_calendars options
     assert calendar_user is not None, "no room_calendars found"
@@ -35,13 +68,11 @@ def week_view(request):
             assert date is not None, "date should be something"
             ref_date_partial = p.datetime(date.year,date.month,date.day)
             room_calendar = None # To pass as info into the calendar object
-            sessions = (SessionModel.objects
-                        .filter(client__user=request.user,
-                                             date__week=ref_date_partial.week_of_year)
-                        .select_related('client','client__user'))
+            sessions = sessions.filter(date__week=ref_date_partial.week_of_year).select_related('client','client__user')
             if form_partial.cleaned_data['calendar']:
                 room_calendar = form_partial.cleaned_data['calendar']
                 sessions = sessions.filter(calendar=room_calendar)
+
             calendar_partial = CalendarRender(sessions=sessions,
                                               date_ref=ref_date_partial,
                                               room_cal=room_calendar
@@ -57,12 +88,9 @@ def week_view(request):
         response = render(request,form_partial_template,context)
         return retarget(response,"#calendar-form-tr") # retarget if not valid, switch week table (edge cases)
     #default GET response
+    sessions = sessions.filter(date__week=p.now().week_of_year)
     form = WeekCalendarForm()
     form.fields['calendar'].queryset = calendar_user
-    sessions = (SessionModel.objects
-                .filter(client__user=request.user,
-                                           date__week=p.now().week_of_year)
-                .select_related('client','client__user'))
     assert sessions is not None, "no sessions found"
     calendar = CalendarRender(sessions=sessions) # today by default
     context = {'calendar':calendar,'form':form}
@@ -297,3 +325,20 @@ def tenant_delete_hx(request,tenant_pk):
     tenant.delete()
     return HttpResponseClientRefresh()
 
+def week_blocks_view(request):
+    clients = BlocksModel.objects.all()
+    calendar = CalendarBlocksRender(clients)
+    form = RoomSwitchForm()
+    form.fields["room"].queryset = RoomCalendarModel.objects.filter(tenantmodel__user=request.user)
+    context = {"calendar": calendar, "form": form}
+    template = "room_calendar_app/dynamic/week_view_clients.html"
+    return render(request, template, context)
+
+def week_schedule_view(request):
+    clients = ClientModel.objects.filter(user=request.user)
+    calendar = CalendarClientsRender(clients)
+    form = RoomSwitchForm()
+    form.fields["room"].queryset = RoomCalendarModel.objects.filter(tenantmodel__user=request.user)
+    context = {"calendar":calendar,"form":form}
+    template = "room_calendar_app/dynamic/week_view_clients.html"
+    return render(request,template,context)

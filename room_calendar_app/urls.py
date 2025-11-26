@@ -24,7 +24,9 @@ urlpatterns = [
     path("room-calendar-edit/<uuid:room_calendar_pk>/", views.room_calendar_edit_view, name="edit_room_calendar"),
      
 
-    path("week-view/", views.week_view, name="week_view"),#todo
+    path("week-view/", views.week_view, name="week_view"),
+    path("week-blocks-view/", views.week_blocks_view, name="week_blocks_view"),
+    path("week-schedule-view/", views.week_schedule_view, name="week_schedule_view"),
 
     path("link-tenant/<uuid:calendar_pk>/", views.tenant_link_view, name="link_tenant"),
     path("unlink-tenant/<uuid:tenant_pk>/", views.tenant_unlink_view, name="unlink_tenant"),

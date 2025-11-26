@@ -1,4 +1,4 @@
-{% extends '_base.html' %}
+{% extends 'room_calendar_app/navs/calendar-nav.html' %}
 
 
 {% load django_bootstrap5 %}
@@ -20,11 +20,8 @@
                             id="switch-table"
                     >
                         <tr class="" id="calendar-form-tr">
-                            <td id="cell-form-field-date"
-                            >{% bootstrap_field form.date_reference show_label='skip' %}
-                            </td>
                             <td id="cell-form-field-calendar"
-                            >{% bootstrap_field form.calendar show_label='skip' %}
+                            >{% bootstrap_field form.room show_label='skip' %}
                             </td>
                         </tr>
                     </table>
@@ -36,45 +33,45 @@
 
         <div id="calendar-table-wrapper">
             {% partialdef calendar-view-partial inline %}
-                <table class="table table-secondary table-striped-columns table-sm"
+                <table class="table table-info table-striped-columns table-sm"
                        id="week-view-table">
                     <thead>
                     <tr>
                         <th scope="col">#</th>
-                        {% for day in calendar.week_days %}
+                        {% for n,day in calendar.week_days %}
 
                             <th scope="col"
                                 style="font-size:.8rem;"
-                            >{{ day|date:'d-m-y' }}</th>
+                            >{{ day }}</th>
                         {% endfor %}
                     </tr>
                     </thead>
+
                     <tbody>
 
-                    {% for slot,data in calendar.week_dict.items %}
+                    {% for slot,data in calendar.client_dict.items %}
                         <tr> <!-- row for time -->
                         <th scope="row"
                             style="font-size:.6rem;"
                         >{{ slot|time:"H:i" }}</th>
 
                         {% for weekday,occurrence in data.items %}
-                            {% if occurrence.date %}
-                                <td class="table-info"
-                                    hx-get="{% url 'session_client:session_hx_item' occurrence.id %}"
+                            {% if occurrence.pk %}
+                                <td class="table-danger"
+                                    hx-get="{% url 'session_client:client_hx_item' occurrence.pk %}"
                                     hx-target="#modal-wrapper"
                                     style="font-size:.6rem;"
                                     id="{{ slot }}"
-                                >{{ occurrence.client.tenant.display_name }}-
-                                    {{ occurrence.start_time }}-
-                                    {{ occurrence.end_time }}</td>
+                                >{{ occurrence.code }}-
+                                    {{ occurrence.time }}</td>
                             {% else %}
                                 <td
                                         style="font-size:.6rem;">
                                     <i
                                             {% if calendar.room_calendar %}
-                                                hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" calendar.room_calendar.pk %}"
+                                                hx-get="{% url 'session_client:week_view_add_client' weekday slot|time:"H:i" calendar.room_calendar.pk %}"
                                             {% else %}
-                                                hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" %}"
+                                                hx-get="{% url 'session_client:week_view_add_client' weekday slot|time:"H:i" %}"
                                             {% endif %}
                                                 hx-target="#modal-wrapper" class="bi bi-patch-plus"></i></a>
                                 </td>

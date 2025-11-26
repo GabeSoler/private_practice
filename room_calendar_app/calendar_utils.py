@@ -1,8 +1,10 @@
 """ A series of functions to deal with the calendar"""
+from collections import namedtuple
+
 import pendulum as p
 
 from room_calendar_app.models import RoomCalendarModel, BlocksModel
-from session_client.choices import time_slots
+from session_client.choices import time_slots,WEEKDAY_LONG
 from session_client.models import ClientModel
 from session_client.utils import date_plus_time, time_plus_duration, now_at_time
 
@@ -53,11 +55,8 @@ class CalendarRender:
         """organises the dictionary by the session, it cannot handle two in a slot (which is the idea)"""
         week_dict = week_slot_dic()
         for session in self.sessions:
-            #assert session.start_time is not None, "Calendar UtilsL: start_datetime should not be None"
-            start_time = session.start_time
-            end_time = p.time(session.end_time.hour,session.end_time.minute).subtract(minutes=30)
-            start_datetime = date_plus_time(session.date,start_time) # session date! not self.datetime!
-            end_datetime = date_plus_time(session.date,end_time)
+            start_datetime = p.instance(session.start_datetime) #annotated datetime
+            end_datetime = p.instance(session.end_datetime_adjusted) #adjusted with subtract min=30
             time_range = p.interval(start_datetime,end_datetime)
             iso_day = session.date.isoweekday()
             for time_slot in time_range.range('minutes',30):
@@ -86,8 +85,10 @@ class CalendarBlocksRender:
         return block_dict
 
 class CalendarClientsRender:
-    def __init__(self,clients:list[ClientModel]):
+    def __init__(self,clients:list[ClientModel],calendar=None):
         self.clients = clients
+        self.week_days = WEEKDAY_LONG
+        self.room_calendar = calendar
 
     @property
     def client_dict(self)->dict:

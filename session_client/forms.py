@@ -108,4 +108,9 @@ class SelectAttendanceForm(forms.ModelForm):
 class PatchBriefForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['brief']
+        fields = ['brief','keywords']
+
+class ClientFromCalendarForm(forms.ModelForm):
+    class Meta:
+        model = ClientModel
+        fields = ['code','duration','fee','type']
