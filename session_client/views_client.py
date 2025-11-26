@@ -179,7 +179,7 @@ def edit_client_view(request, client_pk):
 
 
 @login_required
-def week_view_add_client(request, weekday=None, time=None, calendar=None):
+def week_view_add_client(request, weekday=None, time=None):
     """ to create sessions from the calendar using calendar info as base """
     template = 'room_calendar_app/input/client_calendar_form.html'
     if request.method == 'POST':
@@ -200,9 +200,7 @@ def week_view_add_client(request, weekday=None, time=None, calendar=None):
     # get response
     assert weekday is not None, "Week_day is required for get calls"
     assert time is not None, "Time is required for get calls"
-    data = {
-        'calendar': calendar or None,
-    }
-    form = ClientFromCalendarForm(data=data)
+    form = ClientFromCalendarForm()
+    form.fields['tenant'].queryset = TenantModel.objects.filter(user=request.user)
     context = {'form': form}
     return render(request, template, context)

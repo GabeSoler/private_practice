@@ -335,10 +335,18 @@ def week_blocks_view(request):
     return render(request, template, context)
 
 def week_schedule_view(request):
+    template = "room_calendar_app/dynamic/week_view_clients.html"
+    if request.method =='POST':
+        form = RoomSwitchForm(data=request.POST)
+        if form.is_valid():
+            room = form.cleaned_data['room']
+            clients = ClientModel.objects.filter(tenant__calendar=room)
+            calendar = CalendarClientsRender(clients)
+            template_partial = template + "#calendar-table-partial"
+            return render(request,template_partial,{"calendar":calendar})
     clients = ClientModel.objects.filter(user=request.user)
     calendar = CalendarClientsRender(clients)
     form = RoomSwitchForm()
-    form.fields["room"].queryset = RoomCalendarModel.objects.filter(tenantmodel__user=request.user)
+    form.fields["room"].queryset = RoomCalendarModel.objects.filter(Q(tenantmodel__user=request.user)|Q(user=request.user))
     context = {"calendar":calendar,"form":form}
-    template = "room_calendar_app/dynamic/week_view_clients.html"
     return render(request,template,context)

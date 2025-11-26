@@ -11,7 +11,7 @@
         <div id="form-table-wrapper">
             {% partialdef form-partial inline %}
                 <form
-                        hx-post="{% url "room_calendar_app:week_view" %}"
+                        hx-post="{% url "room_calendar_app:week_schedule_view" %}"
                         hx-target="#calendar-table-wrapper"
                         hx-trigger="change throttle:1s"
                 >
@@ -19,11 +19,12 @@
                             class="table table-primary table-striped-columns table-sm mb-0"
                             id="switch-table"
                     >
-                        <tr class="" id="calendar-form-tr">
+                        <td class="" id="calendar-form-tr">
                             <td id="cell-form-field-calendar"
                             >{% bootstrap_field form.room show_label='skip' %}
                             </td>
-                        </tr>
+                        </td>
+                    <td></td>
                     </table>
                 </form>
             {% endpartialdef %} <!-- end partial table -->
@@ -32,7 +33,7 @@
         <!-- Partial def  week calendar -->
 
         <div id="calendar-table-wrapper">
-            {% partialdef calendar-view-partial inline %}
+            {% partialdef calendar-table-partial inline %}
                 <table class="table table-info table-striped-columns table-sm"
                        id="week-view-table">
                     <thead>

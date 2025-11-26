@@ -113,4 +113,4 @@ class PatchBriefForm(forms.ModelForm):
 class ClientFromCalendarForm(forms.ModelForm):
     class Meta:
         model = ClientModel
-        fields = ['code','duration','fee','type']
+        fields = ['code','nick_name','duration','fee','type','tenant']

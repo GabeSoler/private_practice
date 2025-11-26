@@ -14,20 +14,36 @@
               hx-target="#session-form-wrapper"
         >
             {% csrf_token %}
+            <div class="row">
+                <div class="col">
+            {% bootstrap_field form.code %}
 
+                </div>
+                <div class="col">
 
-            {% bootstrap_field form.client %}
+            {% bootstrap_field form.nick_name %}
+                </div>
+            </div>
+
 
             <div class="row">
                 <div class="col">
-                    {% bootstrap_field form.date %}
+                    {% bootstrap_field form.duration %}
                 </div>
                 <div class="col">
-                    {% bootstrap_field form.start_time %}
+                    {% bootstrap_field form.fee %}
                 </div>
 
             </div>
-            {% bootstrap_field form.calendar %}
+            <div class="row">
+                <div class="col">
+                    {% bootstrap_field form.type %}
+                </div>
+                <div class="col">
+                    {% bootstrap_field form.tenant %}
+                </div>
+
+            </div>
 
             <button type="submit"
                     class="btn btn-outline-secondary float-end"

@@ -31,6 +31,9 @@ urlpatterns = [
          views_client.hx_client_short_form, name='hx_client_short_form'),
     path('clients_edit/<uuid:client_pk>/',
          views_client.clients_toggle_active, name='client_toggle_active'),
+
+    path('clients_week_add/',
+         views_client.week_view_add_client, name='week_view_add_client'),
     path('clients_week_add/<int:weekday>/<str:time>/',
          views_client.week_view_add_client, name='week_view_add_client'),
     path('clients_week_add/<int:weekday>/<str:time>/<uuid:calendar>/',
