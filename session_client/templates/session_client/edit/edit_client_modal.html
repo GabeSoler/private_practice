@@ -14,8 +14,8 @@
     <div id="modal-body-wrapper">
         {% partialdef modal-body-partial inline %}
 
-            <div class="card bg-dark mb-5 border border-secondary">
-                <form data-bs-theme="dark"
+            <div class="card bg-body mb-5 border border-secondary">
+                <form
                         {% if client %}
                       action="{% url 'session_client:edit_client' client.pk %}" method="post"
                       hx-post="{% url 'session_client:edit_client' client.pk %}">

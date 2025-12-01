@@ -45,10 +45,10 @@
     <script src="{% static 'js/color_mode.js' %}"></script>
 </head>
 
-<body class="{% block background %}bg-light {% endblock background %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+<body class="{% block background %}bg-body {% endblock background %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
 hx-ext="{% if debug %}debug{% endif %}, event-header">
 
-  <nav class="navbar navbar-expand-lg bg-primary sticky-top start-0 py-2 mb-0" data-bs-theme="dark">
+  <nav class="navbar navbar-expand-lg bg-primary sticky-top start-0 py-2 mb-0">
     <div class='container-fluid'>
       <span class="position-relative p-2" style="min-width:12rem;">
       <a class='navbar-brand position-relative' href="{% url 'session_client:index' %}">
@@ -96,12 +96,12 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
                                     <ul class="dropdown-menu dropdown-menu-end" data-bs-popper="static">
                                       <li>
                                         <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
-                                          <i class="bi bi-sun-fill"></i><span class="ms-2">Light</span>
+                                          <i class="bi bi-sun-fill"></i><span class="ms-2">Dawn</span>
                                         </button>
                                       </li>
                                       <li>
                                         <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="true">
-                                          <i class="bi bi-moon-stars-fill"></i><span class="ms-2">Dark</span>
+                                          <i class="bi bi-moon-stars-fill"></i><span class="ms-2">Dusk</span>
                                         </button>
                                       </li>
                                     </ul>

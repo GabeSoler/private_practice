@@ -37,7 +37,7 @@ urlpatterns = [
     path('clients_week_add/<int:weekday>/<str:time>/',
          views_client.week_view_add_client, name='week_view_add_client'),
     path('clients_week_add/<int:weekday>/<str:time>/<uuid:calendar>/',
-         views_client.week_view_add_client, name='week_view_add_client'),
+         views_client.week_view_add_client, name='week_view_add_client_with_calendar'),
 
     # Session Views
 
@@ -71,6 +71,8 @@ urlpatterns = [
          views_session.hx_delete_session, name='hx_delete_session'),
     path('patch_brief_session/<uuid:session_pk>/',
          views_session.patch_brief_view, name='session_patch_brief'),
+    path('add_copy_session/<uuid:session_pk>/',
+         views_session.add_copy_forward_view, name='session_add_copy'),
     path('add_series/<uuid:client_pk>/<int:number>/',
          views_session.add_series_view, name='add_series'),
 

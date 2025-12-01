@@ -13,8 +13,8 @@
     <div id="modal-body-wrapper">
         {% partialdef modal-body-partial inline %}
 
-            <div class="card bg-dark mb-5 border border-secondary">
-                <form data-bs-theme="dark"
+            <div class="card bg-body mb-5 border border-secondary">
+                <form
 
                         {% if session %}
                       action="{% url 'session_client:edit_session' session.pk %}"
@@ -28,7 +28,7 @@
                     {% csrf_token %}
                     <div class="card-body">
 
-                        <!--- Session Title -->
+                        <!--- Session Client and Calendar -->
                         <div class="container text-center">
                             <div class="row align-items-center">
                                 <div class="col">
@@ -36,8 +36,20 @@
                                     {% bootstrap_field form.client layout="horizontal" show_label="skip" show_help=False %}
                                 </div>
                                 <div class="col">
+                            <small>Calendar:</small>
+                            {% bootstrap_field form.calendar layout="horizontal" show_label="skip" show_help=False field_class="mx-auto" %}
+                                </div>
+                            </div>
+                        </div>
+                        <!--- Session Date and time -->
+                        <div class="container text-center border-top border-secondary">
+                            <div class="row align-items-center">
+                                <div class="col">
                                     <small>Date:</small>
                                     {% bootstrap_field form.date layout="horizontal" show_label="skip" show_help=False %}
+                                </div>
+                                <div class="col">
+                                    <small>Time:</small>
                                     {% bootstrap_field form.start_time layout="horizontal" show_label="skip" show_help=False %}
 
                                 </div>
@@ -45,15 +57,13 @@
                         </div>
 
                         <!--- Session Brief -->
-                        <div class="container text-center border-top border-secondary m-1">
+                        <div class="container text-center border-top border-secondary col-12 d-block">
+                            <div class="mx-auto">
                             <small>Session brief:</small>
-                            {% bootstrap_field form.brief layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
-                        </div>
+                            {% bootstrap_field form.brief layout="horizontal" show_label="skip" show_help=False field_class="col-12" %}
+                            {% bootstrap_field form.keywords layout="horizontal" show_label="skip" show_help=False field_class="col-12 mt-1" %}
 
-                        <!--- Session Calendar -->
-                        <div class="container text-center border-top border-secondary m-1">
-                            <small>Session Calendar:</small>
-                            {% bootstrap_field form.calendar layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
+                            </div>
                         </div>
 
                         <!--- Session Attendance -->

@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, \
     SelectAttendanceForm, PatchBriefForm
-from django_htmx.http import retarget, HttpResponseClientRefresh
+from django_htmx.http import retarget, HttpResponseClientRefresh, trigger_client_event,reswap
 import pendulum as p
 from django.contrib import messages
 from .utils import csv_session_list_response
@@ -241,7 +241,7 @@ def hx_delete_session(request, session_pk):
 @login_required
 def week_view_add_session_client(request, year=None, week=None, week_day=None, time=None, calendar=None):
     """ to create sessions from the calendar using calendar info as base """
-    template = 'room_calendar_app/input/session_form_client.html'
+    template = 'session_client/templates/session_client/edit/edit_session_modal.html'
     if request.method == 'POST':
         form = SessionFromCalendarForm(data=request.POST)
         if form.is_valid():
@@ -256,7 +256,9 @@ def week_view_add_session_client(request, year=None, week=None, week_day=None, t
                 return retarget(response,"#modal-wrapper")
             instance.save()
             messages.info(request, f"Session added for {instance.client.code}")
-            return HttpResponseClientRefresh()
+            response = HttpResponse(request)
+            response = trigger_client_event(response,"RefreshTable",{"target":"#room-switch-form"})
+            return trigger_client_event(response,"CloseModal",{"target":"#modal"})
         # form errors
         template = template + '#session_calendar_form_partial'
         context = {'form': form}
@@ -296,6 +298,32 @@ def add_series_view(request,client_pk,number):
             response = render(request, template_overlap, {'sessions': sessions,"created":False})
             return retarget(response,"#toast-wrapper")
     return Http404("Not a expected request")
+
+def add_copy_forward_view(request,session_pk):
+    if request.htmx:
+        session = SessionModel.objects.get(pk=session_pk)
+        new_session = SessionModel(
+            date=p.instance(session.date).add(weeks=1),
+            start_time=session.start_time,
+            end_time=session.end_time,
+            calendar=session.calendar,
+            client=session.client,
+            amount_paid=session.amount_paid,
+            open=True,
+            paid=False
+        )
+        unique, qs = new_session.is_unique()
+        if unique:
+            new_session.save()
+            return render(request,"session_client/hx/_ok.html")
+        else:
+            sessions = qs
+            template = "session_client/lists/session_overlap_modal.html"
+            response = render(request,template,{"sessions":sessions})
+            response = reswap(response,"innerHTML")
+            return retarget(response,"#modal-wrapper")
+    return Http404("Ups,error on this site")
+
 
 @login_required()
 def sessions_hx_edit_attendance(request,session_pk,attendance):

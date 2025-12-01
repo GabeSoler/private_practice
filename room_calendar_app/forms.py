@@ -3,7 +3,7 @@ from random import choices
 from django import forms
 
 from session_client.choices import MONTH_SHORT, years_choices
-from .models import RoomCalendarModel,TenantModel
+from .models import RoomCalendarModel, TenantModel, BlocksModel
 from django.utils import timezone
 
 
@@ -51,3 +51,8 @@ class TenantReportForm(forms.Form):
 
 class RoomSwitchForm(forms.Form):
     room = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all())
+
+class BlockForm(forms.ModelForm):
+    class Meta:
+        model= BlocksModel
+        fields = ['tenant','start_time','end_time','day']

@@ -31,6 +31,12 @@ urlpatterns = [
     path("link-tenant/<uuid:calendar_pk>/", views.tenant_link_view, name="link_tenant"),
     path("unlink-tenant/<uuid:tenant_pk>/", views.tenant_unlink_view, name="unlink_tenant"),
 
+    path("block-add-edit/", views.block_add_view, name="block_add_view"),
+    path("block-add-edit/<uuid:block_pk>/", views.block_edit_view, name="block_edit"),
+    path("block-add-edit/<int:day>/<str:time>", views.block_add_view, name="block_add_with_day_time"),
+    path("block-add-edit/<int:day>/<str:time>/<uuid:room>", views.block_add_view, name="block_add_with_room"),
+
+    path("block-delete/<uuid:block_pk>/", views.block_delete_view, name="delete_block"),
 
     path("hx-client-list/", views.week_view_auxiliary, name="client_list_auxiliary"),
 

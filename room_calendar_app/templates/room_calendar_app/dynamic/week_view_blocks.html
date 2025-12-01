@@ -1,4 +1,4 @@
-{% extends '_base.html' %}
+{% extends 'room_calendar_app/navs/calendar-nav.html' %}
 
 
 {% load django_bootstrap5 %}
@@ -10,10 +10,10 @@
 
         <div id="form-table-wrapper">
             {% partialdef form-partial inline %}
-                <form
-                        hx-post="{% url "room_calendar_app:week_view" %}"
+                <form id="room-switch-form"
+                        hx-post="{% url "room_calendar_app:week_blocks_view" %}"
                         hx-target="#calendar-table-wrapper"
-                        hx-trigger="change throttle:1s"
+                        hx-trigger="change throttle:1s,load once,RefreshTable"
                 >
                     <table
                             class="table table-primary table-striped-columns table-sm mb-0"
@@ -21,7 +21,7 @@
                     >
                         <tr class="" id="calendar-form-tr">
                             <td id="cell-form-field-calendar"
-                            >{% bootstrap_field form.calendar show_label='skip' %}
+                            >{% bootstrap_field form.room show_label='skip' %}
                             </td>
                         </tr>
                     </table>
@@ -30,15 +30,14 @@
         </div>
 
         <!-- Partial def  week calendar -->
-
         <div id="calendar-table-wrapper">
-            {% partialdef calendar-view-partial inline %}
+            {% partialdef calendar-table-partial inline %}
                 <table class="table table-secondary table-striped-columns table-sm"
                        id="week-view-table">
                     <thead>
                     <tr>
                         <th scope="col">#</th>
-                        {% for day in calendar.week_days %}
+                        {% for n,day in calendar.week_days %}
 
                             <th scope="col"
                                 style="font-size:.8rem;"
@@ -47,21 +46,20 @@
                     </tr>
                     </thead>
                     <tbody>
-
-                    {% for slot,data in calendar.week_dict.items %}
+                    {% for slot,data in calendar.block_dict.items %}
                         <tr> <!-- row for time -->
                         <th scope="row"
                             style="font-size:.6rem;"
                         >{{ slot|time:"H:i" }}</th>
 
                         {% for weekday,occurrence in data.items %}
-                            {% if occurrence.date %}
+                            {% if occurrence.pk %}
                                 <td class="table-info"
-                                    hx-get="{% url 'session_client:session_hx_item' occurrence.id %}"
+                                    hx-get="{% url 'room_calendar_app:block_edit' occurrence.pk %}"
                                     hx-target="#modal-wrapper"
                                     style="font-size:.6rem;"
                                     id="{{ slot }}"
-                                >{{ occurrence.client.tenant.display_name }}-
+                                >{{ occurrence.tenant }}-
                                     {{ occurrence.start_time }}-
                                     {{ occurrence.end_time }}</td>
                             {% else %}
@@ -69,9 +67,9 @@
                                         style="font-size:.6rem;">
                                     <i
                                             {% if calendar.room_calendar %}
-                                                hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" calendar.room_calendar.pk %}"
+                                                hx-get="{% url 'room_calendar_app:block_add_with_room' weekday slot|time:"H:i" calendar.room_calendar.pk %}"
                                             {% else %}
-                                                hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" %}"
+                                                hx-get="{% url 'room_calendar_app:block_add_with_day_time' weekday slot|time:"H:i" %}"
                                             {% endif %}
                                                 hx-target="#modal-wrapper" class="bi bi-patch-plus"></i></a>
                                 </td>
@@ -84,7 +82,6 @@
             {% endpartialdef %}
         </div>
         <!-- End partial def -->
-
         <div id="modal-wrapper"></div>
 
 

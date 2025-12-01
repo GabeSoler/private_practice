@@ -59,11 +59,14 @@
                             {% partialdef row-instance inline %}
                                 <tr class="fade-in">
                                     <th scope="row">
-                                        <a href="{% url "session_client:session_hx_item" session.pk %}"
-                                           hx-get="{% url "session_client:session_hx_item" session.pk %}"
+                                        <a href="{% url "session_client:edit_session" session.pk %}"
+                                           hx-get="{% url "session_client:edit_session" session.pk %}"
                                            hx-target="#modal-wrapper">
                                             {% if session.date %}{{ session.date }}{% else %}
                                                 {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>
+                                    <i class="bi bi-repeat-1 ms-3 text-secondary fade-out"
+                                    hx-post="{% url 'session_client:session_add_copy' session.pk%}"
+                                    hx-swap="outerHTML"></i>
                                     </th>
 
                                     <td>{{ session.client }}</td>

@@ -34,8 +34,9 @@ class ClientFormShort(forms.ModelForm):
 class SessionForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['brief','date','start_time', 'client', 'paid', 'amount_paid', 'attendance', 'open', 'calendar']
+        fields = ['brief','keywords','date','start_time', 'client', 'paid', 'amount_paid', 'attendance', 'open', 'calendar']
         labels = {'brief':'Brief',
+                  'keywords':'Keywords',
                   'date': 'Date',
                   'start_time': 'time',
                   'client':'Client',

@@ -26,6 +26,9 @@ static:
 manage *arg:
     uv run python3 manage.py {{arg}}
 
+context:
+    uv run python3 manage.py add_context 5
+
 shell:
     uv run python3 manage.py shell -i ipython
 

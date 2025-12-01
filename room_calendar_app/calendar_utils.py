@@ -54,6 +54,8 @@ class CalendarRender:
     def week_dict(self)->dict:
         """organises the dictionary by the session, it cannot handle two in a slot (which is the idea)"""
         week_dict = week_slot_dic()
+        if not self.sessions:
+            return week_dict
         for session in self.sessions:
             start_datetime = p.instance(session.start_datetime) #annotated datetime
             end_datetime = p.instance(session.end_datetime_adjusted) #adjusted with subtract min=30
@@ -66,13 +68,17 @@ class CalendarRender:
 
 
 class CalendarBlocksRender:
-    def __init__(self,blocks:list[BlocksModel]):
+    def __init__(self,blocks:list[BlocksModel],calendar=None):
         self.blocks = blocks
+        self.week_days = WEEKDAY_LONG
+        self.room_calendar = calendar
 
     @property
     def block_dict(self)->dict:
         """organises the dictionary by the time blocks of tenants"""
         block_dict = week_slot_dic()
+        if not self.blocks:
+            return block_dict
         for block in self.blocks:
             #assert block.start_time is not None, "Calendar UtilsL: start_datetime should not be None"
             start_datetime = p.now().at(block.start_time.hour,block.start_time.minute) # now() is ok!
@@ -94,6 +100,8 @@ class CalendarClientsRender:
     def client_dict(self)->dict:
         """organises the dictionary by clients default times in a week"""
         client_dict = week_slot_dic()
+        if not self.clients:
+            return client_dict
         for client in self.clients:
             #assert session.start_time is not None, "Calendar UtilsL: start_datetime should not be None"
             end_time = time_plus_duration(client.time,client.duration)

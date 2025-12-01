@@ -1,8 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
-from session_client.choices import duration_times_as_choices,WEEKDAY_SHORT
-
+from session_client.choices import duration_times_as_choices, WEEKDAY_SHORT, time_slot_options
 
 
 class RoomCalendarModel(models.Model):
@@ -40,7 +39,8 @@ class TenantModel(models.Model):
         return self.name
 
 class BlocksModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tenant = models.ForeignKey(TenantModel,on_delete=models.CASCADE)
     day = models.IntegerField(choices=WEEKDAY_SHORT)
-    start_time = models.TimeField(choices=duration_times_as_choices())
-    end_time = models.TimeField(choices=duration_times_as_choices())
+    start_time = models.TimeField(choices=time_slot_options())
+    end_time = models.TimeField(choices=time_slot_options())

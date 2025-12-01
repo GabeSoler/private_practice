@@ -9,10 +9,10 @@
     <div id="page-wrapper">
         <div id="form-table-wrapper">
             {% partialdef form-partial inline %}
-                <form
+                <form id="room-switch-form"
                         hx-post="{% url "room_calendar_app:week_view" %}"
                         hx-target="#calendar-table-wrapper"
-                        hx-trigger="change throttle:1s"
+                        hx-trigger="change throttle:1s,RefreshTable"
                 >
                     <table
                             class="table table-primary table-striped-columns table-sm mb-0"

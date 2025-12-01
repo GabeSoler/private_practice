@@ -19,7 +19,7 @@ from django.contrib.postgres.search import (SearchHeadline,
                                             SearchRank,
                                             SearchVector)
 
-
+import pendulum as p
 # Create your views here.
 
 
@@ -179,17 +179,13 @@ def edit_client_view(request, client_pk):
 
 
 @login_required
-def week_view_add_client(request, weekday=None, time=None):
+def week_view_add_client(request, weekday=None, time=None,calendar=None):
     """ to create sessions from the calendar using calendar info as base """
-    template = 'room_calendar_app/input/client_calendar_form.html'
+    template = 'session_client/edit/edit_client_modal.html'
     if request.method == 'POST':
-        form = ClientFromCalendarForm(data=request.POST)
+        form = ClientForm(data=request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
-            instance.day = weekday
-            instance.time = time
-            if not instance.calendar:
-                instance.calendar=calendar
             instance.save()
             messages.info(request, f"Client added: {instance.code}")
             return HttpResponseClientRefresh()
@@ -200,7 +196,10 @@ def week_view_add_client(request, weekday=None, time=None):
     # get response
     assert weekday is not None, "Week_day is required for get calls"
     assert time is not None, "Time is required for get calls"
-    form = ClientFromCalendarForm()
-    form.fields['tenant'].queryset = TenantModel.objects.filter(user=request.user)
+    form = ClientForm(initial={"day":weekday,"time":p.parse(time).time()})
+    tenant_qs = TenantModel.objects.filter(user=request.user)
+    if calendar:
+        tenant_qs = tenant_qs.filter(calendar__pk=calendar)
+    form.fields['tenant'].queryset = tenant_qs
     context = {'form': form}
     return render(request, template, context)
