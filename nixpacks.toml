@@ -1,4 +1,5 @@
 [variables]
+UV_PYTHON_DOWNLOADS = 'automatic'
 UV_LINK_MODE= 'copy'
 
 [phases.build]
