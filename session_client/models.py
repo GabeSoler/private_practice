@@ -87,7 +87,7 @@ class ClientModel(models.Model):
              """
         ref_date = self.get_last_date_or_now()
         target_date = ref_date.next(self.day)
-        if self.series is 2:
+        if self.series == 2:
             target_date = target_date.add(weeks=1)
         if add_weeks:
             target_date = target_date.add(weeks=add_weeks)
