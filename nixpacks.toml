@@ -5,4 +5,4 @@ UV_LINK_MODE= 'copy'
 cmds = ["python manage.py collectstatic --noinput"]
 
 [phases.start]
-cmds = ["uv run manage.py collectstatic --noinput && manage.py migrate && gunicorn ppm_app.wsgi"]
+cmds = ["uv run manage.py migrate && gunicorn ppm_app.wsgi"]
