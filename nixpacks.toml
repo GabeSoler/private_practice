@@ -1,2 +1,8 @@
 [variables]
 UV_LINK_MODE= 'copy'
+
+[phases.build]
+cmds = ["python manage.py collectstatic --noinput"]
+
+[phases.start]
+cmds = ["uv run manage.py migrate && gunicorn ppm_app.wsgi"]
