@@ -20,10 +20,8 @@ from django.db.models import (Q, F, Case, When, FloatField, Count,
 from django.db.models.functions import Concat,Cast
 
 from .querysets import tenant_annotated_qs, get_tenant_qs_totals
-from datetime import timedelta
 
 @login_required
-@cache_control(private=True)
 def week_view(request):
     """ Displays a calendar table with occurrences
         You can change the week to display or select a specific room calendar
@@ -325,6 +323,7 @@ def tenant_delete_hx(request,tenant_pk):
     tenant.delete()
     return HttpResponseClientRefresh()
 
+@login_required()
 def week_blocks_view(request):
     clients = BlocksModel.objects.all()
     calendar = CalendarBlocksRender(clients)
@@ -334,6 +333,7 @@ def week_blocks_view(request):
     template = "room_calendar_app/dynamic/week_view_clients.html"
     return render(request, template, context)
 
+@login_required()
 def week_schedule_view(request):
     template = "room_calendar_app/dynamic/week_view_clients.html"
     if request.method =='POST':
