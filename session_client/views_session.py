@@ -346,7 +346,7 @@ def sessions_patch_attendance(request,session_pk):
             return render(request, template, {"session": session})
     return Http404("Error with attendance update")
 
-
+@login_required()
 def patch_brief_view(request,session_pk):
     session = get_object_or_404(SessionModel,pk=session_pk)
     form = PatchBriefForm(instance=session)

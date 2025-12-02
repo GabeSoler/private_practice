@@ -6,10 +6,10 @@ from pygments.lexer import default
 from session_client.utils import csv_room_report_response
 from .models import RoomCalendarModel, TenantModel, BlocksModel
 from .forms import RoomCalendarForm, TenantForm, LinkTenantForm, WeekCalendarForm, RoomReportForm, TenantReportForm, \
-    RoomSwitchForm, BlockForm
+    RoomSwitchForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
-from django_htmx.http import retarget, HttpResponseClientRefresh,trigger_client_event
+from django_htmx.http import retarget, HttpResponseClientRefresh
 from .calendar_utils import CalendarRender, CalendarClientsRender, CalendarBlocksRender
 import pendulum as p
 from session_client.models import SessionModel,ClientModel
@@ -20,12 +20,8 @@ from django.db.models import (Q, F, Case, When, FloatField, Count,
 from django.db.models.functions import Concat,Cast
 
 from .querysets import tenant_annotated_qs, get_tenant_qs_totals
-import logging
-
-logger = logging.getLogger(__name__)
 
 @login_required
-@cache_control(private=True)
 def week_view(request):
     """ Displays a calendar table with occurrences
         You can change the week to display or select a specific room calendar
@@ -327,92 +323,30 @@ def tenant_delete_hx(request,tenant_pk):
     tenant.delete()
     return HttpResponseClientRefresh()
 
+@login_required()
 def week_blocks_view(request):
-    template = "room_calendar_app/dynamic/week_view_blocks.html"
-    if request.method =='POST':
-        form = RoomSwitchForm(data=request.POST)
-        if form.is_valid():
-            room = form.cleaned_data['room']
-            blocks = BlocksModel.objects.filter(tenant__calendar=room)
-            calendar = CalendarBlocksRender(blocks,calendar=room)
-            template_partial = template + "#calendar-table-partial"
-            return render(request,template_partial,{"calendar":calendar})
-    blocks = BlocksModel.objects.none()
-    room_qs = RoomCalendarModel.objects.filter(Q(tenantmodel__user=request.user)|Q(user=request.user))
-    calendar = CalendarBlocksRender(blocks)
-    form = RoomSwitchForm(initial={"room":room_qs[0]})
-    form.fields["room"].queryset = room_qs
+    clients = BlocksModel.objects.all()
+    calendar = CalendarBlocksRender(clients)
+    form = RoomSwitchForm()
+    form.fields["room"].queryset = RoomCalendarModel.objects.filter(tenantmodel__user=request.user)
     context = {"calendar": calendar, "form": form}
+    template = "room_calendar_app/dynamic/week_view_clients.html"
     return render(request, template, context)
 
+@login_required()
 def week_schedule_view(request):
     template = "room_calendar_app/dynamic/week_view_clients.html"
     if request.method =='POST':
         form = RoomSwitchForm(data=request.POST)
         if form.is_valid():
             room = form.cleaned_data['room']
-            clients = ClientModel.objects.filter(tenant__calendar=room) or None
-            calendar = CalendarClientsRender(clients,calendar=room)
+            clients = ClientModel.objects.filter(tenant__calendar=room)
+            calendar = CalendarClientsRender(clients)
             template_partial = template + "#calendar-table-partial"
             return render(request,template_partial,{"calendar":calendar})
-    clients = ClientModel.objects.filter(user=request.user) or None
+    clients = ClientModel.objects.filter(user=request.user)
     calendar = CalendarClientsRender(clients)
     form = RoomSwitchForm()
     form.fields["room"].queryset = RoomCalendarModel.objects.filter(Q(tenantmodel__user=request.user)|Q(user=request.user))
     context = {"calendar":calendar,"form":form}
     return render(request,template,context)
-
-
-def block_add_view(request,day=None,time=None,room=None):
-    """ add an event, it needs to set occurrences to appear in the calendar"""
-    template = 'room_calendar_app/input/add_block.html'
-    if request.method =='POST':
-        #POST data submitted; process data
-        form = BlockForm(data=request.POST)
-        logger.debug("method post received")
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.user = request.user
-            instance.save()
-            logger.debug("form saved")
-            response = HttpResponse(request)
-            response = trigger_client_event(response,"RefreshTable",{"target":"#room-switch-form"})
-            return trigger_client_event(response,"CloseModal",{"target":"#modal"})
-        logger.debug("form errors")
-        template_partial = template + '#block-form-partial'
-        return render(request,template_partial,{"form":form})
-    start_time = p.parse(time).time()
-    initial = {"day":day,"start_time":start_time,"end_time":start_time.add(hours=1)}
-    tenant_filter = Q(user=request.user)
-    if room:
-        initial['room'] = room
-        tenant_filter &= Q(calendar__pk=room)
-    form = BlockForm(data=initial)
-    form.fields["tenant"].queryset = TenantModel.objects.filter(tenant_filter)
-    logger.debug("form with initials")
-    context = {'form':form}
-    #display a blank or invalid form
-    return render(request,template,context)
-
-def block_edit_view(request,block_pk=None):
-    """ add an event, it needs to set occurrences to appear in the calendar"""
-    template = 'room_calendar_app/input/add_block.html'
-    block = get_object_or_404(BlocksModel,pk=block_pk)
-    assert isinstance(block,BlocksModel)
-    form = BlockForm(instance=block)
-    if request.method =='POST':
-        #POST data submitted; process data
-        form = BlockForm(data=request.POST,instance=block)
-        if form.is_valid():
-            form.save()
-            return HttpResponseClientRefresh()
-        template_partial = template + '#block-form-partial'
-        return render(request,template_partial,{"form":form})
-    context = {'form':form,"block_item":block}
-    return render(request,template,context)
-
-def block_delete_view(request,block_pk):
-    block = get_object_or_404(BlocksModel,pk=block_pk)
-    block.delete()
-    logger.debug("block deleted")
-    return HttpResponseClientRefresh()
