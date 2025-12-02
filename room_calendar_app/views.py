@@ -25,7 +25,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 @login_required
-@cache_control(private=True)
 def week_view(request):
     """ Displays a calendar table with occurrences
         You can change the week to display or select a specific room calendar
@@ -98,6 +97,7 @@ def week_view(request):
     context = {'calendar':calendar,'form':form}
     return render(request,template,context)
 
+@login_required()
 def week_view_auxiliary(request):
     clients = ClientModel.objects.filter(user=request.user)
     template = "room_calendar_app/auxiliary/client_list_li.html"
@@ -327,6 +327,7 @@ def tenant_delete_hx(request,tenant_pk):
     tenant.delete()
     return HttpResponseClientRefresh()
 
+@login_required()
 def week_blocks_view(request):
     template = "room_calendar_app/dynamic/week_view_blocks.html"
     if request.method =='POST':
@@ -345,6 +346,7 @@ def week_blocks_view(request):
     context = {"calendar": calendar, "form": form}
     return render(request, template, context)
 
+@login_required()
 def week_schedule_view(request):
     template = "room_calendar_app/dynamic/week_view_clients.html"
     if request.method =='POST':
@@ -362,7 +364,7 @@ def week_schedule_view(request):
     context = {"calendar":calendar,"form":form}
     return render(request,template,context)
 
-
+@login_required()
 def block_add_view(request,day=None,time=None,room=None):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     template = 'room_calendar_app/input/add_block.html'
@@ -394,6 +396,7 @@ def block_add_view(request,day=None,time=None,room=None):
     #display a blank or invalid form
     return render(request,template,context)
 
+@login_required()
 def block_edit_view(request,block_pk=None):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     template = 'room_calendar_app/input/add_block.html'
@@ -411,6 +414,7 @@ def block_edit_view(request,block_pk=None):
     context = {'form':form,"block_item":block}
     return render(request,template,context)
 
+@login_required()
 def block_delete_view(request,block_pk):
     block = get_object_or_404(BlocksModel,pk=block_pk)
     block.delete()
