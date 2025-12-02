@@ -94,6 +94,7 @@ def sessions_hx_edit_open(request, session_pk):
     raise Http404("Not a expected request")
 
 
+@login_required()
 def session_hx_item(request, session_pk):
     if request.method == 'GET':
         session = get_object_or_404(SessionModel, client__user=request.user, pk=session_pk)
@@ -299,6 +300,7 @@ def add_series_view(request,client_pk,number):
             return retarget(response,"#toast-wrapper")
     return Http404("Not a expected request")
 
+@login_required()
 def add_copy_forward_view(request,session_pk):
     if request.htmx:
         session = SessionModel.objects.get(pk=session_pk)
