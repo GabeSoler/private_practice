@@ -8,7 +8,6 @@ from .models import RoomCalendarModel, TenantModel, BlocksModel
 from .forms import RoomCalendarForm, TenantForm, LinkTenantForm, WeekCalendarForm, RoomReportForm, TenantReportForm, \
     RoomSwitchForm, BlockForm
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import cache_control
 from django_htmx.http import retarget, HttpResponseClientRefresh,trigger_client_event
 from .calendar_utils import CalendarRender, CalendarClientsRender, CalendarBlocksRender
 import pendulum as p
