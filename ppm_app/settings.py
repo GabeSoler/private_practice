@@ -34,6 +34,7 @@ ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "0.0.0.0", "1.1.1.1", "8080
 
 CSRF_TRUSTED_ORIGINS = [
      "https://www"+HOST_URL,
+     "https://dreamy-alpha-release"+HOST_URL,
 ]
 
 
