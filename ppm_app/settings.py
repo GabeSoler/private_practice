@@ -39,6 +39,8 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 
+LOGIN_REDIRECT_URL = "session_client:client_list"
+
 # Application definition
 
 INSTALLED_APPS = [
