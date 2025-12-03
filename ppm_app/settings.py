@@ -160,6 +160,7 @@ USE_TZ = False
 
 STATIC_URL = "/var/"+ URL_BASE +"."+HOST_URL +"/static/"
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
