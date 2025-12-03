@@ -28,13 +28,14 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 HOST_URL = config("HOST_URL",default="")
+URL_BASE = "dreamy-alpha-release"
 
 ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "0.0.0.0", "1.1.1.1", "8080",
                  HOST_URL]
 
 CSRF_TRUSTED_ORIGINS = [
      "https://www"+HOST_URL,
-     "https://dreamy-alpha-release"+HOST_URL,
+     "https://"+ URL_BASE +HOST_URL,
 ]
 
 
@@ -157,7 +158,7 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/var/"+ URL_BASE + HOST_URL +"/static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
