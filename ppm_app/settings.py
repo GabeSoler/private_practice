@@ -177,7 +177,7 @@ ADMIN_URL = config('ADMIN_URL')
 #config of bootstrap5, I added a theme called 'sandstone' from 'bootswatch'
 BOOTSTRAP5 = {
     # The complete URL to the Bootstrap CSS theme file (None means no theme).
-    "theme_url": "/" + STATIC_URL + "css/dreamy.css/",
+    "theme_url": STATIC_URL + "css/dreamy.css/",
     }
 
 
