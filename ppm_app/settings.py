@@ -31,7 +31,7 @@ HOST_URL = config("HOST_URL",default="")
 URL_BASE = config('URL_BASE')
 
 ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "0.0.0.0", "1.1.1.1", "8080",
-                 HOST_URL]
+                 URL_BASE+HOST_URL,]
 
 CSRF_TRUSTED_ORIGINS = [
      "https://www"+HOST_URL,
