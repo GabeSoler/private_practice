@@ -228,6 +228,4 @@ INTERNAL_IPS = (
 
 
 
-OPENAI_API_KEY = config('OPENAI_API_KEY')
-
 SALT_KEY=config('SALT_KEY')
