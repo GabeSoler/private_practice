@@ -28,7 +28,7 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 HOST_URL = config("HOST_URL",default="")
-URL_BASE = "dreamy-alpha-release"
+URL_BASE = config('URL_BASE')
 
 ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "0.0.0.0", "1.1.1.1", "8080",
                  HOST_URL]
@@ -169,6 +169,9 @@ STATIC_ROOT = "assets/" #change when knowing the real address, plus change url p
 MEDIA_URL = 'media/'
 STATICFILES_DIRS = [BASE_DIR / "staticfiles"]
 
+
+#admin url
+ADMIN_URL = config('ADMIN_URL')
 
 #config of bootstrap5, I added a theme called 'sandstone' from 'bootswatch'
 BOOTSTRAP5 = {
