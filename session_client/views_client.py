@@ -19,11 +19,14 @@ from django.contrib.postgres.search import (SearchHeadline,
                                             SearchRank,
                                             SearchVector)
 
+from django.views.decorators.debug import sensitive_post_parameters,sensitive_variables
+
 import pendulum as p
 # Create your views here.
 
 
 @login_required
+@sensitive_variables('clients')
 def clients_view(request):
     """show all clients"""
     template = 'session_client/lists/client_list.html'
@@ -33,6 +36,7 @@ def clients_view(request):
 
 
 @login_required
+@sensitive_post_parameters()
 def hx_client_short_form(request):
     if request.htmx:
         form = ClientFormShort()
@@ -43,6 +47,7 @@ def hx_client_short_form(request):
 
 
 @login_required
+@sensitive_variables('client')
 def client_hx_item(request, client_pk):
     if request.method == 'GET':
         client = get_object_or_404(ClientModel, user=request.user, pk=client_pk)
@@ -53,6 +58,8 @@ def client_hx_item(request, client_pk):
 
 
 @login_required
+@sensitive_post_parameters()
+@sensitive_variables('occurrence')
 def clients_toggle_active(request, client_pk):
     """ manages clients htmx calls """
     if request.method == 'PATCH':
@@ -69,6 +76,8 @@ def clients_toggle_active(request, client_pk):
 
 
 @login_required
+@sensitive_post_parameters()
+@sensitive_variables('client','sessions')
 def client_search_view(request):
     template = 'session_client/lists/client_search.html'
     if request.method == 'POST':
@@ -115,6 +124,7 @@ def client_search_view(request):
 
 
 @login_required
+@sensitive_variables('clients')
 def client_archived_view(request):
     template = 'session_client/lists/client_archived_list.html'
     clients = ClientModel.objects.filter(user=request.user, active=False).order_by('code')
@@ -123,6 +133,8 @@ def client_archived_view(request):
 
 
 @login_required
+@sensitive_post_parameters()
+@sensitive_variables('instance')
 def add_client_view(request):
     """add a new client"""
     if request.htmx:
@@ -150,6 +162,8 @@ def add_client_view(request):
 
 
 @login_required
+@sensitive_post_parameters()
+@sensitive_variables('client')
 def edit_client_view(request, client_pk):
     """edit an existing entry"""
     client = get_object_or_404(ClientModel,
@@ -179,6 +193,8 @@ def edit_client_view(request, client_pk):
 
 
 @login_required
+@sensitive_post_parameters()
+@sensitive_variables('instance')
 def week_view_add_client(request, weekday=None, time=None,calendar=None):
     """ to create sessions from the calendar using calendar info as base """
     template = 'session_client/edit/edit_client_modal.html'

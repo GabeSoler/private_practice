@@ -44,3 +44,4 @@ class BlocksModel(models.Model):
     day = models.IntegerField(choices=WEEKDAY_SHORT)
     start_time = models.TimeField(choices=time_slot_options())
     end_time = models.TimeField(choices=time_slot_options())
+    monthly_cost = models.IntegerField(default=0,blank=True,help_text="Monthly cost for this block")

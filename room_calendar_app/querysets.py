@@ -16,7 +16,7 @@ def tenant_annotated_qs(year,month,cal=None):
                           default=0))
 
     .annotate(
-        session_pay=Case(
+        session_pay=Case(When(blocksmodel__monthly_cost__gt=0,then=F('blocksmodel__monthly_cost')),
             When(clientmodel__type="RoomP",
                  then=F("period_income") * F("calendar__percentage") / 100),
             default=F("calendar__cost") * F("session_count"),

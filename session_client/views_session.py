@@ -12,6 +12,8 @@ from django.contrib import messages
 from .utils import csv_session_list_response
 import logging
 
+from django.views.decorators.debug import sensitive_post_parameters,sensitive_variables
+
 logger = logging.getLogger(__name__)
 
 # Create your views here.
@@ -24,6 +26,8 @@ def index_view(request):
 # * session
 
 @login_required
+@sensitive_post_parameters()
+@sensitive_variables('sessions')
 def sessions_view(request,client_pk=None,add_forward=False) -> HttpResponse:
     """show open sessions, add a new simple session, update pay status with other hx-views
     it filters sessions that are open and have already passed now() -1 hour as reference.
@@ -63,6 +67,7 @@ def sessions_view(request,client_pk=None,add_forward=False) -> HttpResponse:
 
 
 @login_required
+@sensitive_variables('session')
 def sessions_hx_edit_paid(request, session_pk):
     """ manages clients htmx calls """
     if request.method == 'PUT':
@@ -79,6 +84,7 @@ def sessions_hx_edit_paid(request, session_pk):
 
 
 @login_required
+@sensitive_variables('session')
 def sessions_hx_edit_open(request, session_pk):
     """ manages clients htmx calls """
     if request.method == 'PUT':
@@ -95,6 +101,7 @@ def sessions_hx_edit_open(request, session_pk):
 
 
 @login_required()
+@sensitive_variables('session')
 def session_hx_item(request, session_pk):
     if request.method == 'GET':
         session = get_object_or_404(SessionModel, client__user=request.user, pk=session_pk)
@@ -107,6 +114,7 @@ def session_hx_item(request, session_pk):
 
 
 @login_required
+@sensitive_variables('sessions')
 def sessions_search(request,review=False):
     """ Search sessions by date and client
     Creates a CSV file from results
@@ -143,6 +151,7 @@ def sessions_search(request,review=False):
     return render(request, template, context)
 
 @login_required()
+@sensitive_variables('sessions')
 def session_list_forward_modal(request, client_pk):
     now = p.now()
     template = "session_client/lists/session_list_modal.html"
@@ -154,6 +163,7 @@ def session_list_forward_modal(request, client_pk):
     return render(request, template, context)
 
 @login_required()
+@sensitive_variables('sessions')
 def session_pending_list_modal(request, client_pk):
     now = p.now()
     template = "session_client/lists/session_list_modal.html"
@@ -167,6 +177,7 @@ def session_pending_list_modal(request, client_pk):
 
 
 @login_required
+@sensitive_post_parameters()
 def add_session_view(request):
     """add new session"""
     if request.htmx:
@@ -196,6 +207,8 @@ def add_session_view(request):
 
 
 @login_required
+@sensitive_post_parameters()
+@sensitive_variables('session')
 def edit_session_view(request, session_pk):
     """edit an existing Session"""
     session = get_object_or_404(SessionModel,
@@ -229,6 +242,7 @@ def edit_session_view(request, session_pk):
 
 
 @login_required
+@sensitive_variables('session')
 def hx_delete_session(request, session_pk):
     session = get_object_or_404(SessionModel, pk=session_pk, client__user=request.user)
     if request.method == 'DELETE':
@@ -240,6 +254,7 @@ def hx_delete_session(request, session_pk):
 
 
 @login_required
+@sensitive_post_parameters()
 def week_view_add_session_client(request, year=None, week=None, week_day=None, time=None, calendar=None):
     """ to create sessions from the calendar using calendar info as base """
     template = 'session_client/templates/session_client/edit/edit_session_modal.html'
@@ -282,6 +297,7 @@ def week_view_add_session_client(request, year=None, week=None, week_day=None, t
     return render(request, template, context)
 
 @login_required()
+@sensitive_variables('sessions')
 def add_series_view(request,client_pk,number):
     """add new session"""
     if request.htmx:
@@ -301,6 +317,7 @@ def add_series_view(request,client_pk,number):
     return Http404("Not a expected request")
 
 @login_required()
+@sensitive_variables('session')
 def add_copy_forward_view(request,session_pk):
     if request.htmx:
         session = SessionModel.objects.get(pk=session_pk)
@@ -328,6 +345,7 @@ def add_copy_forward_view(request,session_pk):
 
 
 @login_required()
+@sensitive_variables('session')
 def sessions_hx_edit_attendance(request,session_pk,attendance):
     session = get_object_or_404(SessionModel, pk=session_pk, client__user=request.user)
     session.attendance = attendance
@@ -337,6 +355,7 @@ def sessions_hx_edit_attendance(request,session_pk,attendance):
     return render(request, template, {"session": session})
 
 @login_required()
+@sensitive_variables('session')
 def sessions_patch_attendance(request,session_pk):
     session = get_object_or_404(SessionModel, pk=session_pk, client__user=request.user)
     if request.htmx:
@@ -349,6 +368,7 @@ def sessions_patch_attendance(request,session_pk):
     return Http404("Error with attendance update")
 
 @login_required()
+@sensitive_variables('session')
 def patch_brief_view(request,session_pk):
     session = get_object_or_404(SessionModel,pk=session_pk)
     form = PatchBriefForm(instance=session)
