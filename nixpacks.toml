@@ -2,8 +2,3 @@
 UV_PYTHON_DOWNLOADS = 'automatic'
 UV_LINK_MODE= 'copy'
 
-[phases.build]
-cmds = ["uv run manage.py collectstatic --noinput"]
-
-[phases.start]
-cmds = ["uv run manage.py migrate && gunicorn ppm_app.wsgi"]

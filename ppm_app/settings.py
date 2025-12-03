@@ -59,11 +59,13 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "whitenoise.runserver_nostatic",#whitenoise
     "django.contrib.staticfiles",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware", #white noise
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -73,8 +75,6 @@ MIDDLEWARE = [
     "django_htmx.middleware.HtmxMiddleware", # django-htmx middleware
     "django_browser_reload.middleware.BrowserReloadMiddleware", # django reload (browser experience)
     "django.contrib.admindocs.middleware.XViewMiddleware", # django documentation view link
-    "django.middleware.security.SecurityMiddleware", # white noise
-    "whitenoise.middleware.WhiteNoiseMiddleware",
 
 ]
 
@@ -144,13 +144,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en-uk"
 
 TIME_ZONE = "UTC"
 
-USE_I18N = True
+USE_I18N = False
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -173,9 +173,6 @@ BOOTSTRAP5 = {
     # The complete URL to the Bootstrap CSS theme file (None means no theme).
     "theme_url": "/" + STATIC_URL + "css/dreamy.css/",
     }
-
-# noinspection PyRedeclaration
-USE_TZ = True #change to True when ready to deploy??
 
 
 
