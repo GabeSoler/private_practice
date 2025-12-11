@@ -1,6 +1,7 @@
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
 
+from responses.hx_responses import ok_response_modal, ups_response
 from .models import ClientModel, SessionModel
 from django.contrib.auth.decorators import login_not_required
 from django.http import Http404, HttpResponse
@@ -191,7 +192,7 @@ def add_session_view(request):
                 template_overlap = "session_client/lists/session_overlap_modal.html"
                 response = render(request, template_overlap,{"sessions":overlap})
                 return retarget(response,"#modal-wrapper")
-            return HttpResponseClientRefresh()
+            return ok_response_modal(request,"Session Saved",f"On {instance.date}",re_target=f"#modal-")
     # display a blank or invalid form
     context = {'form': form}
     return render(request, template, context)
@@ -220,11 +221,11 @@ def edit_session_view(request, session_pk):
             session = form.save(commit=False)
             saved,overlap = session.save_with_checks()
             if not saved:
-                template_overlap = "session_client/lists/session_overlap_modal.html"
-                response = render(request, template_overlap,{"sessions":overlap})
-                return retarget(response,"#modal-wrapper")
-            messages.info(request, f"Session '{session.brief}' updated")
-            return HttpResponseClientRefresh()
+                # template_overlap = "session_client/lists/session_overlap_modal.html"+"#modal-inner-partial"
+                # response = render(request, template_overlap,{"sessions":overlap})
+                # return retarget(response,f"#modal-{session.pk}")
+                return ups_response(request,f"ups, overlaps","#ups-col") #TODO ; can i know more specific overlap??
+            return ok_response_modal(request,"Session Saved",f"On {session.date}",re_target=f"#modal-{session.pk}")
         else:
             return render(request, template, {'form': form})
     context = {'session': session, 'form': form}

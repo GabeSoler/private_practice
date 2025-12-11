@@ -1,6 +1,8 @@
 {% extends '_modal.html' %}
 {% load django_bootstrap5 %}
 
+{% block modal-pk %}-{{ session.pk }}{% endblock %}
+
 {% block modal_title %}
     {% if session %}Session: <small class="fs-5">{{ session.client }} - {{ session.date }}</small>
     {% else %}
@@ -22,6 +24,7 @@
                       hx-post="{% url 'session_client:edit_session' session.pk %}"
                         {% else %}
                       action="{% url 'session_client:add_session' %}"
+                      hx-post="{% url 'session_client:add_session' %}"
                         {% endif %}
                       method="post">
 
@@ -95,18 +98,29 @@
                                 </div>
                             </div>
                         </div>
-                        <button
-                                type="submit"
-                                class="btn btn-secondary float-end">Save
-                        </button>
-                    </div>
+
+                        <div class="row">
+                            <div class="col">
                     {% if session %}
                         <button
                                 hx-confirm="Confirm session delete"
                                 hx-delete="{% url 'session_client:hx_delete_session' session.pk %}"
-                                class="btn btn-outline-danger start-0 m-2">Delete
-                        </button>
+                                class="btn btn-outline-danger start-0 m-2">Delete</button>
                     {% endif %}
+
+                            </div>
+                            <div class="col" id="ups-col">
+                        <p class="text-danger" id="ups-message"></p>
+
+                            </div>
+                            <div class="col">
+
+                        <button
+                                type="submit"
+                                class="btn btn-secondary float-end">Save</button>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
         {% endpartialdef %}
