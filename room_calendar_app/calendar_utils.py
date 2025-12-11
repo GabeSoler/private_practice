@@ -4,7 +4,7 @@ from collections import namedtuple
 import pendulum as p
 
 from room_calendar_app.models import RoomCalendarModel, BlocksModel
-from session_client.choices import time_slots,WEEKDAY_LONG
+from session_client.choices import time_slots,WEEKDAY_SHORT
 from session_client.models import ClientModel
 from session_client.utils import date_plus_time, time_plus_duration, now_at_time
 
@@ -70,7 +70,7 @@ class CalendarRender:
 class CalendarBlocksRender:
     def __init__(self,blocks:list[BlocksModel],calendar=None):
         self.blocks = blocks
-        self.week_days = WEEKDAY_LONG
+        self.week_days = WEEKDAY_SHORT
         self.room_calendar = calendar
 
     @property
@@ -93,7 +93,7 @@ class CalendarBlocksRender:
 class CalendarClientsRender:
     def __init__(self,clients:list[ClientModel],calendar=None):
         self.clients = clients
-        self.week_days = WEEKDAY_LONG
+        self.week_days = WEEKDAY_SHORT
         self.room_calendar = calendar
 
     @property

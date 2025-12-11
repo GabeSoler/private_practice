@@ -42,10 +42,10 @@
                                     <!-- list month forward -->
                                     <span class="text-secondary small me-1" style="font-size:0.7rem">{{ client.created_at|timesince }}</span>
                                     <!-- count of open before today -->
-                                    <div class="badge text-bg-info"
+                                    <a class="btn btn-info btn-sm text-bg-info"
                                          hx-get="{% url 'session_client:session_pending_list_modal' client.pk %}"
                                          hx-target="#modal-wrapper"
-                                    >{{ client.pending_sort_sessions|default:0 }}</div>
+                                    >{{ client.pending_sort_sessions|default:0 }}</a>
                                 </div>
 
                                 <div class="row"><!--first client card row -->
@@ -66,25 +66,31 @@
 
                                 <div class="row"><!--second client card row -->
                                     <div class="col-4"
-                                        hx-get="{% url 'session_client:session_list_modal' client.pk %}"
-                                        hx-target="#modal-wrapper"
                                          id="future-sessions-{{ client.pk }}">
                                         {% partialdef future_sessions_partial inline %}
+                                    <a class="btn btn-outline-secondary btn-sm"
+                                       hx-get="{% url 'session_client:session_list_modal' client.pk %}"
+                                        hx-target="#modal-wrapper">
                                             <i class="bi bi-fast-forward-fill"></i>
-                                            <span class="fs-5"
+                                            <span class=""
                                             > {{ client.future_sessions_count }}</span>
                                             {% if add_toast %}{% include '_toasts.html' %}{% endif %}
                                         {% endpartialdef future_sessions_partial %}
+                                    </a>
                                     </div>
                                     <div class="col-4"> <!-- add 3 sessions forward -->
-                                        +<i class="bi bi-3-circle-fill"
-                                            hx-post="{% url 'session_client:add_series' client.pk 3 %}"
-                                            hx-target="#future-sessions-{{ client.pk }}"></i>
+                                        <a class="btn btn-outline-secondary btn-sm"
+                                           hx-post="{% url 'session_client:add_series' client.pk 3 %}"
+                                           hx-target="#future-sessions-{{ client.pk }}">
+                                        +3
+                                        </a>
                                     </div>
                                     <div class="col-4"> <!-- add 6 sessions forward -->
-                                        +<i class="bi bi-6-circle-fill"
-                                            hx-post="{% url 'session_client:add_series' client.pk 6 %}"
-                                            hx-target="#future-sessions-{{ client.pk }}"></i>
+                                        <a class="btn btn-outline-secondary btn-sm"
+                                        hx-post="{% url 'session_client:add_series' client.pk 6 %}"
+                                            hx-target="#future-sessions-{{ client.pk }}">
+                                        +6
+                                        </a>
 
                                     </div>
                                 </div>

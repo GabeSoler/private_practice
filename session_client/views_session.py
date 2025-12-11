@@ -2,7 +2,7 @@ from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import ClientModel, SessionModel
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required
 from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, \
     SelectAttendanceForm, PatchBriefForm
@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 # Create your views here.
 
+@login_not_required
 def index_view(request):
     """show all session_client"""
     return render(request, 'session_client/index.html')
@@ -25,7 +26,6 @@ def index_view(request):
 
 # * session
 
-@login_required
 @sensitive_post_parameters()
 @sensitive_variables('sessions')
 def sessions_view(request,client_pk=None,add_forward=False) -> HttpResponse:
@@ -66,7 +66,6 @@ def sessions_view(request,client_pk=None,add_forward=False) -> HttpResponse:
     return render(request, template, context)
 
 
-@login_required
 @sensitive_variables('session')
 def sessions_hx_edit_paid(request, session_pk):
     """ manages clients htmx calls """
@@ -83,7 +82,6 @@ def sessions_hx_edit_paid(request, session_pk):
     raise Http404("Not a expected request")
 
 
-@login_required
 @sensitive_variables('session')
 def sessions_hx_edit_open(request, session_pk):
     """ manages clients htmx calls """
@@ -100,7 +98,6 @@ def sessions_hx_edit_open(request, session_pk):
     raise Http404("Not a expected request")
 
 
-@login_required()
 @sensitive_variables('session')
 def session_hx_item(request, session_pk):
     if request.method == 'GET':
@@ -113,7 +110,6 @@ def session_hx_item(request, session_pk):
     raise Http404("Not a expected request")
 
 
-@login_required
 @sensitive_variables('sessions')
 def sessions_search(request,review=False):
     """ Search sessions by date and client
@@ -150,7 +146,6 @@ def sessions_search(request,review=False):
     context = {'sessions': sessions, 'form': form}
     return render(request, template, context)
 
-@login_required()
 @sensitive_variables('sessions')
 def session_list_forward_modal(request, client_pk):
     now = p.now()
@@ -162,7 +157,6 @@ def session_list_forward_modal(request, client_pk):
     context = {'sessions': sessions,"client_pk":client_pk,"forward":True}
     return render(request, template, context)
 
-@login_required()
 @sensitive_variables('sessions')
 def session_pending_list_modal(request, client_pk):
     now = p.now()
@@ -176,7 +170,6 @@ def session_pending_list_modal(request, client_pk):
     return render(request, template, context)
 
 
-@login_required
 @sensitive_post_parameters()
 def add_session_view(request):
     """add new session"""
@@ -198,15 +191,12 @@ def add_session_view(request):
                 template_overlap = "session_client/lists/session_overlap_modal.html"
                 response = render(request, template_overlap,{"sessions":overlap})
                 return retarget(response,"#modal-wrapper")
-            if request.htmx:
-                return HttpResponseClientRefresh()
-            return redirect('session_client:session_list')
+            return HttpResponseClientRefresh()
     # display a blank or invalid form
     context = {'form': form}
     return render(request, template, context)
 
 
-@login_required
 @sensitive_post_parameters()
 @sensitive_variables('session')
 def edit_session_view(request, session_pk):
@@ -241,7 +231,6 @@ def edit_session_view(request, session_pk):
     return render(request, template, context)
 
 
-@login_required
 @sensitive_variables('session')
 def hx_delete_session(request, session_pk):
     session = get_object_or_404(SessionModel, pk=session_pk, client__user=request.user)
@@ -253,13 +242,12 @@ def hx_delete_session(request, session_pk):
     return render(request, '_toasts.html')
 
 
-@login_required
 @sensitive_post_parameters()
 def week_view_add_session_client(request, year=None, week=None, week_day=None, time=None, calendar=None):
     """ to create sessions from the calendar using calendar info as base """
-    template = 'session_client/templates/session_client/edit/edit_session_modal.html'
+    template = 'room_calendar_app/input/session_form_client.html'
     if request.method == 'POST':
-        form = SessionFromCalendarForm(data=request.POST)
+        form = SessionForm(data=request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.deduce_from_client(date=False,
@@ -292,11 +280,10 @@ def week_view_add_session_client(request, year=None, week=None, week_day=None, t
         'start_time': time_from_str,
         'calendar': calendar or None,
     }
-    form = SessionFromCalendarForm(data=data)
+    form = SessionForm(initial=data)
     context = {'form': form}
     return render(request, template, context)
 
-@login_required()
 @sensitive_variables('sessions')
 def add_series_view(request,client_pk,number):
     """add new session"""
@@ -316,7 +303,6 @@ def add_series_view(request,client_pk,number):
             return retarget(response,"#toast-wrapper")
     return Http404("Not a expected request")
 
-@login_required()
 @sensitive_variables('session')
 def add_copy_forward_view(request,session_pk):
     if request.htmx:
@@ -334,7 +320,7 @@ def add_copy_forward_view(request,session_pk):
         unique, qs = new_session.is_unique()
         if unique:
             new_session.save()
-            return render(request,"session_client/hx/_ok.html")
+            return render(request,"_ok.html")
         else:
             sessions = qs
             template = "session_client/lists/session_overlap_modal.html"
@@ -344,7 +330,6 @@ def add_copy_forward_view(request,session_pk):
     return Http404("Ups,error on this site")
 
 
-@login_required()
 @sensitive_variables('session')
 def sessions_hx_edit_attendance(request,session_pk,attendance):
     session = get_object_or_404(SessionModel, pk=session_pk, client__user=request.user)
@@ -354,7 +339,6 @@ def sessions_hx_edit_attendance(request,session_pk,attendance):
     template = 'session_client/navs/session-nav.html'+ "#attendance_partial"
     return render(request, template, {"session": session})
 
-@login_required()
 @sensitive_variables('session')
 def sessions_patch_attendance(request,session_pk):
     session = get_object_or_404(SessionModel, pk=session_pk, client__user=request.user)
@@ -367,7 +351,6 @@ def sessions_patch_attendance(request,session_pk):
             return render(request, template, {"session": session})
     return Http404("Error with attendance update")
 
-@login_required()
 @sensitive_variables('session')
 def patch_brief_view(request,session_pk):
     session = get_object_or_404(SessionModel,pk=session_pk)

@@ -24,7 +24,6 @@ from django.views.decorators.debug import sensitive_post_parameters,sensitive_va
 
 logger = logging.getLogger(__name__)
 
-@login_required
 @sensitive_post_parameters()
 @sensitive_variables('sessions')
 def week_view(request):
@@ -108,14 +107,12 @@ def week_view_auxiliary(request):
     return render(request,template,context)
 
 
-@login_required
 @sensitive_variables('room_calendar_tenant')
 def room_calendar_listing_view(request):
     room_calendar_tenant = RoomCalendarModel.objects.filter(Q(tenantmodel__user=request.user)|Q(user=request.user)).prefetch_related("tenantmodel_set").distinct()
     context = {"calendar_tenant": room_calendar_tenant}
     return render(request,"room_calendar_app/display/room_calendar_list.html",context)
 
-@login_required
 @sensitive_variables('my_rooms')
 def room_calendar_manage_view(request):
     ref_date = p.now()
@@ -145,7 +142,6 @@ def room_manage_refresh_view(request,cal_pk):
     return Http404("Ups")
 
 
-@login_required
 @sensitive_post_parameters()
 @sensitive_variables('tenants_qs')
 @sensitive_variables('instance')
@@ -167,7 +163,6 @@ def room_calendar_add_view(request):
     context = {'form':form}
     return render(request,template,context)
 
-@login_required
 @sensitive_post_parameters()
 @sensitive_variables('room_calendar')
 def room_calendar_edit_view(request,room_calendar_pk):
@@ -188,14 +183,12 @@ def room_calendar_edit_view(request,room_calendar_pk):
     context = {'form':form,"room":room_calendar}
     return render(request,template,context)
 
-@login_required
 @sensitive_variables('tenant')
 def tenant_view(request,tenant_pk):
     tenant = get_object_or_404(TenantModel, pk=tenant_pk)
     context = {"tenant": tenant}
     return render(request, "room_calendar_app/display/tenant_modal.html", context)
 
-@login_required
 @sensitive_variables('tenant_list')
 def tenant_listing_view(request):
     """View a list of user's events """
@@ -203,7 +196,6 @@ def tenant_listing_view(request):
     context = {"tenant_list":tenant_list}
     return render(request, "room_calendar_app/dynamic/tenant_list.html", context)
 
-@login_required
 @sensitive_post_parameters()
 @sensitive_variables('instance')
 def tenant_add_view(request):
@@ -228,7 +220,6 @@ def tenant_add_view(request):
 
 
 
-@login_required
 @sensitive_post_parameters()
 @sensitive_variables('tenant')
 def tenant_edit_view(request,tenant_pk):
@@ -251,7 +242,6 @@ def tenant_edit_view(request,tenant_pk):
     context = {'tenant':tenant,'form':form}
     return render(request,template,context)
 
-@login_required
 @sensitive_post_parameters()
 @sensitive_variables('calendar')
 def tenant_link_view(request,calendar_pk):
