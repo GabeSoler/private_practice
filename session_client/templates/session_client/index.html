@@ -13,15 +13,41 @@
         <image class="position-absolute start-50 bottom-0" id="bottle" src={% static 'alchemist/bubbles.svg' %} style="max-width:100px;">
         </image>
     </div>
-<div class="position-relative flex-container p-4 mb-5 bg-primary text-secondary" style="height: 38vh;width: 100vw;">
 
-    <h1 class="bg-primary">Clients</h1>
-    <h1 class="bg-primary">Sessions</h1>
-    <h1 class="bg-primary">Rooms</h1>
-    <p class="text-end fs-5">Therapists handle a lot of complexity</p>
-    <p class="text-end fs-5">Let's make it a bit easier to handle their admin</p>
+<div class="py-4 mb-5 position-fixed bg-primary text-secondary" style="height: 38vh;width: 100vw;">
 
+<div class="row">
+
+    <div class="col ps-1 ps-md-5">
+    <ul class="">
+        <li class="nav-link">
+        <a href="{% url 'session_client:client_list' %}"
+           class="link-secondary
+           link-underline link-underline-opacity-0 display-2">Clients</a>
+        </li>
+        <li class="nav-link">
+        <a href="{% url 'session_client:session_list' %}"
+           class="link-secondary
+           link-underline link-underline-opacity-0 display-2">Sessions</a>
+        </li>
+        <li class="nav-link">
+        <a href="{% url 'room_calendar_app:room_calendar_list' %}"
+           class="link-secondary
+           link-underline link-underline-opacity-0 display-2">Rooms</a>
+        </li>
+    </ul>
+    </div>
+
+    <div class="col text-secondary">
+        <div class="position-absolute top-50 end-0 m-4">
+
+        <p class="fs-5">Therapists handle a lot of complexity</p>
+        <p class="fs-5">Let's make it a bit easier to handle their admin</p>
+        </div>
+    </div>
 </div>
+</div>
+
 {% endblock %}
 
 {% block content %}

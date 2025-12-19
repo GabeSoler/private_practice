@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
+
+from room_calendar_app.choices import AGREEMENT_CHOICES
 from session_client.choices import duration_times_as_choices, WEEKDAY_SHORT, time_slot_options
 
 
@@ -30,6 +32,7 @@ class TenantModel(models.Model):
     display_name = models.CharField(max_length=20)
     description = models.CharField(max_length=200,blank=True)
     calendar = models.ForeignKey(RoomCalendarModel,on_delete=models.SET_NULL,null=True)
+    agreement = models.CharField(default="Amount",max_length=10, choices=AGREEMENT_CHOICES)
 
     class Meta:
         verbose_name = "tenant"

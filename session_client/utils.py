@@ -45,11 +45,11 @@ def csv_session_list_response(sessions,client,date_start,date_end):
         end_ref_str = p.instance(date_end).to_formatted_date_string()
         file_name = f"{client}: {start_ref_str}-{end_ref_str}" if client else f"{start_ref_str}-{end_ref_str}"
         response = make_csv_response(file_name)
-        fieldnames = ["date", "start_time", "client", "brief", "paid"]
+        fieldnames = ["date", "start_time", "client" "paid"]
         writer = csv.writer(response)  # response is the output
         writer.writerow(fieldnames)
         for row in sessions:
-            writer.writerow([row.date, row.start_time, row.client, row.brief, row.paid])
+            writer.writerow([row.date, row.start_time, row.client,row.keywords, row.paid])
         return response
 
 def csv_room_report_response(sessions,room:RoomCalendarModel,year:int,month:int):

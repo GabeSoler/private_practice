@@ -83,8 +83,7 @@ def client_search_view(request):
             vector_brief = SearchVector("keywords",weight="A")
             vector_calendar = SearchVector("calendar__name",weight="D")
             vector_client = SearchVector("client__code",weight="C")
-            vector_nick = SearchVector("client__nick_name",weight="B")
-            vector = (vector_client + vector_calendar + vector_brief + vector_nick)
+            vector = (vector_client + vector_calendar + vector_brief)
             client = form_partial.cleaned_data['client']
             sessions = (SessionModel.objects
                         .filter(client__user=request.user)

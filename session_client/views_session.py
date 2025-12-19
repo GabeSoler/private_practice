@@ -48,7 +48,7 @@ def sessions_view(request,client_pk=None,add_forward=False) -> HttpResponse:
                 sessions = sessions.filter(date__lte=p.now().date())
             if client:
                 sessions = sessions.filter(client=client)
-            template_calendar = "session_client/navs/session-nav.html" + "#session-list-partial"
+            template_calendar = "session_client/hx/_session_list.html" + "#session-list-partial"
             form_partial.fields['client'].queryset = clients_user
             context = {'sessions': sessions}
             return render(request, template_calendar, context)
@@ -77,7 +77,7 @@ def sessions_hx_edit_paid(request, session_pk):
         else:
             session.paid = True
         session.save()
-        template = 'session_client/navs/session-nav.html#session_paid'
+        template = 'session_client/hx/_session_list.html#session_paid'
         context = {'session': session}
         return render(request, template, context)  # empty response that empties the li object
     raise Http404("Not a expected request")
@@ -93,7 +93,7 @@ def sessions_hx_edit_open(request, session_pk):
         else:
             session.open = True
         session.save()
-        template = 'session_client/navs/session-nav.html#session_open'
+        template = 'session_client/hx/_session_list.html#session_open'
         context = {'session': session}
         return render(request, template, context)  # empty response that empties the li object
     raise Http404("Not a expected request")
@@ -124,7 +124,7 @@ def sessions_search(request,review=False):
         template_hx = template + "#session-list-partial"
     else:
         template += "session_date_list.html"
-        template_hx = "session_client/navs/session-nav.html" + "#session-list-partial"
+        template_hx = "session_client/hx/_session_list.html" + "#session-list-partial"
     clients_user = ClientModel.objects.filter(user=request.user) or ClientModel.objects.none()  # for select
     if request.POST:
         form_partial = SearchSessionForm(data=request.POST)
@@ -337,7 +337,7 @@ def sessions_hx_edit_attendance(request,session_pk,attendance):
     session.attendance = attendance
     session.save()
     messages.info(request, f"Session '{session.start_time.strftime('%d-%m-%y,%H:%M')}' updated")
-    template = 'session_client/navs/session-nav.html'+ "#attendance_partial"
+    template = 'session_client/hx/_session_list.html'+ "#attendance_partial"
     return render(request, template, {"session": session})
 
 @sensitive_variables('session')
@@ -348,7 +348,7 @@ def sessions_patch_attendance(request,session_pk):
         if form.is_valid():
             session = form.save()
             messages.info(request, f"Session '{session.start_time.strftime('%d-%m-%y,%H:%M')}' updated")
-            template = 'session_client/navs/session-nav.html'+ "#attendance_partial"
+            template = 'session_client/hx/_session_list.html'+ "#attendance_partial"
             return render(request, template, {"session": session})
     return Http404("Error with attendance update")
 

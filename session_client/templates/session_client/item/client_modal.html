@@ -1,7 +1,7 @@
 {% extends '_modal.html' %}
 {% comment %} Client modal {% endcomment %}
 
-{% block modal_title %}{{client.code}}<small>{% if client.nick_name %}-{{client.nick_name}}{% endif %}</small>
+{% block modal_title %}{{client.code}}
     <small><a href="{% url 'session_client:edit_client' client.pk %}"
        hx-get="{% url 'session_client:edit_client' client.pk %}"
        hx-target="#modal-body-wrapper"
@@ -13,8 +13,8 @@
 <div id="modal-body-wrapper">
 {% partialdef modal-body-partial inline  %}
 
-        <div class="card bg-dark mb-5 border border-secondary">
-            <div class="card-body">
+        <div class="card mb-5 border border-secondary">
+            <div class="">
 
                 <!--- Client Title -->
                 <div class="container text-center">
@@ -24,9 +24,9 @@
                             <h5>{{ client.code }}</h5>
                         </div>
                         <div class="col">
-                            <small>Date:</small>
-                            <h5>{% if client.nick_name %}{{ client.nick_name }}{% else %}
-                                -- {% endif %}</h5>
+                            <small>Day:</small>
+                            {{ client.get_day_display }}
+                            {{ client.get_time_display }}
                         </div>
                     </div>
                 </div>

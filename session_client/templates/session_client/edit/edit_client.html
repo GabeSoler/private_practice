@@ -1,11 +1,11 @@
 {% extends 'session_client/navs/client-nav.html' %}
 {% load django_bootstrap5 %}
-{% block background %}bg-dark{% endblock %}
+{% block background %}{% endblock %}
 
 {% block content %}
 
     {% if client %}
-        <div class="display-3">{{ client.code }}<small>{% if client.nick_name %}-{{ client.nick_name }}{% endif %}</small>
+        <div class="display-3">{{ client.code }}
    </div>
         {% else %}
         <div class="display-3">Add Client</div>
@@ -15,7 +15,7 @@
     <div id="modal-body-wrapper">
         {% partialdef modal-body-partial inline %}
 
-            <div class="card bg-body mb-5 border border-secondary">
+            <div class="card mb-5 border border-secondary">
                 <form
                         {% if client %}
                       action="{% url 'session_client:edit_client' client.pk %}" method="post"
@@ -36,8 +36,7 @@
                                     {% bootstrap_field form.code layout="horizontal" show_label="skip" show_help=False %}
                                 </div>
                                 <div class="col">
-                                    <small>Nick name:</small>
-                                    {% bootstrap_field form.nick_name layout="horizontal" show_label="skip" show_help=False %}
+                                    <small>Link:</small>
                                 </div>
                             </div>
                         </div>

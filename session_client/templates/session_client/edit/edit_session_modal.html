@@ -15,7 +15,7 @@
     <div id="modal-body-wrapper">
         {% partialdef modal-body-partial inline %}
 
-            <div class="card bg-body mb-5 border border-secondary">
+            <div class="card mb-5 border border-secondary">
                 <form
 
                         {% if session %}
@@ -62,8 +62,7 @@
                         <!--- Session Brief -->
                         <div class="container text-center border-top border-secondary col-12 d-block">
                             <div class="mx-auto">
-                            <small>Session brief:</small>
-                            {% bootstrap_field form.brief layout="horizontal" show_label="skip" show_help=False field_class="col-12" %}
+                            <small>Session Keywords:</small>
                             {% bootstrap_field form.keywords layout="horizontal" show_label="skip" show_help=False field_class="col-12 mt-1" %}
 
                             </div>

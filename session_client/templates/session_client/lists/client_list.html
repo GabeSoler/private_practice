@@ -36,15 +36,28 @@
                                        href="{% url 'session_client:client_hx_item' client.pk %}"
                                        hx-get="{% url 'session_client:client_hx_item' client.pk %}"
                                        hx-target="#modal-wrapper"
-                                    >{{ client.code }}{% if client.nick_name %} "{{ client.nick_name }}"{% endif %}
+                                    >{{ client.code }}
                                     </a>
 
                                     <!-- list month forward -->
-                                    <span class="text-secondary small me-1" style="font-size:0.7rem">{{ client.created_at|timesince }}</span>
+                                    <span class="text-secondary small me-1"
+                                            data-bs-toggle="tooltip"
+                                             data-bs-trigger="hover"
+                                             data-bs-delay="500"
+                                             data-bs-title="Time from creation"
+                                             data-bs-custom-class="custom-tooltip"
+                                          style="font-size:0.7rem">{{ client.created_at|timesince }}</span>
+
+
                                     <!-- count of open before today -->
                                     <a class="btn btn-info btn-sm text-bg-info"
                                          hx-get="{% url 'session_client:session_pending_list_modal' client.pk %}"
                                          hx-target="#modal-wrapper"
+                                             data-bs-toggle="tooltip"
+                                             data-bs-trigger="hover"
+                                             data-bs-delay="500"
+                                             data-bs-title="Open Sessions"
+                                             data-bs-custom-class="custom-tooltip"
                                     >{{ client.pending_sort_sessions|default:0 }}</a>
                                 </div>
 
@@ -52,15 +65,45 @@
 
                                     <div class="col"> <!-- day, time and room -->
                                         <p class="lh-1"><span
+                                                data-bs-toggle="tooltip"
+                                             data-bs-trigger="hover"
+                                             data-bs-delay="500"
+                                             data-bs-title="Date default"
+                                             data-bs-custom-class="custom-tooltip"
                                                 class="small">{{ client.get_day_display }}-{{ client.time }}</span>
-                                            </br> <span class="small">{{ client.calendar }}</span></p>
+                                            </br> <span
+                                             data-bs-toggle="tooltip"
+                                             data-bs-trigger="hover"
+                                             data-bs-delay="500"
+                                             data-bs-title="Client's tenant"
+                                             data-bs-custom-class="custom-tooltip"
+                                                    class="small">{{ client.tenant }}</span></p>
                                     </div>
                                     <div class="col"> <!-- month back paid and expected pay -->
-                                        <span class="fs-5">£{{ client.month_sessions_paid }}</span>/<span
+                                        <span
+                                             data-bs-toggle="tooltip"
+                                             data-bs-trigger="hover"
+                                             data-bs-delay="500"
+                                             data-bs-title="sessions paid"
+                                             data-bs-custom-class="custom-tooltip"
+
+                                                class="fs-5">£{{ client.month_sessions_paid }}</span>
+                                        /<span
+                                                                                             data-bs-toggle="tooltip"
+                                             data-bs-trigger="hover"
+                                             data-bs-delay="500"
+                                             data-bs-title="paiment expected"
+                                             data-bs-custom-class="custom-tooltip"
                                                 class="small">{{ client.month_sessions_expected }}</span>
                                     </div>
                                     <div class="col-auto">
-                                        <span class="fs-5">{{ client.attendance_percentage|floatformat }}%</span>
+                                        <span
+                                                                                             data-bs-toggle="tooltip"
+                                             data-bs-trigger="hover"
+                                             data-bs-delay="500"
+                                             data-bs-title="Attendance percentage"
+                                             data-bs-custom-class="custom-tooltip"
+                                                class="fs-5">{{ client.attendance_percentage|floatformat }}%</span>
                                     </div>
                                 </div>
 
@@ -70,7 +113,13 @@
                                         {% partialdef future_sessions_partial inline %}
                                     <a class="btn btn-outline-secondary btn-sm"
                                        hx-get="{% url 'session_client:session_list_modal' client.pk %}"
-                                        hx-target="#modal-wrapper">
+                                        hx-target="#modal-wrapper"
+                                            data-bs-toggle="tooltip"
+                                             data-bs-trigger="hover"
+                                             data-bs-delay="500"
+                                             data-bs-title="Future sessions"
+                                             data-bs-custom-class="custom-tooltip"
+                                    >
                                             <i class="bi bi-fast-forward-fill"></i>
                                             <span class=""
                                             > {{ client.future_sessions_count }}</span>
@@ -81,14 +130,26 @@
                                     <div class="col-4"> <!-- add 3 sessions forward -->
                                         <a class="btn btn-outline-secondary btn-sm"
                                            hx-post="{% url 'session_client:add_series' client.pk 3 %}"
-                                           hx-target="#future-sessions-{{ client.pk }}">
+                                           hx-target="#future-sessions-{{ client.pk }}"
+                                           data-bs-toggle="tooltip"
+                                             data-bs-trigger="hover"
+                                             data-bs-delay="500"
+                                             data-bs-title="book 3 forward"
+                                             data-bs-custom-class="custom-tooltip"
+                                        >
                                         +3
                                         </a>
                                     </div>
                                     <div class="col-4"> <!-- add 6 sessions forward -->
                                         <a class="btn btn-outline-secondary btn-sm"
                                         hx-post="{% url 'session_client:add_series' client.pk 6 %}"
-                                            hx-target="#future-sessions-{{ client.pk }}">
+                                            hx-target="#future-sessions-{{ client.pk }}"
+                                           data-bs-toggle="tooltip"
+                                             data-bs-trigger="hover"
+                                             data-bs-delay="500"
+                                             data-bs-title="book 6 forward"
+                                             data-bs-custom-class="custom-tooltip"
+                                        >
                                         +6
                                         </a>
 

@@ -8,15 +8,15 @@ from django.forms.widgets import DateInput,Select,SearchInput
 class ClientForm(forms.ModelForm):
     class Meta:
         model = ClientModel
-        fields = ['code','nick_name','type','fee', 'tenant', 'day','time', 'duration','series', 'active']
+        fields = ['code','type','fee', 'tenant', 'day','time', 'duration','series', 'active','link']
         labels = {'code':'Code',                  
                   'type':'Type',
                   'fee':'Fee',
-                  'nick_name':'Nickname',
                   'tenant': 'Profile',
                   'day':'Default Day',
                   'duration':'Duration',
                   'active':'Active',
+                  'link':'Link'
                   }
         widgets = {'active':forms.CheckboxInput(attrs={'class':'form-check-input',"type":"checkbox", "role":"switch", 'name':"radioDefault"}),
                    }
@@ -34,8 +34,8 @@ class ClientFormShort(forms.ModelForm):
 class SessionForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['brief','keywords','date','start_time', 'client', 'paid', 'amount_paid', 'attendance', 'open', 'calendar']
-        labels = {'brief':'Brief',
+        fields = ['keywords','date','start_time', 'client', 'paid', 'amount_paid', 'attendance', 'open', 'calendar']
+        labels = {
                   'keywords':'Keywords',
                   'date': 'Date',
                   'start_time': 'time',
@@ -50,7 +50,6 @@ class SessionForm(forms.ModelForm):
                    'start_time':forms.Select(attrs={'class':'form-select'},
                                                     choices=time_slot_options,
                                              ),
-                   'brief':forms.Textarea(attrs={'class':'form-control','rows':3}),
                    'paid':forms.CheckboxInput(attrs={'class':'form-check-input','type':"checkbox",'role':'switch'}),
                    'open':forms.CheckboxInput(attrs={'class':'form-check-input','type':"checkbox",'role':'switch'}),
                    }
@@ -109,9 +108,9 @@ class SelectAttendanceForm(forms.ModelForm):
 class PatchBriefForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['brief','keywords']
+        fields = ['keywords']
 
 class ClientFromCalendarForm(forms.ModelForm):
     class Meta:
         model = ClientModel
-        fields = ['code','nick_name','duration','fee','type','tenant']
+        fields = ['code','duration','fee','type','tenant']

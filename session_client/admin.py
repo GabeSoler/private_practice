@@ -4,14 +4,14 @@ from .models import ClientModel,SessionModel
 
 
 class SessionAdmin(admin.ModelAdmin):
-    list_display = ("updated_at", "client", "brief")
+    list_display = ("updated_at", "client")
     list_filter = ("updated_at",)
-    search_fields = ("updated_at", "client","brief")
+    search_fields = ("updated_at", "client")
 
 class ClientAdmin(admin.ModelAdmin):
     list_display = ("updated_at", "code", "type")
     list_filter = ("updated_at",)
-    search_fields = ("code", "type","nick_name","updated_at")
+    search_fields = ("code", "type","updated_at")
 
 
 

@@ -1,7 +1,7 @@
 {% extends 'session_client/navs/session-nav.html' %}
 {% load django_bootstrap5 %}
 
-{% block background %}bg-dark{% endblock %}
+{% block background %}{% endblock %}
 {% block content %}
     {% if session %}
 
@@ -14,7 +14,7 @@
     <div id="modal-body-wrapper">
         {% partialdef modal-body-partial inline %}
 
-            <div class="card bg-body mb-5 border border-secondary">
+            <div class="card mb-5 border border-secondary">
                 <form
                         {% if session %}
                       action="{% url 'session_client:edit_session' session.pk %}"
