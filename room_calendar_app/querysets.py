@@ -4,7 +4,6 @@ from .models import TenantModel
 from django.db.models import Q, F, Case, When,FloatField,Prefetch,Count,Sum
 import pendulum as p
 
-@keep_lazy
 def tenant_annotated_qs(year,month,cal=None,user=None):
     tenants_qs = (TenantModel.objects
     .annotate(
@@ -18,8 +17,8 @@ def tenant_annotated_qs(year,month,cal=None,user=None):
                           default=0))
 
     .annotate(
-        session_pay=Case(When(agrement="Block",then=F('blocksmodel__monthly_cost')),
-            When(agrement="Percentage",
+        session_pay=Case(When(agreement="Block",then=F('blocksmodel__monthly_cost')),
+            When(agreement="Percentage",
                  then=F("period_income") * F("calendar__percentage") / 100),
             default=F("calendar__cost") * F("session_count"),
             output_field=FloatField()
@@ -30,7 +29,6 @@ def tenant_annotated_qs(year,month,cal=None,user=None):
         tenants_qs = tenants_qs.filter(user=user)
     return tenants_qs
 
-@keep_lazy
 def get_tenant_qs_totals(tenants_qs):
     totals = tenants_qs.aggregate(
         total_sessions=Sum("session_count"),

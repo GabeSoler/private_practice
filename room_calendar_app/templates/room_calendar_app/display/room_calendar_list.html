@@ -21,41 +21,23 @@
         {% for calendar in calendar_tenant %}
             <li class="list-group-item">
                 <div class="row">
-                    <div class="col">
+                    <div class="col-4">
                         <span class="display-5">{{ calendar.name }}| </span>
 
                     </div>
                     <div class="col">
+                        <small>Period:</small></br>
+                        {{ month|date:"M-Y" }}
 
                     </div>
 
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <ul class="list-group">
-                            {% for tenant in  calendar.tenants.all %}
-                                <li class="list-group-item py-0">
-                                    {% if tenant.user == user %}
-                                        <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
-                                           hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
-                                            hx-target="#modal-wrapper"
-                                        >- {{ tenant.name }}
-                                        (Me)</a>
-                                    {% else %}
-                                        <span>- {{ tenant.name }}</span>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
                 <div class="col">
-                    Sessions Month</br>
-                    <span class="placeholder bg-secondary col-2"></span>
+                    <small>Sessions:</small></br>
+                    <span class="fs-4">{{ calendar.sessions_count }}</span>
                 </div>
                 <div class="col">
-                    to pay month
-                    <span class="placeholder bg-secondary col-2"></span>
-                </div>
+                    <small>Income</small></br>
+                    <span class="fs-4">{{ calendar.period_income }}</span>
                 </div>
             </li>
         {% empty %}

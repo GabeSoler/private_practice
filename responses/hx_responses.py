@@ -6,9 +6,11 @@ def ok_response_modal(request,title:str,text:str,
                       event:str=None,
                       event_target:str=None,
                       re_swap:str=None,
-                      partial:str=True):
+                      partial=False):
     template = "_modal_ok_response.html"
     if partial:
+        template += "#ok-body-partial"
+    else:
         template += "#ok-inner-partial"
     context = {"title":title,"text":text}
     response = render(request,template,context)

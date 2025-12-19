@@ -3,6 +3,7 @@ from django.http import Http404, HttpResponse
 from django.contrib import messages
 from pygments.lexer import default
 
+from responses.hx_responses import ok_response_modal
 from session_client.utils import csv_room_report_response
 from .models import RoomCalendarModel, TenantModel, BlocksModel
 from .forms import RoomCalendarForm, TenantForm, LinkTenantForm, WeekCalendarForm, RoomReportForm, TenantReportForm, \
@@ -24,8 +25,6 @@ from django.views.decorators.debug import sensitive_post_parameters,sensitive_va
 
 logger = logging.getLogger(__name__)
 
-@sensitive_post_parameters()
-@sensitive_variables('sessions')
 def week_view(request):
     """ Displays a calendar table with occurrences
         You can change the week to display or select a specific room calendar
@@ -99,7 +98,6 @@ def week_view(request):
     return render(request,template,context)
 
 @login_required()
-@sensitive_variables('clients')
 def week_view_auxiliary(request):
     clients = ClientModel.objects.filter(user=request.user)
     template = "room_calendar_app/auxiliary/client_list_li.html"
@@ -107,13 +105,23 @@ def week_view_auxiliary(request):
     return render(request,template,context)
 
 
-@sensitive_variables('room_calendar_tenant')
 def room_calendar_listing_view(request):
-    room_calendar_tenant = RoomCalendarModel.objects.filter(Q(tenantmodel__user=request.user)|Q(user=request.user)).prefetch_related("tenantmodel_set").distinct()
-    context = {"calendar_tenant": room_calendar_tenant}
+    last_month = p.now().start_of('month').subtract(months=1)
+    room_calendar_tenant = (RoomCalendarModel.objects.
+                            filter(Q(tenantmodel__user=request.user)|Q(user=request.user))
+                            .annotate(
+                                      sessions_count=Count("sessionmodel",filter=Q(user=request.user)),
+                                      period_income=Sum('sessionmodel__amount_paid',
+                                                        filter=Q(sessionmodel__date__year=last_month.year,
+                                                                 sessionmodel__date__month=last_month.month)&
+                                                                Q(sessionmodel__client__user=request.user.pk),
+                                                        default=0),
+
+                                )
+    )
+    context = {"calendar_tenant": room_calendar_tenant,"month":last_month}
     return render(request,"room_calendar_app/display/room_calendar_list.html",context)
 
-@sensitive_variables('my_rooms')
 def room_calendar_manage_view(request):
     ref_date = p.now()
     my_rooms = RoomCalendarModel.objects.filter(user=request.user)
@@ -122,9 +130,6 @@ def room_calendar_manage_view(request):
     context = {"rooms": my_rooms, "form": form,"form_tenant":form_tenant}
     return render(request,"room_calendar_app/display/room_calendar_manage.html",context)
 
-@login_required()
-@sensitive_post_parameters()
-@sensitive_variables('tenants_qs')
 def room_manage_refresh_view(request,cal_pk):
     if request.method == "POST":
         form_tenant = TenantReportForm(initial={"month": p.now().month},
@@ -142,9 +147,6 @@ def room_manage_refresh_view(request,cal_pk):
     return Http404("Ups")
 
 
-@sensitive_post_parameters()
-@sensitive_variables('tenants_qs')
-@sensitive_variables('instance')
 def room_calendar_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     template = "room_calendar_app/input/edit_calendar_modal.html"
@@ -158,13 +160,11 @@ def room_calendar_add_view(request):
             instance = form.save(commit=False)
             instance.user = request.user
             instance.save()
-            return redirect('room_calendar_app:room_calendar_list')
+            return HttpResponseClientRefresh()
     #display a blank or invalid form
     context = {'form':form}
     return render(request,template,context)
 
-@sensitive_post_parameters()
-@sensitive_variables('room_calendar')
 def room_calendar_edit_view(request,room_calendar_pk):
     """edit the occurrence repetition erasing future events"""
     room_calendar = get_object_or_404(RoomCalendarModel,pk=room_calendar_pk,user=request.user)
@@ -183,21 +183,17 @@ def room_calendar_edit_view(request,room_calendar_pk):
     context = {'form':form,"room":room_calendar}
     return render(request,template,context)
 
-@sensitive_variables('tenant')
 def tenant_view(request,tenant_pk):
     tenant = get_object_or_404(TenantModel, pk=tenant_pk)
     context = {"tenant": tenant}
     return render(request, "room_calendar_app/display/tenant_modal.html", context)
 
-@sensitive_variables('tenant_list')
 def tenant_listing_view(request):
     """View a list of user's events """
     tenant_list = TenantModel.objects.filter(user=request.user)  #? I already changed this one
     context = {"tenant_list":tenant_list}
     return render(request, "room_calendar_app/dynamic/tenant_list.html", context)
 
-@sensitive_post_parameters()
-@sensitive_variables('instance')
 def tenant_add_view(request):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     if request.method !='POST':
@@ -220,8 +216,6 @@ def tenant_add_view(request):
 
 
 
-@sensitive_post_parameters()
-@sensitive_variables('tenant')
 def tenant_edit_view(request,tenant_pk):
     """edit the occurrence repetition erasing future events"""
     tenant = get_object_or_404(TenantModel,pk=tenant_pk,user=request.user)
@@ -242,8 +236,6 @@ def tenant_edit_view(request,tenant_pk):
     context = {'tenant':tenant,'form':form}
     return render(request,template,context)
 
-@sensitive_post_parameters()
-@sensitive_variables('calendar')
 def tenant_link_view(request,calendar_pk):
     """edit the occurrence repetition erasing future events"""
     calendar = get_object_or_404(RoomCalendarModel, pk=calendar_pk,user=request.user)
@@ -262,9 +254,6 @@ def tenant_link_view(request,calendar_pk):
     else:
         return Http404
 
-@login_required()
-@sensitive_post_parameters()
-@sensitive_variables('tenant')
 def tenant_unlink_view(request,tenant_pk):
     """edit the occurrence repetition erasing future events"""
     tenant = get_object_or_404(TenantModel,pk=tenant_pk,user=request.user)
@@ -280,9 +269,6 @@ def tenant_unlink_view(request,tenant_pk):
     return retarget(response,"#modal-wrapper")
 
 
-@login_required()
-@sensitive_post_parameters()
-@sensitive_variables('sessions')
 def room_report_view(request):
     template = 'room_calendar_app/display/room_report.html'
     if request.method == 'POST':
@@ -320,8 +306,6 @@ def room_report_view(request):
     context = {'form':form,'sessions':sessions}
     return render(request,template,context)
 
-@login_required()
-@sensitive_post_parameters()
 def tenant_duplicate_hx(request,tenant_pk):
     if request.method == 'POST':
         tenant = TenantModel.objects.get(pk=tenant_pk)
@@ -336,16 +320,11 @@ def tenant_duplicate_hx(request,tenant_pk):
         return render(request,template,{'tenant':tenant_2})
     return Http404("ups, page not wat you thought")
 
-@login_required()
-@sensitive_variables('tenant')
 def tenant_delete_hx(request,tenant_pk):
     tenant = TenantModel.objects.get(pk=tenant_pk)
     tenant.delete()
     return HttpResponseClientRefresh()
 
-@login_required()
-@sensitive_post_parameters()
-@sensitive_variables('bloks','room_qs')
 def week_blocks_view(request):
     template = "room_calendar_app/dynamic/week_view_blocks.html"
     if request.method =='POST':
@@ -364,9 +343,6 @@ def week_blocks_view(request):
     context = {"calendar": calendar, "form": form}
     return render(request, template, context)
 
-@login_required()
-@sensitive_post_parameters()
-@sensitive_variables('clients','calendar')
 def week_schedule_view(request):
     template = "room_calendar_app/dynamic/week_view_clients.html"
     if request.method =='POST':
@@ -384,9 +360,6 @@ def week_schedule_view(request):
     context = {"calendar":calendar,"form":form}
     return render(request,template,context)
 
-@login_required()
-@sensitive_post_parameters()
-@sensitive_variables('instance')
 def block_add_view(request,day=None,time=None,room=None):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     template = 'room_calendar_app/input/add_block.html'
@@ -418,9 +391,6 @@ def block_add_view(request,day=None,time=None,room=None):
     #display a blank or invalid form
     return render(request,template,context)
 
-@login_required()
-@sensitive_post_parameters()
-@sensitive_variables('block')
 def block_edit_view(request,block_pk=None):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     template = 'room_calendar_app/input/add_block.html'
@@ -438,8 +408,6 @@ def block_edit_view(request,block_pk=None):
     context = {'form':form,"block_item":block}
     return render(request,template,context)
 
-@login_required()
-@sensitive_variables('block')
 def block_delete_view(request,block_pk):
     block = get_object_or_404(BlocksModel,pk=block_pk)
     block.delete()

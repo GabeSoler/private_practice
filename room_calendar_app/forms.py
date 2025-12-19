@@ -21,11 +21,12 @@ class RoomCalendarForm(forms.ModelForm):
 class TenantForm(forms.ModelForm):
     class Meta:
         model = TenantModel
-        fields = ("display_name","name","description")
+        fields = ("display_name","name","description","agreement")
         labels = {
             "display_name":"Your name to display",
             "name":"Name for your records",
             "description":"a description of the place you are linking to",
+            "agreement":"Agreement type",
         }
 
 class LinkTenantForm(forms.Form):

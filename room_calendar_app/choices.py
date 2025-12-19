@@ -2,7 +2,7 @@
 
 
 AGREEMENT_CHOICES = (
-("Amount","Amount"),
-("Percentage","Percentage"),
-("Block","Block"),
+("Amount","By Amount"),
+("Percentage","By Percentage"),
+("Block","By Block"),
 )

@@ -28,7 +28,7 @@
                                href="{% url 'room_calendar_app:edit_room_calendar' calendar.pk %}"
                                hx-get="{% url 'room_calendar_app:edit_room_calendar' calendar.pk %}"
                                hx-target="#modal-wrapper">
-                        {{ calendar.name }}</a> | </span>
+                        {{ calendar.name }}</a></span>
 
                     <!-- form to change tenant report by month -->
   <div id="form-table-wrapper">
@@ -36,8 +36,8 @@
   <form action="{% url 'room_calendar_app:room_manage_refresh' calendar.pk %}" method="post"
     hx-post="{% url "room_calendar_app:room_manage_refresh" calendar.pk %}"
     hx-target="next <tbody/>"
-    hx-trigger="change throttle:1s,load once"
-    >
+    hx-trigger="change throttle:1s,load once,RefreshEvent"
+    id="id-{{ calendar.pk }}">
     {% csrf_token %}
     <table
     class="table table-sm mb-0"

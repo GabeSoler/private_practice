@@ -11,6 +11,7 @@ class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel">
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="modalBody">
+      {% partialdef ok-body-partial inline %}
       <h5>
         {% block modal_body %}{{ text }}{% endblock %}
       </h5>
@@ -19,11 +20,12 @@ class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel">
       style="font-size: 15vw;"></i>
 
       </div>
+          {% endpartialdef ok-body-partial  %}
       <div class="modal-footer">
                   <button type="button" class="btn btn-secondary float-end" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
-{% endpartialdef %}
+{% endpartialdef ok-inner-partial %}
 
 </div>

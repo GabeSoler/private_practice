@@ -11,21 +11,45 @@
       ></i></h2>
 </div>
 <div class="card-body">
+
   <ul class="list-group">
     {% for tenant in tenant_list %}
         {% partialdef tenant_item_partial inline %}
       <li class="list-group-item list-group-item-action list-group-item-primary  fade-out">
-        <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
-        hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
+      <div class="row">
+          <div class="col">
+        <a href="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
+        hx-get="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
            hx-target="#modal-wrapper"
-        >{{tenant.name}}</a> | {{tenant.calendar}} |
-      <i class="bi bi-copy"
-      hx-post="{% url 'room_calendar_app:duplicate_tenant' tenant.pk %}"></i>
-      <i
-                class="bi bi-pencil-square ms-3"
-                                hx-get="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
-                                hx-target="#modal-wrapper"
-                                ></i>
+        >{{tenant.name}}</a>
+
+          </div>
+          <div class="col">
+
+          {{tenant.calendar}}
+          </div>
+          <div class="col">
+
+              <i class="bi bi-copy"
+                hx-post="{% url 'room_calendar_app:duplicate_tenant' tenant.pk %}"
+              hx-target="closest <li/>"
+              hx-swap="afterend"></i>
+          </div>
+
+
+          <div class="col">
+                <span class="bg-primary border" hidden id="code-{{ tenant.pk }}">{{ tenant.pk }}</span>
+                    <button class="btn btn-outline-secondary btn-sm"
+                            _="on click
+                    put innerHTML of previous <span/> into myText
+                    writeText(myText) into the navigator's clipboard
+                    set my innerHTML to 'Copied!'
+                    end"
+                    >Share Code
+                    </button>
+          </div>
+
+      </div>
     </li>
                 {% endpartialdef tenant_item_partial %}
 
