@@ -111,7 +111,7 @@ def room_calendar_listing_view(request):
                             filter(Q(tenantmodel__user=request.user)|Q(user=request.user))
                             .annotate(
                                       sessions_count=Count("sessionmodel",filter=Q(user=request.user)),
-                                      period_income=Sum('sessionmodel__amount_paid',
+                                      period_income=Sum('sessionmodel__fee',
                                                         filter=Q(sessionmodel__date__year=last_month.year,
                                                                  sessionmodel__date__month=last_month.month)&
                                                                 Q(sessionmodel__client__user=request.user.pk),
@@ -287,7 +287,7 @@ def room_report_view(request):
             sessions = sessions.annotate(
                 pay=Case(
                     When(client__type="RoomP",
-                         then=F("amount_paid") * room.percentage / 100),
+                         then=F("fee") * room.percentage / 100),
                     default=room.cost,
                     output_field=FloatField()
                                 )

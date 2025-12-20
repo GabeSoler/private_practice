@@ -34,14 +34,14 @@ class ClientFormShort(forms.ModelForm):
 class SessionForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['keywords','date','start_time', 'client', 'paid', 'amount_paid', 'attendance', 'open', 'calendar']
+        fields = ['keywords','date','start_time', 'client', 'paid', 'fee', 'attendance', 'open', 'calendar']
         labels = {
                   'keywords':'Keywords',
                   'date': 'Date',
                   'start_time': 'time',
                   'client':'Client',
                   'paid':'Paid',
-                  'amount_paid':'Amount',
+                  'fee':'Amount',
                   'open':'Open',
                   'attendance': 'Attendance'}
         # I needed to add the split field so it processes date and time before goes to DateTime

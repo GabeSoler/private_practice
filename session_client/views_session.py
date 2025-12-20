@@ -302,7 +302,7 @@ def add_copy_forward_view(request,session_pk):
             end_time=session.end_time,
             calendar=session.calendar,
             client=session.client,
-            amount_paid=session.amount_paid,
+            fee=session.fee,
             open=True,
             paid=False
         )

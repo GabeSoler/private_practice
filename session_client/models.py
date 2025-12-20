@@ -30,7 +30,7 @@ class ClientModel(models.Model):
     code = models.CharField(blank=False,max_length=15,help_text="Add an Identifier code") #Create a code instead of a name
     # nick_name = models.CharField(default="",blank=True,null=True,max_length=20,help_text="Give it a memorable nickname")
     type = models.CharField(default='Pvt', choices=CLIENT_TYPE, max_length=20, help_text="Select a type of client") # add choices like private, service, eap, supervisee
-    fee = models.IntegerField(default=50,validators=(MinValueValidator(1),MaxValueValidator(100)),help_text="Whats your agreed fee")
+    fee = models.DecimalField(blank=True,decimal_places=2,max_digits=10,null=True,default=60,help_text="Whats your agreed fee")
     #client base info (delete after 7 years?) (I am thinking to only erase the fields as the admin is yours)
     active = models.BooleanField(default=True,help_text="Move from archive to active or vice versa")
     archived_at = models.DateTimeField(blank=True,null=True)
@@ -240,7 +240,7 @@ class SessionModel(models.Model):
     #admin info
     paid = models.BooleanField(default=False,blank=True) #check payment
     attendance = models.CharField(default='', blank=True, max_length=20, choices=ATTENDANCE) #record attendance
-    amount_paid = models.IntegerField(default=0,blank=True) #record attendance
+    fee = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True,default=60.00)
     open = models.BooleanField(default=True,blank=True)
     #manager
     objects = SessionManager()

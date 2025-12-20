@@ -12,7 +12,7 @@ def tenant_annotated_qs(year,month,cal=None,user=None):
                                      clientmodel__sessionmodel__date__month=month)&
                             ~Q(clientmodel__sessionmodel__attendance="Cancel"),
                             ),
-        period_income=Sum('clientmodel__sessionmodel__amount_paid',
+        period_income=Sum('clientmodel__sessionmodel__fee',
                           filter=Q(clientmodel__sessionmodel__date__year=year,
                                    clientmodel__sessionmodel__date__month=month),
                           default=0))

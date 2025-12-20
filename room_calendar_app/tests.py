@@ -91,7 +91,7 @@ class MetaTestSetupMixin:
             end_time=p.time(9, 30),  # 9:30
             calendar=cls.room_1,  # assuming you have cls.room_1 defined
             brief="Session1",
-            amount_paid=60,
+            fee=60,
             paid=True,
             attendance="Attended",
 
@@ -105,7 +105,7 @@ class MetaTestSetupMixin:
             end_time=p.time(9, 30),
             calendar=cls.room_2,
             brief="Session2",
-            amount_paid=60,
+            fee=60,
             paid=False,
             attendance="Attended",
 
@@ -119,7 +119,7 @@ class MetaTestSetupMixin:
             end_time=p.time(9, 30),
             calendar=cls.room_1,
             brief="Overlap1",
-            amount_paid=60,
+            fee=60,
             paid=False,
             attendance="Attended",
 
@@ -133,7 +133,7 @@ class MetaTestSetupMixin:
             end_time=p.time(10, 30),
             calendar=cls.room_1,
             brief="Overlap2",
-            amount_paid=60,
+            fee=60,
             paid=False,
             attendance="Attended",
 
@@ -165,7 +165,7 @@ class MetaTestSetupMixin:
                 end_time=p.time(n + 1, 0),  # Next week +1 hour
                 calendar=cls.room_2,  # assuming you have cls.room_2 defined
                 brief=f"Test{n}",
-                amount_paid=60,
+                fee=60,
                 paid=False,
                 attendance="LateC",
             )

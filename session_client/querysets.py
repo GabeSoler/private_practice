@@ -16,10 +16,10 @@ def annotate_client_list(user, active=True):
         user=user,
         active=active
     ).annotate(
-        total_payments=Sum('sessionmodel__amount_paid'),
+        total_payments=Sum('sessionmodel__fee'),
         total_sessions=Count('sessionmodel'),
         month_sessions_paid=Sum(
-            'sessionmodel__amount_paid',
+            'sessionmodel__fee',
             filter=Q(
                 sessionmodel__date__gte=date_ref.subtract(days=30).date(),
                 sessionmodel__date__lte=date_ref.date(),
@@ -27,7 +27,7 @@ def annotate_client_list(user, active=True):
             )
         ),
         month_sessions_expected=Sum(
-            'sessionmodel__amount_paid',
+            'sessionmodel__fee',
             filter=Q(
                 sessionmodel__date__gte=date_ref.subtract(days=30).date(),
                 sessionmodel__date__lte=date_ref.date(),
