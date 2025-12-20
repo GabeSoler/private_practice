@@ -9,7 +9,8 @@ def tenant_annotated_qs(year,month,cal=None,user=None):
     .annotate(
         session_count=Count("clientmodel__sessionmodel",
                             filter=Q(clientmodel__sessionmodel__date__year=year,
-                                     clientmodel__sessionmodel__date__month=month),
+                                     clientmodel__sessionmodel__date__month=month)&
+                            ~Q(clientmodel__sessionmodel__attendance="Cancel"),
                             ),
         period_income=Sum('clientmodel__sessionmodel__amount_paid',
                           filter=Q(clientmodel__sessionmodel__date__year=year,

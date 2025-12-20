@@ -6,11 +6,11 @@
     <!-- search rooms when many  -->
     {% if rooms|length > 2 %}
         <div class="container bg-primary">
-            <label for="client-search-input">Filter clients</label>
+            <label for="client-search-input">Filter Rooms</label>
             <input class="form-control" type="text" placeholder="Search" id="client-search-input"
                    _="on input
-                                                        tell <a/> in <div>.card/>
-                                                            show closest <div>.card/>
+                                                        tell <a/> in <li/>
+                                                            show closest <li/>
                                                             when your textContent.toLowerCase()
                                                             contains my value.toLowerCase()
                                                         end">
@@ -87,6 +87,7 @@
                             <thead>
                             <tr>
                                 <th scope="col">Tenant</th>
+                                <th scope="col">Agreement</th>
                                 <th scope="col">Sessions</th>
                                 <th scope="col">Rent</th>
                             </tr>
@@ -112,9 +113,15 @@
                                    hx-swap="outerHTML"
                                 ></i>
                                 </th>
+
+                                <td class="small">
+                                    {{tenant.get_agreement_display}}
+                                </td>
+
                                 <td>
                                     {{tenant.session_count}}
                                 </td>
+
                                 <td>
                                     {{tenant.session_pay}}
                                 </td>
@@ -124,6 +131,8 @@
                             <tr class="text-info">
                                 <td class="text-info">
                                     Total
+                                </td>
+                                <td class="text-info">
                                 </td>
                                 <td class="text-info">
                                     {{ totals.total_sessions }}

@@ -12,18 +12,9 @@
     <div class="card">
         <div class="card-body">
             {% partialdef tenant-partial inline %}
-                <h5 class="card-title display-4">{{ tenant.name }}</h5>
-                <p class="card-text">{{ tenant.description }}</p>
-                <p class="card-text"><span class="bg-primary border" id="code">{{ tenant.pk }}</span>
-                    <button class="btn btn-outline-secondary"
-                            _="on click
-                    put innerHTML of previous <span/> into myText
-                    writeText(myText) into the navigator's clipboard
-                    end"
-                    >copy
-                    </button>
-                </p>
-                <p class="card-text small">Give the code to a Room Calendar controller to link it</p>
+                <p class="card-title display-4">Display: {{ tenant.display_name }}</p>
+                <p class="card-text">Description: {{ tenant.description }}</p>
+                <p class="card-text">Agreement: {{ tenant.agreement }}</p>
             {% endpartialdef tenant-partial %}
         </div>
     </div>

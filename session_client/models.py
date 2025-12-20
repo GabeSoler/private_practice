@@ -111,7 +111,7 @@ class ClientModel(models.Model):
         ref_date = self.deduce_next_datetime(add_weeks=add_weeks)
         ref_date = ref_date
         fortnight = True if self.series == 2 else False
-        range_weeks = amount * 2 if fortnight else amount -1 # double of weeks if fortnight,take one week as starts on day
+        range_weeks = amount * 2 if fortnight else amount -1 # double of weeks if a fortnight,take one week as starts on day
         interval = p.interval(ref_date,ref_date.add(weeks=range_weeks))
         assert isinstance(ref_date,p.DateTime)
         assert ref_date.day_of_week == self.day,f"The ref_date should be on the client.day, {ref_date.day_of_week} != {self.day}"
@@ -140,13 +140,14 @@ class ClientModel(models.Model):
                 start_time=self.time,
                 end_time=time_plus_duration(self.time, self.duration),
                 calendar=tenant.calendar,
+                amount_paid=self.fee
             )
 
             session_list.append(session_instance)
         sessions = SessionModel.objects.bulk_create(session_list)
         sessions_len = len(sessions)
         logger.debug("Sessions created, length: {}",sessions_len)
-        assert sessions_len is amount,f"sessions created must match amount, {sessions_len} != {amount}"
+        assert sessions_len == amount,f"sessions created must match amount, {sessions_len} != {amount}"
         __bool__= True
         return True,sessions
 
@@ -157,7 +158,8 @@ class ClientModel(models.Model):
                              range_filter=True,
                              calendar_filter=True,
                              week_day_filter=True,
-                             time_filter=True,):
+                             time_filter=True,
+                             cancel_filter=True):
         """ checks if there are sessions on the same day/times in the range set
         args:
             start range: when to start
@@ -189,6 +191,8 @@ class ClientModel(models.Model):
         # base query sets the calendar, start and end of range, and day of a week.
 
         filters = Q()
+        if cancel_filter:
+            filters &= ~Q(attendance="Cancel")
         if range_filter:
             filters &= Q(date__range=(start_range_p.date(),end_range_p.date()))
         if calendar_filter:

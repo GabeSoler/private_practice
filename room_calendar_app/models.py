@@ -43,7 +43,7 @@ class TenantModel(models.Model):
 
 class BlocksModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    tenant = models.ForeignKey(TenantModel,on_delete=models.CASCADE)
+    tenant = models.ForeignKey(TenantModel,on_delete=models.CASCADE,help_text="Select a linked tenant")
     day = models.IntegerField(choices=WEEKDAY_SHORT)
     start_time = models.TimeField(choices=time_slot_options())
     end_time = models.TimeField(choices=time_slot_options())

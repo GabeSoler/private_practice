@@ -51,7 +51,7 @@ class TenantReportForm(forms.Form):
     year = forms.ChoiceField(choices=years_choices())
 
 class RoomSwitchForm(forms.Form):
-    room = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all())
+    room = forms.ModelChoiceField(help_text="Select a room to see its blocks",queryset=RoomCalendarModel.objects.all())
 
 class BlockForm(forms.ModelForm):
     class Meta:

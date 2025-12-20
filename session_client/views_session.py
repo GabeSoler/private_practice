@@ -185,7 +185,7 @@ def add_session_view(request):
                 template_overlap = "session_client/lists/session_overlap_modal.html"
                 response = render(request, template_overlap,{"sessions":overlap})
                 return retarget(response,"#modal-wrapper")
-            return ok_response_modal(request,"Session Saved",f"On {instance.date}",re_target=f"#modal-")
+            return ok_response_modal(request,f"Saved ok")
     # display a blank or invalid form
     context = {'form': form}
     return render(request, template, context)
@@ -217,7 +217,7 @@ def edit_session_view(request, session_pk):
                 # response = render(request, template_overlap,{"sessions":overlap})
                 # return retarget(response,f"#modal-{session.pk}")
                 return ups_response(request,f"ups, overlaps","#ups-col") #TODO ; can i know more specific overlap??
-            return ok_response_modal(request,"Session Saved",f"On {session.date}",re_target=f"#modal-{session.pk}")
+            return ok_response_modal(request,f"Saved ok")
         else:
             return render(request, template, {'form': form})
     context = {'session': session, 'form': form}
@@ -252,9 +252,8 @@ def week_view_add_session_client(request, year=None, week=None, week_day=None, t
                 return retarget(response,"#modal-wrapper")
             instance.save()
             messages.info(request, f"Session added for {instance.client.code}")
-            response = HttpResponse(request)
-            response = trigger_client_event(response,"RefreshTable",{"target":"#room-switch-form"})
-            return trigger_client_event(response,"CloseModal",{"target":"#modal"})
+            return ok_response_modal(request,"Session Saved",
+                                     event_and_target=("RefreshTable","#room-switch-form"))
         # form errors
         template = template + '#session_calendar_form_partial'
         context = {'form': form}

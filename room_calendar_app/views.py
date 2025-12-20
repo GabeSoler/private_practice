@@ -3,7 +3,6 @@ from django.http import Http404, HttpResponse
 from django.contrib import messages
 from pygments.lexer import default
 
-from responses.hx_responses import ok_response_modal
 from session_client.utils import csv_room_report_response
 from .models import RoomCalendarModel, TenantModel, BlocksModel
 from .forms import RoomCalendarForm, TenantForm, LinkTenantForm, WeekCalendarForm, RoomReportForm, TenantReportForm, \
@@ -32,6 +31,7 @@ def week_view(request):
     sessions = (SessionModel.objects
                 .filter(client__user=request.user)
                 .select_related('client__user')
+                .exclude(attendance="Cancel")
                 .annotate(
                 out_display=Concat(
                     F("client__tenant__display_name"),
@@ -384,7 +384,7 @@ def block_add_view(request,day=None,time=None,room=None):
     if room:
         initial['room'] = room
         tenant_filter &= Q(calendar__pk=room)
-    form = BlockForm(data=initial)
+    form = BlockForm(initial=initial)
     form.fields["tenant"].queryset = TenantModel.objects.filter(tenant_filter)
     logger.debug("form with initials")
     context = {'form':form}

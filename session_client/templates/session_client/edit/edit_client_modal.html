@@ -29,22 +29,22 @@
                 <div class="">
 
                     <!--- Client Code -->
-                    <div class="container text-center">
+                    <div class="container text-center my-1 p-1">
                         <div class="row align-items-center">
                             <div class="col">
                                 <small>Client:</small>
-                                {% bootstrap_field form.code layout="horizontal" show_label="skip" show_help=True size='sm' %}
+                                {% bootstrap_field form.code layout="horizontal" show_label="skip" show_help=True size='sm' wrapper_class="mx-auto" %}
                             </div>
                             <div class="col">
                                 <small>Link:</small>
-                                {% bootstrap_field form.link layout="horizontal" show_label="skip" show_help=True size='sm' %}
+                                {% bootstrap_field form.link layout="horizontal" show_label="skip" show_help=True size='sm' wrapper_class="mx-auto" %}
                             </div>
                         </div>
                     </div>
 
                     <!--- Client Type and tenant -->
-                    <div class="container text-center border-top border-secondary my-1">
-                        <div class="row">
+                    <div class="container text-center border-top border-secondary my-1 p-1">
+                        <div class="row align-items-center">
                             <div class="col">
                         <small>Client Type:</small>
                         {% bootstrap_field form.type layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
@@ -59,11 +59,11 @@
                         </div>
                     </div>
 
-                    <div class="container text-center border-top border-secondary">
+                    <div class="container text-center border-top border-secondary my-1 p-1">
                         <div class="row align-items-center">
                             <div class="col">
                                 <small>Fee:</small>
-                                {% bootstrap_field form.fee layout="horizontal" show_label="skip" show_help=False %}
+                                {% bootstrap_field form.fee layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                             </div>
                             <div class="col mx-auto">
                                 <small>Active:</small>
@@ -78,30 +78,30 @@
 
                         <!--- Client Date defaults -->
 
-                        <div class="container text-center border-top border-secondary">
+                        <div class="container text-center border-top border-secondary my-1 p-1">
                             <div class="row align-items-center">
                                 <div class="col">
                                     <small>Day:</small>
-                                    {% bootstrap_field form.day layout="horizontal" show_label="skip" show_help=False %}
+                                    {% bootstrap_field form.day layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                                 </div>
                                 <div class="col">
                                     <small>Time:</small>
-                                    {% bootstrap_field form.time layout="horizontal" show_label="skip" show_help=False %}
+                                    {% bootstrap_field form.time layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                                 </div>
                             </div>
                         </div>
 
                         <!--- Client Durations -->
 
-                        <div class="container text-center border-top border-secondary">
+                        <div class="container text-center border-top border-secondary my-1 p-1">
                             <div class="row align-items-center">
                                 <div class="col">
                                     <small>Duration:</small>
-                                    {% bootstrap_field form.duration layout="horizontal" show_label="skip" show_help=False %}
+                                    {% bootstrap_field form.duration layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                                 </div>
                                 <div class="col">
                                     <small>Series:</small>
-                                    {% bootstrap_field form.series layout="horizontal" show_label="skip" show_help=False %}
+                                    {% bootstrap_field form.series layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                                 </div>
                             </div>
                         </div>
