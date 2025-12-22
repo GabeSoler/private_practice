@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'session_client',
     'accounts',
     'room_calendar_app',
+    'my_numbers',
 
     #third party
     'django_bootstrap5',
