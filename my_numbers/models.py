@@ -2,12 +2,15 @@ from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
 
-from my_numbers.choices import QUARTER_CHOICES, PERIOD_TYPE_CHOICES
+from my_numbers.choices import QUARTER_CHOICES, PERIOD_TYPE_CHOICES, TAX_YEAR_TYPE_CHOICES
 from session_client.models import SessionModel
 
 
 # Create your models here.
 
+class ReportSettings(models.Model):
+    user = models.OneToOneField(get_user_model(),on_delete=models.CASCADE)
+    tax_year = models.CharField(choices=TAX_YEAR_TYPE_CHOICES,blank=True,max_length=15)
 
 
 class ReportModel(models.Model):
@@ -20,6 +23,7 @@ class ReportModel(models.Model):
     modified = models.DateTimeField(auto_now=True)
     period_type = models.CharField(choices=PERIOD_TYPE_CHOICES,max_length=15)
     quarter = models.IntegerField(choices=QUARTER_CHOICES,blank=True,null=True)
+    tax_year = models.CharField(choices=TAX_YEAR_TYPE_CHOICES,blank=True,max_length=15)
     period_start = models.DateField()
     period_end = models.DateField()
 
