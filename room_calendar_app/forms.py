@@ -1,4 +1,3 @@
-from random import choices
 
 from django import forms
 

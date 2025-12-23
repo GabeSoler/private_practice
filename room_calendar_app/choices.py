@@ -1,8 +1,9 @@
+from django.utils.translation import gettext_lazy as _
 
 
 
 AGREEMENT_CHOICES = (
-("Amount","By Amount"),
-("Percentage","By Percentage"),
-("Block","By Block"),
+("Amount",_("By Amount")),
+("Percentage",_("By Percentage")),
+("Block",_("By Block")),
 )

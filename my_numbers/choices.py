@@ -1,17 +1,19 @@
 from collections import namedtuple
 import pendulum as p
+from django.utils.translation import gettext_lazy as _
+
 
 PERIOD_TYPE_CHOICES = (
-("quarter","quarter"),
-("year","year"),
-("tax_year","tax_year"),
+("quarter",_("quarter")),
+("year",_("year")),
+("tax_year",_("tax_year")),
 )
 
 QUARTER_CHOICES = (
-("1","first quarter"),
-("2","second quarter"),
-("3","third quarter"),
-("4","fourth quarter"),
+("1",_("first quarter")),
+("2",_("second quarter")),
+("3",_("third quarter")),
+("4",_("fourth quarter")),
 )
 
 QuarterRanges = namedtuple("QuarterRanges",["first","second","third","fourth"])
@@ -27,11 +29,11 @@ quarter_ranges = QuarterRanges(
 )
 
 TAX_YEAR_TYPE_CHOICES = (
-("jan-dec","January(1)-December(31)"),
-("apr-apr","April(6)-April(5)"),
-("apr-mar","April(1)-March(31)"),
-("jul-jun","July(1)-June(30)"),
-("mar-mar","March(21)-March(20)"),
+("jan-dec",_("January(1)-December(31)")),
+("apr-apr",_("April(6)-April(5)")),
+("apr-mar",_("April(1)-March(31)")),
+("jul-jun",_("July(1)-June(30)")),
+("mar-mar",_("March(21)-March(20)")),
 )
 
 year_types = YearTypes(

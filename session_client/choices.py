@@ -5,25 +5,25 @@ from typing import Tuple,Any,List
 
 
 ATTENDANCE = [
-    ("Attended", "Attended"),
-    ("LateC", "Late Cancel"),
-    ("Missed", "Missed"),
-    ("Cancel", "Cancelled"),
+    ("Attended", _("Attended")),
+    ("LateC", _("Late Cancel")),
+    ("Missed", _("Missed")),
+    ("Cancel", _("Cancelled")),
 ]
 
 CLIENT_TYPE = [
-    ("Private", "Private"),
-    ("RoomP", "Room Percentage"),
-    ("Agency", "Agency"),
-    ("EAP", "EAP"),
-    ("SuperV", "Supervisee"),
-    ("Other", "Other"),
+    ("Private", _("Private")),
+    ("RoomP", _("Room Percentage")),
+    ("Agency", _("Agency")),
+    ("EAP", _("EAP")),
+    ("SuperV", _("Supervisee")),
+    ("Other", _("Other")),
 ]
 
 
 SERIES_CHOICE = [
-    (1, "Every week"),
-    (2, "Every two weeks")
+    (1, _("Every week")),
+    (2, _("Every two weeks")),
 ]
 
 
@@ -74,11 +74,11 @@ def duration_times_as_choices()->list:
 
 
 EVENT_TYPE = [
-    ("client", "Client Session"),
-    ("super", "Supervision"),
-    ("Admin", "Admin"),
-    ("Processing", "Processing"),
-    ("CPD", "CPD"),
+    ("client", _("Client's Session")),
+    ("super", _("Supervision")),
+    ("Admin", _("Admin")),
+    ("Processing", _("Processing")),
+    ("CPD", _("CPD")),
 ]
 
 
