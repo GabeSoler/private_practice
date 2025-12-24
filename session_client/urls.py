@@ -7,8 +7,6 @@ from . import views_session, views_client
 app_name = 'session_client'
 
 urlpatterns = [
-    #Home page
-    path('', views_session.index_view, name='index'),
 
     # Client views
 

@@ -3,7 +3,7 @@ import time
 import pendulum as p
 import cython as c
 
-from session_client.choices import time_slots
+from base.choices import time_slots
 from session_client.utils import date_plus_time
 
 class CalendarRender:

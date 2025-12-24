@@ -1,7 +1,7 @@
 
 from django import forms
 
-from session_client.choices import MONTH_SHORT, years_choices
+from base.choices import MONTH_SHORT, years_choices
 from .models import RoomCalendarModel, TenantModel, BlocksModel
 from django.utils import timezone
 

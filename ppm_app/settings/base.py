@@ -15,7 +15,7 @@ from decouple import config
 from django.conf.global_settings import STATIC_ROOT
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -24,8 +24,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
 
 HOST_URL = config("HOST_URL",default="")
 URL_BASE = config('URL_BASE')
@@ -39,12 +37,12 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 
-LOGIN_REDIRECT_URL = "session_client:client_list"
 
 # Application definition
 
 INSTALLED_APPS = [
     #mine
+    'base',
     'session_client',
     'accounts',
     'room_calendar_app',
@@ -89,7 +87,7 @@ ROOT_URLCONF = "ppm_app.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR/"templates"],
+        "DIRS": [BASE_DIR/"ppm_app/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -159,37 +157,21 @@ USE_I18N = False
 USE_TZ = False
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
-if DEBUG:
-    STATIC_URL = "/static/"
-else:
-    STATIC_URL = "https://"+ URL_BASE +"."+HOST_URL +"/static/"
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 STATIC_ROOT = "assets/" #change when knowing the real address, plus change url patterns
 MEDIA_URL = 'media/'
-STATICFILES_DIRS = [BASE_DIR / "staticfiles"]
+STATICFILES_DIRS = [BASE_DIR / "ppm_app/staticfiles"]
 
 
 #admin url
 ADMIN_URL = config('ADMIN_URL')
 
-#config of bootstrap5, I added a theme called 'sandstone' from 'bootswatch'
-BOOTSTRAP5 = {
-    # The complete URL to the Bootstrap CSS theme file (None means no theme).
-    "theme_url": STATIC_URL + "css/dreamy.css",
-    }
 
-
-
-LOGIN_REDIRECT_URL = 'session_client:index'
+LOGIN_REDIRECT_URL = 'session_client:client_list'
 LOGOUT_REDIRECT_URL = 'session_client:index'
 
 DATE_FORMAT = "%d/%m/%Y"
@@ -211,7 +193,7 @@ DATE_INPUT_FORMATS = [
 ]
 
 
-# logging conf to add some info when things are wrong (there are more complex setups). 
+# logging conf to add some info when things are wrong (there are more complex setups).
 # By default django messages are shown when debug True even in info level.
 LOGGING = {
     "version": 1,

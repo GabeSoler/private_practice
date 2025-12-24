@@ -9,6 +9,7 @@ urlpatterns = [
     path('admin/doc/', include('django.contrib.admindocs.urls')),
     path(config('ADMIN_URL'), admin.site.urls),
     path('accounts/',include('accounts.urls')),
+    path('',include('base.urls')),
     path('',include('session_client.urls')),
     path('calendar/',include('room_calendar_app.urls')),
     path("__reload__/", include("django_browser_reload.urls")), # to use django reload

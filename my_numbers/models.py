@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
 
-from my_numbers.choices import QUARTER_CHOICES, PERIOD_TYPE_CHOICES, TAX_YEAR_TYPE_CHOICES
+from base.choices import QUARTER_CHOICES, PERIOD_TYPE_CHOICES, TAX_YEAR_TYPE_CHOICES
 from session_client.models import SessionModel
 import pendulum as p
 
@@ -24,7 +24,7 @@ class ReportModel(models.Model):
     # fields
     period_type = models.CharField(choices=PERIOD_TYPE_CHOICES,max_length=15) # use next two varies with this
     quarter = models.IntegerField(choices=QUARTER_CHOICES,blank=True,null=True)
-    tax_year = models.CharField(choices=TAX_YEAR_TYPE_CHOICES,blank=True,max_length=15)
+    tax_year_type = models.CharField(choices=TAX_YEAR_TYPE_CHOICES,blank=True,max_length=15)
     period_start = models.DateField()
     period_end = models.DateField()
     year_start = models.IntegerField(default=p.now().year,blank=True)

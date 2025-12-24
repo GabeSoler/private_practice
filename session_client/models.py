@@ -1,16 +1,14 @@
 
 from django.db import models
 from django.db.models import Q
-from django.core.validators import MinValueValidator,MaxValueValidator
 from django.contrib.auth import get_user_model
 import uuid
 
 from django.urls import reverse
 
-from .choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices,time_slot_options,SERIES_CHOICE
+from base.choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices,time_slot_options,SERIES_CHOICE
 from room_calendar_app.models import RoomCalendarModel, TenantModel
 import pendulum as p
-from encrypted_fields.fields import EncryptedCharField
 
 from .utils import time_plus_duration,range_from_date
 import logging

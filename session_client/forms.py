@@ -1,7 +1,7 @@
 from django import forms
 from .models import ClientModel,SessionModel
 import pendulum as p
-from session_client.choices import time_slot_options
+from base.choices import time_slot_options
 from django.forms.widgets import DateInput,Select,SearchInput
 
 

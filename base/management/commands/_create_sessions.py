@@ -19,7 +19,7 @@ def create_sessions(day=0):
             date=today.date(),
             start_time=today.at(i).time(),
             end_time=today.at(i+1).time(),
-            brief=f"Test Session {i}",
+            keywords=f"Test Session {i}",
             calendar=room
         )
         sessions.append(session)

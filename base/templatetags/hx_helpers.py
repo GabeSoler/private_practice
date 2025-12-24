@@ -1,5 +1,5 @@
 from django import template
-from ..choices import ATTENDANCE
+from base.choices import ATTENDANCE
 from django.utils.safestring import mark_safe
 
 register = template.Library()

@@ -4,7 +4,7 @@ from collections import namedtuple
 import pendulum as p
 
 from room_calendar_app.models import RoomCalendarModel, BlocksModel
-from session_client.choices import time_slots,WEEKDAY_SHORT
+from base.choices import time_slots,WEEKDAY_SHORT
 from session_client.models import ClientModel
 from session_client.utils import date_plus_time, time_plus_duration, now_at_time
 

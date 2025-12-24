@@ -1,9 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
-
-from room_calendar_app.choices import AGREEMENT_CHOICES
-from session_client.choices import duration_times_as_choices, WEEKDAY_SHORT, time_slot_options
+from base.choices import (WEEKDAY_SHORT,
+                          AGREEMENT_CHOICES,time_slot_options)
 
 
 class RoomCalendarModel(models.Model):

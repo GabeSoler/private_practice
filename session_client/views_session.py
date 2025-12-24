@@ -1,9 +1,8 @@
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
 
-from responses.hx_responses import ok_response_modal, ups_response
+from ppm_app.responses.hx_responses import ok_response_modal, ups_response
 from .models import ClientModel, SessionModel
-from django.contrib.auth.decorators import login_not_required
 from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, \
     SelectAttendanceForm, PatchBriefForm
@@ -13,16 +12,10 @@ from django.contrib import messages
 from .utils import csv_session_list_response
 import logging
 
-from django.views.decorators.debug import sensitive_post_parameters,sensitive_variables
 
 logger = logging.getLogger(__name__)
 
 # Create your views here.
-
-@login_not_required
-def index_view(request):
-    """show all session_client"""
-    return render(request, 'session_client/index.html')
 
 
 # * session

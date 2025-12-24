@@ -1,12 +1,15 @@
 
 from django import forms
-
-from session_client.choices import years_choices
 from .models import *
-from .choices import TAX_YEAR_TYPE_CHOICES
+from base.choices import (create_quarter_range_dates,
+                          create_year_range_dates,
+                          years_choices)
 
 
 class ReportQuarterForm(forms.ModelForm):
+    """
+    To report different quarters
+    """
     class Meta:
         model = ReportModel
         fields = ['year_start','quarter']
@@ -14,12 +17,63 @@ class ReportQuarterForm(forms.ModelForm):
             'year_start':'Year Start',
             'quarter':'Quarter'}
 
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        year_start = self.cleaned_data['year_start']
+        quarter = self.cleaned_data['quarter']
+        date_start,date_end = create_quarter_range_dates(quarter,year_start)
+        instance.period_start = date_start
+        instance.period_end = date_end
+        instance.period_type = 'quarter'
+        if commit:
+            instance.save()
+        return instance
+
+
 class ReportYearForm(forms.ModelForm):
-    year = forms.ChoiceField(choices=years_choices())
+    """
+    To report different years
+    """
+    class Meta:
+        model = ReportModel
+        fields = ['year_start']
+        labels = {
+            'year_start':'Year Start',
+        }
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        year_start = self.cleaned_data['year_start']
+        date_start,date_end = create_year_range_dates("jan-dec",year_start)
+        instance.period_start = date_start
+        instance.period_end = date_end
+        instance.period_type = 'year'
+        if commit:
+            instance.save()
+        return instance
+
 
 class ReportTaxYearForm(forms.Form):
-    year = forms.ChoiceField(choices=years_choices())
-    tax_range = forms.ChoiceField(choices=TAX_YEAR_TYPE_CHOICES)
+    """
+    To report different tax years
+    """
+    class Meta:
+        model = ReportModel
+        fields = ['year_start']
+        labels = {
+            'year_start':'Year Start',
+        }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        year_start = self.cleaned_data['year_start']
+        date_start,date_end = create_year_range_dates("jan-dec",year_start)
+        instance.period_start = date_start
+        instance.period_end = date_end
+        instance.period_type = 'tax_year'
+        if commit:
+            instance.save()
+        return instance
+
 
 class TransactionForm(forms.ModelForm):
     class Meta:
