@@ -1,7 +1,7 @@
 
 
 {% extends 'room_calendar_app/navs/rooms-nav.html' %}
-{% load django_bootstrap5 %}
+{% load django_bootstrap5 i18n %}
 
 
 {% block content %}
@@ -47,17 +47,17 @@
         <div id="session-list-wrapper">
             {% if sessions %} {% comment %} As i re use it its here, a bit messy :/ {% endcomment %}
                 {% partialdef session-list-partial inline %}
-                    <p class="bg-secondary text-primary">Total Sessions: {{ totals.session_count }} - Expected pay: {{ totals.session_pay }}</p>
+                    <p class="bg-secondary text-primary">{% translate 'Total Sessions' %}: {{ totals.session_count }} - {% translate 'Expected pay' %}: {{ totals.session_pay }}</p>
                     <table class="table">
                         <thead>
                         <tr>
-                            <th scope="col">Date
+                            <th scope="col">{% translate 'Date' %}
                             </th>
-                            <th scope="col">Client
+                            <th scope="col">{% translate 'Client' %}
                             </th>
-                            <th scope="col">Attendance
+                            <th scope="col">{% translate 'Attendance' %}
                             </th>
-                            <th scope="col">Pay
+                            <th scope="col">{% translate 'Pay' %}
                             </th>
                             </th>
                         </tr>

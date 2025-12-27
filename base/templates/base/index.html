@@ -1,7 +1,6 @@
 {% extends '_base.html' %}
-{% load static %}
+{% load static i18n %}
 {% block background %}bg-secondary{% endblock %}
-{% load i18n %}
 
 
 {% block hero_block %}
@@ -10,7 +9,7 @@
         >Dreamy
         </spam>
         <span class="fs-2 text-primary position-absolute start-50 bottom-0"
-        >Admin for therapists</span>
+        >{% translate 'Admin for therapists' %}</span>
         <image class="position-absolute start-50 bottom-0" id="bottle" src={% static 'alchemist/bubbles.svg' %} style="max-width:100px;">
         </image>
     </div>
@@ -24,17 +23,17 @@
         <li class="nav-link">
         <a href="{% url 'session_client:client_list' %}"
            class="link-secondary
-           link-underline link-underline-opacity-0 display-2">Clients</a>
+           link-underline link-underline-opacity-0 display-2">{% translate 'Clients' %}</a>
         </li>
         <li class="nav-link">
         <a href="{% url 'session_client:session_list' %}"
            class="link-secondary
-           link-underline link-underline-opacity-0 display-2">Sessions</a>
+           link-underline link-underline-opacity-0 display-2">{% translate 'Sessions' %}</a>
         </li>
         <li class="nav-link">
         <a href="{% url 'room_calendar_app:room_calendar_list' %}"
            class="link-secondary
-           link-underline link-underline-opacity-0 display-2">Rooms</a>
+           link-underline link-underline-opacity-0 display-2">{% translate 'Rooms' %}</a>
         </li>
     </ul>
     </div>
@@ -42,8 +41,8 @@
     <div class="col text-secondary">
         <div class="position-absolute top-50 end-0 m-4">
 
-        <p class="fs-5">Therapists handle a lot of complexity</p>
-        <p class="fs-5">Let's make it a bit easier to handle their admin</p>
+        <p class="fs-5">{% translate 'Therapists handle a lot of complexity' %}</p>
+        <p class="fs-5">{% translate "Let's make it a bit easier to handle their admin" %}</p>
         </div>
     </div>
 </div>

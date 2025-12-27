@@ -11,24 +11,22 @@ urlpatterns = [
 
         path(config('ADMIN_URL'), admin.site.urls),
 
-        path('accounts/',include('accounts.urls')),
-
-        path('',include('base.urls')),
 
 
         path("__reload__/", include("django_browser_reload.urls")), # to use django reload
+        path("i18n/", include("django.conf.urls.i18n")),
 
               ]+  static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
 urlpatterns += i18n_patterns(
+                path('',include('base.urls')),
+                path('accounts/',include('accounts.urls')),
 
-    path('clients/',include('session_client.urls')),
+                path('clients/',include('session_client.urls')),
 
-        path('calendar/',include('room_calendar_app.urls')),
+                path('calendar/',include('room_calendar_app.urls')),
 
-        path("i18n/", include("django.conf.urls.i18n")),
-prefix_default_language=False,
 )
 
 if settings.DEBUG:

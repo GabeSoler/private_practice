@@ -1,10 +1,10 @@
 {% extends 'room_calendar_app/navs/rooms-nav.html' %}
-
+{% load i18n %}
 {% block content %}
 
 <div class="card">
 <div class="card-header">
-  <h2 class="card-title">My Profiles
+  <h2 class="card-title">{% translate 'Tenancies' %}
       <i class="bi bi-plus-circle-fill"
          hx-get="{% url 'room_calendar_app:add_tenant' %}"
          hx-target="#modal-wrapper"
@@ -45,7 +45,7 @@
                     writeText(myText) into the navigator's clipboard
                     set my innerHTML to 'Copied!'
                     end"
-                    >Share Code
+                    >{% translate 'Share Code' %}
                     </button>
           </div>
 

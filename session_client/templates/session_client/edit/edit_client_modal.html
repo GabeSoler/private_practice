@@ -1,6 +1,6 @@
 {% extends '_modal.html' %}
 {% load django_bootstrap5 %}
-
+{% load i18n %}
 {% block modal_title %}
     {% if client %}
         {{ client.code }}
@@ -32,11 +32,11 @@
                     <div class="container text-center my-1 p-1">
                         <div class="row align-items-center">
                             <div class="col">
-                                <small>Client:</small>
+                                <small>{{ form.code.label }}:</small>
                                 {% bootstrap_field form.code layout="horizontal" show_label="skip" show_help=True size='sm' wrapper_class="mx-auto" %}
                             </div>
                             <div class="col">
-                                <small>Link:</small>
+                                <small>{{ form.link.label }}:</small>
                                 {% bootstrap_field form.link layout="horizontal" show_label="skip" show_help=True size='sm' wrapper_class="mx-auto" %}
                             </div>
                         </div>
@@ -46,13 +46,13 @@
                     <div class="container text-center border-top border-secondary my-1 p-1">
                         <div class="row align-items-center">
                             <div class="col">
-                        <small>Client Type:</small>
+                        <small>{{ form.type.label }}:</small>
                         {% bootstrap_field form.type layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
 
                             </div>
 
                             <div class="col">
-                        <small>Tenant:</small>
+                        <small>{{ form.tenant.label }}:</small>
                         {% bootstrap_field form.tenant layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
 
                             </div>
@@ -62,11 +62,11 @@
                     <div class="container text-center border-top border-secondary my-1 p-1">
                         <div class="row align-items-center">
                             <div class="col">
-                                <small>Fee:</small>
+                                <small>{{ form.fee.label }}:</small>
                                 {% bootstrap_field form.fee layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                             </div>
                             <div class="col mx-auto">
-                                <small>Active:</small>
+                                <small>{{ form.active.label }}:</small>
                                 <div class="row">
                                     <div class="col"></div>
                                     <div class="form-check form-switch col">
@@ -81,11 +81,11 @@
                         <div class="container text-center border-top border-secondary my-1 p-1">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <small>Day:</small>
+                                    <small>{{ form.day.label }}:</small>
                                     {% bootstrap_field form.day layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                                 </div>
                                 <div class="col">
-                                    <small>Time:</small>
+                                    <small>{{  form.time.label }}:</small>
                                     {% bootstrap_field form.time layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                                 </div>
                             </div>
@@ -96,11 +96,11 @@
                         <div class="container text-center border-top border-secondary my-1 p-1">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <small>Duration:</small>
+                                    <small>{{ form.duration.label }}:</small>
                                     {% bootstrap_field form.duration layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                                 </div>
                                 <div class="col">
-                                    <small>Series:</small>
+                                    <small>{{ form.series.label }}:</small>
                                     {% bootstrap_field form.series layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                                 </div>
                             </div>
@@ -117,7 +117,7 @@
                                         hx-patch="{% url 'session_client:client_toggle_active' client.pk %}"
                                         hx-target="#{{ client.code }}"
                                         hx-swap="outerHTML"
-                                >Archive
+                                >{% translate 'Archive' %}
                                 </button>
                             {% endif %}
                         </div>
@@ -127,7 +127,7 @@
                         <div class="col">
                     <button
                             type="submit"
-                            class="btn btn-secondary float-end">Save
+                            class="btn btn-secondary float-end">{% translate 'Save' %}
                     </button>
                         </div>
                     </div>

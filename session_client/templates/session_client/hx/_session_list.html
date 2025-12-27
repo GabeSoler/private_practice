@@ -1,5 +1,5 @@
 {% load hx_helpers %}
-
+{% load i18n %}
         <!-- Session list -->
         <div id="session-list-wrapper">
             {% if sessions %} {% comment %} As i re use it its here, a bit messy :/ {% endcomment %}
@@ -7,17 +7,17 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th scope="col">Date
+                            <th scope="col">{% translate 'Date' %}
                             </th>
-                            <th scope="col">Client
+                            <th scope="col">{% translate 'Client'  %}
                             </th>
-                            <th scope="col">Attendance
+                            <th scope="col">{% translate 'Attendance'  %}
                             </th>
-                            <th scope="col">
+                            <th scope="col">{% translate ''  %}
                             </th>
-                            <th scope="col">Paid
+                            <th scope="col">{% translate 'Paid'  %}
                             </th>
-                            <th scope="col">Open
+                            <th scope="col">{% translate 'Open'  %}
                             </th>
                         </tr>
                         </thead>
@@ -77,7 +77,7 @@
 
                                     <!-- Session open/closed partial -->
                                     {% partialdef session_open inline %}
-                                        <td hx-put={% url "session_client:sessions_hx_edit_open" session.pk %}>
+                                        <td hx-put="{% url "session_client:sessions_hx_edit_open" session.pk %}">
                                             {% if session.open %}
                                                 <i
                                                         data-bs-toggle="tooltip" data-bs-trigger="hover"

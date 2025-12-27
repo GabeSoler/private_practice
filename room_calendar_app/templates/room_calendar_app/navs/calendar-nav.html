@@ -1,23 +1,24 @@
 {% extends '_base.html' %}
+{% load i18n %}
 
 {% block local_nav %}
 <!-- Sessions Nav -->
 <nav
   class="nav mt-0 nav-tabs bg-secondary"
 >
-  <h4 class="text-primary m-2">Calendar</h4>
+  <h4 class="text-primary m-2">{% translate 'Calendar' %}</h4>
 
   <a class="nav-link {% if request.path == "/calendar/week-view/"  %}active {% endif %}"
       href="{% url "room_calendar_app:week_view" %}" aria-current="page"
-    >Week</a
+    >{% translate 'Week' %}</a
   >
   <a class="nav-link {% if request.path == "/calendar/week-blocks-view/" %}active {% endif %}"
       href="{% url "room_calendar_app:week_blocks_view" %}"
-      >Blocks</a>
+      >{% translate 'Blocks' %}</a>
 
     <a class="nav-link {% if request.path == "/calendar/week-schedule-view/" %}active {% endif %}"
       href="{% url 'room_calendar_app:week_schedule_view' %}"
-      >Clients</a>
+      >{% translate 'Clients' %}</a>
 
 
 </nav>

@@ -1,4 +1,5 @@
 <!-- Modal -->
+{% load i18n %}
 <div _="init call bootstrap.Modal.getOrCreateInstance(me).show() end
     on CloseModal call bootstrap.Modal.getOrCreateInstance(me).hide() end"
 class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel">
@@ -8,7 +9,7 @@ class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel">
     <div class="modal-content bg-body">
       <div class="modal-header bg-primary text-secondary">
         <h1 class="modal-title display-6" id="modalLabel">{% block modal_title %}{{ title }}{% endblock %}</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Close' %}"></button>
       </div>
       <div class="modal-body" id="modalBody">
       {% partialdef ok-body-partial inline %}
@@ -24,7 +25,7 @@ class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel">
       </div>
           {% endpartialdef ok-body-partial  %}
       <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary float-end" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-secondary float-end" data-bs-dismiss="modal">{% translate 'Close' %}</button>
       </div>
     </div>
   </div>

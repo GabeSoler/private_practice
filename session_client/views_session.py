@@ -209,8 +209,8 @@ def edit_session_view(request, session_pk):
                 # template_overlap = "session_client/lists/session_overlap_modal.html"+"#modal-inner-partial"
                 # response = render(request, template_overlap,{"sessions":overlap})
                 # return retarget(response,f"#modal-{session.pk}")
-                return ups_response(request,f"ups, overlaps","#ups-col") #TODO ; can i know more specific overlap??
-            return ok_response_modal(request,f"Saved ok")
+                return ups_response(request,_(f"ups, overlaps"),"#ups-col",overlaps=overlap) #TODO ; can i know more specific overlap??
+            return ok_response_modal(request,_(f"Saved ok"))
         else:
             return render(request, template, {'form': form})
     context = {'session': session, 'form': form}

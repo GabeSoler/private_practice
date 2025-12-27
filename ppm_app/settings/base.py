@@ -70,6 +70,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware", #white noise
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -200,7 +201,7 @@ DATE_INPUT_FORMATS = [
 
 LANGUAGES = [
     ("es", _("Spanish")),
-    ("en-uk", _("English")),
+    ("en", _("English")),
 ]
 
 LOCALE_PATHS = [

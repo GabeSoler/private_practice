@@ -6,7 +6,7 @@
 {% block content %}
     {% if clients|length > 3  %}
     <div class="container bg-primary">
-        <label for="client-search-input">Filter clients</label>
+        <label for="client-search-input">{% translate 'Filter clients' %}</label>
         <input class="form-control" type="text" placeholder="Search" id="client-search-input"
                                                         _="on input
                                                         tell <a/> in <div>.card/>
@@ -45,7 +45,7 @@
                                             data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
-                                             data-bs-title="Time from creation"
+                                             data-bs-title="{% translate 'Time from creation' %}"
                                              data-bs-custom-class="custom-tooltip"
                                           style="font-size:0.7rem">{{ client.created_at|timesince }}</span>
 
@@ -57,7 +57,7 @@
                                              data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
-                                             data-bs-title="Open Sessions"
+                                             data-bs-title="{% translate 'Open Sessions' %}"
                                              data-bs-custom-class="custom-tooltip"
                                     >{{ client.pending_sort_sessions|default:0 }}</a>
                                 </div>
@@ -69,23 +69,23 @@
                                                 data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
-                                             data-bs-title="Date default"
+                                             data-bs-title="{% translate 'Date default' %}"
                                              data-bs-custom-class="custom-tooltip"
                                                 class="small">{{ client.get_day_display }}-{{ client.time }}</span>
-                                            </br> <span
+                                            <br/> <span
                                              data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
-                                             data-bs-title="Client's tenant"
+                                             data-bs-title="{% translate 'Client tenant' %}"
                                              data-bs-custom-class="custom-tooltip"
-                                                    class="small">{{ client.tenant }}</span></p>
+                                                   class="small">{{ client.tenant }}</span></p>
                                     </div>
                                     <div class="col"> <!-- month back paid and expected pay -->
                                         <span
                                              data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
-                                             data-bs-title="sessions paid"
+                                             data-bs-title="{% translate 'sessions paid' %}"
                                              data-bs-custom-class="custom-tooltip"
 
                                                 class="fs-5">£{{ client.month_sessions_paid }}</span>
@@ -93,7 +93,7 @@
                                                                                              data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
-                                             data-bs-title="paiment expected"
+                                             data-bs-title="{% translate 'paiment expected' %}"
                                              data-bs-custom-class="custom-tooltip"
                                                 class="small">{{ client.month_sessions_expected }}</span>
                                     </div>
@@ -102,7 +102,7 @@
                                                                                              data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
-                                             data-bs-title="Attendance percentage"
+                                             data-bs-title="{% translate 'Attendance percentage' %}"
                                              data-bs-custom-class="custom-tooltip"
                                                 class="fs-5">{{ client.attendance_percentage|floatformat }}%</span>
                                     </div>
@@ -118,7 +118,7 @@
                                             data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
-                                             data-bs-title="Future sessions"
+                                             data-bs-title="{% translate 'Future sessions' %}"
                                              data-bs-custom-class="custom-tooltip"
                                     >
                                             <i class="bi bi-fast-forward-fill"></i>
@@ -135,7 +135,7 @@
                                            data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
-                                             data-bs-title="book 3 forward"
+                                             data-bs-title="{% translate 'book 3 forward' %}"
                                              data-bs-custom-class="custom-tooltip"
                                         >
                                         +3
@@ -148,7 +148,7 @@
                                            data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
-                                             data-bs-title="book 6 forward"
+                                             data-bs-title="{% translate 'book 6 forward' %}"
                                              data-bs-custom-class="custom-tooltip"
                                         >
                                         +6
@@ -159,7 +159,7 @@
                             </div>
                         {% endpartialdef client-card-partial %}
                     {% empty %}
-                        <div class="card">There are no clients yet.</div>
+                        <div class="card">{% translate 'There are no clients yet.' %}</div>
 
                     {% endfor %}
                 {% endpartialdef client-list-partial %}

@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 import uuid
 from base.choices import (WEEKDAY_SHORT,
                           AGREEMENT_CHOICES,time_slot_options)
-
+from django.utils.translation import gettext_lazy as _
 
 class RoomCalendarModel(models.Model):
     """ a room calendar model that will hold the events """
@@ -42,8 +42,8 @@ class TenantModel(models.Model):
 
 class BlocksModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    tenant = models.ForeignKey(TenantModel,on_delete=models.CASCADE,help_text="Select a linked tenant")
+    tenant = models.ForeignKey(TenantModel,on_delete=models.CASCADE,help_text=_("Select a linked tenant"))
     day = models.IntegerField(choices=WEEKDAY_SHORT)
     start_time = models.TimeField(choices=time_slot_options())
     end_time = models.TimeField(choices=time_slot_options())
-    monthly_cost = models.IntegerField(default=0,blank=True,help_text="Monthly cost for this block")
+    monthly_cost = models.IntegerField(default=0,blank=True,help_text=_("Monthly cost for this block"))

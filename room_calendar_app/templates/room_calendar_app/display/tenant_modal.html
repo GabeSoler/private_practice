@@ -1,4 +1,6 @@
 {% extends '_modal.html' %}
+{% load i18n %}
+
 {% block modal_title %}
     Profile:{{ tenant.name }}<small> <i class="bi bi-pencil-square small"
                                 hx-get="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
@@ -12,9 +14,9 @@
     <div class="card">
         <div class="card-body">
             {% partialdef tenant-partial inline %}
-                <p class="card-title display-4">Display: {{ tenant.display_name }}</p>
-                <p class="card-text">Description: {{ tenant.description }}</p>
-                <p class="card-text">Agreement: {{ tenant.agreement }}</p>
+                <p class="card-title display-4">{% translate 'Display' %}: {{ tenant.display_name }}</p>
+                <p class="card-text">{% translate 'Description' %}: {{ tenant.description }}</p>
+                <p class="card-text">{% translate 'Agreement' %}: {{ tenant.agreement }}</p>
             {% endpartialdef tenant-partial %}
         </div>
     </div>

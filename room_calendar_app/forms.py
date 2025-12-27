@@ -1,6 +1,6 @@
 
 from django import forms
-
+from django.utils.translation import gettext_lazy as _
 from base.choices import MONTH_SHORT, years_choices
 from .models import RoomCalendarModel, TenantModel, BlocksModel
 from django.utils import timezone
@@ -11,10 +11,10 @@ class RoomCalendarForm(forms.ModelForm):
         model = RoomCalendarModel
         fields = ("name","description","percentage","cost")
         labels = {
-        "name" : "Name",
-        "description" : "Description",
-            "percentage" : "Percentage charge",
-            "cost" : "Cost of per session",
+        "name" :_("Name"),
+        "description" :_("Description"),
+        "percentage" :_("Percentage charge"),
+        "cost" :_("Cost of per session"),
         }
 
 class TenantForm(forms.ModelForm):
@@ -22,10 +22,10 @@ class TenantForm(forms.ModelForm):
         model = TenantModel
         fields = ("display_name","name","description","agreement")
         labels = {
-            "display_name":"Your name to display",
-            "name":"Name for your records",
-            "description":"a description of the place you are linking to",
-            "agreement":"Agreement type",
+            "display_name":_("Your name to display"),
+            "name":_("Name for your records"),
+            "description":_("a description of the place you are linking to"),
+            "agreement":_("Agreement type"),
         }
 
 class LinkTenantForm(forms.Form):

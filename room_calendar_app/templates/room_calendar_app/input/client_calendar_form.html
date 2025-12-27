@@ -1,8 +1,8 @@
 {% extends '_modal.html' %}
-{% load django_bootstrap5 %}
+{% load django_bootstrap5 i18n %}
 
 {% block modal_title %}
-    Add Client
+    {% translate 'Add Client' %}
 {% endblock modal_title %}
 
 
@@ -44,7 +44,7 @@
 
             <button type="submit"
                     class="btn btn-outline-secondary float-end"
-            >Add Session
+            >{% translate 'Add Session' %}
             </button>
 
         </form>

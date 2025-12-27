@@ -10,7 +10,7 @@
 <ul class="list-group" id="client-list-ul">
   {% for client in clients%}
     <li class="list-group-item list-group-item-danger fade-out" id="{{client.code}}">
-      <a href="{%url 'session_client:client_hx_item' client.pk %}">{{client.code}}</a>  | archived: {{client.archived_at|date:'M d,Y'}}
+      <a href="{%url 'session_client:client_hx_item' client.pk %}">{{client.code}}</a>  | {% translate 'archived' %}: {{client.archived_at|date:'M d,Y'}}
         <i class="bi bi-skip-backward-circle-fill text-success" 
           hx-patch={% url 'session_client:client_toggle_active' client.pk %}
           hx-trigger="click"
@@ -19,7 +19,7 @@
           ></i>
     </li>
     {% empty %}
-    <li>There are no clients yet. </li>
+    <li>{% translate 'There are no clients yet.' %}</li>
     
     {% endfor %}
   </ul>

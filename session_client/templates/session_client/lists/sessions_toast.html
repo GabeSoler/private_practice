@@ -3,7 +3,7 @@
 
 
 {% block content %}
-    {% if created %}Created Sessions {% else %}Overlapping Sessions {% endif %}
+    {% if created %}{% translate 'Created Sessions' %}{% else %}{% translate 'Overlapping Sessions' %}{% endif %}
     <ul>
         {% for session in sessions %}
 

@@ -55,7 +55,7 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
       <a class='navbar-brand position-relative' href="{% url 'base:index' %}">
         <image src="{% static 'alchemist/bubbles.svg'%}" class="m-1 position-absolute" style="max-width:3rem;max-height:4rem;"/>
         <span class="position-absolute bottom-0 start-50 fs-2" style="font-family:'Love Light',cursive;">Dreamy</span>
-      </a><small class="text-secondary ms-5 p-2">admin</small></span>
+      </a><small class="text-secondary ms-5 p-2">{% translate 'admin' %}</small></span>
         
         <button class='navbar-toggler' type='button' data-bs-toggle='collapse'
         data-bs-target='#navbarCollapse' aria-controls='navbarCollapse'
@@ -90,19 +90,19 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
                                   </li>
 
                                   <li class="nav-item dropdown" data-bs-theme="light">
-                                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="theme-menu" aria-expanded="true" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme">
+                                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="theme-menu" aria-expanded="true" data-bs-toggle="dropdown" data-bs-display="static" aria-label="{% translate 'Toggle theme' %}">
                                       <i class="bi bi-circle-half"></i>
-                                      <span class="d-lg-none ms-2">Toggle theme</span>
+                                      <span class="d-lg-none ms-2">{% translate 'Toggle theme' %}</span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end" data-bs-popper="static">
                                       <li>
                                         <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
-                                          <i class="bi bi-sun-fill"></i><span class="ms-2">Dawn</span>
+                                          <i class="bi bi-sun-fill"></i><span class="ms-2">{% translate 'Dawn' %}</span>
                                         </button>
                                       </li>
                                       <li>
                                         <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="true">
-                                          <i class="bi bi-moon-stars-fill"></i><span class="ms-2">Dusk</span>
+                                          <i class="bi bi-moon-stars-fill"></i><span class="ms-2">{% translate 'Dusk' %}</span>
                                         </button>
                                       </li>
                                     </ul>
@@ -112,7 +112,12 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 
                                 <form class="p-0 m-0 small"
                                       action="{% url 'set_language' %}"
-                                      method="post">
+                                      method="post"
+                                      hx-post="{% url 'set_language' %}"
+                                      hx-target="<body/>"
+                                      hx-trigger="change"
+                                      hx-push-url="true"
+                                >
                                     {% csrf_token %}
                                     <input name="next" type="hidden" value="{{ request.path }}">
                                     <select class="form-select" name="language">
@@ -125,7 +130,6 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
                                             </option>
                                         {% endfor %}
                                     </select>
-                                <button type="submit">go</button>
                                 </form> <!-- end language changer  -->
 
             </ul><!-- End of links on left side of nvbar -->
@@ -133,11 +137,11 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
             <ul class='navbar-nav ms-auto mb-2 mb-md-0'>
                 {% if user.is_authenticated %}
                 <li class='nav-item'>
-                    <span class='navbar-text me-2'>Hello, {{user.username}}!
+                    <span class='navbar-text me-2'>{% translate 'Hello' %}, {{user.username}}!
                     <form action="{% url 'accounts:logout' %}" method='post' style='display:inline;'>
                         {% csrf_token %}
                         <button name='submit' class='btn btn-outline-secondary btn-sm'>
-                            Log out</button>
+                            {% translate 'Logout' %}</button>
                         </form>
                       </span>
                       </li>
@@ -145,7 +149,7 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 {#                <li class='nav-item'>#}
 {#                    <a class='nav-link' href="{% url 'accounts:register'%}">Signup</a></li>#}
                 <li class='nav-item'>
-                    <a class='nav-link' href="{% url 'accounts:login' %}">Log in</a></li>
+                    <a class='nav-link' href="{% url 'accounts:login' %}">{% translate 'Login' %}</a></li>
                 {% endif %}
             </ul> 
                <!-- End of account related links -->
@@ -186,12 +190,12 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
       data-bs-toggle="tooltip"
         data-bs-trigger="hover"
          data-bs-delay="500"
-         data-bs-title="Home"
+         data-bs-title="{% translate 'Home' %}"
       data-bs-custom-class="custom-tooltip"
       href="{% url "base:index" %}">
       <i class="bi bi-house-fill"></i>
       <span class="d-none d-md-inline fs-5">
-        Home
+        {% translate 'Home' %}
       </span>
     </a>
   </li>
@@ -207,7 +211,7 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
       >
       <i class="bi bi-journal-medical"></i>
       <span class="d-none d-md-inline fs-5">
-        Clients
+        {% translate 'Clients' %}
       </span>
     </a>
   </li>
@@ -223,7 +227,7 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
       >
       <i class="bi bi-list-check"></i>
       <span class="d-none d-md-inline fs-5">
-        Sessions
+        {% translate 'Sessions' %}
       </span>
     </a>
   </li>
@@ -239,7 +243,7 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
       href="{% url "room_calendar_app:week_view" %}">
       <i class="bi bi-calendar-date"></i>
       <span class="d-none d-md-inline fs-5">
-        Week View
+        {% translate 'Week View' %}
         </span>
   </a>
     </li>

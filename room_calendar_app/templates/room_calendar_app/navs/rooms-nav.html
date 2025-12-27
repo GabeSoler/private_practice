@@ -1,33 +1,34 @@
 {% extends '_base.html' %}
+{% load i18n %}
 
 {% block local_nav %}
 <!-- Sessions Nav -->
 <nav
   class="nav mt-0 nav-tabs bg-secondary"
 >
-  <h4 class="text-primary m-2">Rooms</h4>
+  <h4 class="text-primary m-2">{% translate 'Rooms' %}</h4>
 
   <a class="nav-link {% if request.path == "/calendar/room-calendar-list/"  %}active {% endif %}"
       href="{% url "room_calendar_app:room_calendar_list" %}" aria-current="page"
-    >Spaces</a
+    >{% translate 'Spaces' %}</a
   >
   <a class="nav-link {% if request.path == "/calendar/profile-list/"  %}active {% endif %}"
       href="{% url "room_calendar_app:tenant_list" %}"
-      >Rentals</a>
+      >{% translate 'Rentals' %}</a>
 
     <a class="nav-link {% if request.path == "/calendar/room-calendar-manage/"  %}active {% endif %}"
       href={% url 'room_calendar_app:room_calendar_manage' %}
-      >Manage</a>
+      >{% translate 'Manage' %}</a>
 
   <a class="nav-link {% if request.path == "/calendar/room-calendar-report/"  %}active{% endif %}"
     href="{% url "room_calendar_app:room_report" %}"
-  >Report</a>
+  >{% translate 'Report' %}</a>
 
   <a class="nav-link {% if request.path == "/add_client/"  %}active{% endif %}"
     href="{% url "room_calendar_app:add_room_calendar" %}"
         hx-get="{% url "room_calendar_app:add_room_calendar" %}"
        hx-target="#modal-wrapper"
-  >Add</a>
+  >{% translate 'Add' %}</a>
 
 </nav>
 

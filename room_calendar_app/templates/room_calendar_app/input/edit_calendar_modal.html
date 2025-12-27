@@ -1,14 +1,15 @@
 {% extends '_modal.html' %}
+{% load i18n %}
 
-{% block modal-pk %}-{{ room.pk }}{% endblock %}
+{% block modal-id %}-{{ room.pk }}{% endblock %}
 
 {% block modal_title %}
     {% if room %}
-        <span class="d-block small" style="font-size: .9rem">Edit</span>
+        <span class="d-block small" style="font-size: .9rem">{% translate 'Edit' %}</span>
         <span class="d-block display-5">{{ room }}</span>
     {% else %}
-        <span class="d-block small" style="font-size: .9rem">Add new</span>
-                <span class="d-block display-5">Room</span>
+        <span class="d-block small" style="font-size: .9rem">{% translate 'Add new' %}</span>
+                <span class="d-block display-5">{% translate 'Room' %}</span>
 {% endif %}
 {% endblock modal_title %}
 
@@ -32,7 +33,7 @@
 
       <hr>
       <hr>
-      <h4>Add a form of pay</h4>
+      <h4>{% translate 'Add a form of pay' %}</h4>
       <div class="row">
           <div class="col">
       {% bootstrap_field form.percentage size="sm" %}
@@ -42,7 +43,7 @@
       {% bootstrap_field form.cost size="sm" %}
           </div>
       </div>
-    <button type="submit" class="btn btn-outline-secondary float-end">Save</button>
+    <button type="submit" class="btn btn-outline-secondary float-end">{% translate 'Save' %}</button>
   </form>
 
   {% endblock modal_body %}

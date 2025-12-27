@@ -1,10 +1,12 @@
 {% extends 'room_calendar_app/navs/rooms-nav.html' %}
+{% load i18n %}
+
 
 {% block content %}
     {% if calendar_tenant|length > 3  %}
     <div class="container bg-primary">
-        <label for="client-search-input">Filter clients</label>
-        <input class="form-control" type="text" placeholder="Search" id="client-search-input"
+        <label for="client-search-input">{% translate 'Filter clients' %}</label>
+        <input class="form-control" type="text" placeholder="{% translate 'Search' %}" id="client-search-input"
                                                         _="on input
                                                         tell <a/> in <li/>
                                                             show closest <div>.card/>
@@ -26,22 +28,22 @@
 
                     </div>
                     <div class="col">
-                        <small>Period:</small></br>
+                        <small>{% translate 'Period' %}:</small></br>
                         {{ month|date:"M-Y" }}
 
                     </div>
 
                 <div class="col">
-                    <small>Sessions:</small></br>
+                    <small>{% translate 'Sessions' %}:</small></br>
                     <span class="fs-4">{{ calendar.sessions_count }}</span>
                 </div>
                 <div class="col">
-                    <small>Income</small></br>
+                    <small>{% translate 'Income' %}</small></br>
                     <span class="fs-4">{{ calendar.period_income }}</span>
                 </div>
             </li>
         {% empty %}
-            <li class="list-group-item">There are no Spaces yet.</li>
+            <li class="list-group-item">{% translate 'There are no Spaces yet.' %}</li>
             </ul>
         {% endfor %}
 

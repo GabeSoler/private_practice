@@ -1,13 +1,13 @@
 {% extends 'room_calendar_app/navs/rooms-nav.html' %}
-{% load django_bootstrap5 %}
+{% load django_bootstrap5 i18n %}
 
 {% block content %}
 
     <!-- search rooms when many  -->
     {% if rooms|length > 2 %}
         <div class="container bg-primary">
-            <label for="client-search-input">Filter Rooms</label>
-            <input class="form-control" type="text" placeholder="Search" id="client-search-input"
+            <label for="client-search-input">{% translate 'Filter Rooms' %}</label>
+            <input class="form-control" type="text" placeholder="{% translate 'Search' %}" id="client-search-input"
                    _="on input
                                                         tell <a/> in <li/>
                                                             show closest <li/>
@@ -73,7 +73,7 @@
                                     hx-target="next <tbody/>"
 
                             >
-                                Link
+                                {% translate 'Link' %}
                             </button>
                         {% endpartialdef form-partial %}
                             </form>
@@ -86,10 +86,10 @@
                         <table class="table">
                             <thead>
                             <tr>
-                                <th scope="col">Tenant</th>
-                                <th scope="col">Agreement</th>
-                                <th scope="col">Sessions</th>
-                                <th scope="col">Rent</th>
+                                <th scope="col">{% translate 'Tenant' %}</th>
+                                <th scope="col">{% translate 'Agreement' %}</th>
+                                <th scope="col">{% translate 'Sessions' %}</th>
+                                <th scope="col">{% translate 'Rent' %}</th>
                             </tr>
                             </thead>
 
@@ -130,7 +130,7 @@
                             </tr>
                             <tr class="text-info">
                                 <td class="text-info">
-                                    Total
+                                    {% translate 'Total' %}
                                 </td>
                                 <td class="text-info">
                                 </td>
@@ -148,7 +148,7 @@
 
             </li>
         {% empty %}
-            <li class="list-group-item">Add a new Room.</li>
+            <li class="list-group-item">{% translate 'Add a new Room.' %}</li>
         {% endfor %}
     </ul>
 {% endblock content %}

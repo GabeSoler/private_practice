@@ -3,20 +3,20 @@ from .models import ClientModel,SessionModel
 import pendulum as p
 from base.choices import time_slot_options
 from django.forms.widgets import DateInput,Select,SearchInput
-
+from django.utils.translation import gettext_lazy as _
 
 class ClientForm(forms.ModelForm):
     class Meta:
         model = ClientModel
         fields = ['code','type','fee', 'tenant', 'day','time', 'duration','series', 'active','link']
-        labels = {'code':'Code',                  
-                  'type':'Type',
-                  'fee':'Fee',
-                  'tenant': 'Profile',
-                  'day':'Default Day',
-                  'duration':'Duration',
-                  'active':'Active',
-                  'link':'Link'
+        labels = {'code':_('Code'),
+                  'type':_('Type'),
+                  'fee':_('Fee'),
+                  'tenant':_('Tenant'),
+                  'day':_('Default Day'),
+                  'duration':_('Duration'),
+                  'active':_('Active'),
+                  'link':_('Link'),
                   }
         widgets = {'active':forms.CheckboxInput(attrs={'class':'form-check-input',"type":"checkbox", "role":"switch", 'name':"radioDefault"}),
                    }
@@ -25,10 +25,10 @@ class ClientFormShort(forms.ModelForm):
     class Meta:
         model = ClientModel
         fields = ['code','day','duration','time']
-        labels = {'code':'Code',                  
-                  'day':'Default Day',
-                  'time':'time',
-                  'duration':'Duration',
+        labels = {'code':_('Code'),
+                  'day':_('Default Day'),
+                  'time':_('time'),
+                  'duration':_('Duration'),
         }
 
 class SessionForm(forms.ModelForm):
@@ -36,14 +36,15 @@ class SessionForm(forms.ModelForm):
         model = SessionModel
         fields = ['keywords','date','start_time', 'client', 'paid', 'fee', 'attendance', 'open', 'calendar']
         labels = {
-                  'keywords':'Keywords',
-                  'date': 'Date',
-                  'start_time': 'time',
-                  'client':'Client',
-                  'paid':'Paid',
-                  'fee':'Amount',
-                  'open':'Open',
-                  'attendance': 'Attendance'}
+                  'keywords':_('Keywords'),
+                  'date':_('Date'),
+                  'start_time':_('time'),
+                  'client':_('Client'),
+                  'paid':_('Paid'),
+                  'fee':_('Amount'),
+                  'open':_('Open'),
+                  'attendance':_('Attendance'),
+        }
         # I needed to add the split field so it processes date and time before goes to DateTime
         widgets = {'date':forms.DateInput(attrs={'class': 'form-select', 'type': 'date'},
                                                     format="%Y-%m-%d"),
@@ -62,8 +63,9 @@ class SessionShortForm(forms.ModelForm):
     class Meta:
         model = SessionModel
         fields = ['date','start_time', 'client']
-        labels = {'start_time': 'Day and Time',
-                  'client':'Client'
+        labels = {
+            'start_time':_('Day and Time'),
+            'client':_('Client'),
                   }
         widgets = {'date':DateInput(attrs={'class': 'form-select', 'type': 'date'},
                                                     format="%Y-%m-%d"),
@@ -80,7 +82,7 @@ class StartDateSessionForm(forms.ModelForm):
     class Meta:
         model = SessionModel
         fields = ['start_time']
-        labels = {'start_time': 'Day and Time'}
+        labels = {'start_time':_('Day and Time')}
 
 class SessionSelectGroupForm(forms.Form):
     """ for changin open sessions """

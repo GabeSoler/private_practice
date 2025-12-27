@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 import uuid
-
+from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 
 from base.choices import ATTENDANCE,CLIENT_TYPE,WEEKDAY_SHORT,duration_times_as_choices,time_slot_options,SERIES_CHOICE
@@ -25,18 +25,18 @@ class ClientModel(models.Model):
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     tenant = models.ForeignKey(TenantModel, on_delete=models.SET_NULL, blank=True, null=True)
     #Client labels
-    code = models.CharField(blank=False,max_length=15,help_text="Add an Identifier code") #Create a code instead of a name
-    # nick_name = models.CharField(default="",blank=True,null=True,max_length=20,help_text="Give it a memorable nickname")
-    type = models.CharField(default='Pvt', choices=CLIENT_TYPE, max_length=20, help_text="Select a type of client") # add choices like private, service, eap, supervisee
-    fee = models.DecimalField(blank=True,decimal_places=2,max_digits=10,null=True,default=60,help_text="Whats your agreed fee")
+    code = models.CharField(blank=False,max_length=15,help_text=_("Add an Identifier code")) #Create a code instead of a nam)e
+    # nick_name = models.CharField(default="",blank=True,null=True,max_length=20,help_text=_("Give it a memorable nickname")
+    type = models.CharField(default='Pvt', choices=CLIENT_TYPE, max_length=20, help_text=_("Select a type of client")) # add choices like private, service, eap, supervise)e
+    fee = models.DecimalField(blank=True,decimal_places=2,max_digits=10,null=True,default=60,help_text=_("Whats your agreed fee"))
     #client base info (delete after 7 years?) (I am thinking to only erase the fields as the admin is yours)
-    active = models.BooleanField(default=True,help_text="Move from archive to active or vice versa")
+    active = models.BooleanField(default=True,help_text=_("Move from archive to active or vice versa"))
     archived_at = models.DateTimeField(blank=True,null=True)
-    day = models.IntegerField(choices=WEEKDAY_SHORT,default=1,help_text="Default day of week")
-    time = models.TimeField(choices=time_slot_options(),help_text='default time')
-    duration = models.DurationField(default='60 minutes',choices=duration_times_as_choices(),help_text='default duration')
+    day = models.IntegerField(choices=WEEKDAY_SHORT,default=1,help_text=_("Default day of week"))
+    time = models.TimeField(choices=time_slot_options(),help_text=_('default time'))
+    duration = models.DurationField(default='60 minutes',choices=duration_times_as_choices(),help_text=_('default duration'))
     series = models.IntegerField(default=1,choices=SERIES_CHOICE)
-    link = models.URLField(blank=True,null=True,help_text="External link")
+    link = models.URLField(blank=True,null=True,help_text=_("External link"))
 
     class Meta:
         verbose_name ="Client"
@@ -224,17 +224,17 @@ class SessionManager(models.Manager):
 
 
 class SessionModel(models.Model):
-    client = models.ForeignKey(ClientModel,null=True,on_delete=models.CASCADE,help_text="Link to a client")
+    client = models.ForeignKey(ClientModel,null=True,on_delete=models.CASCADE,help_text=_("Link to a client"))
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
     # datetime fields
-    date = models.DateField(blank=True,default="2025-10-3",help_text="Date of session")
-    start_time = models.TimeField(editable=True, default="09:00:00", help_text="Start of session?")
-    end_time = models.TimeField(default="10:00:00",blank=True,editable=True, help_text="End of session")
+    date = models.DateField(blank=True,default="2025-10-3",help_text=_("Date of session"))
+    start_time = models.TimeField(editable=True, default="09:00:00", help_text=_("Start of session?"))
+    end_time = models.TimeField(default="10:00:00",blank=True,editable=True, help_text=_("End of session"))
    #Session notes and vector (delete after 7 years?)
-    # brief = EncryptedCharField(default='',null=True,blank=True,max_length=250,help_text="250 characters note") #short description
-    keywords = models.CharField(blank=True,max_length=25,help_text="words for search")
+    # brief = EncryptedCharField(default='',null=True,blank=True,max_length=250,help_text=_("250 characters note") #short descriptio)n
+    keywords = models.CharField(blank=True,max_length=25,help_text=_("words for search"))
     #admin info
     paid = models.BooleanField(default=False,blank=True) #check payment
     attendance = models.CharField(default='', blank=True, max_length=20, choices=ATTENDANCE) #record attendance
