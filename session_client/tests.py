@@ -168,7 +168,7 @@ class TestClientSession(MetaTestSetupMixin,TestCase):
                                    headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response,self.session_1.client)
-        self.assertContains(response,self.session_1.brief)
+        self.assertContains(response,self.session_1.keywords)
 
 
     def test_annotate_client_list(self):

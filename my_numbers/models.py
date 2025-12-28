@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from ppm_app.settings.base import AUTH_USER_MODEL
 import uuid
 
 from base.choices import QUARTER_CHOICES, PERIOD_TYPE_CHOICES, TAX_YEAR_TYPE_CHOICES
@@ -9,7 +9,7 @@ import pendulum as p
 # Create your models here.
 
 class ReportSettings(models.Model):
-    user = models.OneToOneField(get_user_model(),on_delete=models.CASCADE)
+    user = models.OneToOneField(AUTH_USER_MODEL,on_delete=models.CASCADE)
     tax_year = models.CharField(choices=TAX_YEAR_TYPE_CHOICES,blank=True,max_length=15)
 
 
@@ -18,7 +18,7 @@ class ReportModel(models.Model):
         needed to record how a report was made in the future
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    user = models.ForeignKey(AUTH_USER_MODEL,on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     # fields
@@ -35,7 +35,7 @@ class TransactionModel(models.Model):
         would receive sessions fee data and expenses
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    user = models.ForeignKey(AUTH_USER_MODEL,on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     #fields

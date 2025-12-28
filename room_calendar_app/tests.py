@@ -5,7 +5,6 @@ from .models import RoomCalendarModel, TenantModel
 from .forms import WeekCalendarForm
 from django.contrib.auth import get_user_model
 import pendulum as p
-from datetime import timedelta
 from .calendar_utils import CalendarRender
 from session_client.models import ClientModel, SessionModel
 
@@ -31,8 +30,9 @@ class MetaTestSetupMixin:
 
     @classmethod
     def setUpTestData(cls):
-        cls.now = p.now("UTC")
+        cls.now = p.now()
         cls.user = get_user_model().objects.create(username="Gabriel", email="test@gabriel.cl")
+        cls.user.password="password"
         cls.user.save()
         cls.user_host = get_user_model().objects.create(username="John", email="test@john.cl")
         cls.user_host.save()
@@ -90,7 +90,7 @@ class MetaTestSetupMixin:
             start_time=p.time(8, 0),  # 8:00
             end_time=p.time(9, 30),  # 9:30
             calendar=cls.room_1,  # assuming you have cls.room_1 defined
-            brief="Session1",
+            keywords="Session 1",
             fee=60,
             paid=True,
             attendance="Attended",
@@ -104,7 +104,7 @@ class MetaTestSetupMixin:
             start_time=p.time(8, 00, 00),  # Next week the same time
             end_time=p.time(9, 30),
             calendar=cls.room_2,
-            brief="Session2",
+            keywords="Session 2",
             fee=60,
             paid=False,
             attendance="Attended",
@@ -118,7 +118,7 @@ class MetaTestSetupMixin:
             start_time=p.time(8, 00, 00),  # Next week the same time
             end_time=p.time(9, 30),
             calendar=cls.room_1,
-            brief="Overlap1",
+            keywords="Overlap1",
             fee=60,
             paid=False,
             attendance="Attended",
@@ -132,7 +132,7 @@ class MetaTestSetupMixin:
             start_time=p.time(9, 00, 00),  # Next week the same time
             end_time=p.time(10, 30),
             calendar=cls.room_1,
-            brief="Overlap2",
+            keywords="Overlap2",
             fee=60,
             paid=False,
             attendance="Attended",
@@ -164,7 +164,7 @@ class MetaTestSetupMixin:
                 start_time=p.time(n, 0),  # add one each hour
                 end_time=p.time(n + 1, 0),  # Next week +1 hour
                 calendar=cls.room_2,  # assuming you have cls.room_2 defined
-                brief=f"Test{n}",
+                keywords=f"Test{n}",
                 fee=60,
                 paid=False,
                 attendance="LateC",

@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -329,7 +330,7 @@ def sessions_patch_attendance(request,session_pk):
             messages.info(request, f"Session '{session.start_time.strftime('%d-%m-%y,%H:%M')}' updated")
             template = 'session_client/hx/_session_list.html'+ "#attendance_partial"
             return render(request, template, {"session": session})
-    return Http404("Error with attendance update")
+    return HttpResponse(status=404)
 
 def patch_brief_view(request,session_pk):
     session = get_object_or_404(SessionModel,pk=session_pk)

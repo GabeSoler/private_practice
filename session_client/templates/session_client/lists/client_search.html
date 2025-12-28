@@ -62,7 +62,10 @@ similar to events. needs custom form and view {% endcomment %}
            </div>
 
            {% endif %}
-      {%  else  %}{% comment %}end endless trigger{% endcomment %}
+      {%  else  %}
+
+           {% comment %}end endless trigger{% endcomment %}
+
       <a href="{%url 'session_client:session_hx_item' session.pk %}"
          hx-get="{%url 'session_client:session_hx_item' session.pk %}"
          hx-target="#modal-wrapper"
@@ -73,7 +76,7 @@ similar to events. needs custom form and view {% endcomment %}
           hx-target="closest li"
           hx-swap="outerHTML"
           ></i>
-    <p>{{ session.headline|bleach_me }}</p>
+    <p>{{ session.headline|bleach_emphasis }}</p>
       {% endif %}
     </li>
     {% empty %}

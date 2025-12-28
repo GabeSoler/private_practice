@@ -41,20 +41,6 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
-    #mine
-    'base',
-    'session_client',
-    'accounts',
-    'room_calendar_app',
-    'my_numbers',
-
-    #third party
-    'django_bootstrap5',
-    "django_htmx",
-    "django_browser_reload",
-
-    # dj extras
-    "django.contrib.admindocs",
 
     #default
     "django.contrib.admin",
@@ -64,6 +50,21 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "whitenoise.runserver_nostatic",#whitenoise
     "django.contrib.staticfiles",
+
+    # dj extras
+    "django.contrib.admindocs",
+
+    #third party
+    'django_bootstrap5',
+    "django_htmx",
+    "django_browser_reload",
+
+    #mine
+    'accounts.apps.AccountsConfig',
+    'base.apps.BaseConfig',
+    'session_client.apps.SessionClientConfig',
+    'room_calendar_app.apps.RoomCalendarAppConfig',
+    'my_numbers.apps.MyNumbersConfig',
 ]
 
 MIDDLEWARE = [

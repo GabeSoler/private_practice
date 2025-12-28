@@ -67,6 +67,9 @@ def clients_toggle_active(request, client_pk):
 
 
 def client_search_view(request):
+    """
+    searchs through sessions based on text vectors, and organises results by clients
+    """
     template = 'session_client/lists/client_search.html'
     if request.method == 'POST':
         form_partial = SearchClientForm(data=request.POST)
@@ -178,11 +181,12 @@ def week_view_add_client(request, weekday=None, time=None,calendar=None):
         form = ClientForm(data=request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
+            instance.user = request.user
             instance.save()
             messages.info(request, f"Client added: {instance.code}")
             return HttpResponseClientRefresh()
         # form errors
-        template = template + '#client_calendar_form_partial'
+        template = template + '#modal-body-partial'
         context = {'form': form}
         return render(request, template, context)
     # get response

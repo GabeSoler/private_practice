@@ -1,7 +1,7 @@
 
 from django.db import models
 from django.db.models import Q
-from django.contrib.auth import get_user_model
+from ppm_app.settings.base import AUTH_USER_MODEL
 import uuid
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
@@ -22,7 +22,7 @@ class ClientModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
-    user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    user = models.ForeignKey(AUTH_USER_MODEL,on_delete=models.CASCADE)
     tenant = models.ForeignKey(TenantModel, on_delete=models.SET_NULL, blank=True, null=True)
     #Client labels
     code = models.CharField(blank=False,max_length=15,help_text=_("Add an Identifier code")) #Create a code instead of a nam)e
@@ -39,6 +39,7 @@ class ClientModel(models.Model):
     link = models.URLField(blank=True,null=True,help_text=_("External link"))
 
     class Meta:
+        app_label = 'session_client'
         verbose_name ="Client"
         verbose_name_plural = "Clients"
         ordering = ("code", "created_at")
@@ -252,6 +253,7 @@ class SessionModel(models.Model):
 
 
     class Meta:
+        app_label = 'session_client'
         verbose_name ="session"
         verbose_name_plural = "sessions"
         ordering = ("date","start_time")
