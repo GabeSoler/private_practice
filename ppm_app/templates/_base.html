@@ -51,8 +51,9 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 
   <nav class="navbar navbar-expand-lg bg-primary sticky-top py-0 mb-0">
     <div class='container-fluid'>
-      <a class='navbar-brand position-relative' href="{% url 'base:index' %}">
+      <a class='navbar-brand position-relative' href="{% url 'base:index' %}" style="width: 8rem;">
           <!-- logo svg -->
+          <span id="brand-wrapper" class="bg-primary">
 
                       <?xml version="1.0" encoding="utf-8"?>
                       <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="2rem"
@@ -90,7 +91,8 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
                         </svg>
 
           <!-- end logo -->
-        <span class="fs-2" style="font-family:'Love Light',cursive;">Dreamy</span>
+        <span class="fs-2 position-static my-0" style="font-family:'Love Light',cursive;">Dreamy</span>
+              </span>
       </a>
 
         <button class='navbar-toggler' type='button' data-bs-toggle='collapse'
@@ -299,6 +301,7 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 </script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>
 

@@ -52,7 +52,91 @@
 
 {% block content %}
 
+{% block extra_js %}
+    <!-- GSap -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/DrawSVGPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js"></script>
 
+    <script>
+        gsap.registerPlugin(DrawSVGPlugin, Flip);
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const logo = document.querySelector("#dreamy");
+            const brandWrapper = document.querySelector("#brand-wrapper");
+            if (!logo || !brandWrapper) return;
+
+            const paths = logo.querySelectorAll("path");
+            const logoBg = document.querySelector("#logo-bg");
+
+            // 1. Prepare SVG for drawing (DrawSVG needs strokes!)
+            gsap.set(paths, {
+                drawSVG: "0%",
+                stroke: "var(--bs-secondary)",
+                strokeWidth: 2,
+                fill: "transparent"
+            });
+            gsap.set(logoBg, { scale: 0, transformOrigin: "center" });
+
+            // 2. Capture the "Home" state (Navbar position)
+            const state = Flip.getState(brandWrapper);
+
+            // 3. Set "Splash" state
+            gsap.set(brandWrapper, {
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                zIndex: 9999,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "var(--bs-secondary)"
+            });
+
+            const tl = gsap.timeline();
+
+            // 4. Animation Sequence
+            tl.to(logoBg, {
+                scale: 1,
+                duration: 0.8,
+                ease: "back.out(1.7)"
+            })
+            .to(paths, {
+                drawSVG: "100%",
+                duration: 2,
+                stagger: 0.15,
+                ease: "power2.inOut"
+            })
+            // Fill the shapes after drawing the outline
+            .to(paths, {
+                fill: "var(--bs-secondary)",
+                duration: 0.5
+            })
+            // 5. Flip back to Origin
+            .add(() => {
+                // Clear splash styles so Flip knows where to go
+                gsap.set(brandWrapper, { clearProps: "all" });
+
+                Flip.from(state, {
+                    duration: 1.5,
+                    ease: "expo.inOut",
+                    absolute: true,
+                    onComplete: () => {
+                        // Cleanup
+                        gsap.set(brandWrapper, { clearProps: "zIndex" });
+                    }
+                });
+            }, "+=0.3")
+            .from(".navbar-brand span", {
+                opacity: 0,
+                x: -20,
+                duration: 0.6
+            }, "-=0.5");
+        });
+    </script>
+{% endblock %}
 
 
 {% endblock content %}
