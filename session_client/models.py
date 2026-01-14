@@ -139,7 +139,7 @@ class ClientModel(models.Model):
                 start_time=self.time,
                 end_time=time_plus_duration(self.time, self.duration),
                 calendar=tenant.calendar,
-                amount_paid=self.fee
+                fee=self.fee
             )
 
             session_list.append(session_instance)

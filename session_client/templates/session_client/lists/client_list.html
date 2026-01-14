@@ -33,6 +33,10 @@
                                     p-2"
                                  id="{{ client.code }}">
                                 <div class="card-header d-flex justify-content-between align-items-center bg-primary">
+                                    <div id="spinner-{{ client.pk }}" class="htmx-indicator spinner-border text-success d-inline" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                        </div>
+
                                     <a class="col link-secondary link-client-code"
                                        href="{% url 'session_client:client_hx_item' client.pk %}"
                                        hx-get="{% url 'session_client:client_hx_item' client.pk %}"
@@ -112,7 +116,7 @@
                                     <div class="col-4"
                                          id="future-sessions-{{ client.pk }}">
                                         {% partialdef future_sessions_partial inline %}
-                                    <a class="btn btn-outline-secondary btn-sm"
+                                    <a class="btn btn-outline-secondary btn-sm success-shine"
                                        hx-get="{% url 'session_client:session_list_modal' client.pk %}"
                                         hx-target="#modal-wrapper"
                                             data-bs-toggle="tooltip"
@@ -127,11 +131,13 @@
                                             {% if add_toast %}{% include '_toasts.html' %}{% endif %}
                                         {% endpartialdef future_sessions_partial %}
                                     </a>
+
                                     </div>
                                     <div class="col-4"> <!-- add 3 sessions forward -->
                                         <a class="btn btn-outline-secondary btn-sm"
                                            hx-post="{% url 'session_client:add_series' client.pk 3 %}"
                                            hx-target="#future-sessions-{{ client.pk }}"
+                                           hx-indicator="#spinner-{{ client.pk }}"
                                            data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"

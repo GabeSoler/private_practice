@@ -1,3 +1,5 @@
+import time
+
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
@@ -282,7 +284,7 @@ def add_series_view(request,client_pk,number):
             messages.info(request, f"✅{len(sessions)} Sessions added for {client.code}")
             client_after = ClientModel.objects.filter(pk=client_pk).annotate(future_sessions_count=Count('sessionmodel',
                                         filter=Q(sessionmodel__date__gt=date_ref.date()))).last()
-            return render(request,template,{"client":client_after,'add_toast':True,'oob':True})
+            return render(request,template,{"client":client_after,'add_toast':True,'oob':True,'ok':True})
         else:
             template_overlap = "session_client/lists/sessions_toast.html"
             response = render(request, template_overlap, {'sessions': sessions,"created":False})

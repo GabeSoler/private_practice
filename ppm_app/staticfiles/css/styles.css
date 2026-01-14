@@ -17,9 +17,16 @@
 
 .fade-in.htmx-added  {
     opacity:.3;
+}
+.fade-in-slide.htmx-added  {
+    opacity:.3;
     transform: translateX(20px);
 }
 
+.success-shine.htmx-added {
+    background-color:var(--bs-success);
+    transition:all .2s ease-in;
+}
 .fade-in {
 opacity:1;
 transform: translateX(0px);
@@ -30,6 +37,11 @@ transition: all .2s ease-in;
 opacity:1;
 transform: translateX(0px);
 transition: all .2s ease-in;
+}
+
+.success-shine {
+opacity:1;
+transition: all .4s ease-in-out;
 }
 
 .fade-out.htmx-swapping {

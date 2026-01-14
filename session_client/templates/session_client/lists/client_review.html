@@ -14,6 +14,7 @@
     hx-post="{% url "session_client:client_review" %}"
     hx-target="#session-list-wrapper"
     hx-trigger="change throttle:1s,load once"
+        hx-indicator="#spinner"
     >
     {% csrf_token %}
     <table
@@ -31,16 +32,26 @@
           >{% bootstrap_field form.client show_label='skip'  %}
         </td>
         <td id="cell-form-button">
-          <div class="dropdown">
-            <button class="btn link btn-secondary" type="submit" value="submit" >
-              <i class="bi bi-cloud-download text-primary fs-5"></i>
-            </button>
-        </div>
+            <div class="row">
+                <div class="col">
+                <button class="btn link btn-secondary" type="submit" value="submit" >
+                <i class="bi bi-cloud-download text-primary fs-5"></i></button>
+                </div>
+                <div class="col p-0 m-0">
+                  <div id="spinner" class="htmx-indicator spinner-border text-success" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                    </div>
+
+                </div>
+            </div>
       </td>
+        <td class="">
+        </td>
     </tr>
   </table>
 </form>
       {% endpartialdef %} <!-- end partial table -->
+
       </div>
 
 
