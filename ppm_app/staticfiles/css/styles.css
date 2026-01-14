@@ -26,6 +26,12 @@ transform: translateX(0px);
 transition: all .2s ease-in;
 } 
 
+.fade-in-slide {
+opacity:1;
+transform: translateX(0px);
+transition: all .2s ease-in;
+}
+
 .fade-out.htmx-swapping {
     opacity: 0;
     transition: opacity .2s ease-out;

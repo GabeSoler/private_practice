@@ -1,16 +1,17 @@
 {% load i18n %}
-<div class="btn-group">
+<div class="btn-group fade-in">
   <button type="button" class="btn btn-outline-danger btn-sm">
-      <i class="bi bi-emoji-smile-upside-down-fill"> {{ text }}</i>
+      <i class="bi bi-emoji-frown-fill"> {{ text }}</i>
   </button>
 {% if overlaps %}
   <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="visually-hidden">{% translate 'Toggle Dropdown' %}</span>
   </button>
   <ul class="dropdown-menu"  style="font-size: .5rem;">
+        <li class="ms-2 fw-bold">Overlaps with:</li>
 
           {% for session in overlaps %}
-            <li>{{ session.date }} - {{ session.start_time }} - {{ session.calendar }}</li>
+            <li class="ms-2">{{ session.date }} - {{ session.start_time }} - {{ session.calendar }}</li>
           {% endfor %}
   </ul>
 

@@ -31,9 +31,9 @@
                                            hx-target="#modal-wrapper">
                                             {% if session.date %}{{ session.date }}{% else %}
                                                 {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>
-                                    <i class="bi bi-repeat-1 ms-3 text-secondary fade-out"
-                                    hx-post="{% url 'session_client:session_add_copy' session.pk%}"
-                                    hx-swap="outerHTML"></i>
+{#                                    <i class="bi bi-repeat-1 ms-3 text-secondary fade-out"#}
+{#                                    hx-post="{% url 'session_client:session_add_copy' session.pk%}"#}
+{#                                    hx-swap="outerHTML"></i>#}
                                     </th>
 
                                     <td>{{ session.client }}</td>
