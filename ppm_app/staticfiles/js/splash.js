@@ -103,7 +103,7 @@ const gsap = window.gsap;
                 duration:.2,
             },"backHome")
             tl.to(brandWrapper,{
-                height:"3rem",
+                height:"3.7rem",
                 duration:.2,
 
             },"backHome")

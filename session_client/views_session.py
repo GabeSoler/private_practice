@@ -180,9 +180,10 @@ def add_session_view(request):
             instance.deduce_from_client()
             saved,overlap = instance.save_with_checks()
             if not saved:
-                template_overlap = "session_client/lists/session_overlap_modal.html"
-                response = render(request, template_overlap,{"sessions":overlap})
-                return retarget(response,"#modal-wrapper")
+                # template_overlap = "session_client/lists/session_overlap_modal.html"
+                # response = render(request, template_overlap,{"sessions":overlap})
+                # return retarget(response,"#modal-wrapper")
+                return ups_response(request,_(f"ups"),"#ups-col",overlaps=overlap) #TODO ; can i know more specific overlap??
             return ok_response_modal(request,f"Saved ok")
     # display a blank or invalid form
     context = {'form': form}
@@ -281,10 +282,9 @@ def add_series_view(request,client_pk,number):
         client = get_object_or_404(ClientModel,pk=client_pk,user=request.user)
         success, sessions = client.add_series(number)
         if success:
-            messages.info(request, f"✅{len(sessions)} Sessions added for {client.code}")
             client_after = ClientModel.objects.filter(pk=client_pk).annotate(future_sessions_count=Count('sessionmodel',
                                         filter=Q(sessionmodel__date__gt=date_ref.date()))).last()
-            return render(request,template,{"client":client_after,'add_toast':True,'oob':True,'ok':True})
+            return render(request,template,{"client":client_after,'oob':True})
         else:
             template_overlap = "session_client/lists/sessions_toast.html"
             response = render(request, template_overlap, {'sessions': sessions,"created":False})

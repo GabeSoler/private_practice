@@ -49,9 +49,9 @@
 <body class="{% block background %}bg-body {% endblock background %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
 hx-ext="{% if debug %}debug{% endif %}, event-header">
 
-  <nav class="navbar navbar-expand-lg bg-primary sticky-top py-0 mb-0" style="height: 3rem">
+  <nav class="navbar navbar-expand-lg bg-primary sticky-top py-0 mb-0">
     <div class='container-fluid'>
-      <a id="brand-link" class='navbar-brand position-relative' href="{% url 'base:index' %}" style="width: 8rem;">
+      <a id="brand-link" class='navbar-brand position-relative py-0' href="{% url 'base:index' %}" style="width: 9rem;min-height: 3.7rem;">
           <!-- logo svg -->
           <span id="brand-wrapper" class="bg-primary">
 

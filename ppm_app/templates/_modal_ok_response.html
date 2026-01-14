@@ -1,6 +1,6 @@
 <!-- Modal -->
 {% load i18n %}
-<div _="init call bootstrap.Modal.getOrCreateInstance(me).show() end
+<div _="init call bootstrap.Modal.getOrCreateInstance(me).show()
     on CloseModal call bootstrap.Modal.getOrCreateInstance(me).hide() end"
 class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel">
 
@@ -13,7 +13,11 @@ class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel">
       </div>
       <div class="modal-body" id="modalBody">
       {% partialdef ok-body-partial inline %}
-      <h5>
+      <h5  _="init
+  log 'after init'
+  wait 400ms then send CloseModal
+   log 'CloseModal sent'
+    end">
         {% block modal_body %}{{ text }}{% endblock %}
       </h5>
 <div class="text-center mx-auto">
