@@ -297,6 +297,13 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 <script><!-- tooltip activation -->
 const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
 const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+
+// Re-initialize tooltips after HTMX content swaps
+document.body.addEventListener('htmx:afterSwap', function(evt) {
+    const newTooltips = evt.detail.target.querySelectorAll('[data-bs-toggle="tooltip"]');
+    [...newTooltips].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+});
+
 </script>
 {% block extra_js %}{% endblock %}
 </body>
