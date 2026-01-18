@@ -65,6 +65,7 @@ def week_view(request):
         if form_partial.is_valid():
             """ main functionality changing content by date or calendar, 
             if calendar is empty all occurrences of user """
+            logger.debug("form valid")
             date = form_partial.cleaned_data['date_reference']
             assert date is not None, "date should be something"
             ref_date_partial = p.datetime(date.year,date.month,date.day)
@@ -79,9 +80,10 @@ def week_view(request):
                                               room_cal=room_calendar
                                               )
             template_calendar = template + "#calendar-view-partial"
-            context = {'calendar':calendar_partial}
+            context = {'calendar':calendar_partial,'form':form_partial}
             return render(request,template_calendar,context)
         # There should not be errors here but just in case
+        logger.debug(form_partial.errors)
         form_partial_template = template + "#form-partial"
         form_partial.fields['calendar'].queryset = calendar_user
         context = {'form':form_partial}
@@ -89,6 +91,7 @@ def week_view(request):
         response = render(request,form_partial_template,context)
         return retarget(response,"#calendar-form-tr") # retarget if not valid, switch week table (edge cases)
     #default GET response
+    logger.debug("rendering week view")
     sessions = sessions.filter(date__week=p.now().week_of_year)
     form = WeekCalendarForm()
     form.fields['calendar'].queryset = calendar_user

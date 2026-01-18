@@ -38,6 +38,10 @@ class CalendarRender:
         self.week_ref = self.datetime.week_of_year
         self.year_ref = self.datetime.year
         self.room_calendar = room_cal
+        self.week_start = self.datetime.start_of('week')
+        self.week_end = self.datetime.end_of('week')
+        self.next_ref = self.datetime.add(weeks=1)
+        self.prev_ref = self.datetime.subtract(weeks=1)
 
     @property
     def week_days(self)->list:

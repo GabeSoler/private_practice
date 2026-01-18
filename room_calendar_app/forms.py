@@ -37,7 +37,7 @@ class WeekCalendarForm(forms.Form):
     """calendar switch form"""
     date_reference = forms.DateField(widget=forms.DateInput(attrs={"type":"date",}),required=True,initial=timezone.now(),
                                      help_text='Select week reference')
-    calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all(),required=False, help_text='Select the calendar to search')
+    calendar = forms.ModelChoiceField(queryset=RoomCalendarModel.objects.all(),required=False,widget=forms.Select(attrs={'class':'form-control'}))
 
 
 class RoomReportForm(forms.Form):

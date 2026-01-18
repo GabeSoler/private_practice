@@ -177,6 +177,10 @@ ADMIN_URL = config('ADMIN_URL')
 
 ROOT_URLCONF = "ppm_app.urls"
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+
 # login
 LOGIN_REDIRECT_URL = 'session_client:client_list'
 LOGOUT_REDIRECT_URL = 'base:index'
@@ -221,7 +225,7 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console"],
-        "level": "WARNING",
+        "level": "DEBUG" if DEBUG else "INFO",
     },
     "loggers": {
         "django": {

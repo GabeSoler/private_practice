@@ -59,3 +59,10 @@ transition: all .4s ease-in-out;
     visibility: visible;
     transition: opacity 200ms ease-in;
 }
+
+caption {
+    caption-side: top;
+    text-align: center;
+    padding: 2px;
+    background-color: var(--bs-primary);
+}

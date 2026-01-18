@@ -1,0 +1,59 @@
+{% load hx_helpers %}
+{% load i18n  %}
+<table class="table">
+    <thead>
+                        <tr>
+                            <th scope="col">{% translate 'Date' %}
+                            </th>
+                            <th scope="col">{% translate 'Client'  %}
+                            </th>
+                            <th scope="col">{% translate 'Attendance'  %}
+                            </th>
+                            <th scope="col">{% translate ''  %}
+                            </th>
+                            <th scope="col">{% translate 'Paid'  %}
+                            </th>
+                            <th scope="col">{% translate 'Open'  %}
+                            </th>
+                        </tr>
+    </thead>
+
+    <tbody id="tableBody">
+        <tr>
+            <th scope="row">
+                <a>Jan. 2, 2026</a>
+            </th>
+
+            <td>Test123</td>
+                <td>
+                    <select name="attendance" class="form-select"
+                            id="id_123">
+                        <option value="{{ session.get_attendance_display }}" selected="">{{ session.get_attendance_display }}</option>
+                    {% attendance_choices_as_html %}
+
+                    </select>
+                </td>
+        <td>
+                <i class="bi bi-pencil-fill text-success"
+                ></i>
+            </td>
+
+            <!-- paid/not paid partial -->
+                <td>
+                     <i _="on click toggle between .text-success and .text-danger on me
+                        end
+                        "
+                                data-bs-toggle="tooltip" data-bs-trigger="hover"
+                                data-bs-delay="500" data-bs-title="Paid"
+                                class="bi bi-currency-exchange text-success"></i>
+                </td>
+
+            <!-- Session opens/closed partial -->
+                <td>
+                        <i _="on click toggle between .text-success and .text-warning on me
+                        end
+                        "></i>
+                </td>
+        </tr>
+   </tbody>
+</table>

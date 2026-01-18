@@ -2,8 +2,7 @@ from .base import *
 
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
+
 
 
 # Static files (CSS, JavaScript, Images)
@@ -15,3 +14,4 @@ BOOTSTRAP5 = {
     # The complete URL to the Bootstrap CSS theme file (None means no theme).
     "theme_url": STATIC_URL + "css/dreamy.css",
     }
+

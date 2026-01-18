@@ -8,36 +8,92 @@
 {% block content %}
 
     <div id="page-wrapper">
-        <div id="form-table-wrapper">
-            {% partialdef form-partial inline %}
-                <form id="room-switch-form"
-                        hx-post="{% url "room_calendar_app:week_view" %}"
-                        hx-target="#calendar-table-wrapper"
-                        hx-trigger="change throttle:1s,RefreshTable"
-                >
-                    <table
-                            class="table table-primary table-striped-columns table-sm mb-0"
-                            id="switch-table"
-                    >
-                        <tr class="" id="calendar-form-tr">
-                            <td id="cell-form-field-date"
-                            >{% bootstrap_field form.date_reference show_label='skip' %}
-                            </td>
-                            <td id="cell-form-field-calendar"
-                            >{% bootstrap_field form.calendar show_label='skip' %}
-                            </td>
-                        </tr>
-                    </table>
-                </form>
-            {% endpartialdef %} <!-- end partial table -->
-        </div>
-
         <!-- Partial def  week calendar -->
 
         <div id="calendar-table-wrapper">
             {% partialdef calendar-view-partial inline %}
-                <table class="table table-secondary table-striped-columns table-sm"
+                <table class="table table-secondary table-striped-columns table-sm mb-0 pb-0"
                        id="week-view-table">
+
+                <caption class="text-light">
+                    <div class="row">
+                        <div class="col">
+                            <form class="d-inline">
+                                <input class="visually-hidden" name="calendar" value="{{ calendar.room_calendar.pk }}">
+                                <input class="visually-hidden" name="date_reference" value="{{ calendar.prev_ref|date:"Y-m-d" }}">
+
+                            <button class="btn d-inline" type="submit">
+                            <i class="bi bi-caret-left-fill"
+                                hx-post="{% url "room_calendar_app:week_view" %}"
+                                hx-target="#calendar-table-wrapper"
+                            ></i>
+                            </button>
+                            </form>
+                        </div>
+
+
+                        <div class="col">
+                            <form class="d-inline p-0 mx-0"
+                                hx-post="{% url "room_calendar_app:week_view" %}"
+                                hx-target="#calendar-table-wrapper"
+                                  hx-trigger="change"
+                            >
+                                    <label class="btn d-inline"
+                                            for="{{ form.calendar.id_for_label }}"
+                                           _="on click
+                                           tell #{{ form.calendar.id_for_label }}
+                                           call you.showPicker()
+                                           end"
+                                    >{{ calendar.room_calendar|default:"All Rooms" }}
+                                        <i class="bi bi-house-down"></i>
+                                    </label>
+                                    <div class="visually-hidden">
+                                        {{ form.calendar }}
+                                    </div>
+
+                                    <div class="visually-hidden">
+                                        {{ form.date_reference }}
+                                    </div>
+                            </form>
+
+                        </div>
+
+                        <div class="col" style="font-size: .8rem;">
+                            <span class="d-inline">
+                                       {{ calendar.week_start|date:"d/m/y" }}-
+                                        {{ calendar.week_end|date:"d/m/y"  }}
+                            </span>
+                                    <label class="btn d-inline"
+                                            for="{{ form.date_reference.id_for_label }}"
+                                           _="on click
+                                           tell #{{form.date_reference.id_for_label}}
+                                           call you.showPicker()
+                                           end">
+                                        <i class="bi bi-calendar2-date"></i>
+                                    </label>
+
+
+                        </div>
+
+                        <div class="col">
+                            <form class="d-inline">
+                                <input class="visually-hidden" name="calendar" value="{{ calendar.room_calendar.pk }}">
+                                <input class="visually-hidden" name="date_reference" value="{{ calendar.next_ref|date:"Y-m-d" }}">
+
+                            <button class="btn d-inline" type="submit">
+                            <i class="bi bi-caret-right-fill"
+                               hx-post="{% url "room_calendar_app:week_view" %}"
+                               hx-target="#calendar-table-wrapper"
+                            ></i>
+                            </button>
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </caption>
+
                     <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -49,7 +105,7 @@
                         {% endfor %}
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="mb-0 pb-0">
 
                     {% for slot,data in calendar.week_dict.items %}
                         <tr> <!-- row for time -->

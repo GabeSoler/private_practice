@@ -52,8 +52,11 @@
 {% endblock %}
 
 {% block content %}
+    <h1 class="text-primary">Features</h1>
+
     <!-- Client card display -->
     <section class="container mb-5 p-2 d-block">
+    <h2 class="text-primary">Client Card</h2>
     <div class="row">
 
         {% include 'base/client-card.html' %}
@@ -61,9 +64,17 @@
     <!-- Card explained -->
         {% include 'base/client-card-intro.html' %}
     </div>
+    </section>
 
+    <!-- Sessions Management -->
+    <section class="mb-5 bg-primary">
+        <h2 class="text-secondary">Session list</h2>
+
+{% include 'base/session-intro.html' %}
 
     </section>
+
+
 
 {% endblock content %}
 
