@@ -30,8 +30,6 @@
                                hx-target="#modal-wrapper">
                         {{ calendar.name }}</a></span>
 
-
-                        {% include 'room_calendar_app/auxiliary/form-tenant-partial.html' %}
                     </div>
 
                 <!-- form to add new tenants to the room -->
@@ -55,7 +53,10 @@
                             </form>
                         </div>
 
+                    <div class="row">
+                                                {% include 'room_calendar_app/auxiliary/form-tenant-partial.html' %}
 
+                    </div>
                     <div class="row">
 
                         {% include 'room_calendar_app/auxiliary/tenant_list_info.html' %}

@@ -43,9 +43,18 @@
                             _="on click
                     put innerHTML of previous <span/> into myText
                     writeText(myText) into the navigator's clipboard
+                    remove .bi-clipboard from the first <i/> in me
+                    add .bi-clipboard-check-fill to the first <i/> in me
+                    end"
+                    ><i class="bi bi-clipboard"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm"
+                            _="on click
+                    put innerHTML of previous <span/> into myText
+                    call the navigator.share({text:myText})
                     set my innerHTML to 'Copied!'
                     end"
-                    >{% translate 'Share Code' %}
+                    ><i class="bi bi-share-fill"></i>
                     </button>
           </div>
 
