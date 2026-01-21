@@ -29,7 +29,7 @@ class TenantForm(forms.ModelForm):
         }
 
 class LinkTenantForm(forms.Form):
-    tenant_id = forms.UUIDField(required=True,label='Tenant Code',help_text='Paste here')
+    tenant_id = forms.UUIDField(required=True,label='Tenant Code')
 
 
 
@@ -50,7 +50,7 @@ class TenantReportForm(forms.Form):
     year = forms.ChoiceField(choices=years_choices())
 
 class RoomSwitchForm(forms.Form):
-    room = forms.ModelChoiceField(help_text="Select a room to see its blocks",queryset=RoomCalendarModel.objects.all())
+    calendar = forms.ModelChoiceField(help_text="Select a room to see its blocks",required=False,queryset=RoomCalendarModel.objects.all())
 
 class BlockForm(forms.ModelForm):
     class Meta:

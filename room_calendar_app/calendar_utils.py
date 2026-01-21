@@ -1,12 +1,10 @@
 """ A series of functions to deal with the calendar"""
-from collections import namedtuple
-
 import pendulum as p
 
-from room_calendar_app.models import RoomCalendarModel, BlocksModel
+from room_calendar_app.models import RoomCalendarModel
 from base.choices import time_slots,WEEKDAY_SHORT
-from session_client.models import ClientModel
-from session_client.utils import date_plus_time, time_plus_duration, now_at_time
+from session_client.utils import time_plus_duration, now_at_time
+from base.choices import MONTH_LONG
 
 
 def week_slot_dic() -> dict:
@@ -72,10 +70,10 @@ class CalendarRender:
 
 
 class CalendarBlocksRender:
-    def __init__(self,blocks:list[BlocksModel],calendar=None):
+    def __init__(self,blocks,room_cal:RoomCalendarModel=None):
         self.blocks = blocks
         self.week_days = WEEKDAY_SHORT
-        self.room_calendar = calendar
+        self.room_calendar = room_cal
 
     @property
     def block_dict(self)->dict:
@@ -95,10 +93,10 @@ class CalendarBlocksRender:
         return block_dict
 
 class CalendarClientsRender:
-    def __init__(self,clients:list[ClientModel],calendar=None):
+    def __init__(self,clients,room_cal:RoomCalendarModel=None):
         self.clients = clients
         self.week_days = WEEKDAY_SHORT
-        self.room_calendar = calendar
+        self.room_calendar = room_cal
 
     @property
     def client_dict(self)->dict:
@@ -117,3 +115,12 @@ class CalendarClientsRender:
                 slot = time_slot.time()
                 client_dict[slot][iso_day] = client
         return client_dict
+
+
+class MonthNextUtil:
+    def __init__(self,date_ref=p.now(),room_cal=None):
+        self.date_ref = date_ref.start_of("month")
+        self.room_calendar = room_cal
+        self.next_ref = self.date_ref.add(months=1)
+        self.prev_ref = self.date_ref.subtract(months=1)
+        self.month = self.date_ref.format("YY-MM")

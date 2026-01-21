@@ -14,7 +14,8 @@ def tenant_annotated_qs(year,month,cal=None,user=None):
                             ),
         period_income=Sum('clientmodel__sessionmodel__fee',
                           filter=Q(clientmodel__sessionmodel__date__year=year,
-                                   clientmodel__sessionmodel__date__month=month),
+                                   clientmodel__sessionmodel__date__month=month)&
+                                 ~Q(clientmodel__sessionmodel__attendance="Cancel"),
                           default=0))
 
     .annotate(
@@ -33,6 +34,7 @@ def tenant_annotated_qs(year,month,cal=None,user=None):
 def get_tenant_qs_totals(tenants_qs):
     totals = tenants_qs.aggregate(
         total_sessions=Sum("session_count"),
-        total_pay=Sum("session_pay")
+        total_pay=Sum("session_pay"),
+        total_income=Sum("period_income"),
     )
     return totals

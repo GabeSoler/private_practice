@@ -230,4 +230,3 @@ def create_quarter_range_dates(quarter_n:int,year):
     end_date = p.date(year,quarter_range.end.month,quarter_range.end.day)
     return start_date,end_date
 
-

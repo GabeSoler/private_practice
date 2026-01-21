@@ -1,0 +1,72 @@
+{% load django_bootstrap5 i18n %}
+
+<!-- list of tenants and their sessions  -->
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">{% translate 'Tenant' %}</th>
+        {% if show_income %}
+        <th scope="col">{% translate 'Income' %}</th>
+        {% else %}
+        <th scope="col">{% translate 'Agreement' %}</th>
+        {% endif %}
+        <th scope="col">{% translate 'Sessions' %}</th>
+        <th scope="col">{% translate 'Rent' %}</th>
+    </tr>
+    </thead>
+
+    <tbody id="tenant-table-body">
+{% partialdef table-body-partial inline %}
+    {% for tenant in  tenants %}
+        <tr>
+        <th scope="row">
+            {% if tenant.user == user %}
+                <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
+                   hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
+                   hx-target="#modal-wrapper"
+                >{{ tenant.name }}
+                    (Me)</a>
+            {% else %}
+                <span>- {{ tenant.name }}</span>
+            {% endif %}
+        <i class="bi bi-slash-circle-fill text-danger ms-4"
+                hx-post="{% url 'room_calendar_app:unlink_tenant' tenant.pk %}"
+           hx-target="closest <tr/>"
+           hx-swap="outerHTML"
+        ></i>
+        </th>
+
+        <td class="small">
+        {% if show_income %}
+            {{tenant.period_income}}
+            {% else %}
+            {{tenant.get_agreement_display}}
+        {% endif %}
+        </td>
+
+        <td>
+            {{tenant.session_count}}
+        </td>
+
+        <td>
+            {{tenant.session_pay}}
+        </td>
+
+    {% endfor %}
+    </tr>
+    <tr class="text-info">
+        <td class="text-info">
+            {% translate 'Total' %}
+        </td>
+        <td class="text-info">
+        </td>
+        <td class="text-info">
+            {{ totals.total_sessions }}
+        </td>
+        <td class="text-info">
+            {{ totals.total_pay }}
+        </td>
+    </tr>
+{% endpartialdef table-body-partial %}
+    </tbody>
+</table>

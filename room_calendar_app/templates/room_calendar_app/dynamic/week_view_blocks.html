@@ -9,32 +9,15 @@
 
     <div id="page-wrapper">
 
-        <div id="form-table-wrapper">
-            {% partialdef form-partial inline %}
-                <form id="room-switch-form"
-                        hx-post="{% url "room_calendar_app:week_blocks_view" %}"
-                        hx-target="#calendar-table-wrapper"
-                        hx-trigger="change throttle:1s,load once,RefreshTable"
-                >
-                    <table
-                            class="table table-primary table-striped-columns table-sm mb-0"
-                            id="switch-table"
-                    >
-                        <tr class="" id="calendar-form-tr">
-                            <td id="cell-form-field-calendar"
-                            >{% bootstrap_field form.room show_label='skip' %}
-                            </td>
-                        </tr>
-                    </table>
-                </form>
-            {% endpartialdef %} <!-- end partial table -->
-        </div>
 
         <!-- Partial def  week calendar -->
         <div id="calendar-table-wrapper">
             {% partialdef calendar-table-partial inline %}
                 <table class="table table-secondary table-striped-columns table-sm"
                        id="week-view-table">
+                                <!-- navigation caption -->
+                    {% include 'room_calendar_app/navs/cal-caption.html' with inner_url="room_calendar_app:week_blocks_view" %}
+
                     <thead>
                     <tr>
                         <th scope="col">#</th>

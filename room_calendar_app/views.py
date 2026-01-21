@@ -9,7 +9,7 @@ from .forms import RoomCalendarForm, TenantForm, LinkTenantForm, WeekCalendarFor
     RoomSwitchForm, BlockForm
 from django.contrib.auth.decorators import login_required
 from django_htmx.http import retarget, HttpResponseClientRefresh,trigger_client_event
-from .calendar_utils import CalendarRender, CalendarClientsRender, CalendarBlocksRender
+from .calendar_utils import CalendarRender, CalendarClientsRender, CalendarBlocksRender,MonthNextUtil
 import pendulum as p
 from session_client.models import SessionModel,ClientModel
 from django.db.models import (Q, F, Case, When, FloatField, Count,
@@ -80,16 +80,14 @@ def week_view(request):
                                               room_cal=room_calendar
                                               )
             template_calendar = template + "#calendar-view-partial"
+            form_partial.fields['calendar'].queryset = calendar_user
             context = {'calendar':calendar_partial,'form':form_partial}
             return render(request,template_calendar,context)
         # There should not be errors here but just in case
         logger.debug(form_partial.errors)
-        form_partial_template = template + "#form-partial"
-        form_partial.fields['calendar'].queryset = calendar_user
-        context = {'form':form_partial}
-        #response for form error
-        response = render(request,form_partial_template,context)
-        return retarget(response,"#calendar-form-tr") # retarget if not valid, switch week table (edge cases)
+        messages.error(request,"error on request")
+        response = render(request,"_toasts.html")
+        return retarget(response,"#modal-wrapper") # retarget if not valid, switch week table (edge cases)
     #default GET response
     logger.debug("rendering week view")
     sessions = sessions.filter(date__week=p.now().week_of_year)
@@ -100,7 +98,6 @@ def week_view(request):
     context = {'calendar':calendar,'form':form}
     return render(request,template,context)
 
-@login_required()
 def week_view_auxiliary(request):
     clients = ClientModel.objects.filter(user=request.user)
     template = "room_calendar_app/auxiliary/client_list_li.html"
@@ -108,21 +105,66 @@ def week_view_auxiliary(request):
     return render(request,template,context)
 
 
-def room_calendar_listing_view(request):
-    last_month = p.now().start_of('month').subtract(months=1)
-    room_calendar_tenant = (RoomCalendarModel.objects.
-                            filter(Q(tenantmodel__user=request.user)|Q(user=request.user))
-                            .annotate(
-                                      sessions_count=Count("sessionmodel",filter=Q(user=request.user)),
-                                      period_income=Sum('sessionmodel__fee',
-                                                        filter=Q(sessionmodel__date__year=last_month.year,
-                                                                 sessionmodel__date__month=last_month.month)&
-                                                                Q(sessionmodel__client__user=request.user.pk),
-                                                        default=0),
+def week_blocks_view(request):
+    template = "room_calendar_app/dynamic/week_view_blocks.html"
+    room_qs = RoomCalendarModel.objects.filter(Q(tenantmodel__user=request.user)|Q(user=request.user))
+    if request.method =='POST':
+        form = RoomSwitchForm(data=request.POST)
+        if form.is_valid():
+            room_cal = None
+            if form.cleaned_data['calendar']:
+                room_cal = form.cleaned_data['calendar']
+            blocks = BlocksModel.objects.filter(tenant__calendar=room_cal)
+            calendar = CalendarBlocksRender(blocks,room_cal=room_cal)
+            template_partial = template + "#calendar-table-partial"
+            form.fields["calendar"].queryset = room_qs
+            context={"calendar":calendar,"form":form}
+            return render(request,template_partial,context)
+        messages.error(request,"error on request")
+        logger.warning(form.errors)
+        response = render(request,"_toasts.html")
+        return retarget(response,"#modal-wrapper")
+    blocks = BlocksModel.objects.none()
+    calendar = CalendarBlocksRender(blocks)
+    form = RoomSwitchForm(initial={"room":room_qs[0]})
+    form.fields["calendar"].queryset = room_qs
+    context = {"calendar": calendar, "form": form}
+    return render(request, template, context)
 
-                                )
-    )
-    context = {"calendar_tenant": room_calendar_tenant,"month":last_month}
+def week_schedule_view(request):
+    template = "room_calendar_app/dynamic/week_view_clients.html"
+    room_qs = (RoomCalendarModel.objects.
+                                        filter(Q(tenantmodel__user=request.user)|Q(user=request.user)))
+    if request.method =='POST':
+        form = RoomSwitchForm(data=request.POST)
+        if form.is_valid():
+            room_cal = None
+            clients = ClientModel.objects.filter(user=request.user)
+            if form.cleaned_data['calendar']:
+                room_cal = form.cleaned_data['calendar']
+                clients = clients.filter(tenant__calendar=room_cal)
+            calendar = CalendarClientsRender(clients,room_cal=room_cal)
+            template_partial = template + "#calendar-table-partial"
+            form.fields["calendar"].queryset = room_qs
+            context={"calendar":calendar,"form":form}
+            return render(request,template_partial,context)
+        messages.error(request,"error on request")
+        logger.warning(form.errors)
+        response = render(request,"_toasts.html")
+        return retarget(response,"#modal-wrapper")
+    clients = ClientModel.objects.filter(user=request.user) or None
+    calendar = CalendarClientsRender(clients)
+    form = RoomSwitchForm()
+    form.fields["calendar"].queryset = room_qs
+    context = {"calendar":calendar,"form":form}
+    return render(request,template,context)
+
+
+
+def room_calendar_listing_view(request):
+    my_rooms = RoomCalendarModel.objects.filter(tenantmodel__user=request.user)
+    date_initial = p.now()
+    context = {"my_rooms": my_rooms, "date_initial": date_initial}
     return render(request,"room_calendar_app/display/room_calendar_list.html",context)
 
 def room_calendar_manage_view(request):
@@ -142,11 +184,33 @@ def room_manage_refresh_view(request,cal_pk):
             month = form_tenant.cleaned_data['month']
             tenants_qs = tenant_annotated_qs(year,month,cal=cal_pk)
             totals = get_tenant_qs_totals(tenants_qs)
-            template = "room_calendar_app/display/room_calendar_manage.html"+"#table-body-partial"
+            template = "room_calendar_app/auxiliary/tenant_list_info.html"+"#table-body-partial"
             context = {"tenants":tenants_qs,"totals":totals}
             return render(request,template,context)
-
         return Http404("Ups")
+    return Http404("Ups")
+
+def room_list_refresh_view(request):
+    if request.method == "POST":
+        form = WeekCalendarForm(data=request.POST)
+        logger.debug("form post received")
+        if form.is_valid():
+            logger.debug("form valid")
+            room_cal = form.cleaned_data['calendar'] or None
+            date_ref = p.instance(form.cleaned_data['date_reference'])
+            month_util = MonthNextUtil(date_ref,room_cal)
+            tenants_qs = tenant_annotated_qs(date_ref.year,
+                                             date_ref.month,
+                                             cal=room_cal,
+                                             user=request.user) #to get right to pay numbers in totals
+            totals = get_tenant_qs_totals(tenants_qs)
+            template = "room_calendar_app/display/room_calendar_list.html"+"#calendar_info_partial"
+            context = {"totals":totals,"month_util":month_util,"calendar":room_cal}
+            return render(request,template,context)
+        logger.debug(form.errors)
+        messages.error(request,f"Error")
+        response = render(request,"_toasts.html")
+        return retarget(response,"#modal-wrapper")
     return Http404("Ups")
 
 
@@ -328,40 +392,6 @@ def tenant_delete_hx(request,tenant_pk):
     tenant.delete()
     return HttpResponseClientRefresh()
 
-def week_blocks_view(request):
-    template = "room_calendar_app/dynamic/week_view_blocks.html"
-    if request.method =='POST':
-        form = RoomSwitchForm(data=request.POST)
-        if form.is_valid():
-            room = form.cleaned_data['room']
-            blocks = BlocksModel.objects.filter(tenant__calendar=room)
-            calendar = CalendarBlocksRender(blocks,calendar=room)
-            template_partial = template + "#calendar-table-partial"
-            return render(request,template_partial,{"calendar":calendar})
-    blocks = BlocksModel.objects.none()
-    room_qs = RoomCalendarModel.objects.filter(Q(tenantmodel__user=request.user)|Q(user=request.user))
-    calendar = CalendarBlocksRender(blocks)
-    form = RoomSwitchForm(initial={"room":room_qs[0]})
-    form.fields["room"].queryset = room_qs
-    context = {"calendar": calendar, "form": form}
-    return render(request, template, context)
-
-def week_schedule_view(request):
-    template = "room_calendar_app/dynamic/week_view_clients.html"
-    if request.method =='POST':
-        form = RoomSwitchForm(data=request.POST)
-        if form.is_valid():
-            room = form.cleaned_data['room']
-            clients = ClientModel.objects.filter(tenant__calendar=room) or None
-            calendar = CalendarClientsRender(clients,calendar=room)
-            template_partial = template + "#calendar-table-partial"
-            return render(request,template_partial,{"calendar":calendar})
-    clients = ClientModel.objects.filter(user=request.user) or None
-    calendar = CalendarClientsRender(clients)
-    form = RoomSwitchForm()
-    form.fields["room"].queryset = RoomCalendarModel.objects.filter(Q(tenantmodel__user=request.user)|Q(user=request.user))
-    context = {"calendar":calendar,"form":form}
-    return render(request,template,context)
 
 def block_add_view(request,day=None,time=None,room=None):
     """ add an event, it needs to set occurrences to appear in the calendar"""

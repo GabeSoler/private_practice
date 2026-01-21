@@ -49,7 +49,7 @@
 <body class="{% block background %}bg-body {% endblock background %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
 hx-ext="{% if debug %}debug{% endif %}, event-header">
 
-  <nav class="navbar navbar-expand-lg bg-primary sticky-top py-0 mb-0">
+  <nav class="navbar navbar-expand-lg bg-primary sticky-top py-0 mb-0 col-12">
     <div class='container-fluid'>
       <a id="brand-link" class='navbar-brand position-relative py-0' href="{% url 'base:index' %}" style="width: 9rem;min-height: 3.7rem;">
           <!-- logo svg -->
@@ -113,9 +113,9 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
                 <li class='nav-item'>
                     <a class='nav-link' href="{% url 'room_calendar_app:week_view' %}">
                         {% translate "My Calendar" %}</a></li>
-                <li class='nav-item'>
-                    <a class='nav-link' href="{% url 'room_calendar_app:week_view' %}">
-                        {% translate "My Numbers" %}</a></li>
+{#                <li class='nav-item'>#}
+{#                    <a class='nav-link' href="{% url 'room_calendar_app:week_view' %}">#}
+{#                        {% translate "My Numbers" %}</a></li>#}
 
                                                         <!-- bootswatch theme changer -->
 
@@ -203,11 +203,11 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 {% block hero_block %}
   {% endblock %}
 
-<main class='container'>
-
-
     {% block local_nav %} {% comment %} for navigation by topic, like sessoin and client {% endcomment %}
     {% endblock local_nav %}
+<main class='mx-auto col-12 col-md-11 cols-lg-10'>
+
+
 {% block search_nav %} {% comment %} for search inside lists{% endcomment %}
 {% endblock search_nav %}
     <div> 
