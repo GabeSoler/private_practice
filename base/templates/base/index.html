@@ -5,14 +5,15 @@
 
 {% block hero_block %}
     <div class="position-relative flex-container mb-5 bg-secondary" style="height:40vh;">
-        <span class="text-light col col-lg-8 position-relative" style="font-size:30cqw;font-family:'Love Light',cursive;"
-        >Dreamy
-        </span>
-        <span class="fs-2 text-primary position-absolute start-50 bottom-0"
-        >{% translate 'Admin for therapists' %}</span>
-        <span id="dreamy-wrapper" class="bg-secondary float-end">
-            <img src="{% static 'images/dreamy.svg' %}" style="width: 8rem;height: 8rem;">
+        <div class="col-12 col-md-8" style="max-width: 10rem;">
+            <span class="text-light position-relative"
+                      style="font-size:35cqmin;font-family:'Love Light',cursive;z-index: 98;"
+                >Dreamy
             </span>
+
+            <span class="fs-2 text-primary position-absolute start-50 bottom-0" style="z-index: 99;"
+            >{% translate 'Admin for therapists' %}</span>
+        </div>
     </div>
 
 <div class="py-4 mb-5 position-relative bg-primary text-secondary" style="height: 38vh;width: 100vw;">
