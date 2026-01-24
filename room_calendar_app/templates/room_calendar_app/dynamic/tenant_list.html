@@ -12,51 +12,52 @@
 </div>
 <div class="card-body">
 
-  <ul class="list-group">
+  <ul id="tenant-list" class="list-group">
     {% for tenant in tenant_list %}
         {% partialdef tenant_item_partial inline %}
-      <li class="list-group-item list-group-item-action list-group-item-primary  fade-out">
+      <li class="list-group-item
+      list-group-item-action
+      list-group-item-primary
+      fade-out {{ status }}-shine-7">
       <div class="row">
           <div class="col">
-        <a href="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
+        <a
         hx-get="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
-           hx-target="#modal-wrapper"
+        hx-target="#modal-wrapper"
         >{{tenant.name}}</a>
 
           </div>
           <div class="col">
-
+            <span>
           {{tenant.calendar}}
+                {% if tenant.calendar %}
+              <i class="bi bi-x-circle-fill text-danger ms-4"
+                hx-post="{% url 'room_calendar_app:unlink_tenant' tenant.pk %}"
+           hx-target="closest <span/>"
+           hx-swap="outerHTML"
+           hx-confirm="{% translate 'Un-link tenant'  %}"
+        ></i>
+                {% endif %}
+            </span>
           </div>
           <div class="col">
 
               <i class="bi bi-copy"
                 hx-post="{% url 'room_calendar_app:duplicate_tenant' tenant.pk %}"
               hx-target="closest <li/>"
-              hx-swap="afterend"></i>
+              hx-swap="afterend"
+             data-bs-toggle="tooltip"
+             data-bs-trigger="hover"
+             data-bs-delay="500"
+             data-bs-title="{% translate 'Duplicate' %}"
+             data-bs-custom-class="custom-tooltip"
+              ></i>
           </div>
 
 
-          <div class="col">
-                <span class="bg-primary border" hidden id="code-{{ tenant.pk }}">{{ tenant.pk }}</span>
-                    <button class="btn btn-outline-secondary btn-sm"
-                            _="on click
-                    put innerHTML of previous <span/> into myText
-                    writeText(myText) into the navigator's clipboard
-                    remove .bi-clipboard from the first <i/> in me
-                    add .bi-clipboard-check-fill to the first <i/> in me
-                    end"
-                    ><i class="bi bi-clipboard"></i>
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm"
-                            _="on click
-                    put innerHTML of previous <span/> into myText
-                    call the navigator.share({text:myText})
-                    set my innerHTML to 'Copied!'
-                    end"
-                    ><i class="bi bi-share-fill"></i>
-                    </button>
-          </div>
+              <!-- tenant link form -->
+              {% include 'room_calendar_app/auxiliary/tenant-link-form.html' with form=form tenant=tenant %}
+
 
       </div>
     </li>
@@ -68,7 +69,12 @@
     </ul>
 </div>
 
-
+<div id="hx-helper"
+  hx-get="{% url 'room_calendar_app:tenant_list' %}"
+  hx-target="#tenant-list"
+  hx-select="#tenant-list"
+  hx-trigger="RefreshTable"
+></div>
 </div>
 
   {% endblock content %}

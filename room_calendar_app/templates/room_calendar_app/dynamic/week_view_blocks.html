@@ -43,7 +43,7 @@
                                     hx-get="{% url 'room_calendar_app:block_edit' occurrence.pk %}"
                                     hx-target="#modal-wrapper"
                                     {% endif %}
-                                    style="font-size:.6rem;"
+                                    style="font-size:.6rem;max-width:5rem;"
                                     id="{{ slot }}"
                                 >{{ occurrence.tenant }}-
                                     {{ occurrence.start_time }}-

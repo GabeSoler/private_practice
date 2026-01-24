@@ -43,7 +43,7 @@
                                 <td class="table-danger"
                                     hx-get="{% url 'session_client:client_hx_item' occurrence.pk %}"
                                     hx-target="#modal-wrapper"
-                                    style="font-size:.6rem;"
+                                    style="font-size:.6rem;max-width:5rem;"
                                     id="{{ slot }}"
                                 >{{ occurrence.code }}-
                                     {{ occurrence.time }}</td>

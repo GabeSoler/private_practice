@@ -16,18 +16,7 @@
 
             {% partialdef block-form-partial inline %}
                 <form id="block-form"
-                        {% if block_item.pk %}
-                      action="{% url 'room_calendar_app:block_edit' block_item.pk %}"
-                      hx-post="{% url 'room_calendar_app:block_edit' block_item.pk %}"
-                      hx-target="#block-form"
-                      hx-swap="outerHTML"
-                        {% else %}
-                      action="{% url 'room_calendar_app:block_add_view' %}"
-                      hx-post="{% url 'room_calendar_app:block_add_view' %}"
-                      hx-target="#block-form"
-                      hx-swap="outerHTML"
-                        {% endif %}
-                      method='post'>
+                     >
                     {% csrf_token %}
 
 
@@ -35,11 +24,21 @@
                     {% bootstrap_field form.day size="lg" %}
                     {% bootstrap_field form.start_time size="sm" %}
                     {% bootstrap_field form.end_time size="sm" %}
-                    <button type="submit" class="btn btn-secondary float-end">{% translate 'Submit' %}</button>
+
+                    <button
+                            {% if block_item.pk %}
+                      hx-post="{% url 'room_calendar_app:block_edit' block_item.pk %}"
+                      hx-target="#block-form"
+                      hx-swap="outerHTML"
+                        {% else %}
+                      hx-post="{% url 'room_calendar_app:block_add_view' %}"
+                      hx-target="#block-form"
+                      hx-swap="outerHTML"
+                        {% endif %}
+                            type="submit" class="btn btn-secondary float-end">{% translate 'Submit' %}</button>
 
                     {% if block_item %}
-                        <button type="delete" class="btn btn-primary float-start"
-                        hx-post="{% url 'room_calendar_app:delete_block' block_item.pk %}">{% translate 'Delete' %}</button>
+                        <button type="delete" class="btn btn-primary float-start">{% translate 'Delete' %}</button>
                     {% endif %}
                 </form>
             {% endpartialdef block-form-partial %}

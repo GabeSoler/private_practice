@@ -32,34 +32,37 @@
 
                     </div>
 
-                <!-- form to add new tenants to the room -->
+                <!-- code link for room share -->
                     <div class="col">
-                            <form class="" id="tenant-link-form">
-                        {% partialdef form-partial inline %}
-                                {% bootstrap_field form.tenant_id layout='horizontal' show_label='skip' %}
-                            </div>
+                    <span>Share Room code</span>
+                                    <span class="bg-primary border" hidden id="code-{{ calendar.pk }}">{{ calendar.pk }}</span>
+                    <button class="btn btn-outline-secondary btn-sm"
+                            _="on click
+                    put innerHTML of previous <span/> into myText
+                    writeText(myText) into the navigator's clipboard
+                    remove .bi-clipboard from the first <i/> in me
+                    add .bi-clipboard-check-fill to the first <i/> in me
+                    end"
+                    ><i class="bi bi-clipboard"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm"
+                            _="on click
+                    put innerHTML of previous <span/> into myText
+                    call the navigator.share({text:myText})
+                    set my innerHTML to 'Copied!'
+                    end"
+                    ><i class="bi bi-share-fill"></i>
+                    </button>
 
-                            <div class="col">
-                            <button
-                                    type="button"
-                                    class="btn btn-outline-secondary btn-md col-10"
-                                    hx-post="{% url 'room_calendar_app:link_tenant' calendar.pk %}"
-                                    hx-target="next <tbody/>"
-
-                            >
-                                {% translate 'Link' %}
-                            </button>
-                        {% endpartialdef form-partial %}
-                            </form>
-                        </div>
+                    </div>
 
                     <div class="row">
-                                                {% include 'room_calendar_app/auxiliary/form-tenant-partial.html' %}
+                                                {% include 'room_calendar_app/auxiliary/form-tenant-partial.html' with calendar=calendar %}
 
                     </div>
                     <div class="row">
 
-                        {% include 'room_calendar_app/auxiliary/tenant_list_info.html' %}
+                        {% include 'room_calendar_app/auxiliary/tenant_list_info.html' with calendar=calendar %}
                     </div>
 
             </li>

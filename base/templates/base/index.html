@@ -53,11 +53,11 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="text-primary">Features</h1>
+    <h1 class="text-primary display-1 fw-bold">Features</h1>
 
     <!-- Client card display -->
-    <section class="container mb-5 p-2 d-block">
-    <h2 class="text-primary">Client Card</h2>
+    <section class="my-5 p-2">
+    <h2 class="text-primary border-bottom">Client Card</h2>
     <div class="row">
 
         {% include 'base/client-card.html' %}
@@ -68,14 +68,35 @@
     </section>
 
     <!-- Sessions Management -->
-    <section class="mb-5 bg-primary">
-        <h2 class="text-secondary">Session list</h2>
+    <section class="my-5">
+    <h2 class="text-primary border-bottom">Session's list</h2>
+    <p class="text-primary fs-3"
+    >Quickly handle the management of your sessions once it is time for it.</p>
 
 {% include 'base/session-intro.html' %}
 
     </section>
 
+    <!-- Rooms -->
+    <section class="my-5">
+        <h2 class="text-primary border-bottom">Rooms management</h2>
+            <p class="text-primary fs-3">
+                Rooms can be quickly seen, shared and managed.
+            </p>
+    {% include 'base/room-info.html' %}
 
+    </section>
+
+
+<!-- Calendar -->
+    <section class="my-5">
+        <h2 class="text-primary border-bottom">Calendar View</h2>
+            <p class="text-primary fs-3">
+                See your sessions by room and date, while in sync with your colleages
+            </p>
+
+    {% include 'base/cal-info.html' %}
+    </section>
 
 {% endblock content %}
 

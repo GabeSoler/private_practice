@@ -43,7 +43,7 @@
                                     {% endif %}"
                                     hx-get="{% url 'session_client:session_hx_item' occurrence.pk %}"
                                     hx-target="#modal-wrapper"
-                                    style="font-size:.6rem;"
+                                    style="font-size:.6rem;max-width:5rem;"
                                     id="{{ slot }}"
                                 >{% if occurrence.start_time == slot %}
                                 {{ occurrence.display }}

@@ -5,7 +5,11 @@ from session_client.models import ClientModel, SessionModel
 import pendulum as p
 from django.utils import translation
 from datetime import timedelta
-from .forms import ClientForm,SearchClientForm
+from .forms import (ClientForm,
+                    SearchClientForm,
+                    SessionFromCalendarForm,
+                    SessionSelectGroupForm)
+
 
 class PostMethodTests(MetaTestSetupMixin, TestCase):
 
@@ -18,13 +22,13 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
     def test_client_search_view_post(self):
         url = reverse('session_client:client_search')
         # Search for 'Session1' which is session_1.keywords
-        data = {'search_input': "session", 'client':""}
+        data = {'search_input': "session", 'client': ""}
         form = SearchClientForm(data=data)
         print(form.errors)
         self.assertTrue(form.is_valid())
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response,"session")
+        self.assertContains(response, "session")
 
     def test_add_client_view_post(self):
         url = reverse('session_client:add_client')
@@ -43,7 +47,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         print(form.errors)
         self.assertTrue(form.is_valid())
         response = self.client.post(url, data, headers=self.htmx_headers)
-        self.assertEqual(response.status_code, 200) # Returns HttpResponseClientRefresh
+        self.assertEqual(response.status_code, 200)  # Returns HttpResponseClientRefresh
         self.assertNotContains(response, "<form")
         self.assertTrue(ClientModel.objects.filter(user=self.user, code='NEWCLIENT').exists())
 
@@ -68,33 +72,47 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.client_instance.refresh_from_db()
         self.assertEqual(self.client_instance.code, 'UPDATEDCODE')
 
-    def test_week_view_add_client_post(self):
-        url = reverse('session_client:week_view_add_client', kwargs={'weekday':1, 'time':'08:00'})
+    def test_week_view_add_session_post(self):
+        url = reverse('session_client:week_view_add_client', kwargs={'weekday': 1, 'time': '08:00'})
+        date_ref = p.now().format('YYYY-MM-DD')
         data = {
-            'code': 'WEEKCLIENT',
-            'type': 'Private',
-            'fee': 60,
-            'tenant': self.tenant.pk,
-            'day': 1,
-            'time': '08:00:00',
-            'duration': 'PT01H00M00S',
-            'series': 'Each week',
-            'active': 'on',
+            "client": self.client_instance.pk,
+            "date": date_ref,
+            "start_time": "08:00:00",
+            "calendar": self.room_1.pk,
         }
+        form = SessionFromCalendarForm(data=data)
+        if form.errors:
+            print(form.errors)
+        self.assertTrue(form.is_valid())
+
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(ClientModel.objects.filter(code='WEEKCLIENT').exists())
+        self.assertTrue(SessionModel.objects.filter(client=self.client_instance, date=date_ref).exists())
 
     def test_sessions_view_post_htmx(self):
         url = reverse('session_client:session_list')
         data = {
-            'only_unpaid': True,
-            'include_next': True,
+            'only_unpaid': False,
+            'include_next': False,
         }
+        form = SessionSelectGroupForm(data=data)
+        self.assertTrue(form.is_valid())
         response = self.client.post(url, data, headers=self.htmx_headers)
+        self.assertNotContains(response, self.client_instance_2.code)  # to check a form clients query
         self.assertEqual(response.status_code, 200)
         # Check if one of the sessions is present
-        self.assertContains(response, self.session_2.client.code)
+        self.assertNotContains(response, f"id_{self.session_2.pk}")
+        data['only_unpaid'] = True
+        data['include_next'] = True
+        response = self.client.post(url, data, headers=self.htmx_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f"id_{self.session_2.pk}")
+        self.assertNotContains(response, 'hx-post="/en/clients/session_list/"')  # check not form passed
+        # testing client filter
+        data['client'] = self.client_instance_3.pk
+        response = self.client.post(url, data, headers=self.htmx_headers)
+        self.assertNotContains(response, f"id_{self.session_2.pk}")
 
     def test_sessions_search_post(self):
         url = reverse('session_client:session_search')
@@ -104,7 +122,16 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         }
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.session_1.client.code)
+        self.assertContains(response, f"id_{self.session_1.pk}")
+        self.assertContains(response, f"id_{self.session_2.pk}")
+        data_2 = {
+            'date_ref_start': (p.now().subtract(days=1)).format('YYYY-MM-DD'),
+            'date_ref_end': (p.now().add(days=1)).format('YYYY-MM-DD'),
+        }
+        response = self.client.post(url, data_2, headers=self.htmx_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f"id_{self.session_1.pk}")
+        self.assertNotContains(response, f"id_{self.session_2.pk}")
 
     def test_add_session_view_post(self):
         url = reverse('session_client:add_session')
@@ -153,15 +180,18 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(SessionModel.objects.filter(client=self.client_instance, start_time='15:00:00').exists())
+        self.assertNotContains(response, f"id_client_helptext")
 
     def test_sessions_patch_attendance_post(self):
         url = reverse('session_client:session_patch_attendance', args=[self.session_1.pk])
-        data = {'attendance': 'Late Cancel'}
+        data = {
+            'attendance': 'LateC'
+        }
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.session_1.refresh_from_db()
-        self.assertEqual(self.session_1.attendance, 'Late Cancel')
-        self.assertContains(response, 'Late Cancel')
+        self.assertEqual(self.session_1.attendance, 'LateC')
+        self.assertContains(response, 'LateC')
 
     def test_patch_brief_view_post(self):
         url = reverse('session_client:session_patch_brief', args=[self.session_1.pk])

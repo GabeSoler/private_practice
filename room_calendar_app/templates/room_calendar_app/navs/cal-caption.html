@@ -20,10 +20,11 @@
 
 
         <div class="col">
-            <form class="d-inline p-0 mx-0"
+            <form id="caption-form"
+                    class="d-inline p-0 mx-0"
                 hx-post="{% url inner_url %}"
                 hx-target="#calendar-table-wrapper"
-                  hx-trigger="change"
+                  hx-trigger="change,RefreshTable"
             >
                     <label class="btn d-inline"
                             for="{{ form.calendar.id_for_label }}"

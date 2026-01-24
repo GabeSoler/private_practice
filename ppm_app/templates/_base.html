@@ -205,7 +205,7 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 
     {% block local_nav %} {% comment %} for navigation by topic, like sessoin and client {% endcomment %}
     {% endblock local_nav %}
-<main class='mx-auto col-12 col-md-11 cols-lg-10'>
+<main class='mx-auto col-12 col-md-11 cols-lg-10' style="min-height: 100vh;">
 
 
 {% block search_nav %} {% comment %} for search inside lists{% endcomment %}
@@ -218,7 +218,28 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 </main>
 
 <!--Fixed footer nav -->
-<footer class="bg-primary mt-5">
+<footer class="bg-primary mt-5" style="height: 15rem;">
+<nav class="nav p-5" style="height: 5rem;">
+    <ul class="nav mx-auto">
+        <li class="nav-item">
+            <a class="nav-link">Data Policy</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link">CreaTherapy</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link">About</a>
+        </li>
+    </ul>
+</nav>
+<nav class="nav mt-4" style="height: 5rem;">
+    <ul class="nav mx-auto">
+        <li class="nav-item">
+            <a class="nav-link">By Gabriel Soler <i class="bi bi-c-circle"></i></a>
+        </li>
+    </ul>
+</nav>
+
   <ul class="nav nav-underline px-3 bg-primary fixed-bottom nav-fill">
     <li class="nav-item">
       <a class="nav-link fw-light link-secondary fs-4 {% if request.path == '/' %}active{% endif %}" 

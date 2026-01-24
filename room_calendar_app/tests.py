@@ -83,6 +83,28 @@ class MetaTestSetupMixin:
         )
         cls.client_instance.save()
 
+        cls.client_instance_2 = ClientModel.objects.create(
+            user=cls.user_host,
+            code="Host123",
+            time=p.now().at(17, 0).time(),
+            day=p.WEDNESDAY,
+            duration=p.duration(hours=1),
+            tenant=cls.tenant_host,
+            fee=60,
+        )
+        cls.client_instance.save()
+
+        cls.client_instance_3 = ClientModel.objects.create(
+            user=cls.user,
+            code="Usert123",
+            time=p.now().at(12, 0).time(),
+            day=p.WEDNESDAY,
+            duration=p.duration(hours=1),
+            tenant=cls.tenant_host,
+            fee=60,
+        )
+        cls.client_instance.save()
+
         # Create sessions (equivalent to occurrences)
         cls.session_1 = SessionModel.objects.create(
             client=cls.client_instance,

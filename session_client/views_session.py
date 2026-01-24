@@ -46,10 +46,10 @@ def sessions_view(request,client_pk=None,add_forward=False) -> HttpResponse:
             if client:
                 sessions = sessions.filter(client=client)
             template_calendar = "session_client/hx/_session_list.html" + "#session-list-partial"
-            form_partial.fields['client'].queryset = clients_user
             context = {'sessions': sessions}
             return render(request, template_calendar, context)
         # render form errors
+        form_partial.fields['client'].queryset = clients_user
         template_partial = template + '#session-form-partial'
         context = {'form': form_partial}
         response = render(request, template_partial, context)
@@ -262,7 +262,7 @@ def week_view_add_session_client(request, year=None, week=None, week_day=None, t
     assert week is not None, "Week is required for get calls"
     assert week_day is not None, "Week_day is required for get calls"
     assert time is not None, "Time is required for get calls"
-    iso_week = f"{year}-W{week}-{week_day}"
+    iso_week = f"{year}-W{week:02d}-{week_day}"
     date_from_iso_week = p.parse(iso_week).date()
     time_from_str = p.parse(time).time()
     data = {

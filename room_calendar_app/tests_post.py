@@ -4,7 +4,7 @@ from .models import RoomCalendarModel, TenantModel, BlocksModel
 from django.utils import translation
 import pendulum as p
 from .tests import MetaTestSetupMixin
-from django.http import HttpResponse
+
 
 class PostMethodTests(MetaTestSetupMixin, TestCase):
 
@@ -32,7 +32,18 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         }
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "test") # tenant display_name
+        self.assertContains(response, "test")  # tenant display_name
+
+    def test_room_list_refresh_view_post(self):
+        url = reverse('room_calendar_app:room_list_refresh')
+        ref_date = p.now().add(months=1)
+        data = {
+            'date_reference': ref_date.format('YYYY-MM-DD'),
+            'calendar': self.room_1.pk
+        }
+        response = self.client.post(url, data, headers=self.htmx_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, ref_date.format("YY-MM"))  # tenant display_name
 
     def test_room_calendar_add_view_post(self):
         url = reverse('room_calendar_app:add_room_calendar')
@@ -122,7 +133,11 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         data = {'room': self.room_1.pk}
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "calendar")
+        self.assertNotContains(response, "errors")
+        self.assertContains(response, self.client_instance.code)
+        data = {'room': ''}
+        response = self.client.post(url, data, headers=self.htmx_headers)
+        self.assertEqual(response.status_code, 200)
 
     def test_week_schedule_view_post(self):
         url = reverse('room_calendar_app:week_schedule_view')
@@ -141,6 +156,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         }
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "id_tenant_helptext")
         self.assertTrue(BlocksModel.objects.filter(tenant=self.tenant, start_time='10:00:00').exists())
 
     def test_block_edit_view_post(self):
@@ -149,7 +165,6 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
             start_time='09:00:00',
             end_time='10:00:00',
             day=1,
-            user=self.user
         )
         url = reverse('room_calendar_app:block_edit', args=[block.pk])
         data = {
@@ -161,7 +176,8 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         block.refresh_from_db()
-        self.assertEqual(str(block.start_time), '11:00:00')
+        self.assertNotContains(response, "id_tenant_helptext")
+        self.assertTrue(BlocksModel.objects.filter(tenant=self.tenant, start_time='11:00:00').exists())
 
     def test_block_delete_view_post(self):
         block = BlocksModel.objects.create(
@@ -169,7 +185,6 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
             start_time='09:00:00',
             end_time='10:00:00',
             day=1,
-            user=self.user
         )
         # block_delete_view doesn't explicitly check for POST, but we can call it with POST
         url = reverse('room_calendar_app:delete_block', args=[block.pk])
