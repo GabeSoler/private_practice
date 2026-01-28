@@ -9,15 +9,13 @@ aptPkgs = ["curl", "wget"]
 [phases.install]
 dependsOn = ["setup"]
 cmds = [
-  "python -m venv --copies /opt/venv",
-  ". /opt/venv/bin/activate && pip install uv==0.5.11",
-  ". /opt/venv/bin/activate && uv sync --no-dev --frozen"
+    "python -m venv --copies /opt/venv",
+    ". /opt/venv/bin/activate && pip install uv==0.5.11",
+    ". /opt/venv/bin/activate && uv sync --no-dev --frozen"
 ]
 paths = ["/opt/venv/bin"]
 
 
-[phases.build]
-....
 
 [start]
 cmd = "uv run manage.py collectstatic --noinput && manage.py migrate && gunicorn ppm_app.wsgi"
