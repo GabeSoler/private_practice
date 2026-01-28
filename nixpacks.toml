@@ -2,8 +2,9 @@ providers = ["...", "python"]
 
 [variables]
 NIXPACKS_PYTHON_PACKAGE_MANAGER = 'uv'
-UV_PYTHON_DOWNLOADS = 'automatic'
+UV_PYTHON_DOWNLOADS = 'never'
 UV_LINK_MODE = 'copy'
+UV_PYTHON = "/opt/venv/bin/python "
 
 [phases.setup]
 nixPkgs = ["...", "uv"]
