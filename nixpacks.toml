@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["python3", "gcc"]
+nixPkgs = ["python3", "gcc", "uv"]
 
 [phases.install]
 dependsOn = ["setup"]

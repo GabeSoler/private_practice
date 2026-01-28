@@ -50,3 +50,5 @@ r_stop:
 clean:
     uv cache clean
 
+nix:
+    nixpacks build /Users/gsole/Documents/Web-Work/private_practice --name dreamy
