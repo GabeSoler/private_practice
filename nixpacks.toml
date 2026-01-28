@@ -1,3 +1,8 @@
+providers = ["...", "python"]
+
+[phases.setup]
+nixPkgs = ["...", "uv"] # Install the ffmpeg package from Nix
+
 [variables]
 UV_PYTHON_DOWNLOADS = 'automatic'
 UV_LINK_MODE = 'copy'
