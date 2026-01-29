@@ -52,4 +52,4 @@ RUN uv run manage.py collectstatic --noinput --clear
 
 # Runtime command that executes when "docker run" is called.
 # It migrates the database and then starts Gunicorn.
-CMD ["sh", "-c", "uv run manage.py migrate --noinput && uv run gunicorn ppm_app.wsgi:application --bind 0.0.0.0:$PORT"]
+CMD ["sh", "-c", "uv", "run","manage.py", "migrate", "--noinput", "&&", "uv", "run", "gunicorn", "ppm_app.wsgi:application", "--bind 0.0.0.0:$PORT"]
