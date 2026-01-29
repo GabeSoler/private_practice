@@ -40,6 +40,9 @@ COPY --chown=gsoler:gsoler pyproject.toml uv.lock ./
 # We use --frozen to ensure the lockfile is used exactly.
 RUN uv sync --frozen --no-install-project
 
+# Fix ownership so the non-root user can use the venv
+RUN chown -R gsoler:gsoler /app/.venv
+
 # Copy the rest of the source code.
 COPY --chown=gsoler:gsoler . .
 
