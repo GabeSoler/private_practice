@@ -140,12 +140,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# for login required middleware
-LOGIN_REQUIRED_URLS_EXCEPTIONS = [
-    r'^/i18n/',
-    # other public paths...
-]
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
