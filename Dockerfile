@@ -15,8 +15,8 @@ ENV PYTHONUNBUFFERED=1 \
     PORT=3000 \
     UV_NO_DEV=1 \
     UV_COMPILE_BYTECODE=1
-    UV_PYTHON_DOWNLOADS=auto
-    UV_LINK_MODE=copy
+    UV_PYTHON_DOWNLOADS="never"
+    UV_LINK_MODE="copy"
 
 # Use /app folder as a directory where the source code is stored.
 WORKDIR /app
