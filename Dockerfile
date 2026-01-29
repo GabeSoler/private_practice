@@ -1,7 +1,5 @@
 FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-# Add user that will be used in the container.
-RUN useradd -m gsoler
 
 # Port used by this container to serve HTTP.
 EXPOSE 3000
@@ -21,6 +19,13 @@ ENV PYTHONUNBUFFERED=1 \
 # Use /app folder as a directory where the source code is stored.
 WORKDIR /app
 
+# Add user that will be used in the container.
+RUN useradd -m gsoler
+
+# Fix ownership so the non-root user can use the venv
+RUN chown -R gsoler:gsoler /app
+
+
 # Install system packages required by Django and its dependencies.
 RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
     build-essential \
@@ -36,21 +41,17 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
 # Copy the dependency files first to leverage Docker caching.
 COPY --chown=gsoler:gsoler pyproject.toml uv.lock ./
 
+# Switch to the non-root user BEFORE uv sync
+USER gsoler
+
 # Install dependencies using uv.
 # We use --frozen to ensure the lockfile is used exactly.
 RUN uv sync --frozen --no-install-project
 
-# Fix ownership so the non-root user can use the venv
-RUN chown -R gsoler:gsoler /app/.venv
 
 # Copy the rest of the source code.
 COPY --chown=gsoler:gsoler . .
 
-# Set ownership for the app directory.
-RUN chown -R gsoler:gsoler /app
-
-# Switch to the non-root user.
-USER gsoler
 
 # Runtime command that executes when "docker run" is called.
 #collect static is needed at the end, so gets the env variables made dynamically
