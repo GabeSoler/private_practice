@@ -53,10 +53,21 @@ clean:
 nix:
     nixpacks build /Users/gsole/Documents/Web-Work/private_practice --name dreamy
 
-docker:
-    colima start && \
+dkr:
     docker build -t ppm_app:local . && \
     docker run --rm -p 3000:3000 \
-    -e DJANGO_SETTINGS_MODULE=ppm_app.dev.settings \
-    -e DATABASE_URL=postgres://<user>:<password>@host.docker.internal:5432/<db> \
+    --env-file ppm_app/.env \
+    -e DJANGO_SETTINGS_MODULE=ppm_app.settings.dev \
     ppm_app:local
+
+dkr-run:
+  docker run --rm -p 3000:3000 \
+  --env-file ppm_app/.env \
+  -e DJANGO_SETTINGS_MODULE=ppm_app.settings.dev \
+  ppm_app:local
+
+dkr-build:
+     docker build -t ppm_app:local
+
+dkr-compose:
+    docker compose -f docker-compose.dev.yml up --build
