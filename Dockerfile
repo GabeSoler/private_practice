@@ -16,7 +16,7 @@ ENV PYTHONUNBUFFERED=1 \
     UV_NO_DEV=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
-    UV_MANAGED_PYTHON=1 \
+    UV_MANAGED_PYTHON=1
 
 # Use /app folder as a directory where the source code is stored.
 WORKDIR /app
