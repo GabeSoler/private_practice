@@ -13,6 +13,8 @@ EXPOSE 3000
 ENV PYTHONUNBUFFERED=1 \
     PORT=3000
 
+# Use /app folder as a directory where the source code is stored.
+WORKDIR /app
 
 # Install system packages required by Wagtail and Django.
 RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-recommends \
@@ -50,8 +52,6 @@ ENV PATH="/root/.local/bin/:$PATH"
 # Disable development dependencies
 ENV UV_NO_DEV=1
 
-# Use /app folder as a directory where the source code is stored.
-WORKDIR /app
 
 
 
