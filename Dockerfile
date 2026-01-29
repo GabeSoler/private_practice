@@ -42,8 +42,6 @@ ENV UV_NO_DEV=1
 WORKDIR /app
 
 
-# Sync the project into a new environment, asserting the lockfile is up to date
-RUN uv sync --locked
 
 # Set this directory to be owned by the "wagtail" user. This Wagtail project
 # uses SQLite, the folder needs to be owned by the user that
@@ -55,6 +53,9 @@ COPY --chown=gsoler:gsoler . .
 
 # Use user "wagtail" to run the build commands below and the server itself.
 USER gsoler
+
+# Sync the project into a new environment, asserting the lockfile is up to date
+RUN uv sync --locked
 
 # Collect static files.
 RUN python manage.py collectstatic --noinput --clear
