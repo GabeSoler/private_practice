@@ -17,49 +17,45 @@ from django.utils.translation import gettext_lazy as _
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 
-
-HOST_URL = config("HOST_URL",default="")
+HOST_URL = config("HOST_URL", default="")
 URL_BASE = config('URL_BASE')
 
 ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "0.0.0.0", "1.1.1.1", "8080",
-                 URL_BASE+"."+HOST_URL,]
+                 URL_BASE + "." + HOST_URL, ]
 
 CSRF_TRUSTED_ORIGINS = [
-     "https://www"+HOST_URL,
-     "https://"+ URL_BASE+"."+HOST_URL,
+    "https://www" + HOST_URL,
+    "https://" + URL_BASE + "." + HOST_URL,
 ]
-
-
 
 # Application definition
 
 INSTALLED_APPS = [
 
-    #default
+    # default
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "whitenoise.runserver_nostatic",#whitenoise
+    "whitenoise.runserver_nostatic",  # whitenoise
     "django.contrib.staticfiles",
 
     # dj extras
     "django.contrib.admindocs",
 
-    #third party
+    # third party
     'django_bootstrap5',
     "django_htmx",
     "django_browser_reload",
 
-    #mine
+    # mine
     'accounts.apps.AccountsConfig',
     'base.apps.BaseConfig',
     'session_client.apps.SessionClientConfig',
@@ -69,7 +65,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware", #white noise
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # white noise
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -78,9 +74,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django_htmx.middleware.HtmxMiddleware", # django-htmx middleware
-    "django_browser_reload.middleware.BrowserReloadMiddleware", # django reload (browser experience)
-    "django.contrib.admindocs.middleware.XViewMiddleware", # django documentation view link
+    "django_htmx.middleware.HtmxMiddleware",  # django-htmx middleware
+    "django_browser_reload.middleware.BrowserReloadMiddleware",  # django reload (browser experience)
+    "django.contrib.admindocs.middleware.XViewMiddleware",  # django documentation view link
 
 ]
 
@@ -89,7 +85,7 @@ ROOT_URLCONF = "ppm_app.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR/"ppm_app/templates"],
+        "DIRS": [BASE_DIR / "ppm_app/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -126,8 +122,6 @@ STORAGES = {
     },
 }
 
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
@@ -146,6 +140,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# for login required middleware
+LOGIN_REQUIRED_URLS_EXCEPTIONS = [
+    r'^/i18n/',
+    # other public paths...
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -158,21 +157,18 @@ USE_I18N = True
 
 USE_TZ = False
 
-
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-STATIC_ROOT = "assets/" #change when knowing the real address, plus change url patterns
+STATIC_ROOT = "assets/"  # change when knowing the real address, plus change url patterns
 STATICFILES_DIRS = [BASE_DIR / "ppm_app/staticfiles"]
 
-#media
+# media
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'ppm_app/uploads'
 
-
-#admin url
+# admin url
 ADMIN_URL = config('ADMIN_URL')
 
 ROOT_URLCONF = "ppm_app.urls"
@@ -180,13 +176,11 @@ ROOT_URLCONF = "ppm_app.urls"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-
 # login
 LOGIN_REDIRECT_URL = 'session_client:client_list'
 LOGOUT_REDIRECT_URL = 'base:index'
 
 DATE_FORMAT = "%d/%m/%Y"
-
 
 DATE_INPUT_FORMATS = [
     "%d/%m/%Y",  # '25/10/2006'
@@ -202,7 +196,6 @@ DATE_INPUT_FORMATS = [
     "%d %B %Y",  # '25 October 2006'
     "%d %B, %Y",  # '25 October, 2006'
 ]
-
 
 LANGUAGES = [
     ("es", _("Spanish")),
@@ -240,7 +233,4 @@ INTERNAL_IPS = (
     '127.0.0.1',
 )
 
-
-
-
-SALT_KEY=config('SALT_KEY')
+SALT_KEY = config('SALT_KEY')
