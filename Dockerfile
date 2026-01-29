@@ -26,6 +26,18 @@ RUN apt-get update --yes --quiet && apt-get install --yes --quiet --no-install-r
     ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
+
+# Set this directory to be owned by the "wagtail" user. This Wagtail project
+# uses SQLite, the folder needs to be owned by the user that
+# will be writing to the database file.
+RUN chown gsoler:gsoler /app
+
+# Copy the source code of the project into the container.
+COPY --chown=gsoler:gsoler pyproject.toml uv.lock ./
+
+# Use user "wagtail" to run the build commands below and the server itself.
+USER gsoler
+
 # Download the latest installer uv
 ADD https://astral.sh/uv/0.1.0/install.sh /uv-installer.sh
 
@@ -43,19 +55,11 @@ WORKDIR /app
 
 
 
-# Set this directory to be owned by the "wagtail" user. This Wagtail project
-# uses SQLite, the folder needs to be owned by the user that
-# will be writing to the database file.
-RUN chown gsoler:gsoler /app
-
-# Copy the source code of the project into the container.
-COPY --chown=gsoler:gsoler . .
-
-# Use user "wagtail" to run the build commands below and the server itself.
-USER gsoler
-
 # Sync the project into a new environment, asserting the lockfile is up to date
 RUN uv sync --locked
+
+# Then copy the rest of the source code
+COPY . .
 
 # Collect static files.
 RUN python manage.py collectstatic --noinput --clear
