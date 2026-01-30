@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 from decouple import config
 from django.utils.translation import gettext_lazy as _
+from pygments.lexer import default
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -23,8 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY")
 
-HOST_URL = config("HOST_URL", default="")
-URL_BASE = config('URL_BASE')
+HOST_URL = config("HOST_URL", default=":8000")
+URL_BASE = config('URL_BASE', default="localhost")
 
 ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "0.0.0.0", "1.1.1.1", "8080",
                  URL_BASE + "." + HOST_URL, ]

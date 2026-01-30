@@ -98,14 +98,14 @@
                                              data-bs-title="{% translate 'sessions paid' %}"
                                              data-bs-custom-class="custom-tooltip"
 
-                                                class="fs-5">£{{ client.month_sessions_paid }}</span>
+                                                class="fs-5">£{{ client.month_sessions_paid|default:0 }}</span>
                                         /<span
                                                                                              data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
                                              data-bs-title="{% translate 'paiment expected' %}"
                                              data-bs-custom-class="custom-tooltip"
-                                                class="small">{{ client.month_sessions_expected }}</span>
+                                                class="small">{{ client.month_sessions_expected|default:0 }}</span>
                                     </div>
                                     <div class="col-auto">
                                         <span
