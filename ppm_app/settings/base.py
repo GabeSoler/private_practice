@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = config("SECRET_KEY")
 
 HOST_URL = config("HOST_URL", default=":8000")
-URL_BASE = config('URL_BASE', default="localhost")
+URL_BASE = config('URL_BASE', default="www.")
 
 ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "0.0.0.0", "1.1.1.1", "8080",
                  URL_BASE + "." + HOST_URL, ]
