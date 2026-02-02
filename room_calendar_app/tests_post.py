@@ -25,7 +25,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertContains(response, "calendar")
 
     def test_room_manage_refresh_view_post(self):
-        url = reverse('room_calendar_app:room_manage_refresh', args=[self.room_1.pk])
+        url = reverse('room_calendar_app:room_manage_refresh', args=[self.room_1.uuid])
         data = {
             'month': p.now().month,
             'year': p.now().year,
@@ -58,7 +58,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertTrue(RoomCalendarModel.objects.filter(name='New Room').exists())
 
     def test_room_calendar_edit_view_post(self):
-        url = reverse('room_calendar_app:edit_room_calendar', args=[self.room_default.pk])
+        url = reverse('room_calendar_app:edit_room_calendar', args=[self.room_default.uuid])
         data = {
             'name': 'Updated Room',
             'description': 'Updated Description',
@@ -83,7 +83,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertTrue(TenantModel.objects.filter(display_name='New Tenant').exists())
 
     def test_tenant_edit_view_post(self):
-        url = reverse('room_calendar_app:edit_tenant', args=[self.tenant.pk])
+        url = reverse('room_calendar_app:edit_tenant', args=[self.tenant.uuid])
         data = {
             'display_name': 'Updated Tenant',
             'name': 'updated_tenant',
@@ -96,8 +96,8 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertEqual(self.tenant.display_name, 'Updated Tenant')
 
     def test_tenant_link_view_post(self):
-        url = reverse('room_calendar_app:link_tenant', args=[self.room_2.pk])
-        data = {'tenant_id': str(self.tenant.pk)}
+        url = reverse('room_calendar_app:link_tenant', args=[self.room_2.uuid])
+        data = {'tenant_id': str(self.tenant.uuid)}
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.tenant.refresh_from_db()
@@ -105,7 +105,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
 
     def test_tenant_unlink_view_post(self):
         # tenant_unlink_view doesn't explicitly check for POST, but handles HTMX request
-        url = reverse('room_calendar_app:unlink_tenant', args=[self.tenant.pk])
+        url = reverse('room_calendar_app:unlink_tenant', args=[self.tenant.uuid])
         response = self.client.post(url, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.tenant.refresh_from_db()
@@ -123,14 +123,14 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertContains(response, "Session 1")
 
     def test_tenant_duplicate_hx_post(self):
-        url = reverse('room_calendar_app:duplicate_tenant', args=[self.tenant.pk])
+        url = reverse('room_calendar_app:duplicate_tenant', args=[self.tenant.uuid])
         response = self.client.post(url, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(TenantModel.objects.filter(display_name=self.tenant.display_name).count() > 1)
 
     def test_week_blocks_view_post(self):
         url = reverse('room_calendar_app:week_blocks_view')
-        data = {'room': self.room_1.pk}
+        data = {'room': self.room_1.uuid}
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "errors")
@@ -166,7 +166,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
             end_time='10:00:00',
             day=1,
         )
-        url = reverse('room_calendar_app:block_edit', args=[block.pk])
+        url = reverse('room_calendar_app:block_edit', args=[block.uuid])
         data = {
             'tenant': self.tenant.pk,
             'start_time': '11:00:00',
@@ -187,7 +187,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
             day=1,
         )
         # block_delete_view doesn't explicitly check for POST, but we can call it with POST
-        url = reverse('room_calendar_app:delete_block', args=[block.pk])
+        url = reverse('room_calendar_app:delete_block', args=[block.uuid])
         response = self.client.post(url, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(BlocksModel.objects.filter(pk=block.pk).exists())

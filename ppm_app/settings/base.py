@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
     # dj extras
     "django.contrib.admindocs",
+    'django.contrib.postgres',
 
     # third party
     'django_bootstrap5',
@@ -150,7 +151,7 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_TZ = False
+USE_TZ = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

@@ -34,7 +34,8 @@ shell:
 
 
 # alias for full migrations to 'just db'
-alias db := makemigrations
+db:
+    uv run manage.py dbshell
 
 redis:
     brew services start redis

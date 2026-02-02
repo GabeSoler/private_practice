@@ -25,8 +25,8 @@
                     <div class="col">
                         <span class="display-5">
                             <a class="link-secondary"
-                               href="{% url 'room_calendar_app:edit_room_calendar' calendar.pk %}"
-                               hx-get="{% url 'room_calendar_app:edit_room_calendar' calendar.pk %}"
+                               href="{% url 'room_calendar_app:edit_room_calendar' calendar.uuid %}"
+                               hx-get="{% url 'room_calendar_app:edit_room_calendar' calendar.uuid %}"
                                hx-target="#modal-wrapper">
                         {{ calendar.name }}</a></span>
 
@@ -35,7 +35,7 @@
                 <!-- code link for room share -->
                     <div class="col">
                     <span>Share Room code</span>
-                                    <span class="bg-primary border" hidden id="code-{{ calendar.pk }}">{{ calendar.pk }}</span>
+                                    <span class="bg-primary border" hidden id="code-{{ calendar.uuid }}">{{ calendar.uuid }}</span>
                     <button class="btn btn-outline-secondary btn-sm"
                             _="on click
                     put innerHTML of previous <span/> into myText

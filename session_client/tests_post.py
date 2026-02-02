@@ -102,17 +102,17 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertNotContains(response, self.client_instance_2.code)  # to check a form clients query
         self.assertEqual(response.status_code, 200)
         # Check if one of the sessions is present
-        self.assertNotContains(response, f"id_{self.session_2.pk}")
+        self.assertNotContains(response, f"id_{self.session_2.uuid}")
         data['only_unpaid'] = True
         data['include_next'] = True
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, f"id_{self.session_2.pk}")
+        self.assertContains(response, f"id_{self.session_2.uuid}")
         self.assertNotContains(response, 'hx-post="/en/clients/session_list/"')  # check not form passed
         # testing client filter
         data['client'] = self.client_instance_3.pk
         response = self.client.post(url, data, headers=self.htmx_headers)
-        self.assertNotContains(response, f"id_{self.session_2.pk}")
+        self.assertNotContains(response, f"id_{self.session_2.uuid}")
 
     def test_sessions_search_post(self):
         url = reverse('session_client:session_search')

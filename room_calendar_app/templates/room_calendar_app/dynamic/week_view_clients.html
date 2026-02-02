@@ -39,9 +39,9 @@
                         >{{ slot|time:"H:i" }}</th>
 
                         {% for weekday,occurrence in data.items %}
-                            {% if occurrence.pk %}
+                            {% if occurrence.uuid %}
                                 <td class="table-danger"
-                                    hx-get="{% url 'session_client:client_hx_item' occurrence.pk %}"
+                                    hx-get="{% url 'session_client:client_hx_item' occurrence.uuid %}"
                                     hx-target="#modal-wrapper"
                                     style="font-size:.6rem;max-width:5rem;"
                                     id="{{ slot }}"
@@ -52,7 +52,7 @@
                                         style="font-size:.6rem;">
                                     <i
                                             {% if calendar.room_calendar %}
-                                                hx-get="{% url 'session_client:week_view_add_client_with_calendar' weekday slot|time:"H:i" calendar.room_calendar.pk %}"
+                                                hx-get="{% url 'session_client:week_view_add_client_with_calendar' weekday slot|time:"H:i" calendar.room_calendar.uuid %}"
                                             {% else %}
                                                 hx-get="{% url 'session_client:week_view_add_client' weekday slot|time:"H:i" %}"
                                             {% endif %}

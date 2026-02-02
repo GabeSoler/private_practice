@@ -33,13 +33,13 @@
                                     p-2 g-1" style="min-height: 10rem;"
                                  id="{{ client.code }}">
                                 <div class="card-header d-flex justify-content-between align-items-center bg-primary">
-                                    <div id="spinner-{{ client.pk }}" class="htmx-indicator spinner-border text-success d-inline" role="status">
+                                    <div id="spinner-{{ client.uuid }}" class="htmx-indicator spinner-border text-success d-inline" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                         </div>
 
                                     <a class="col link-secondary link-client-code"
-                                       href="{% url 'session_client:client_hx_item' client.pk %}"
-                                       hx-get="{% url 'session_client:client_hx_item' client.pk %}"
+                                       href="{% url 'session_client:client_hx_item' client.uuid %}"
+                                       hx-get="{% url 'session_client:client_hx_item' client.uuid %}"
                                        hx-target="#modal-wrapper"
                                        data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
@@ -62,7 +62,7 @@
 
                                     <!-- count of open before today -->
                                     <a class="btn btn-info btn-sm text-bg-info"
-                                         hx-get="{% url 'session_client:session_pending_list_modal' client.pk %}"
+                                         hx-get="{% url 'session_client:session_pending_list_modal' client.uuid %}"
                                          hx-target="#modal-wrapper"
                                              data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
@@ -122,10 +122,10 @@
 
                                 <!-- Future Sessions -->
                                     <div class="col-4"
-                                         id="future-sessions-{{ client.pk }}">
+                                         id="future-sessions-{{ client.uuid }}">
                                         {% partialdef future_sessions_partial inline %}
                                     <a class="btn btn-outline-secondary btn-sm success-shine"
-                                       hx-get="{% url 'session_client:session_list_modal' client.pk %}"
+                                       hx-get="{% url 'session_client:session_list_modal' client.uuid %}"
                                         hx-target="#modal-wrapper"
                                             data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
@@ -143,9 +143,9 @@
                                     </div>
                                     <div class="col-4"> <!-- add 3 sessions forward -->
                                         <a class="btn btn-outline-secondary btn-sm"
-                                           hx-post="{% url 'session_client:add_series' client.pk 3 %}"
-                                           hx-target="#future-sessions-{{ client.pk }}"
-                                           hx-indicator="#spinner-{{ client.pk }}"
+                                           hx-post="{% url 'session_client:add_series' client.uuid 3 %}"
+                                           hx-target="#future-sessions-{{ client.uuid }}"
+                                           hx-indicator="#spinner-{{ client.uuid }}"
                                            data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"
@@ -157,9 +157,9 @@
                                     </div>
                                     <div class="col-4"> <!-- add 6 sessions forward -->
                                         <a class="btn btn-outline-secondary btn-sm"
-                                        hx-post="{% url 'session_client:add_series' client.pk 6 %}"
-                                            hx-target="#future-sessions-{{ client.pk }}"
-                                          hx-indicator="#spinner-{{ client.pk }}"
+                                        hx-post="{% url 'session_client:add_series' client.uuid 6 %}"
+                                            hx-target="#future-sessions-{{ client.uuid }}"
+                                          hx-indicator="#spinner-{{ client.uuid }}"
                                            data-bs-toggle="tooltip"
                                              data-bs-trigger="hover"
                                              data-bs-delay="500"

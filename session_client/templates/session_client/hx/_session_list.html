@@ -26,13 +26,13 @@
                             {% partialdef row-instance inline %}
                                 <tr class="fade-in">
                                     <th scope="row">
-                                        <a href="{% url "session_client:edit_session" session.pk %}"
-                                           hx-get="{% url "session_client:edit_session" session.pk %}"
+                                        <a href="{% url "session_client:edit_session" session.uuid %}"
+                                           hx-get="{% url "session_client:edit_session" session.uuid %}"
                                            hx-target="#modal-wrapper">
                                             {% if session.date %}{{ session.date }}{% else %}
                                                 {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>
 {#                                    <i class="bi bi-repeat-1 ms-3 text-secondary fade-out"#}
-{#                                    hx-post="{% url 'session_client:session_add_copy' session.pk%}"#}
+{#                                    hx-post="{% url 'session_client:session_add_copy' session.uuid%}"#}
 {#                                    hx-swap="outerHTML"></i>#}
                                     </th>
 
@@ -40,8 +40,8 @@
                                         <td>
                                     {% partialdef attendance_partial inline %}
                                             <select name="attendance" class="form-select"
-                                                    id="id_{{ session.pk }}"
-                                                    hx-post="{% url 'session_client:session_patch_attendance' session.pk %}"
+                                                    id="id_{{ session.uuid }}"
+                                                    hx-post="{% url 'session_client:session_patch_attendance' session.uuid %}"
                                                     hx-swap="outerHTML">
                                                 <option value="{{ session.get_attendance_display }}" selected="">{{ session.get_attendance_display }}</option>
                                             {% attendance_choices_as_html %}
@@ -51,7 +51,7 @@
                                         </td>
                                     <td>{% partialdef brief_partial inline %}
                                         <i class="bi bi-pencil-fill text-{% if session.keywords %}success{% else %}danger{% endif %}"
-                                        hx-get="{% url 'session_client:session_patch_brief' session.pk %}"
+                                        hx-get="{% url 'session_client:session_patch_brief' session.uuid %}"
                                         hx-target="#modal-wrapper"
                                            hx-trigger="click"
                                         ></i>
@@ -59,7 +59,7 @@
 
                                     <!-- paid/not paid partial -->
                                     {% partialdef session_paid inline %}
-                                        <td hx-put={% url "session_client:sessions_hx_edit_paid" session.pk %}>
+                                        <td hx-put={% url "session_client:sessions_hx_edit_paid" session.uuid %}>
 
                                             {% if session.paid %}
                                                 <i
@@ -77,7 +77,7 @@
 
                                     <!-- Session open/closed partial -->
                                     {% partialdef session_open inline %}
-                                        <td hx-put="{% url "session_client:sessions_hx_edit_open" session.pk %}">
+                                        <td hx-put="{% url "session_client:sessions_hx_edit_open" session.uuid %}">
                                             {% if session.open %}
                                                 <i
                                                         data-bs-toggle="tooltip" data-bs-trigger="hover"

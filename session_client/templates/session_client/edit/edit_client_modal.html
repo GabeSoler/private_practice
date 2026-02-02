@@ -17,8 +17,8 @@
             <div class="card mb-5 border border-secondary">
                 <form
                         {% if client %}
-                      action="{% url 'session_client:edit_client' client.pk %}" method="post"
-                      hx-post="{% url 'session_client:edit_client' client.pk %}"
+                      action="{% url 'session_client:edit_client' client.uuid %}" method="post"
+                      hx-post="{% url 'session_client:edit_client' client.uuid %}"
                         {% else %}
                             action="{% url 'session_client:add_client' %}" method="post"
                             hx-post="{% url 'session_client:add_client' %}"
@@ -114,7 +114,7 @@
                                 <button
                                         class="btn btn-outline-danger start-0"
                                         hx-confirm="Confirm client archive"
-                                        hx-patch="{% url 'session_client:client_toggle_active' client.pk %}"
+                                        hx-patch="{% url 'session_client:client_toggle_active' client.uuid %}"
                                         hx-target="#{{ client.code }}"
                                         hx-swap="outerHTML"
                                 >{% translate 'Archive' %}

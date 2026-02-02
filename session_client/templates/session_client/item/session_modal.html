@@ -2,8 +2,8 @@
 {% load i18n %}
 
 {% block modal_title %}Session: <small class="fs-5">{{ session.client }} - {{ session.date }}</small>
-    <a href="{% url 'session_client:edit_session' session.pk %}"
-       hx-get="{% url 'session_client:edit_session' session.pk %}"
+    <a href="{% url 'session_client:edit_session' session.uuid %}"
+       hx-get="{% url 'session_client:edit_session' session.uuid %}"
        hx-target="#modal-body-wrapper"
        _="on htmx:afterOnLoad remove me"
        class="card-link small" style="font-size:.9rem;"><i class="bi bi-pencil-square"></i></a></small>{% endblock modal_title %}

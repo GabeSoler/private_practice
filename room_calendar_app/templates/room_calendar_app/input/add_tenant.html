@@ -16,8 +16,8 @@
             {% partialdef tenant-form-partial inline %}
                 <form id="tenant-form"
                         {% if tenant %}
-                      action="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
-                      hx-post="{% url 'room_calendar_app:edit_tenant' tenant.pk %}"
+                      action="{% url 'room_calendar_app:edit_tenant' tenant.uuid %}"
+                      hx-post="{% url 'room_calendar_app:edit_tenant' tenant.uuid %}"
                       hx-target="#tenant-form"
                       hx-swap="outerHTML"
                         {% else %}
@@ -37,7 +37,7 @@
                     <button type="submit" class="btn btn-primary float-end">Submit</button>
                     {% if tenant %}
                         <button type="delete" class="btn btn-primary float-start"
-                        hx-post="{% url 'room_calendar_app:delete_tenant' tenant.pk %}">Delete</button>
+                        hx-post="{% url 'room_calendar_app:delete_tenant' tenant.uuid %}">Delete</button>
                     {% endif %}
                 </form>
             {% endpartialdef tenant-form-partial %}

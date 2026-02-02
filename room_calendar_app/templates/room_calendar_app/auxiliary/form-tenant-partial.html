@@ -1,13 +1,13 @@
 {% load django_bootstrap5 i18n %}
 
                     <!-- form to change tenant report by month -->
-  <div id="form-tenant-wrapper-{{ calendar.pk }}">
+  <div id="form-tenant-wrapper-{{ calendar.uuid }}">
   {% partialdef form-tenant-partial inline %}
-  <form action="{% url 'room_calendar_app:room_manage_refresh' calendar.pk %}" method="post"
-    hx-post="{% url "room_calendar_app:room_manage_refresh" calendar.pk %}"
-    hx-target="#tenant-table-tbody-{{ calendar.pk }}"
+  <form action="{% url 'room_calendar_app:room_manage_refresh' calendar.uuid %}" method="post"
+    hx-post="{% url "room_calendar_app:room_manage_refresh" calendar.uuid %}"
+    hx-target="#tenant-table-tbody-{{ calendar.uuid }}"
     hx-trigger="change throttle:1s,load once,RefreshEvent"
-    id="form-tenant-date-{{ calendar.pk }}">
+    id="form-tenant-date-{{ calendar.uuid }}">
     {% csrf_token %}
     <table
     class="table table-sm mb-0"

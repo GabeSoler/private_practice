@@ -5,9 +5,9 @@
     {% if client %}
     <div class="fs-3">Client Sessions <a class="link-secondary ms-2" style="font-size:1rem;"
             {% if forward %}
-                                         href="{% url 'session_client:session_list_with_client_and_forward' client_pk "add_forward" %}"
+                                         href="{% url 'session_client:session_list_with_client_and_forward' client_uuid "add_forward" %}"
             {% else %}
-                                         href="{% url 'session_client:session_list_with_client' client_pk %}"
+                                         href="{% url 'session_client:session_list_with_client' client_uuid %}"
             {% endif %}
     ><i class="bi bi-arrows-angle-expand"></i></a></div>
     {% endif %}
@@ -19,9 +19,9 @@
 
             <li>
                 {{ session.date }} - {{ session.time }} - {{ session.brief|truncatechars:10 }}
-                <a href="{% url 'session_client:session_hx_item' session.pk %}"
+                <a href="{% url 'session_client:session_hx_item' session.uuid %}"
                    hx-target="#modal-wrapper"
-                   hx-get="{% url 'session_client:session_hx_item' session.pk %}"
+                   hx-get="{% url 'session_client:session_hx_item' session.uuid %}"
                 ><i class="bi bi-eye-fill"></i></a>
             </li>
         {% endfor %}

@@ -37,10 +37,10 @@
                         >{{ slot|time:"H:i" }}</th>
 
                         {% for weekday,occurrence in data.items %}
-                            {% if occurrence.pk %}
+                            {% if occurrence.uuid %}
                                 <td class="table-info"
                                     {% if user == calendar.room_calendar.user %}
-                                    hx-get="{% url 'room_calendar_app:block_edit' occurrence.pk %}"
+                                    hx-get="{% url 'room_calendar_app:block_edit' occurrence.uuid %}"
                                     hx-target="#modal-wrapper"
                                     {% endif %}
                                     style="font-size:.6rem;max-width:5rem;"
@@ -53,7 +53,7 @@
                                         style="font-size:.6rem;">
                                     <i
                                             {% if calendar.room_calendar and user == calendar.room_calendar.user %}
-                                                hx-get="{% url 'room_calendar_app:block_add_with_room' weekday slot|time:"H:i" calendar.room_calendar.pk %}"
+                                                hx-get="{% url 'room_calendar_app:block_add_with_room' weekday slot|time:"H:i" calendar.room_calendar.uuid %}"
                                             {% else %}
                                                 hx-get="{% url 'room_calendar_app:block_add_with_day_time' weekday slot|time:"H:i" %}"
                                             {% endif %}

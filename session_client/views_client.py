@@ -19,16 +19,18 @@ from django.contrib.postgres.search import (SearchHeadline,
                                             SearchRank,
                                             SearchVector)
 
-from django.views.decorators.debug import sensitive_post_parameters,sensitive_variables
+from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
 
 import pendulum as p
+
+
 # Create your views here.
 
 
 def clients_view(request):
     """show all clients"""
     template = 'session_client/lists/client_list.html'
-    clients = annotate_client_list(request.user,active=True)
+    clients = annotate_client_list(request.user, active=True)
     context = {'clients': clients}
     return render(request, template, context)
 
@@ -42,19 +44,19 @@ def hx_client_short_form(request):
     raise Http404("Not a expected request")
 
 
-def client_hx_item(request, client_pk):
+def client_hx_item(request, client_uuid):
     if request.method == 'GET':
-        client = get_object_or_404(ClientModel, user=request.user, pk=client_pk)
+        client = get_object_or_404(ClientModel, user=request.user, pk=client_uuid)
         template = 'session_client/item/client_modal.html'
         context = {'client': client}
         return render(request, template, context)
     raise Http404("Not a expected request")
 
 
-def clients_toggle_active(request, client_pk):
+def clients_toggle_active(request, client_uuid):
     """ manages clients htmx calls """
     if request.method == 'PATCH':
-        occurrence = get_object_or_404(ClientModel, pk=client_pk, user=request.user)
+        occurrence = get_object_or_404(ClientModel, pk=client_uuid, user=request.user)
         if occurrence.active:
             occurrence.active = False
         else:
@@ -76,17 +78,17 @@ def client_search_view(request):
         if form_partial.is_valid():
             raw_query = form_partial.cleaned_data['search_input']
             search_query = SearchQuery(raw_query)
-            vector_brief = SearchVector("keywords",weight="A")
-            vector_calendar = SearchVector("calendar__name",weight="D")
-            vector_client = SearchVector("client__code",weight="C")
+            vector_brief = SearchVector("keywords", weight="A")
+            vector_calendar = SearchVector("calendar__name", weight="D")
+            vector_client = SearchVector("client__code", weight="C")
             vector = (vector_client + vector_calendar + vector_brief)
             client = form_partial.cleaned_data['client']
             sessions = (SessionModel.objects
                         .filter(client__user=request.user)
                         .annotate(
-                            search=vector,
-                            rank=SearchRank(vector,search_query),
-                            headline=SearchHeadline("keywords",search_query),
+                search=vector,
+                rank=SearchRank(vector, search_query),
+                headline=SearchHeadline("keywords", search_query),
             ).filter(search=raw_query).order_by("-rank"))
             if client:
                 sessions = sessions.filter(client=client)
@@ -100,13 +102,13 @@ def client_search_view(request):
                 context = {'sessions': sessions}
             else:
                 template_calendar = template
-                context = {"form":form_partial,"sessions":sessions}
+                context = {"form": form_partial, "sessions": sessions}
             return render(request, template_calendar, context)
         else:
             if request.htmx:
-                response = render(request,template,{"form":form_partial})
-                return retarget(response,"form-table-wrapper")
-            return render(request,template,{"form":form_partial})
+                response = render(request, template, {"form": form_partial})
+                return retarget(response, "form-table-wrapper")
+            return render(request, template, {"form": form_partial})
     form = SearchClientForm()
     form.fields["client"].queryset = ClientModel.objects.filter(user=request.user)
     context = {'form': form}
@@ -146,10 +148,10 @@ def add_client_view(request):
     return render(request, template, context)
 
 
-def edit_client_view(request, client_pk):
+def edit_client_view(request, client_uuid):
     """edit an existing entry"""
     client = get_object_or_404(ClientModel,
-                               pk=client_pk,
+                               pk=client_uuid,
                                user=request.user)
     form = ClientForm(instance=client)
     form.fields['tenant'].queryset = TenantModel.objects.filter(user=request.user)
@@ -163,7 +165,7 @@ def edit_client_view(request, client_pk):
 
     if request.method == 'POST':
         # POST data submitted; process data
-        form = ClientForm(instance=client,data=request.POST)
+        form = ClientForm(instance=client, data=request.POST)
         if form.is_valid():
             form.save()
             messages.info(request, f"Client '{client.code}' updated")
@@ -174,7 +176,7 @@ def edit_client_view(request, client_pk):
     return render(request, template, context)
 
 
-def week_view_add_client(request, weekday=None, time=None,calendar=None):
+def week_view_add_client(request, weekday=None, time=None, calendar=None):
     """ to create sessions from the calendar using calendar info as base """
     template = 'session_client/edit/edit_client_modal.html'
     if request.method == 'POST':
@@ -192,10 +194,10 @@ def week_view_add_client(request, weekday=None, time=None,calendar=None):
     # get response
     assert weekday is not None, "Week_day is required for get calls"
     assert time is not None, "Time is required for get calls"
-    form = ClientForm(initial={"day":weekday,"time":p.parse(time).time()})
+    form = ClientForm(initial={"day": weekday, "time": p.parse(time).time()})
     tenant_qs = TenantModel.objects.filter(user=request.user)
     if calendar:
-        tenant_qs = tenant_qs.filter(calendar__pk=calendar)
+        tenant_qs = tenant_qs.filter(calendar__uuid=calendar)
     form.fields['tenant'].queryset = tenant_qs
     context = {'form': form}
     return render(request, template, context)

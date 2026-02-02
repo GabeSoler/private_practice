@@ -148,14 +148,14 @@ def room_calendar_manage_view(request):
     return render(request, "room_calendar_app/display/room_calendar_manage.html", context)
 
 
-def room_manage_refresh_view(request, cal_pk):
+def room_manage_refresh_view(request, cal_uuid):
     if request.method == "POST":
         form_tenant = TenantReportForm(initial={"month": p.now().month},
                                        data=request.POST)
         if form_tenant.is_valid():
             year = form_tenant.cleaned_data['year']
             month = form_tenant.cleaned_data['month']
-            tenants_qs = tenant_annotated_qs(year, month, cal=cal_pk)
+            tenants_qs = tenant_annotated_qs(year, month, cal=cal_uuid)
             totals = get_tenant_qs_totals(tenants_qs)
             template = "room_calendar_app/auxiliary/tenant_list_info.html" + "#table-body-partial"
             context = {"tenants": tenants_qs, "totals": totals}
@@ -207,9 +207,9 @@ def room_calendar_add_view(request):
     return render(request, template, context)
 
 
-def room_calendar_edit_view(request, room_calendar_pk):
+def room_calendar_edit_view(request, room_calendar_uuid):
     """edit the occurrence repetition erasing future events"""
-    room_calendar = get_object_or_404(RoomCalendarModel, pk=room_calendar_pk, user=request.user)
+    room_calendar = get_object_or_404(RoomCalendarModel, pk=room_calendar_uuid, user=request.user)
     template = "room_calendar_app/input/edit_calendar_modal.html"
     if request.method != 'POST':
         action = "Edit"
@@ -226,8 +226,8 @@ def room_calendar_edit_view(request, room_calendar_pk):
     return render(request, template, context)
 
 
-def tenant_view(request, tenant_pk):
-    tenant = get_object_or_404(TenantModel, pk=tenant_pk)
+def tenant_view(request, tenant_uuid):
+    tenant = get_object_or_404(TenantModel, pk=tenant_uuid)
     context = {"tenant": tenant}
     return render(request, "room_calendar_app/display/tenant_modal.html", context)
 
@@ -261,9 +261,9 @@ def tenant_add_view(request):
     return render(request, 'room_calendar_app/input/add_tenant.html', context)
 
 
-def tenant_edit_view(request, tenant_pk):
+def tenant_edit_view(request, tenant_uuid):
     """edit the occurrence repetition erasing future events"""
-    tenant = get_object_or_404(TenantModel, pk=tenant_pk, user=request.user)
+    tenant = get_object_or_404(TenantModel, pk=tenant_uuid, user=request.user)
     template = "room_calendar_app/input/add_tenant.html"
     form = TenantForm(instance=tenant)
     if request.method == 'POST':
@@ -285,9 +285,9 @@ def tenant_edit_view(request, tenant_pk):
     return render(request, template, context)
 
 
-def tenant_link_view(request, tenant_pk):
+def tenant_link_view(request, tenant_uuid):
     """edit the occurrence repetition erasing future events"""
-    tenant = get_object_or_404(TenantModel, pk=tenant_pk, user=request.user)
+    tenant = get_object_or_404(TenantModel, pk=tenant_uuid, user=request.user)
     if request.htmx:
         form = LinkTenantForm(data=request.POST)
         if form.is_valid():
@@ -307,15 +307,15 @@ def tenant_link_view(request, tenant_pk):
             return render(request, template_partial, context)
         template_form = "room_calendar_app/auxiliary/tenant-link-form.html" + "#form-partial"
         response = render(request, template_form, {"form": form, "tenant": tenant})
-        response = retarget(response, f"#tenant-link-form-{tenant_pk}")
+        response = retarget(response, f"#tenant-link-form-{tenant_uuid}")
         return reswap(response, "innerHTML")
     else:
         return Http404
 
 
-def tenant_unlink_view(request, tenant_pk):
+def tenant_unlink_view(request, tenant_uuid):
     """edit the occurrence repetition erasing future events"""
-    tenant = get_object_or_404(TenantModel, pk=tenant_pk, user=request.user)
+    tenant = get_object_or_404(TenantModel, pk=tenant_uuid, user=request.user)
     if request.htmx:
         # POST data submitted; process data
         """ render the list of tenants of a calendar back to htmx"""
@@ -367,9 +367,9 @@ def room_report_view(request):
     return render(request, template, context)
 
 
-def tenant_duplicate_hx(request, tenant_pk):
+def tenant_duplicate_hx(request, tenant_uuid):
     if request.method == 'POST':
-        tenant = TenantModel.objects.get(pk=tenant_pk)
+        tenant = TenantModel.objects.get(pk=tenant_uuid)
         tenant_2 = TenantModel(name=tenant.name,
                                display_name=tenant.display_name,
                                description=tenant.description,
@@ -382,8 +382,8 @@ def tenant_duplicate_hx(request, tenant_pk):
     return Http404("ups, page not wat you thought")
 
 
-def tenant_delete_hx(request, tenant_pk):
-    tenant = TenantModel.objects.get(pk=tenant_pk)
+def tenant_delete_hx(request, tenant_uuid):
+    tenant = TenantModel.objects.get(pk=tenant_uuid)
     tenant.delete()
     return HttpResponseClientRefresh()
 
@@ -411,7 +411,7 @@ def block_add_view(request, day=None, time=None, room=None):
     tenant_filter = Q(user=request.user)
     if room:
         initial['room'] = room
-        tenant_filter &= Q(calendar__pk=room)
+        tenant_filter &= Q(calendar__uuid=room)
     form = BlockForm(initial=initial)
     form.fields["tenant"].queryset = TenantModel.objects.filter(tenant_filter)
     logger.debug("form with initials")
@@ -420,10 +420,10 @@ def block_add_view(request, day=None, time=None, room=None):
     return render(request, template, context)
 
 
-def block_edit_view(request, block_pk=None):
+def block_edit_view(request, block_uuid=None):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     template = 'room_calendar_app/input/add_block.html'
-    block = get_object_or_404(BlocksModel, pk=block_pk)
+    block = get_object_or_404(BlocksModel, pk=block_uuid)
     assert isinstance(block, BlocksModel)
     form = BlockForm(instance=block)
     if request.method == 'POST':
@@ -441,8 +441,8 @@ def block_edit_view(request, block_pk=None):
     return render(request, template, context)
 
 
-def block_delete_view(request, block_pk):
-    block = get_object_or_404(BlocksModel, pk=block_pk)
+def block_delete_view(request, block_uuid):
+    block = get_object_or_404(BlocksModel, pk=block_uuid)
     block.delete()
     logger.debug("block deleted")
     return HttpResponseClientRefresh()

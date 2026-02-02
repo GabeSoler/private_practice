@@ -17,7 +17,7 @@
             <div class="card mb-5 border border-secondary">
                 <form
                         {% if session %}
-                      action="{% url 'session_client:edit_session' session.pk %}"
+                      action="{% url 'session_client:edit_session' session.uuid %}"
                         {% else %}
                       action="{% url 'session_client:add_session' %}"
                         {% endif %}
@@ -82,7 +82,7 @@
                     {% if session %}
                         <button
                                 hx-confirm="Confirm session delete"
-                                hx-delete="{% url 'session_client:hx_delete_session' session.pk %}"
+                                hx-delete="{% url 'session_client:hx_delete_session' session.uuid %}"
                                 class="btn btn-outline-danger start-0 m-2">Delete
                         </button>
                     {% endif %}

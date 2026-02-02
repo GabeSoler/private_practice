@@ -18,8 +18,8 @@
             <div class="card mb-5 border border-secondary">
                 <form
                         {% if client %}
-                      action="{% url 'session_client:edit_client' client.pk %}" method="post"
-                      hx-post="{% url 'session_client:edit_client' client.pk %}">
+                      action="{% url 'session_client:edit_client' client.uuid %}" method="post"
+                      hx-post="{% url 'session_client:edit_client' client.uuid %}">
                         {% else %}
                       action="{% url 'session_client:add_client' %}" method="post"
                       hx-post="{% url 'session_client:add_client' %}">

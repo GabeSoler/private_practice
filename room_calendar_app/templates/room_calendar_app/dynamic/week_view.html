@@ -41,7 +41,7 @@
                             {% if occurrence.in_display %}
                                 <td class="table-info {% if occurrence.end_datetime_adjusted.time == slot %}border-warning-subtle border-bottom
                                     {% endif %}"
-                                    hx-get="{% url 'session_client:session_hx_item' occurrence.pk %}"
+                                    hx-get="{% url 'session_client:session_hx_item' occurrence.uuid %}"
                                     hx-target="#modal-wrapper"
                                     style="font-size:.6rem;max-width:5rem;"
                                     id="{{ slot }}"
@@ -56,7 +56,7 @@
                                         style="font-size:.6rem;">
                                     <i
                                             {% if calendar.room_calendar %}
-                                                hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" calendar.room_calendar.pk %}"
+                                                hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" calendar.room_calendar.uuid %}"
                                             {% else %}
                                                 hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" %}"
                                             {% endif %}

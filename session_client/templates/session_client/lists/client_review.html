@@ -68,8 +68,8 @@
                                     <div>
                                         {% ifchanged %}<h3 class="border-bottom">{{ session.client }}</h3>{% endifchanged %}
                                         <a class="ms-4"
-                                                href="{% url "session_client:session_hx_item" session.pk %}"
-                                           hx-get="{% url "session_client:session_hx_item" session.pk %}"
+                                                href="{% url "session_client:session_hx_item" session.uuid %}"
+                                           hx-get="{% url "session_client:session_hx_item" session.uuid %}"
                                            hx-target="#modal-wrapper">
 
                                             {% if session.date %}{{ session.date }}{% else %}

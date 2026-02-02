@@ -1,7 +1,7 @@
 {% extends '_modal.html' %}
 {% load django_bootstrap5 i18n %}
 
-{% block modal-id %}-{{ session.pk }}{% endblock %}
+{% block modal-id %}-{{ session.uuid }}{% endblock %}
 
 {% block modal_title %}
     {% if session %}Session: <small class="fs-5">{{ session.client }} - {{ session.date }}</small>
@@ -19,9 +19,9 @@
                 <form
 
                         {% if session %}
-                      action="{% url 'session_client:edit_session' session.pk %}"
+                      action="{% url 'session_client:edit_session' session.uuid %}"
                       hx-target="#modal-body-wrapper"
-                      hx-post="{% url 'session_client:edit_session' session.pk %}"
+                      hx-post="{% url 'session_client:edit_session' session.uuid %}"
                         {% else %}
                       action="{% url 'session_client:add_session' %}"
                       hx-post="{% url 'session_client:add_session' %}"
@@ -103,7 +103,7 @@
                     {% if session %}
                         <button
                                 hx-confirm="Confirm session delete"
-                                hx-delete="{% url 'session_client:hx_delete_session' session.pk %}"
+                                hx-delete="{% url 'session_client:hx_delete_session' session.uuid %}"
                                 class="btn btn-outline-danger start-0 m-2">{% translate 'Delete' %}</button>
                     {% endif %}
 

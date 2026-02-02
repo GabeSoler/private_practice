@@ -35,7 +35,7 @@
                         <small>{% translate 'Period' %}:</small></br>
 
                         <form class="d-inline mx-0 px-0">
-                                <input class="visually-hidden" name="calendar" value="{{ calendar.pk }}">
+                                <input class="visually-hidden" name="calendar" value="{{ calendar.uuid }}">
                                 <input class="visually-hidden" name="date_reference" value="{{ month_util.prev_ref|date:"Y-m-d" }}">
                             <button class="btn d-inline px-0 mx-0" type="submit">
                             <i class="bi bi-caret-left-fill"
@@ -55,14 +55,14 @@
                                 hx-target="closest <li/>"
                                 hx-trigger="load once"
                                 >
-                                <input class="visually-hidden" name="calendar" value="{{ calendar.pk }}">
+                                <input class="visually-hidden" name="calendar" value="{{ calendar.uuid }}">
                                 <input class="visually-hidden" name="date_reference" value="{{ date_initial|date:"Y-m-d" }}">
                             </form>
                             {% endif %}
 
                         <form class="d-inline mx-0 px-0">
                                 <input class="visually-hidden" name="date_reference" value="{{ month_util.next_ref|date:"Y-m-d" }}">
-                                <input class="visually-hidden" name="calendar" value="{{ calendar.pk }}">
+                                <input class="visually-hidden" name="calendar" value="{{ calendar.uuid }}">
                             <button class="btn d-inline mx-0 px-0" type="submit">
                             <i class="bi bi-caret-right-fill"
                                 hx-post="{% url 'room_calendar_app:room_list_refresh' %}"

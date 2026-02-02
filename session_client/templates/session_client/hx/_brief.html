@@ -9,7 +9,7 @@
 <form>
     {% bootstrap_field form.keywords size='sm' show_label="skip" %}
 <button class="btn btn-secondary float-end"
-hx-post="{% url 'session_client:session_patch_brief' session.pk %}">{% translate 'Send' %}</button>
+hx-post="{% url 'session_client:session_patch_brief' session.uuid %}">{% translate 'Send' %}</button>
 </form>
 {% if session.client.link %}
     <a href="{{ session.client.link }}" target="_blank">{% translate 'Client Link' %} <i class="bi bi-link-45deg"></i></a>

@@ -1,7 +1,7 @@
 {% extends '_modal.html' %}
 {% load i18n %}
 
-{% block modal-id %}-{{ room.pk }}{% endblock %}
+{% block modal-id %}-{{ room.uuid }}{% endblock %}
 
 {% block modal_title %}
     {% if room %}
@@ -19,8 +19,8 @@
 
   <form
           {% if room %}
-          action="{% url 'room_calendar_app:edit_room_calendar' room.pk %}"
-          hx-post="{% url 'room_calendar_app:edit_room_calendar' room.pk %}"
+          action="{% url 'room_calendar_app:edit_room_calendar' room.uuid %}"
+          hx-post="{% url 'room_calendar_app:edit_room_calendar' room.uuid %}"
           {% else %}
           action="{% url 'room_calendar_app:add_room_calendar' %}"
           hx-post="{% url 'room_calendar_app:add_room_calendar' %}"

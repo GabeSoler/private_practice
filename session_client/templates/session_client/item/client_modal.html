@@ -2,8 +2,8 @@
 {% comment %} Client modal {% endcomment %}
 {% load i18n %}
 {% block modal_title %}{{client.code}}
-    <small><a href="{% url 'session_client:edit_client' client.pk %}"
-       hx-get="{% url 'session_client:edit_client' client.pk %}"
+    <small><a href="{% url 'session_client:edit_client' client.uuid %}"
+       hx-get="{% url 'session_client:edit_client' client.uuid %}"
        hx-target="#modal-body-wrapper"
        _="on htmx:afterOnLoad remove me"
        class="card-link small" style="font-size:.9rem;"><i class="bi bi-pencil-square"></i></a></small>{% endblock modal_title %}

@@ -9,14 +9,14 @@
   <div class="card-body">
     <h4 class="card-title">Link a tenant</h4>
     <p>Ask your colleage to generate a code and send it to you to link it here.</p>
-    <form action="{% url 'room_calendar_app:link_tenant' calendar.pk %}" method='post'>
+    <form action="{% url 'room_calendar_app:link_tenant' calendar.uuid %}" method='post'>
       {% csrf_token %}
       {% bootstrap_form form %}
       {% bootstrap_button button_type='submit' content='Add a tenant' %}
     </form>
   </div>
   <div class="card-footer text-muted">
-  <a class="card-link" href={% url 'room_calendar_app:room_calendar' calendar.pk %}>Manage Room</a>
+  <a class="card-link" href={% url 'room_calendar_app:room_calendar' calendar.uuid %}>Manage Room</a>
 </div>
 </div>
 
