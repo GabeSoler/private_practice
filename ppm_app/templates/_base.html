@@ -146,9 +146,9 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
                                 <!-- language changer -->
 
                                 <form class="p-0 m-0 small"
-                                      action="{% url 'set_language' %}"
+                                      action="{% url 'base:set_language' %}"
                                       method="post"
-                                      hx-post="{% url 'set_language' %}"
+                                      hx-post="{% url 'base:set_language' %}"
                                       hx-target="<body/>"
                                       hx-trigger="change"
                                       hx-push-url="true"
