@@ -257,28 +257,6 @@ class SessionModel(models.Model):
         ordering = ("date", "start_time")
         base_manager_name = "objects"
         get_latest_by = "date"
-        # constraints = [
-        #     ExclusionConstraint(
-        #         name="no_overlap_per_calendar_day",
-        #         expressions=[
-        #
-        #             (OpClass("calendar", "btree_uuid_ops"), "="),
-        #             (
-        #                 Func(
-        #                     ExpressionWrapper(F("date") + F("start_time"), output_field=models.DateTimeField()),
-        #                     ExpressionWrapper(F("date") + F("end_time"), output_field=models.DateTimeField()),
-        #                     function="tsrange",
-        #                     output_field=DateTimeRangeField(),
-        #                 ),
-        #                 RangeOperators.OVERLAPS,
-        #             ),
-        #         ],
-        #         condition=~Q(attendance="Cancel"),
-        #         index_type="GIST",
-        #
-        #     ),
-        # ]
-        # constraints += [CheckConstraint(condition=Q(end_time__gt=models.F("start_time")), name="end_after_start", ), ]
 
     def __str__(self):  # noqa: F811
         ref_date = self.start_time or ""
