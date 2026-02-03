@@ -216,7 +216,7 @@ class ClientModel(models.Model):
         possible_overlap = SessionModel.objects.filter(filters)
         if fortnight:
             interval_exclude = range_from_date(start_range_p, end_range_p, step=2, add_weeks=1)
-            exclude_range = [x.date() for x in interval_exclude.range('weeks', 2)]
+            exclude_range = [x.date() for x in interval_exclude]
             possible_overlap = possible_overlap.exclude(date__in=exclude_range)
         if possible_overlap:
             logger.debug("possible overlap function found overlap")
