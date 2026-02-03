@@ -124,13 +124,9 @@ def client_archived_view(request):
 
 def add_client_view(request):
     """add a new client"""
-    if request.htmx:
-        """ sets template to a modal or full page """
-        template = 'session_client/edit/edit_client_modal.html'
-        if request.htmx.target == "modal-body-wrapper":
-            template = template + "#modal-body-partial"
-    else:
-        template = 'session_client/edit/edit_client.html'
+    template = 'session_client/edit/edit_client_modal.html'
+    if request.htmx.target == "modal-body-wrapper":
+        template = template + "#modal-body-partial"
     if request.method == 'POST':
         # POST data submitted; process data
         form = ClientForm(data=request.POST)
@@ -155,13 +151,9 @@ def edit_client_view(request, client_uuid):
                                user=request.user)
     form = ClientForm(instance=client)
     form.fields['tenant'].queryset = TenantModel.objects.filter(user=request.user)
-    if request.htmx:
-        """ sets template to a modal or full page """
-        template = 'session_client/edit/edit_client_modal.html'
-        if request.htmx.target == "modal-body-wrapper":
-            template = template + "#modal-body-partial"
-    else:
-        template = 'session_client/edit/edit_client.html'
+    template = 'session_client/edit/edit_client_modal.html'
+    if request.htmx.target == "modal-body-wrapper":
+        template = template + "#modal-body-partial"
 
     if request.method == 'POST':
         # POST data submitted; process data

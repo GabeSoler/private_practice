@@ -168,10 +168,7 @@ def session_pending_list_modal(request, client_uuid):
 
 def add_session_view(request):
     """add new session"""
-    if request.htmx:
-        template = 'session_client/edit/edit_session_modal.html'
-    else:
-        template = 'session_client/edit/edit_session.html'
+    template = 'session_client/edit/edit_session_modal.html'
     if request.method != 'POST':
         # no data submitted; create a blank form
         form = SessionForm()
@@ -199,12 +196,9 @@ def edit_session_view(request, session_uuid):
     session = get_object_or_404(SessionModel,
                                 uuid=session_uuid,
                                 client__user=request.user)
-    if request.htmx:
-        template = 'session_client/edit/edit_session_modal.html'
-        if request.htmx.target == "modal-body-wrapper":
-            template = template + "#modal-body-partial"
-    else:
-        template = 'session_client/edit/edit_session.html'
+    template = 'session_client/edit/edit_session_modal.html'
+    if request.htmx.target == "modal-body-wrapper":
+        template = template + "#modal-body-partial"
     if request.method != 'POST':
         # initial request;pre-fill form with the current entry
         form = SessionForm(instance=session)
