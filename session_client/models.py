@@ -116,7 +116,7 @@ class ClientModel(models.Model):
         ref_date = self.deduce_next_datetime(add_weeks=add_weeks)
         ref_date = ref_date
         fortnight = True if self.series == 2 else False
-        range_weeks = amount * 2 if fortnight else amount - 1  # double of weeks if a fortnight,take one week as starts on day
+        range_weeks = amount * 2 - 1 if fortnight else amount - 1  # double of weeks if a fortnight,take one week as starts on day
         interval = p.interval(ref_date, ref_date.add(weeks=range_weeks))
         assert isinstance(ref_date, p.DateTime)
         assert ref_date.day_of_week == self.day, f"The ref_date should be on the client.day, {ref_date.day_of_week} != {self.day}"
