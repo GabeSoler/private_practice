@@ -5,6 +5,7 @@ from django.db.models import Count, Q
 from django.shortcuts import render, redirect, get_object_or_404
 
 from ppm_app.responses.hx_responses import ok_response_modal, ups_response
+from room_calendar_app.models import TenantModel, RoomCalendarModel
 from .models import ClientModel, SessionModel
 from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, \
@@ -157,7 +158,7 @@ def session_pending_list_modal(request, client_uuid):
     now = p.now()
     template = "session_client/lists/session_list_modal.html"
     sessions = SessionModel.objects.filter(
-        client=client_uuid,
+        client__uuid=client_uuid,
         client__user=request.user,
         date__lte=now.date(),
         open=True).order_by('-date', '-start_time')
@@ -236,16 +237,17 @@ def hx_delete_session(request, session_uuid):
     return render(request, '_toasts.html')
 
 
-def week_view_add_session_client(request, year=None, week=None, week_day=None, time=None, calendar=None):
+def week_view_add_session_client(request, year=None, week=None, week_day=None, time=None, calendar_uuid=None):
     """ to create sessions from the calendar using calendar info as base """
     template = 'room_calendar_app/input/session_form_client.html'
+
     if request.method == 'POST':
-        form = SessionForm(data=request.POST)
+        form = SessionFromCalendarForm(data=request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.deduce_from_client(date=False,
                                         start_time=False,
-                                        calendar=False if instance.calendar else True)
+                                        tenant=False if instance.tenant else True)
             saved, overlap = instance.save_with_checks()
             if not saved:
                 template_overlap = "session_client/lists/session_overlap_modal.html"
@@ -254,7 +256,7 @@ def week_view_add_session_client(request, year=None, week=None, week_day=None, t
             instance.save()
             messages.info(request, f"Session added for {instance.client.code}")
             return ok_response_modal(request, "Session Saved",
-                                     event_and_target=("RefreshTable", "#room-switch-form"))
+                                     event_and_target=("RefreshTable", "#caption-form"))
         # form errors
         template = template + '#session_calendar_form_partial'
         context = {'form': form}
@@ -270,9 +272,13 @@ def week_view_add_session_client(request, year=None, week=None, week_day=None, t
     data = {
         'date': date_from_iso_week,
         'start_time': time_from_str,
-        'calendar': calendar or None,
     }
-    form = SessionForm(initial=data)
+    form = SessionFromCalendarForm(initial=data)
+    client_qs = ClientModel.objects.filter(user=request.user)
+    if calendar_uuid:
+        calendar = RoomCalendarModel.objects.get(uuid=calendar_uuid)
+        client_qs.filter(tenant__calendar=calendar)
+    form.fields['client'].queryset = ClientModel.objects.filter(user=request.user)
     context = {'form': form}
     return render(request, template, context)
 

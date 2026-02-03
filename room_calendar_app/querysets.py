@@ -11,18 +11,18 @@ from session_client.models import SessionModel
 from django.db.models.functions import Concat, Cast
 
 
-def tenant_annotated_qs(year, month, cal=None, user=None):
+def tenant_annotated_qs(year, month, cal_id=None, cal_uuid=None, user=None):
     tenants_qs = (TenantModel.objects
     .annotate(
-        session_count=Count("clientmodel__sessionmodel",
-                            filter=Q(clientmodel__sessionmodel__date__year=year,
-                                     clientmodel__sessionmodel__date__month=month) &
-                                   ~Q(clientmodel__sessionmodel__attendance="Cancel"),
+        session_count=Count("sessionmodel",
+                            filter=Q(sessionmodel__date__year=year,
+                                     sessionmodel__date__month=month) &
+                                   ~Q(sessionmodel__attendance="Cancel"),
                             ),
-        period_income=Sum('clientmodel__sessionmodel__fee',
-                          filter=Q(clientmodel__sessionmodel__date__year=year,
-                                   clientmodel__sessionmodel__date__month=month) &
-                                 ~Q(clientmodel__sessionmodel__attendance="Cancel"),
+        period_income=Sum('sessionmodel__fee',
+                          filter=Q(sessionmodel__date__year=year,
+                                   sessionmodel__date__month=month) &
+                                 ~Q(sessionmodel__attendance="Cancel"),
                           default=0))
 
     .annotate(
@@ -32,8 +32,11 @@ def tenant_annotated_qs(year, month, cal=None, user=None):
                          default=F("calendar__cost") * F("session_count"),
                          output_field=FloatField()
                          )))
-    if cal:
-        tenants_qs = tenants_qs.filter(calendar=cal)
+    if cal_uuid:
+        tenants_qs = tenants_qs.filter(calendar__uuid=cal_uuid)
+    if cal_id:
+        tenants_qs = tenants_qs.filter(calendar=cal_id)
+    assert not (cal_uuid and cal_id), "cal_uuid and cal_id should not be mixed"
     if user:
         tenants_qs = tenants_qs.filter(user=user)
     return tenants_qs

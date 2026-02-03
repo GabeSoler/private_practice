@@ -42,7 +42,7 @@ def week_view(request):
                                                                                                 'client__user')
             if form_partial.cleaned_data['calendar']:
                 room_calendar = form_partial.cleaned_data['calendar']
-                sessions = sessions.filter(calendar=room_calendar)
+                sessions = sessions.filter(tenant__calendar=room_calendar)
 
             calendar_partial = CalendarRender(sessions=sessions,
                                               date_ref=ref_date_partial,
@@ -65,13 +65,6 @@ def week_view(request):
     assert sessions is not None, "no sessions found"
     calendar = CalendarRender(sessions=sessions)  # today by default
     context = {'calendar': calendar, 'form': form}
-    return render(request, template, context)
-
-
-def week_view_auxiliary(request):
-    clients = ClientModel.objects.filter(user=request.user)
-    template = "room_calendar_app/auxiliary/client_list_li.html"
-    context = {"clients": clients}
     return render(request, template, context)
 
 
@@ -155,7 +148,7 @@ def room_manage_refresh_view(request, cal_uuid):
         if form_tenant.is_valid():
             year = form_tenant.cleaned_data['year']
             month = form_tenant.cleaned_data['month']
-            tenants_qs = tenant_annotated_qs(year, month, cal=cal_uuid)
+            tenants_qs = tenant_annotated_qs(year, month, cal_uuid=cal_uuid)
             totals = get_tenant_qs_totals(tenants_qs)
             template = "room_calendar_app/auxiliary/tenant_list_info.html" + "#table-body-partial"
             context = {"tenants": tenants_qs, "totals": totals}
@@ -175,7 +168,7 @@ def room_list_refresh_view(request):
             month_util = MonthNextUtil(date_ref, room_cal)
             tenants_qs = tenant_annotated_qs(date_ref.year,
                                              date_ref.month,
-                                             cal=room_cal,
+                                             cal_id=room_cal.pk,
                                              user=request.user)  # to get right to pay numbers in totals
             totals = get_tenant_qs_totals(tenants_qs)
             template = "room_calendar_app/display/room_calendar_list.html" + "#calendar_info_partial"
@@ -338,7 +331,7 @@ def room_report_view(request):
             room = form.cleaned_data['room']
             sessions = SessionModel.objects.filter(date__month=month,
                                                    date__year=year,
-                                                   calendar=room,
+                                                   tenant__calendar=room,
                                                    ).exclude(attendance__exact="Cancel")
             template_partial = template + '#session-list-partial'
             if room.user != request.user:

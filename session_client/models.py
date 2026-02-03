@@ -144,14 +144,14 @@ class ClientModel(models.Model):
                 date=date.date(),
                 start_time=self.time,
                 end_time=time_plus_duration(self.time, self.duration),
-                calendar=tenant.calendar,
+                tenant=tenant,
                 fee=self.fee
             )
 
             session_list.append(session_instance)
         sessions = SessionModel.objects.bulk_create(session_list)
         sessions_len = len(sessions)
-        logger.debug("Sessions created, length: {}", sessions_len)
+        logger.debug(f"Sessions created, length: {sessions_len}")
         assert sessions_len == amount, f"sessions created must match amount, {sessions_len} != {amount}"
         __bool__ = True
         return True, sessions
@@ -201,7 +201,7 @@ class ClientModel(models.Model):
         if range_filter:
             filters &= Q(date__range=(start_range_p.date(), end_range_p.date()))
         if calendar_filter:
-            filters &= Q(calendar=calendar_ref)
+            filters &= Q(tenant__calendar=calendar_ref)
         if week_day_filter:
             day_week = self.day + 1  # to convert from a pendulum days system to iso
             filters &= Q(date__iso_week_day=day_week)
@@ -272,8 +272,8 @@ class SessionModel(models.Model):
         """
         start = self.start_time
         end = self.end_time
-        calendar = self.calendar
-        qs = SessionModel.objects.filter(calendar=calendar, date=self.date).filter(
+        calendar = self.tenant.calendar
+        qs = SessionModel.objects.filter(tenant__calendar=calendar, date=self.date).filter(
             models.Q(
                 start_time__gte=start,
                 start_time__lt=end,
@@ -311,7 +311,7 @@ class SessionModel(models.Model):
                            date=True,
                            start_time=True,
                            end_time=True,
-                           calendar=True):
+                           tenant=True):
         """ takes a Session with a client, and deduces from it its room, and extra information about when it happens
         args:
             start_time: if you want to set a with clear datetime object. If present, it blocks the next args.
@@ -323,12 +323,12 @@ class SessionModel(models.Model):
         """
         assert self.client is not None
         client = self.client
-        if calendar:
+        if tenant:
             if client.tenant:
-                self.calendar = client.tenant.calendar
+                self.tenant = client.tenant
             else:
-                base_cal, _ = RoomCalendarModel.objects.get_or_create(user=self.client.user, name="Base Room")
-                self.calendar = base_cal
+                base_tenant, _ = TenantModel.objects.get_or_create(user=self.client.user, name="Base Tenant")
+                self.tenant = base_tenant
         if date:
             self.date = client.deduce_next_datetime().date()
         if start_time:

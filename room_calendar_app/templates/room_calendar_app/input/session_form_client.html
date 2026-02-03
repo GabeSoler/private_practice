@@ -8,8 +8,7 @@
 {% block modal_body %}
     <div id="session-form-wrapper">
     {% partialdef session_calendar_form_partial inline %}
-        <form action="{% url 'session_client:week_view_add_session_client' %}"
-              method="post"
+        <form
               hx-post="{% url 'session_client:week_view_add_session_client' %}"
               hx-target="#session-form-wrapper"
         >
@@ -27,7 +26,6 @@
                 </div>
 
             </div>
-            {% bootstrap_field form.calendar %}
 
             <button type="submit"
                     class="btn btn-outline-secondary float-end"

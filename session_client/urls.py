@@ -79,7 +79,7 @@ urlpatterns = [
          views_session.week_view_add_session_client, name="week_view_add_session_client"),
     path("hx-week_view_add_session_client/<int:year>/<int:week>/<int:week_day>/<str:time>/",
          views_session.week_view_add_session_client, name="week_view_add_session_client"),
-    path("hx-week_view_add_session_client/<int:year>/<int:week>/<int:week_day>/<str:time>/<uuid:calendar>",
+    path("hx-week_view_add_session_client/<int:year>/<int:week>/<int:week_day>/<str:time>/<uuid:calendar_uuid>/>",
          views_session.week_view_add_session_client, name="week_view_add_session_client"),
 
 ]

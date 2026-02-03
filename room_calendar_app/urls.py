@@ -36,6 +36,4 @@ urlpatterns = [
 
     path("block-delete/<uuid:block_uuid>/", views.block_delete_view, name="delete_block"),
 
-    path("hx-client-list/", views.week_view_auxiliary, name="client_list_auxiliary"),
-
 ]

@@ -38,7 +38,7 @@ class ClientFormShort(forms.ModelForm):
 class SessionForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['keywords', 'date', 'start_time', 'client', 'paid', 'fee', 'attendance', 'open']
+        fields = ['keywords', 'date', 'start_time', 'client', 'paid', 'fee', 'attendance', 'open', 'tenant']
         labels = {
             'keywords': _('Keywords'),
             'date': _('Date'),
@@ -48,6 +48,7 @@ class SessionForm(forms.ModelForm):
             'fee': _('Amount'),
             'open': _('Open'),
             'attendance': _('Attendance'),
+            'tenant': _('Tenant'),
         }
         # I needed to add the split field so it processes date and time before goes to DateTime
         widgets = {'date': forms.DateInput(attrs={'class': 'form-select', 'type': 'date'},
@@ -79,7 +80,7 @@ class SessionShortForm(forms.ModelForm):
 class SessionFromCalendarForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['client', 'date', 'start_time', 'tenant']
+        fields = ['client', 'date', 'start_time']
         widgets = {'date': forms.DateInput(attrs={'class': 'form-select', 'type': 'date'},
                                            )}
 
