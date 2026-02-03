@@ -46,7 +46,7 @@ def hx_client_short_form(request):
 
 def client_hx_item(request, client_uuid):
     if request.method == 'GET':
-        client = get_object_or_404(ClientModel, user=request.user, pk=client_uuid)
+        client = get_object_or_404(ClientModel, user=request.user, uuid=client_uuid)
         template = 'session_client/item/client_modal.html'
         context = {'client': client}
         return render(request, template, context)
@@ -56,7 +56,7 @@ def client_hx_item(request, client_uuid):
 def clients_toggle_active(request, client_uuid):
     """ manages clients htmx calls """
     if request.method == 'PATCH':
-        occurrence = get_object_or_404(ClientModel, pk=client_uuid, user=request.user)
+        occurrence = get_object_or_404(ClientModel, uuid=client_uuid, user=request.user)
         if occurrence.active:
             occurrence.active = False
         else:
@@ -151,7 +151,7 @@ def add_client_view(request):
 def edit_client_view(request, client_uuid):
     """edit an existing entry"""
     client = get_object_or_404(ClientModel,
-                               pk=client_uuid,
+                               uuid=client_uuid,
                                user=request.user)
     form = ClientForm(instance=client)
     form.fields['tenant'].queryset = TenantModel.objects.filter(user=request.user)

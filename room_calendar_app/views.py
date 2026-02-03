@@ -209,7 +209,7 @@ def room_calendar_add_view(request):
 
 def room_calendar_edit_view(request, room_calendar_uuid):
     """edit the occurrence repetition erasing future events"""
-    room_calendar = get_object_or_404(RoomCalendarModel, pk=room_calendar_uuid, user=request.user)
+    room_calendar = get_object_or_404(RoomCalendarModel, uuid=room_calendar_uuid, user=request.user)
     template = "room_calendar_app/input/edit_calendar_modal.html"
     if request.method != 'POST':
         action = "Edit"
@@ -263,7 +263,7 @@ def tenant_add_view(request):
 
 def tenant_edit_view(request, tenant_uuid):
     """edit the occurrence repetition erasing future events"""
-    tenant = get_object_or_404(TenantModel, pk=tenant_uuid, user=request.user)
+    tenant = get_object_or_404(TenantModel, uuid=tenant_uuid, user=request.user)
     template = "room_calendar_app/input/add_tenant.html"
     form = TenantForm(instance=tenant)
     if request.method == 'POST':
@@ -287,12 +287,12 @@ def tenant_edit_view(request, tenant_uuid):
 
 def tenant_link_view(request, tenant_uuid):
     """edit the occurrence repetition erasing future events"""
-    tenant = get_object_or_404(TenantModel, pk=tenant_uuid, user=request.user)
+    tenant = get_object_or_404(TenantModel, uuid=tenant_uuid, user=request.user)
     if request.htmx:
         form = LinkTenantForm(data=request.POST)
         if form.is_valid():
             room_uuid = form.cleaned_data["room_id"]
-            room = get_object_or_404(RoomCalendarModel, pk=room_uuid)
+            room = get_object_or_404(RoomCalendarModel, uuid=room_uuid)
             if tenant.calendar is not None:
                 if tenant.calendar == room:
                     form.add_error('room_id', "Same room")
@@ -315,7 +315,7 @@ def tenant_link_view(request, tenant_uuid):
 
 def tenant_unlink_view(request, tenant_uuid):
     """edit the occurrence repetition erasing future events"""
-    tenant = get_object_or_404(TenantModel, pk=tenant_uuid, user=request.user)
+    tenant = get_object_or_404(TenantModel, uuid=tenant_uuid, user=request.user)
     if request.htmx:
         # POST data submitted; process data
         """ render the list of tenants of a calendar back to htmx"""
@@ -369,7 +369,7 @@ def room_report_view(request):
 
 def tenant_duplicate_hx(request, tenant_uuid):
     if request.method == 'POST':
-        tenant = TenantModel.objects.get(pk=tenant_uuid)
+        tenant = TenantModel.objects.get(uuid=tenant_uuid)
         tenant_2 = TenantModel(name=tenant.name,
                                display_name=tenant.display_name,
                                description=tenant.description,
@@ -383,7 +383,7 @@ def tenant_duplicate_hx(request, tenant_uuid):
 
 
 def tenant_delete_hx(request, tenant_uuid):
-    tenant = TenantModel.objects.get(pk=tenant_uuid)
+    tenant = TenantModel.objects.get(uuid=tenant_uuid)
     tenant.delete()
     return HttpResponseClientRefresh()
 
@@ -423,7 +423,7 @@ def block_add_view(request, day=None, time=None, room=None):
 def block_edit_view(request, block_uuid=None):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     template = 'room_calendar_app/input/add_block.html'
-    block = get_object_or_404(BlocksModel, pk=block_uuid)
+    block = get_object_or_404(BlocksModel, uuid=block_uuid)
     assert isinstance(block, BlocksModel)
     form = BlockForm(instance=block)
     if request.method == 'POST':
@@ -442,7 +442,7 @@ def block_edit_view(request, block_uuid=None):
 
 
 def block_delete_view(request, block_uuid):
-    block = get_object_or_404(BlocksModel, pk=block_uuid)
+    block = get_object_or_404(BlocksModel, uuid=block_uuid)
     block.delete()
     logger.debug("block deleted")
     return HttpResponseClientRefresh()
