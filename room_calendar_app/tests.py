@@ -32,7 +32,7 @@ class MetaTestSetupMixin:
     def setUpTestData(cls):
         cls.now = p.now()
         cls.user = get_user_model().objects.create(username="Gabriel", email="test@gabriel.cl")
-        cls.user.password = "password"
+        cls.user.set_password("password")
         cls.user.save()
         cls.user_host = get_user_model().objects.create(username="John", email="test@john.cl")
         cls.user_host.save()

@@ -72,3 +72,7 @@ dkr-build:
 
 dkr-compose:
     docker compose -f docker-compose.dev.yml up --build
+
+
+playwright: play
+    uv run -m playwright codegen http://127.0.0.1:8000
