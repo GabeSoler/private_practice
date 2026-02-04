@@ -40,3 +40,6 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+ppm_app/.env.dk
+ppm_app/.env
+
