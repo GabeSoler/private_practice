@@ -57,13 +57,13 @@ nix:
 dkr:
     docker build -t ppm_app:local . && \
     docker run --rm -p 3000:3000 \
-    --env-file ppm_app/.env \
+    --env-file ppm_app/.env.dk \
     -e DJANGO_SETTINGS_MODULE=ppm_app.settings.dev \
     ppm_app:local
 
 dkr-run:
   docker run --rm -p 3000:3000 \
-  --env-file ppm_app/.env \
+  --env-file ppm_app/.env.dk \
   -e DJANGO_SETTINGS_MODULE=ppm_app.settings.dev \
   ppm_app:local
 
