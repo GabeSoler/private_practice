@@ -9,8 +9,8 @@
         <label for="client-search-input">{% translate 'Filter clients' %}</label>
         <input class="form-control" type="text" placeholder="Search" id="client-search-input"
                                                         _="on input
-                                                        tell <a/> in <div>.card/>
-                                                            show closest <div>.card/>
+                                                        tell <a.link-client-code/> in <.card/>
+                                                            show closest <.card/>
                                                             when your textContent.toLowerCase()
                                                             contains my value.toLowerCase()
                                                         end">
@@ -28,7 +28,7 @@
                         {% partialdef client-card-partial inline %}
                     <div class="col">
                             <div class="card fade-out fade-in
-                                    container text-center
+                                    text-center
                                     border border-secondary
                                     p-2 g-1" style="min-height: 10rem;"
                                  id="{{ client.code }}">

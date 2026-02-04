@@ -4,7 +4,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - ppm_app/.env
+      - ppm_app/.env.dk
     environment:
       DJANGO_SETTINGS_MODULE: ppm_app.settings.dev
     volumes:
