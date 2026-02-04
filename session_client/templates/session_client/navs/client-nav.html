@@ -23,7 +23,7 @@
       href={% url 'session_client:client_archived' %}
       >{% translate 'Archived' %}</a>
 
-  <a class="nav-link {% if request.path == "/add_client/"  %}active{% endif %}" 
+  <a id="add-client-link" class="nav-link {% if request.path == "/add_client/"  %}active{% endif %}"
     href="{% url "session_client:add_client" %}"
         hx-get="{% url "session_client:add_client" %}"
        hx-target="#modal-wrapper"

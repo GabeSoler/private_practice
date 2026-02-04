@@ -102,16 +102,16 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
         <div class='collapse navbar-collapse' id='navbarCollapse'>
             <ul class='navbar-nav me-auto mb2 mb-md-0'> <!-- 'me' refers to left, and 'ms' to right -->
                 <li class='nav-item'>
-                    <a class='nav-link' href="{% url 'session_client:client_list' %}">
+                    <a id="clients-link-top-nav" class='nav-link' href="{% url 'session_client:client_list' %}">
                         {% translate "My Clients" %}</a></li>
                 <li class='nav-item'>
-                    <a class='nav-link' href="{% url 'session_client:session_list' %}">
+                    <a id="sessions-link-top-nav" class='nav-link' href="{% url 'session_client:session_list' %}">
                         {% translate "My Sessions" %}</a></li>
                 <li class='nav-item'>
-                    <a class='nav-link' href="{% url 'room_calendar_app:room_calendar_list' %}">
+                    <a id="rooms-link-top-nav" class='nav-link' href="{% url 'room_calendar_app:room_calendar_list' %}">
                         {% translate "My Rooms" %}</a></li>
                 <li class='nav-item'>
-                    <a class='nav-link' href="{% url 'room_calendar_app:week_view' %}">
+                    <a id="calendar-link-top-nav" class='nav-link' href="{% url 'room_calendar_app:week_view' %}">
                         {% translate "My Calendar" %}</a></li>
 {#                <li class='nav-item'>#}
 {#                    <a class='nav-link' href="{% url 'room_calendar_app:week_view' %}">#}

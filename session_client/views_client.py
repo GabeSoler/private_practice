@@ -6,7 +6,6 @@ from django.urls import reverse
 
 from room_calendar_app.models import RoomCalendarModel, TenantModel
 from .models import ClientModel, SessionModel
-from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from .forms import ClientForm, SearchClientForm, ClientFormShort, SearchSessionForm, ClientFromCalendarForm
 from django_htmx.http import HttpResponseClientRedirect, HttpResponseClientRefresh, retarget
@@ -18,8 +17,6 @@ from django.contrib.postgres.search import (SearchHeadline,
                                             SearchQuery,
                                             SearchRank,
                                             SearchVector)
-
-from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
 
 import pendulum as p
 

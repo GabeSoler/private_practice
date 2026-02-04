@@ -402,11 +402,13 @@ def block_add_view(request, day=None, time=None, room=None):
     start_time = p.parse(time).time()
     initial = {"day": day, "start_time": start_time, "end_time": start_time.add(hours=1)}
     tenant_filter = Q(user=request.user)
+    room = RoomCalendarModel.objects.get(uuid=room)
     if room:
-        initial['room'] = room
-        tenant_filter &= Q(calendar__uuid=room)
+        initial['calendar'] = room
+        tenant_filter &= Q(calendar=room)
     form = BlockForm(initial=initial)
     form.fields["tenant"].queryset = TenantModel.objects.filter(tenant_filter)
+    form.fields["tenant"].label_from_instance = lambda obj: obj.display_name
     logger.debug("form with initials")
     context = {'form': form}
     # display a blank or invalid form
