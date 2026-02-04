@@ -2445,7 +2445,7 @@ progress {
 .form-text {
   margin-top: 0.25rem;
   font-size: 0.875em;
-  color: var(--bs-secondary-color);
+  color: rgb(200, 177, 216);
 }
 
 .form-control {
@@ -4224,7 +4224,7 @@ textarea.form-control-lg {
   --bs-navbar-toggler-padding-y: 0.25rem;
   --bs-navbar-toggler-padding-x: 0.75rem;
   --bs-navbar-toggler-font-size: 1.25rem;
-  --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgb%2891, 47, 104%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+  --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgb%28242, 130, 130%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
   --bs-navbar-toggler-border-color: rgb(65, 45, 73);
   --bs-navbar-toggler-border-radius: var(--bs-border-radius);
   --bs-navbar-toggler-focus-width: 0.25rem;
@@ -11886,6 +11886,7 @@ textarea.form-control-lg {
 .form-control {
   background-color: var(--input-bg);
   color: rgb(242, 130, 130);
+  corner-shape: squircle;
 }
 
 .form-select {
@@ -11899,6 +11900,12 @@ textarea.form-control-lg {
 .card {
   background-color: var(--card-bg);
   color: var(--card-color);
+  corner-shape: squircle;
+}
+
+.btn {
+  border-radius: 2rem;
+  corner-shape: squircle;
 }
 
 /*# sourceMappingURL=dreamy.css.map */
