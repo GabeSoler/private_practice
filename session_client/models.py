@@ -245,7 +245,8 @@ class SessionModel(models.Model):
     # manager
     objects = SessionManager()
     # Calendar connection
-    tenant = models.ForeignKey(TenantModel, null=True, blank=True, on_delete=models.SET_NULL)
+    tenant = models.ForeignKey(TenantModel, null=True, blank=True, on_delete=models.SET_NULL,
+                               help_text=_("Override Client's tenant"))
 
     def get_absolute_url(self):
         return reverse("session_client:session", kwargs={"session_uuid": self.id})

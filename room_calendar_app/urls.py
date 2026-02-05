@@ -29,10 +29,11 @@ urlpatterns = [
     path("link-tenant/<uuid:tenant_uuid>/", views.tenant_link_view, name="link_tenant"),
     path("unlink-tenant/<uuid:tenant_uuid>/", views.tenant_unlink_view, name="unlink_tenant"),
 
-    path("block-add-edit/", views.block_add_view, name="block_add_view"),
-    path("block-add-edit/<uuid:block_uuid>/", views.block_edit_view, name="block_edit"),
-    path("block-add-edit/<int:day>/<str:time>", views.block_add_view, name="block_add_with_day_time"),
-    path("block-add-edit/<int:day>/<str:time>/<uuid:room>", views.block_add_view, name="block_add_with_room"),
+    path("block-edit/<int:block_pk>/", views.block_edit_view, name="block_edit"),
+    path("block-add/", views.block_add_view, name="block_add_view"),
+    path("block-add/<int:day>/<str:time>", views.block_add_view, name="block_add_with_day_time"),
+    path("block-add/<int:day>/<str:time>/<int:room>", views.block_add_view, name="block_add_with_room_day_time"),
+    path("block-add-with-room/<int:room>", views.block_add_view, name="block_add_with_room"),
 
     path("block-delete/<uuid:block_uuid>/", views.block_delete_view, name="delete_block"),
 

@@ -391,41 +391,44 @@ def block_add_view(request, day=None, time=None, room=None):
         if form.is_valid():
             instance = form.save(commit=False)
             instance.user = request.user
-            instance.save()
-            logger.debug(f"{p.now()} - form blocks saved")
-            return ok_response_modal(request,
-                                     "Block Added",
-                                     event_and_target=("RefreshTable", "#caption-form"))
+            saved, overlap = instance.save_with_checks()
+            if saved:
+                logger.debug(f"{p.now()} - form blocks saved")
+                return ok_response_modal(request,
+                                         "Block Added",
+                                         event_and_target=("RefreshTable", "#caption-form"))
+            logger.debug(f"{p.now()} - form blocks not saved")
+            form.add_error("day", "❗Block Overlaps with another")
         logger.debug("form blocks errors")
         template_partial = template + '#block-form-partial'
-        return render(request, template_partial, {"form": form})
-    start_time = p.parse(time).time()
-    initial = {"day": day, "start_time": start_time, "end_time": start_time.add(hours=1)}
-    tenant_filter = Q(user=request.user)
-    room = RoomCalendarModel.objects.get(uuid=room)
-    if room:
-        initial['calendar'] = room
-        tenant_filter &= Q(calendar=room)
+        form.fields["tenant"].queryset = TenantModel.objects.filter(user=request.user, calendar=room)
+        form.fields["tenant"].label_from_instance = lambda obj: obj.display_name
+        return render(request, template_partial, {"form": form, "calendar_pk": room})
+    initial = {}
+    if day and time:
+        start_time = p.parse(time).time()
+        initial = {"day": day, "start_time": start_time, "end_time": start_time.add(hours=1)}
     form = BlockForm(initial=initial)
-    form.fields["tenant"].queryset = TenantModel.objects.filter(tenant_filter)
+    form.fields["tenant"].queryset = TenantModel.objects.filter(user=request.user, calendar=room)
     form.fields["tenant"].label_from_instance = lambda obj: obj.display_name
     logger.debug("form with initials")
-    context = {'form': form}
+    context = {'form': form, "calendar_pk": room}
     # display a blank or invalid form
     return render(request, template, context)
 
 
-def block_edit_view(request, block_uuid=None):
+def block_edit_view(request, block_pk):
     """ add an event, it needs to set occurrences to appear in the calendar"""
     template = 'room_calendar_app/input/add_block.html'
-    block = get_object_or_404(BlocksModel, uuid=block_uuid)
+    block = get_object_or_404(BlocksModel, pk=block_pk)
     assert isinstance(block, BlocksModel)
     form = BlockForm(instance=block)
     if request.method == 'POST':
         # POST data submitted; process data
         form = BlockForm(data=request.POST, instance=block)
         if form.is_valid():
-            form.save()
+            instance = form.save(commit=False)
+            instance.save_with_checks()
             logger.debug(f"{p.now()} - form blocks saved")
             return ok_response_modal(request,
                                      "Block Added",

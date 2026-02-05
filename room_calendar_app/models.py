@@ -59,3 +59,23 @@ class BlocksModel(models.Model):
         verbose_name = "block"
         verbose_name_plural = "blocks"
         ordering = ("day", "start_time")
+
+    def save_with_checks(self):
+        overlap_qs = BlocksModel.objects.filter(tenant__calendar=self.tenant.calendar,
+                                                day=self.day).filter(
+            models.Q(
+                start_time__gte=self.start_time,
+                start_time__lt=self.end_time,
+            )
+            | models.Q(
+                end_time__gt=self.start_time,
+                end_time__lte=self.end_time,
+            )
+            | models.Q(start_time__lt=self.start_time,
+                       end_time__gt=self.end_time)
+        )
+        if overlap_qs:
+            return False, overlap_qs
+        else:
+            self.save()
+            return True, None

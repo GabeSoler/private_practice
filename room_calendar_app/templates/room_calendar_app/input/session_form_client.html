@@ -14,8 +14,17 @@
         >
             {% csrf_token %}
 
-
+            <div class="row">
+                <div class="col">
             {% bootstrap_field form.client %}
+
+                </div>
+                <div class="col">
+
+            {% bootstrap_field form.tenant %}
+                </div>
+            </div>
+
 
             <div class="row">
                 <div class="col">

@@ -31,7 +31,7 @@
                       hx-target="#block-form"
                       hx-swap="outerHTML"
                         {% else %}
-                      hx-post="{% url 'room_calendar_app:block_add_view' %}"
+                      hx-post="{% url 'room_calendar_app:block_add_with_room' calendar_pk %}"
                       hx-target="#block-form"
                       hx-swap="outerHTML"
                         {% endif %}

@@ -80,7 +80,7 @@ class SessionShortForm(forms.ModelForm):
 class SessionFromCalendarForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['client', 'date', 'start_time']
+        fields = ['client', 'date', 'start_time', 'tenant']
         widgets = {'date': forms.DateInput(attrs={'class': 'form-select', 'type': 'date'},
                                            )}
 
