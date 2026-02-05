@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import RoomCalendarModel, TenantModel
+from .models import RoomCalendarModel, TenantModel, BlocksModel
 from .forms import WeekCalendarForm
 from django.contrib.auth import get_user_model
 import pendulum as p
@@ -51,10 +51,11 @@ class MetaTestSetupMixin:
         cls.room_default = RoomCalendarModel.objects.create(user=cls.user, name="Base Room",
                                                             description="base room user",
                                                             )
+        # tenant belongs to user, which means that should display its name in calendars, but show a different name to the exterior
         cls.tenant = TenantModel(
             user=cls.user,
             name="Testing",
-            display_name="test",
+            display_name="test-display",
             description="Testing tenancy",
             calendar=cls.room_1)
         cls.tenant.save()
@@ -62,14 +63,38 @@ class MetaTestSetupMixin:
         cls.tenant_host = TenantModel(
             user=cls.user_host,
             name="T-Host",
-            display_name="test",
+            display_name="t-host-display",
             description="Testing tenancy",
             calendar=cls.room_2)
         cls.tenant_host.save()
 
-        cls.tenant_default, _ = TenantModel.objects.get_or_create(user=cls.user,
-                                                                  name="Default")
+        cls.tenant_host_room_1 = TenantModel(
+            user=cls.user_host,
+            name="T-Host",
+            display_name="t-host-display",
+            description="Testing tenancy",
+            calendar=cls.room_1)
+        cls.tenant_host_room_1.save()
 
+        cls.tenant_default, _ = TenantModel.objects.get_or_create(user=cls.user,
+                                                                  name="Default",
+                                                                  calendar=cls.room_default)
+
+        cls.block_instance = BlocksModel.objects.create(
+            tenant=cls.tenant,
+            start_time=p.time(8, 0),
+            end_time=p.time(9, 30),
+            day=p.WEDNESDAY,
+            monthly_cost=600,
+        )
+        # making two blocks of different users share a room
+        cls.block_host = BlocksModel.objects.create(
+            tenant=cls.tenant_host_room_1,
+            start_time=p.time(8, 0),
+            end_time=p.time(9, 30),
+            day=p.MONDAY,
+            monthly_cost=600,
+        )
         # Create a client (equivalent to event)
         cls.client_instance = ClientModel.objects.create(
             user=cls.user,
@@ -110,7 +135,7 @@ class MetaTestSetupMixin:
             date=p.now().date(),
             start_time=p.time(8, 0),  # 8:00
             end_time=p.time(9, 30),  # 9:30
-            calendar=cls.room_1,  # assuming you have cls.room_1 defined
+            tenant=cls.tenant,  # assuming you have cls.room_1 defined
             keywords="Session 1",
             fee=60,
             paid=True,
@@ -124,7 +149,7 @@ class MetaTestSetupMixin:
             date=p.now().add(weeks=1).date(),
             start_time=p.time(8, 00, 00),  # Next week the same time
             end_time=p.time(9, 30),
-            calendar=cls.room_2,
+            tenant=cls.tenant,
             keywords="Session 2",
             fee=60,
             paid=False,
@@ -138,7 +163,7 @@ class MetaTestSetupMixin:
             date=p.now().subtract(weeks=1).date(),
             start_time=p.time(8, 00, 00),  # Next week the same time
             end_time=p.time(9, 30),
-            calendar=cls.room_1,
+            tenant=cls.tenant,
             keywords="Overlap1",
             fee=60,
             paid=False,
@@ -152,7 +177,7 @@ class MetaTestSetupMixin:
             date=p.now().subtract(weeks=1).date(),
             start_time=p.time(9, 00, 00),  # Next week the same time
             end_time=p.time(10, 30),
-            calendar=cls.room_1,
+            tenant=cls.tenant,
             keywords="Overlap2",
             fee=60,
             paid=False,
@@ -184,7 +209,7 @@ class MetaTestSetupMixin:
                 date=cls.now.add(days=1).date(),
                 start_time=p.time(n, 0),  # add one each hour
                 end_time=p.time(n + 1, 0),  # Next week +1 hour
-                calendar=cls.room_2,  # assuming you have cls.room_2 defined
+                tenant=cls.tenant_host,  # assuming you have cls.room_2 defined
                 keywords=f"Test{n}",
                 fee=60,
                 paid=False,

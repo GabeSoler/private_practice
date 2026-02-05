@@ -129,15 +129,25 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertTrue(TenantModel.objects.filter(display_name=self.tenant.display_name).count() > 1)
 
     def test_week_blocks_view_post(self):
+        """ testing the blocks view, so it shows tenants inside the room
+        in this case, tenant has room_1 as a foreign key so it should belong there,
+        Using a block with a tennat host with room 1, it tests name change
+
+        """
+        from .forms import RoomSwitchForm
         url = reverse('room_calendar_app:week_blocks_view')
-        data = {'room': self.room_1.uuid}
+        response = self.client.get(url, headers=self.htmx_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.tenant.name)
+        data = {'calendar': self.room_1.pk}
+        form = RoomSwitchForm(data)
+        self.assertTrue(form.is_valid())
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "errors")
-        self.assertContains(response, self.client_instance.code)
-        data = {'room': ''}
-        response = self.client.post(url, data, headers=self.htmx_headers)
-        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "errorlist")
+        self.assertContains(response, self.tenant.name)
+        self.assertContains(response, self.tenant_host_room_1.display_name)
+        self.assertNotContains(response, self.tenant_host_room_1.name)
 
     def test_week_schedule_view_post(self):
         url = reverse('room_calendar_app:week_schedule_view')

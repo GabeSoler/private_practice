@@ -122,16 +122,16 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         }
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, f"id_{self.session_1.pk}")
-        self.assertContains(response, f"id_{self.session_2.pk}")
+        self.assertContains(response, f"id_{self.session_1.uuid}")
+        self.assertContains(response, f"id_{self.session_2.uuid}")
         data_2 = {
             'date_ref_start': (p.now().subtract(days=1)).format('YYYY-MM-DD'),
             'date_ref_end': (p.now().add(days=1)).format('YYYY-MM-DD'),
         }
         response = self.client.post(url, data_2, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, f"id_{self.session_1.pk}")
-        self.assertNotContains(response, f"id_{self.session_2.pk}")
+        self.assertContains(response, f"id_{self.session_1.uuid}")
+        self.assertNotContains(response, f"id_{self.session_2.uuid}")
 
     def test_add_session_view_post(self):
         url = reverse('session_client:add_session')
