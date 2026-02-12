@@ -337,3 +337,11 @@ class SessionModel(models.Model):
         if end_time:
             self.end_time = time_plus_duration(self.start_time, client.duration)
         return self
+
+
+class ClientExtraTimes(models.Model):
+    client = models.ForeignKey(ClientModel, on_delete=models.CASCADE)
+    day = models.IntegerField(choices=WEEKDAY_SHORT, default=1, help_text=_("Day of Week"))
+    time = models.TimeField(choices=time_slot_options(), help_text=_('Time of Session'))
+    tenant = models.ForeignKey(TenantModel, on_delete=models.SET_NULL,
+                               blank=True, null=True, help_text=_("Set different tenant"))
