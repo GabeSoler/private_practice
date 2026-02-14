@@ -24,7 +24,7 @@ urlpatterns = [
 
     path("week-view/", views.week_view, name="week_view"),
     path("week-blocks-view/", views.week_blocks_view, name="week_blocks_view"),
-    path("week-schedule-view/", views.week_schedule_view, name="week_schedule_view"),
+    path("week-schedule-view/", views.week_client_defaults_view, name="week_client_defaults_view"),
 
     path("link-tenant/<uuid:tenant_uuid>/", views.tenant_link_view, name="link_tenant"),
     path("unlink-tenant/<uuid:tenant_uuid>/", views.tenant_unlink_view, name="unlink_tenant"),

@@ -1,5 +1,7 @@
 from django.db import models
 from django.db.models import Q, CheckConstraint, F, Func, ExpressionWrapper
+from django.db.transaction import commit
+
 from ppm_app.settings.base import AUTH_USER_MODEL
 import uuid
 from django.utils.translation import gettext_lazy as _
@@ -101,7 +103,7 @@ class ClientModel(models.Model):
             target_date = target_date.add(weeks=add_weeks)
         return target_date
 
-    def add_series(self, amount: int, add_weeks=None, overlap_check=True):
+    def create_series_session_list(self, amount: int, ref_date, overlap_check=True):
         """ Creates a series of sessions, based on the client defaults,
             calculate the last session created first and move from there
         args:
@@ -113,8 +115,7 @@ class ClientModel(models.Model):
             True if saved, false if not
             queryset, overlap or saved sessions
         """
-        ref_date = self.deduce_next_datetime(add_weeks=add_weeks)
-        ref_date = ref_date
+
         fortnight = True if self.series == 2 else False
         range_weeks = amount * 2 - 1 if fortnight else amount - 1  # double of weeks if a fortnight,take one week as starts on day
         interval = p.interval(ref_date, ref_date.add(weeks=range_weeks))
@@ -149,10 +150,39 @@ class ClientModel(models.Model):
             )
 
             session_list.append(session_instance)
+        __bool__ = True
+        return True, session_list
+
+    def add_series(self, amount: int, add_weeks=None, overlap_check=True):
+        """
+        Wraps self.create_series_session_list, adding the extra times before calling a bulk create
+        returns two argumets, created and sessions, if not created sessions are overlaping problems found in the process.
+        The recursions stop every time there is an overlap, which means if there are many extra times, it will return
+        only the last one before a problem occurs.
+        It uses the creation of virtual clients, to trigger the same functions already placed in clients.
+        """
+        ref_date = self.deduce_next_datetime(add_weeks=add_weeks)
+        ref_date = ref_date
+        session_list = []
+        created, sessions = self.create_series_session_list(amount, ref_date,
+                                                            overlap_check=overlap_check)
+        if not created:
+            return False, sessions
+        session_list.extend(sessions)
+        if self.clientextratimes_set.exists():
+            virtual_clients = self.create_virtual_clients()
+            for vc in virtual_clients:
+                vc_ref_date = ref_date.next(vc.day)
+                created, sessions = vc.create_series_session_list(amount, vc_ref_date,
+                                                                  overlap_check=overlap_check)
+                if not created:
+                    return False, sessions
+                session_list.extend(sessions)
+        extra_time_len = len(virtual_clients) + 1 or 1
         sessions = SessionModel.objects.bulk_create(session_list)
         sessions_len = len(sessions)
         logger.debug(f"Sessions created, length: {sessions_len}")
-        assert sessions_len == amount, f"sessions created must match amount, {sessions_len} != {amount}"
+        assert sessions_len == amount * extra_time_len, f"sessions created must match amount, {sessions_len} != {amount}"
         __bool__ = True
         return True, sessions
 
@@ -221,6 +251,41 @@ class ClientModel(models.Model):
         if possible_overlap:
             logger.debug("possible overlap function found overlap")
         return possible_overlap
+
+    def add_extra_time(self, day, time, tenant=None):
+        """
+        add extra time to a client, so it can included in the calendar and series
+        """
+        extra_time = ClientExtraTimes.objects.create(
+            client=self,
+            tenant=tenant or self.tenant,
+            day=day,
+            time=time,
+        )
+        return extra_time
+
+    def create_virtual_clients(self) -> set:
+        """ creates a list of client objects that are not saved based on the extra times of this client
+        Useful to create the client calendar schedule
+        """
+        extras_list = self.clientextratimes_set.all()
+        virtual_list = []
+        for extra in extras_list:
+            c = ClientModel(
+                pk=self.pk,
+                user=self.user,
+                type=self.type,
+                fee=self.fee,
+                duration=self.duration,
+                series=self.series,
+                link=self.link,
+                tenant=extra.tenant,
+                day=extra.day,
+                time=extra.time,
+                active=True,
+            )
+            virtual_list.append(c)
+        return virtual_list
 
 
 class SessionManager(models.Manager):

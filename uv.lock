@@ -212,6 +212,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-pivot"
+version = "1.10.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/39/f9/695d52bca829316af42fef78a62ea71655ed3cbd23194ebf8d2bf625fdac/django_pivot-1.10.0.tar.gz", hash = "sha256:30ed4e16d0ee6c7c7c1b5157b4541b10454a34ffe574228c927fea2316fcb792", size = 14704, upload-time = "2023-09-26T16:09:20.202Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4f/14/3e139699b74afea210ad159aaa2fb45243ef06c47d1f5a59ba895493a911/django_pivot-1.10.0-py3-none-any.whl", hash = "sha256:805b7f70683d37a01c9c65c0d90057f7b675112e87b33ec3576bd032c761562d", size = 15195, upload-time = "2023-09-26T16:09:18.797Z" },
+]
+
+[[package]]
 name = "docutils"
 version = "0.22.4"
 source = { registry = "https://pypi.org/simple" }
@@ -604,6 +616,7 @@ dependencies = [
     { name = "django-bootstrap5" },
     { name = "django-browser-reload" },
     { name = "django-htmx" },
+    { name = "django-pivot" },
     { name = "docutils" },
     { name = "greenlet" },
     { name = "gunicorn" },
@@ -638,6 +651,7 @@ requires-dist = [
     { name = "django-bootstrap5", specifier = "==25.3" },
     { name = "django-browser-reload", specifier = "==1.21.0" },
     { name = "django-htmx", specifier = "==1.27.0" },
+    { name = "django-pivot", specifier = ">=1.10.0" },
     { name = "docutils", specifier = "==0.22.4" },
     { name = "greenlet", specifier = "==3.3.0" },
     { name = "gunicorn", specifier = ">=23.0.0" },

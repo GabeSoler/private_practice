@@ -97,15 +97,19 @@ def week_blocks_view(request):
     return render(request, template, context)
 
 
-def week_schedule_view(request):
+def week_client_defaults_view(request):
     template = "room_calendar_app/dynamic/week_view_clients.html"
     room_qs = (RoomCalendarModel.objects.
                filter(Q(tenantmodel__user=request.user) | Q(user=request.user))).distinct()
+    clients = ClientModel.objects.filter(user=request.user).select_related("clientextratimes_set") or None
+    virtual_times = []
+    for client in clients:
+        virtuals = client.create_virtual_clients()
+        virtual_times.extend(virtuals)
     if request.method == 'POST':
         form = RoomSwitchForm(data=request.POST)
         if form.is_valid():
             room_cal = None
-            clients = ClientModel.objects.filter(user=request.user)
             if form.cleaned_data['calendar']:
                 room_cal = form.cleaned_data['calendar']
                 clients = clients.filter(tenant__calendar=room_cal)
@@ -118,7 +122,6 @@ def week_schedule_view(request):
         logger.warning(form.errors)
         response = render(request, "_toasts.html")
         return retarget(response, "#modal-wrapper")
-    clients = ClientModel.objects.filter(user=request.user) or None
     calendar = CalendarClientsRender(clients)
     form = RoomSwitchForm()
     form.fields["calendar"].queryset = room_qs
