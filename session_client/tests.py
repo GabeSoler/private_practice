@@ -255,8 +255,8 @@ class TestClientSession(MetaTestSetupMixin, TestCase):
 
     def test_extra_times_client_method(self):
         client = self.client_instance
-        extra_time_1 = client.add_extra_time(p.MONDAY, p.time(10, 30))
-        extra_time_2 = client.add_extra_time(p.TUESDAY, p.time(10, 30))
+        extra_time_1 = client.add_time(p.MONDAY, p.time(10, 30))
+        extra_time_2 = client.add_time(p.TUESDAY, p.time(10, 30))
         self.assertTrue(isinstance(extra_time_1, ClientExtraTimes))
         self.assertEqual(2, client.clientextratimes_set.count())
         created, sessions = client.add_series(3)

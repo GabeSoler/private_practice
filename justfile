@@ -1,36 +1,36 @@
 # default with just
 play:
-    uv run python3 manage.py runserver
+    uv run manage.py runserver 0.0.0.0:3000
 
 #start testing
 test *arg:
-    uv run python3 manage.py test {{arg}}
+    uv run manage.py test {{arg}}
 
 #start testing
 testx:
-    uv run python3 manage.py test --parallel
+    uv run manage.py test --parallel
 
 # run migrate
 migrate: makemigrations
-    uv run python3 manage.py migrate
+    uv run manage.py migrate
 
 #rung migrate and makemigrations together
 makemigrations:
-    uv run python3 manage.py makemigrations
+    uv run manage.py makemigrations
 
 #run collect static
 static:
-    uv run python3 manage.py collectstatic
+    uv run manage.py collectstatic
 
 #Allows commands passed to just manage (manage.py)
 manage *arg:
-    uv run python3 manage.py {{arg}}
+    uv run manage.py {{arg}}
 
 context:
-    uv run python3 manage.py add_context 5
+    uv run manage.py add_context 5
 
 shell:
-    uv run python3 manage.py shell -i ipython
+    uv run manage.py shell -i ipython
 
 
 # alias for full migrations to 'just db'
@@ -71,3 +71,7 @@ dkr-compose:
 
 playwright:
     uv run -m playwright codegen http://127.0.0.1:8000
+
+link:
+    adb reverse tcp:3000 tcp:3000
+    adb usb

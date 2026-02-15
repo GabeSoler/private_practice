@@ -1,5 +1,5 @@
 from django import forms
-from .models import ClientModel, SessionModel
+from .models import ClientModel, SessionModel, ClientTimes
 import pendulum as p
 from base.choices import time_slot_options
 from django.forms.widgets import DateInput, Select, SearchInput
@@ -131,3 +131,15 @@ class ClientFromCalendarForm(forms.ModelForm):
     class Meta:
         model = ClientModel
         fields = ['code', 'duration', 'fee', 'type', 'tenant']
+
+
+class TimeForm(forms.ModelForm):
+    class Meta:
+        model = ClientTimes
+        fields = ['tenant', 'day', 'time', 'client']
+
+
+class TimeClientSetForm(forms.ModelForm):
+    class Meta:
+        model = ClientTimes
+        fields = ['tenant', 'day', 'time']

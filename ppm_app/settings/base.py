@@ -27,7 +27,9 @@ SECRET_KEY = config("SECRET_KEY")
 HOST_URL = config("HOST_URL", default=":8000")
 URL_BASE = config('URL_BASE', default="www.")
 
-ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "0.0.0.0", "1.1.1.1", "8080",
+ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "0.0.0.0",
+                 "192.168.x.x",
+                 "1.1.1.1", "8080",
                  URL_BASE + "." + HOST_URL, ]
 
 CSRF_TRUSTED_ORIGINS = [

@@ -74,6 +74,9 @@ class ClientModel(models.Model):
     def __str__(self):
         return f"{self.code}"
 
+    def __repr__(self):
+        return f"ClientModel: {self.code}"
+
     def get_absolute_url(self):
         return reverse("session_client:client", kwargs={"client_uuid": self.uuid})
 
@@ -252,11 +255,11 @@ class ClientModel(models.Model):
             logger.debug("possible overlap function found overlap")
         return possible_overlap
 
-    def add_extra_time(self, day, time, tenant=None):
+    def add_time(self, day, time, tenant=None):
         """
         add extra time to a client, so it can included in the calendar and series
         """
-        extra_time = ClientExtraTimes.objects.create(
+        extra_time = ClientTimes.objects.create(
             client=self,
             tenant=tenant or self.tenant,
             day=day,
@@ -264,27 +267,44 @@ class ClientModel(models.Model):
         )
         return extra_time
 
-    def create_virtual_clients(self) -> set:
+    def save_with_time(self):
+        """ Save with creating  a time object
+        this assumes i will keep a day and time in the Client object """
+        if self.times_set.exists():
+            to_update = self.times_set.earliest("created_at")
+            to_update.time = self.time
+            to_update.day = self.day
+        else:
+            ClientTimes.objects.create(
+                client=self,
+                tenant=self.tenant,
+                day=self.day,
+                time=self.time,
+            )
+        self.save()
+
+    def create_virtual_clients(self) -> list:
         """ creates a list of client objects that are not saved based on the extra times of this client
         Useful to create the client calendar schedule
         """
-        extras_list = self.clientextratimes_set.all()
+        extras_list = self.times.all() or None
         virtual_list = []
-        for extra in extras_list:
-            c = ClientModel(
-                pk=self.pk,
-                user=self.user,
-                type=self.type,
-                fee=self.fee,
-                duration=self.duration,
-                series=self.series,
-                link=self.link,
-                tenant=extra.tenant,
-                day=extra.day,
-                time=extra.time,
-                active=True,
-            )
-            virtual_list.append(c)
+        if extras_list:
+            for extra in extras_list:
+                c = ClientModel(
+                    pk=self.pk,
+                    user=self.user,
+                    type=self.type,
+                    fee=self.fee,
+                    duration=self.duration,
+                    series=self.series,
+                    link=self.link,
+                    tenant=extra.tenant,
+                    day=extra.day,
+                    time=extra.time,
+                    active=True,
+                )
+                virtual_list.append(c)
         return virtual_list
 
 
@@ -404,9 +424,16 @@ class SessionModel(models.Model):
         return self
 
 
-class ClientExtraTimes(models.Model):
-    client = models.ForeignKey(ClientModel, on_delete=models.CASCADE)
+class ClientTimes(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    client = models.ForeignKey(ClientModel, on_delete=models.CASCADE, related_name="times")
     day = models.IntegerField(choices=WEEKDAY_SHORT, default=1, help_text=_("Day of Week"))
     time = models.TimeField(choices=time_slot_options(), help_text=_('Time of Session'))
     tenant = models.ForeignKey(TenantModel, on_delete=models.SET_NULL,
                                blank=True, null=True, help_text=_("Set different tenant"))
+
+    def __str__(self):
+        return f"{self.client}-{self.day}:{self.time}"
+
+    def __repr__(self):
+        return f"ClientExtraTime: {self.client}-{self.day}:{self.time}"

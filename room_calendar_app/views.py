@@ -8,9 +8,9 @@ from .models import RoomCalendarModel, TenantModel, BlocksModel
 from .forms import RoomCalendarForm, TenantForm, LinkTenantForm, WeekCalendarForm, RoomReportForm, TenantReportForm, \
     RoomSwitchForm, BlockForm
 from django_htmx.http import retarget, HttpResponseClientRefresh, trigger_client_event, reswap
-from .calendar_utils import CalendarRender, CalendarClientsRender, CalendarBlocksRender, MonthNextUtil
+from .calendar_utils import CalendarRender, CalendarTimesRender, CalendarBlocksRender, MonthNextUtil
 import pendulum as p
-from session_client.models import SessionModel, ClientModel
+from session_client.models import SessionModel, ClientModel, ClientTimes
 from django.db.models import (Q, F, Case, When, FloatField, Count,
                               Sum)
 from .querysets import tenant_annotated_qs, get_tenant_qs_totals, week_view_session_qs
@@ -101,19 +101,17 @@ def week_client_defaults_view(request):
     template = "room_calendar_app/dynamic/week_view_clients.html"
     room_qs = (RoomCalendarModel.objects.
                filter(Q(tenantmodel__user=request.user) | Q(user=request.user))).distinct()
-    clients = ClientModel.objects.filter(user=request.user).select_related("clientextratimes_set") or None
-    virtual_times = []
-    for client in clients:
-        virtuals = client.create_virtual_clients()
-        virtual_times.extend(virtuals)
+    times = ClientTimes.objects.filter(client__user=request.user).select_related("client").annotate(
+        end_time=F("time") + F("client__duration")
+    )
     if request.method == 'POST':
         form = RoomSwitchForm(data=request.POST)
         if form.is_valid():
             room_cal = None
             if form.cleaned_data['calendar']:
                 room_cal = form.cleaned_data['calendar']
-                clients = clients.filter(tenant__calendar=room_cal)
-            calendar = CalendarClientsRender(clients, room_cal=room_cal)
+                times = times.filter(tenant__calendar=room_cal)
+            calendar = CalendarTimesRender(times, room_cal=room_cal)
             template_partial = template + "#calendar-table-partial"
             form.fields["calendar"].queryset = room_qs
             context = {"calendar": calendar, "form": form}
@@ -122,7 +120,7 @@ def week_client_defaults_view(request):
         logger.warning(form.errors)
         response = render(request, "_toasts.html")
         return retarget(response, "#modal-wrapper")
-    calendar = CalendarClientsRender(clients)
+    calendar = CalendarTimesRender(times)
     form = RoomSwitchForm()
     form.fields["calendar"].queryset = room_qs
     context = {"calendar": calendar, "form": form}
