@@ -33,7 +33,7 @@ ALLOWED_HOSTS = [".localhost", "127.0.0.1", "[::1]", "0.0.0.0",
                  URL_BASE + "." + HOST_URL, ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://www" + HOST_URL,
+    "https://www." + HOST_URL,
     "https://" + URL_BASE + "." + HOST_URL,
 ]
 

@@ -170,13 +170,13 @@
                                         </div>
                                         <div class="col-4"> <!-- add 6 sessions forward -->
                                             <a class="btn btn-outline-secondary btn-sm"
-                                               hx-post="{% url 'session_client:add_series' client.uuid 6 %}"
-                                               hx-target="#future-sessions-{{ client.uuid }}"
+                                               hx-post="{% url 'session_client:manage_client_times' client.uuid %}"
+                                               hx-target="#modal-wrapper"
                                                hx-indicator="#spinner-{{ client.uuid }}"
                                                data-bs-toggle="tooltip"
                                                data-bs-trigger="hover"
                                                data-bs-delay="500"
-                                               data-bs-title="{% translate 'book 6 forward' %}"
+                                               data-bs-title="{% translate 'manage times' %}"
                                                data-bs-custom-class="custom-tooltip"
                                             >
                                                 <i class="bi bi-clock-fill"></i>

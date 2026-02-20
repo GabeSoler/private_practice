@@ -86,5 +86,5 @@ urlpatterns = [
     path("add-client-time/", views_time.add_time, name="add_client_time"),
     path("add-client-time/<int:week_day>/<str:time>", views_time.add_time, name="add_client_time_with_time"),
     path("edit-client-time/<int:time_pk>", views_time.edit_time, name="edit_client_time"),
-    path("manage-client-times/", views_time.manage_times, name="manage_client_times"),
+    path("manage-client-times/<uuid:client_uuid>", views_time.manage_times, name="manage_client_times"),
 ]
