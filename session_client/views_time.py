@@ -41,7 +41,7 @@ def manage_times(request, client_uuid):
     tenant_qs = TenantModel.objects.filter(user=request.user)
     FormSet = inlineformset_factory(ClientModel, ClientTimes,
                                     fields=["day", "time", "tenant"],
-                                    extra=4, max_num=6,
+                                    extra=1, max_num=6,
                                     )
     initial = [{"tenant": client.pk} for _ in range(5) if client.pk]
     formset = FormSet(instance=client, initial=initial)

@@ -3,13 +3,12 @@
 
 
 {% load django_bootstrap5 %}
-{% block content %}
 {% load clean_text %}
 
 
-{% comment %} work to do: create a search widget to search by client and week. 
+{% comment %} work to do: create a search widget to search by client and week.
 similar to events. needs custom form and view {% endcomment %}
-
+{% block search %}
 <div id="wrapper">
 
   <div id="form-table-wrapper">
@@ -45,7 +44,8 @@ similar to events. needs custom form and view {% endcomment %}
       {% endpartialdef %} <!-- end partial table -->
       </div>
 
-
+{% endblock search %}
+{% block content %}
 
 
 

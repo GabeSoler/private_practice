@@ -26,8 +26,6 @@
 
 {% endblock local_nav %}
 
-<div id="content_wrap">
-
     {% block content %}
-{% include 'session_client/hx/_session_list.html' %}
+        {% include 'session_client/hx/_session_list.html' %}
     {% endblock content %}

@@ -4,6 +4,7 @@ from django.utils import timezone
 from session_client.models import ClientModel
 import pendulum as p
 
+
 def annotate_client_list(user, active=True):
     """
     Returns a queryset of clients with common annotations.
@@ -31,7 +32,7 @@ def annotate_client_list(user, active=True):
             filter=Q(
                 sessionmodel__date__gte=date_ref.subtract(days=30).date(),
                 sessionmodel__date__lte=date_ref.date(),
-            ),exclude=Q(sessionmodel__attendance__exact="Cancel")
+            ), exclude=Q(sessionmodel__attendance__exact="Cancel")
         ),
         pending_sort_sessions=Count(
             'sessionmodel',
@@ -58,7 +59,7 @@ def annotate_client_list(user, active=True):
                 default=0,
                 output_field=FloatField()
             ),
-            filter=Q(sessionmodel__date__gte=three_months_ago,sessionmodel__date__lte=date_ref.date())
+            filter=Q(sessionmodel__date__gte=three_months_ago, sessionmodel__date__lte=date_ref.date())
         ),
         attendance_percentage=ExpressionWrapper(
             F('attendance_rate') * 100,

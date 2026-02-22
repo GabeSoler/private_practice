@@ -3,9 +3,9 @@
 
 {% load django_bootstrap5 %}
 
-{% block content %}
+{% block search %}
     {% if clients|length > 3 %}
-        <div class="bg-primary">
+        <div class="bg-primary d-block">
             <label for="client-search-input">{% translate 'Filter clients' %}</label>
             <input class="form-control" type="text" placeholder="Search" id="client-search-input"
                    _="on input
@@ -16,7 +16,9 @@
                                                         end">
         </div>
     {% endif %}
+{% endblock search %}
 
+{% block content %}
     <div class="mx-auto col-12 col-md-10 align-content-center">
 
         <div id="client-list-wrapper">
@@ -76,30 +78,17 @@
                                     <div class="row"><!--first client card row -->
 
                                         <div class="col"> <!-- day, time and room -->
-                                            <div class="dropdown">
-                                                <button type="button" class="btn btn-outline-secondary dropdown-toggle my-1 py-0 lh-2" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <span
-                                                            data-bs-toggle="tooltip"
-                                                            data-bs-trigger="hover"
-                                                            data-bs-delay="500"
-                                                            data-bs-title="{% translate 'Date default' %}"
-                                                            data-bs-custom-class="custom-tooltip"
-                                                            class="small py-0 mb-0">{{ client.get_day_display }}-{{ client.time|time:"H:i" }}</span>
-                                                        <br/> <span
-                                                                data-bs-toggle="tooltip"
-                                                                data-bs-trigger="hover"
-                                                                data-bs-delay="500"
-                                                                data-bs-title="{% translate "Client' tenant profile" %}"
-                                                                data-bs-custom-class="custom-tooltip"
-                                                                class="small py-0 mb-0">{{ client.tenant }}</span>
-                                                </button>
 
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="#">Action</a></li>
-                                                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                                                        <li><a class="dropdown-item" href="#">Something else here</a>
-                                                        </li>
-                                                    </ul>
+                                            <div class="row my-0 lh-1">
+                                                <span class="small"><i class="bi bi-list-check"></i>{{ client.total_sessions }} </span>
+                                            </div>
+                                            <div class="row my-0 lh-1">
+                                                <span class="small"><i class="bi bi-calendar3-week"></i>{{ client.created_at|date:'m/y' }}</span>
+                                            </div>
+                                            <div class="row my-0 lh-1">
+                                                <span class="small">
+                                                <i class="bi bi-hash"></i>{{ client.type }}
+                                                </span>
                                             </div>
 
                                         </div>
@@ -188,9 +177,19 @@
                             </div>
                         {% endpartialdef client-card-partial %}
                     {% empty %}
-                        <div class="card">{% translate 'There are no clients yet.' %}</div>
 
                     {% endfor %}
+                        <div class="card border-secondary">
+                        <h1 class="mx-auto my-auto">
+                            <a hx-get="{% url 'session_client:add_client' %}"
+                            hx-target="#modal-wrapper"
+                            class="nav-link link-secondary">
+
+                            +
+                            </a>
+                        </h1>
+
+                        </div>
                 {% endpartialdef client-list-partial %}
             </div>
         </div>
