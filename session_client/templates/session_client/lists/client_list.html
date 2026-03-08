@@ -6,7 +6,7 @@
 {% block search %}
     {% if clients|length > 3 %}
         <div class="bg-primary d-block">
-            <label for="client-search-input">{% translate 'Filter clients' %}</label>
+            <label for="client-search-input" class="ps-2">{% translate 'Filter clients' %}</label>
             <input class="form-control" type="text" placeholder="Search" id="client-search-input"
                    _="on input
                                                         tell <a.link-client-code/> in <.card/>
@@ -78,18 +78,17 @@
                                     <div class="row"><!--first client card row -->
 
                                         <div class="col"> <!-- day, time and room -->
-
-                                            <div class="row my-0 lh-1">
-                                                <span class="small"><i class="bi bi-list-check"></i>{{ client.total_sessions }} </span>
-                                            </div>
-                                            <div class="row my-0 lh-1">
-                                                <span class="small"><i class="bi bi-calendar3-week"></i>{{ client.created_at|date:'m/y' }}</span>
-                                            </div>
-                                            <div class="row my-0 lh-1">
-                                                <span class="small">
-                                                <i class="bi bi-hash"></i>{{ client.type }}
-                                                </span>
-                                            </div>
+                                            <ul class="my-1 lh-1" style="list-style-type:circle;">
+                                                <li>
+                                                <span class="small"><i class="bi bi-list-check">{{ client.total_sessions }}</i></span>
+                                                </li>
+                                                <li>
+                                                    <span class="small"><i class="bi bi-hash">{{ client.type }}</i></span>
+                                                </li>
+                                                <li>
+                                                <span class="small"><i class="bi bi-calendar3-week">{{ client.created_at|date:'m/y' }}</i></span>
+                                                </li>
+                                            </ul>
 
                                         </div>
                                         <div class="col"> <!-- month back paid and expected pay -->
@@ -97,7 +96,7 @@
                                                     data-bs-toggle="tooltip"
                                                     data-bs-trigger="hover"
                                                     data-bs-delay="500"
-                                                    data-bs-title="{% translate 'sessions paid' %}"
+                                                    data-bs-title="{% translate 'sessions paid in 30 days' %}"
                                                     data-bs-custom-class="custom-tooltip"
 
                                                     class="fs-5">£{{ client.month_sessions_paid|default:0 }}</span>
@@ -105,7 +104,7 @@
                                                     data-bs-toggle="tooltip"
                                                     data-bs-trigger="hover"
                                                     data-bs-delay="500"
-                                                    data-bs-title="{% translate 'paiment expected' %}"
+                                                    data-bs-title="{% translate 'payment expected in 30 days' %}"
                                                     data-bs-custom-class="custom-tooltip"
                                                     class="small">{{ client.month_sessions_expected|default:0 }}</span>
                                         </div>
@@ -114,7 +113,7 @@
                                                 data-bs-toggle="tooltip"
                                                 data-bs-trigger="hover"
                                                 data-bs-delay="500"
-                                                data-bs-title="{% translate 'Attendance percentage' %}"
+                                                data-bs-title="{% translate 'Attendance percentage in 3 months' %}"
                                                 data-bs-custom-class="custom-tooltip"
                                                 class="fs-5">{{ client.attendance_percentage|floatformat }}%</span>
                                         </div>
@@ -151,13 +150,13 @@
                                                data-bs-toggle="tooltip"
                                                data-bs-trigger="hover"
                                                data-bs-delay="500"
-                                               data-bs-title="{% translate 'book 3 forward' %}"
+                                               data-bs-title="{% translate 'book 3 extra weeks' %}"
                                                data-bs-custom-class="custom-tooltip"
                                             >
                                                 +3
                                             </a>
                                         </div>
-                                        <div class="col-4"> <!-- add 6 sessions forward -->
+                                        <div class="col-4"> <!-- manage times -->
                                             <a class="btn btn-outline-secondary btn-sm"
                                                hx-post="{% url 'session_client:manage_client_times' client.uuid %}"
                                                hx-target="#modal-wrapper"

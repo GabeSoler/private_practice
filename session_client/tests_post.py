@@ -8,7 +8,7 @@ from datetime import timedelta
 from .forms import (ClientForm,
                     SearchClientForm,
                     SessionFromCalendarForm,
-                    SessionSelectGroupForm)
+                    SessionSelectGroupForm, TimeForm)
 
 
 class PostMethodTests(MetaTestSetupMixin, TestCase):
@@ -52,7 +52,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertTrue(ClientModel.objects.filter(user=self.user, code='NEWCLIENT').exists())
 
     def test_edit_client_view_post(self):
-        url = reverse('session_client:edit_client', args=[self.client_instance.pk])
+        url = reverse('session_client:edit_client', args=[self.client_instance.uuid])
         data = {
             'code': 'UPDATEDCODE',
             'type': 'Private',
@@ -72,14 +72,14 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.client_instance.refresh_from_db()
         self.assertEqual(self.client_instance.code, 'UPDATEDCODE')
 
-    def test_week_view_add_session_post(self):
-        url = reverse('session_client:week_view_add_client', kwargs={'weekday': 1, 'time': '08:00'})
+    def test_week_add_times_post(self):
+        url = reverse('session_client:add_client_time_with_time', args=[1, "08:00:00"])
         date_ref = p.now().format('YYYY-MM-DD')
         data = {
             "client": self.client_instance.pk,
             "date": date_ref,
             "start_time": "08:00:00",
-            "calendar": self.room_1.pk,
+            "tenant": self.tenant_default.pk,
         }
         form = SessionFromCalendarForm(data=data)
         if form.errors:
@@ -141,14 +141,14 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
             'client': self.client_instance.pk,
             'fee': 60,
             'open': True,
-            'calendar': self.room_1.pk,
+            'calendar': self.tenant_default.pk,
         }
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(SessionModel.objects.filter(client=self.client_instance, start_time='14:00:00').exists())
 
     def test_edit_session_view_post(self):
-        url = reverse('session_client:edit_session', args=[self.session_1.pk])
+        url = reverse('session_client:edit_session', args=[self.session_1.uuid])
         data = {
             'keywords': 'UPDATEDBRIEF',
             'date': self.session_1.date.strftime('%Y-%m-%d'),
@@ -156,7 +156,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
             'client': self.session_1.client.pk,
             'fee': 100,
             'open': True,
-            'calendar': self.session_1.calendar.pk,
+            'tenant': self.session_1.tenant.pk,
         }
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
@@ -183,7 +183,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertNotContains(response, f"id_client_helptext")
 
     def test_sessions_patch_attendance_post(self):
-        url = reverse('session_client:session_patch_attendance', args=[self.session_1.pk])
+        url = reverse('session_client:session_patch_attendance', args=[self.session_1.uuid])
         data = {
             'attendance': 'LateC'
         }
@@ -194,9 +194,55 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertContains(response, 'LateC')
 
     def test_patch_brief_view_post(self):
-        url = reverse('session_client:session_patch_brief', args=[self.session_1.pk])
+        url = reverse('session_client:session_patch_brief', args=[self.session_1.uuid])
         data = {'keywords': 'NEW NOTES'}
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.session_1.refresh_from_db()
         self.assertEqual(self.session_1.keywords, 'NEW NOTES')
+
+    def test_create_client_time(self):
+        url = reverse('session_client:add_client_time')
+        data = {
+            'day': p.WEDNESDAY,
+            'time': 'c',
+            'client': self.client_instance.pk,
+            'tenant': self.tenant_default.pk,
+        }
+        form_invalid = TimeForm(data)
+        self.assertFalse(form_invalid.is_valid())
+        data['time'] = '09:00:00'
+        form = TimeForm(data)
+        self.assertTrue(form.is_valid())
+        response = self.client.post(url, data, headers=self.htmx_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "errorlist")
+
+    def test_manage_client_times(self):
+        url = reverse('session_client:manage_client_times', args=[self.client_instance.uuid])
+        data = {
+            "clienttimes_set-TOTAL_FORMS": "3",
+            "clienttimes_set-INITIAL_FORMS": "2",
+            "clienttimes_set-MIN_NUM_FORMS": "0",
+            "clienttimes_set-MAX_NUM_FORMS": "6",
+
+            # existing row 0
+            "clienttimes_set-0-id": self.client_instance.pk,
+            "clienttimes_set-0-day": "1",
+            "clienttimes_set-0-time": "09:00",
+            "clienttimes_set-0-tenant": self.tenant_default,
+
+            # existing row 1
+            "clienttimes_set-1-id": self.client_instance.pk,
+            "clienttimes_set-1-day": "3",
+            "clienttimes_set-1-time": "14:30",
+            "clienttimes_set-1-tenant": self.tenant_default,
+
+            # new extra row 2 (no id)
+            "clienttimes_set-2-day": "5",
+            "clienttimes_set-2-time": "10:15",
+            "clienttimes_set-2-tenant": self.tenant_default,
+        }
+        response = self.client.post(url, data, headers=self.htmx_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "errorlist")

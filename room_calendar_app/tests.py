@@ -99,35 +99,29 @@ class MetaTestSetupMixin:
         cls.client_instance = ClientModel.objects.create(
             user=cls.user,
             code="Test123",
-            time=p.now().at(8, 0).time(),
-            day=p.MONDAY,
             duration=p.duration(hours=1),
             tenant=cls.tenant,
             fee=60,
         )
-        cls.client_instance.save()
+        cls.client_instance_time_1 = cls.client_instance.add_time(p.MONDAY, p.now().at(8, 0).time())
 
         cls.client_instance_2 = ClientModel.objects.create(
             user=cls.user_host,
             code="Host123",
-            time=p.now().at(17, 0).time(),
-            day=p.WEDNESDAY,
             duration=p.duration(hours=1),
             tenant=cls.tenant_host,
             fee=60,
         )
-        cls.client_instance.save()
+        cls.client_instance_2.add_time(p.WEDNESDAY, p.now().at(17, 0).time())
 
         cls.client_instance_3 = ClientModel.objects.create(
             user=cls.user,
             code="Usert123",
-            time=p.now().at(12, 0).time(),
-            day=p.WEDNESDAY,
             duration=p.duration(hours=1),
             tenant=cls.tenant_host,
             fee=60,
         )
-        cls.client_instance.save()
+        cls.client_instance.add_time(p.WEDNESDAY, p.now().at(12, 0).time())
 
         # Create sessions (equivalent to occurrences)
         cls.session_1 = SessionModel.objects.create(

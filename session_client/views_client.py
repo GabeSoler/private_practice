@@ -75,10 +75,11 @@ def client_search_view(request):
         if form_partial.is_valid():
             raw_query = form_partial.cleaned_data['search_input']
             search_query = SearchQuery(raw_query)
-            vector_brief = SearchVector("keywords", weight="A")
-            vector_calendar = SearchVector("calendar__name", weight="D")
-            vector_client = SearchVector("client__code", weight="C")
-            vector = (vector_client + vector_calendar + vector_brief)
+            vector_keywords = SearchVector("keywords", weight="A")
+            vector_client = SearchVector("client__code", weight="B")
+            vector_tenant = SearchVector("tenant__name", weight="C")
+            vector_calendar = SearchVector("tenant__calendar__name", weight="D")
+            vector = (vector_client + vector_keywords + vector_tenant + vector_calendar)
             client = form_partial.cleaned_data['client']
             sessions = (SessionModel.objects
                         .filter(client__user=request.user)
@@ -162,31 +163,4 @@ def edit_client_view(request, client_uuid):
                 return HttpResponseClientRefresh()
             return redirect('session_client:client_list')
     context = {'client': client, 'form': form}
-    return render(request, template, context)
-
-
-def week_view_add_client(request, weekday=None, time=None, calendar=None):
-    """ to create sessions from the calendar using calendar info as base """
-    template = 'session_client/edit/edit_client_modal.html'
-    if request.method == 'POST':
-        form = ClientForm(data=request.POST)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.user = request.user
-            instance.save()
-            messages.info(request, f"Client added: {instance.code}")
-            return HttpResponseClientRefresh()
-        # form errors
-        template = template + '#modal-body-partial'
-        context = {'form': form}
-        return render(request, template, context)
-    # get response
-    assert weekday is not None, "Week_day is required for get calls"
-    assert time is not None, "Time is required for get calls"
-    form = ClientForm(initial={"day": weekday, "time": p.parse(time).time()})
-    tenant_qs = TenantModel.objects.filter(user=request.user)
-    if calendar:
-        tenant_qs = tenant_qs.filter(calendar__uuid=calendar)
-    form.fields['tenant'].queryset = tenant_qs
-    context = {'form': form}
     return render(request, template, context)
