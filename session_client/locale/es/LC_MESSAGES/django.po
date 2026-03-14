@@ -1,0 +1,316 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#: session_client/templates/session_client/hx/_session_list.html:17
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-27 13:04+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
+"1 : 2;\n"
+
+#: session_client/forms.py:12 session_client/forms.py:28
+#: session_client/templates/session_client/item/client_modal.html:24
+msgid "Code"
+msgstr "Código"
+
+#: session_client/forms.py:13
+msgid "Type"
+msgstr "Tipo"
+
+#: session_client/forms.py:14
+msgid "Fee"
+msgstr "Tarifa"
+
+#: session_client/forms.py:15
+#: session_client/templates/session_client/item/client_modal.html:42
+msgid "Tenant"
+msgstr "Inquilino"
+
+#: session_client/forms.py:16 session_client/forms.py:29
+msgid "Default Day"
+msgstr "Día predeterminado"
+
+#: session_client/forms.py:17 session_client/forms.py:31
+#: session_client/templates/session_client/item/client_modal.html:80
+msgid "Duration"
+msgstr "Duración"
+
+#: session_client/forms.py:18
+msgid "Active"
+msgstr "Activo"
+
+#: session_client/forms.py:19
+msgid "Link"
+msgstr "Enlace"
+
+#: session_client/forms.py:30 session_client/forms.py:41
+msgid "time"
+msgstr "hora"
+
+#: session_client/forms.py:39
+msgid "Keywords"
+msgstr "Palabras clave"
+
+#: session_client/forms.py:40
+#: session_client/templates/session_client/hx/_session_list.html:11
+#: session_client/templates/session_client/item/session_modal.html:28
+msgid "Date"
+msgstr "Fecha"
+
+#: session_client/forms.py:42 session_client/forms.py:68
+#: session_client/templates/session_client/hx/_session_list.html:13
+#: session_client/templates/session_client/item/session_modal.html:24
+msgid "Client"
+msgstr "Cliente"
+
+#: session_client/forms.py:43
+#: session_client/templates/session_client/hx/_session_list.html:19
+msgid "Paid"
+msgstr "Pagado"
+
+#: session_client/forms.py:44
+#: session_client/templates/session_client/item/session_modal.html:64
+msgid "Amount"
+msgstr "Monto"
+
+#: session_client/forms.py:45
+#: session_client/templates/session_client/hx/_session_list.html:21
+#: session_client/templates/session_client/navs/session-nav.html:12
+msgid "Open"
+msgstr "Abierto"
+
+#: session_client/forms.py:46
+#: session_client/templates/session_client/hx/_session_list.html:15
+#: session_client/templates/session_client/item/session_modal.html:45
+msgid "Attendance"
+msgstr "Asistencia"
+
+#: session_client/forms.py:67 session_client/forms.py:85
+msgid "Day and Time"
+msgstr "Día y Hora"
+
+#: session_client/models.py:28
+msgid "Add an Identifier code"
+msgstr "Agregar un código identificador"
+
+#: session_client/models.py:30
+msgid "Select a type of client"
+msgstr "Seleccionar un tipo de cliente"
+
+#: session_client/models.py:31
+msgid "Whats your agreed fee"
+msgstr "Tarifa acordada"
+
+#: session_client/models.py:33
+msgid "Move from archive to active or vice versa"
+msgstr "Mover de archivado a activo o viceversa"
+
+#: session_client/models.py:35
+msgid "Default day of week"
+msgstr "Día predeterminado"
+
+#: session_client/models.py:36
+msgid "default time"
+msgstr "hora predeterminada"
+
+#: session_client/models.py:37
+msgid "default duration"
+msgstr "duración predeterminada"
+
+#: session_client/models.py:39
+msgid "External link"
+msgstr "Enlace externo"
+
+#: session_client/models.py:227
+msgid "Link to a client"
+msgstr "Enlace a un cliente"
+
+#: session_client/models.py:232
+msgid "Date of session"
+msgstr "Fecha de la sesión"
+
+#: session_client/models.py:233
+msgid "Start of session?"
+msgstr "¿Inicio de la sesión?"
+
+#: session_client/models.py:234
+msgid "End of session"
+msgstr "Fin de la sesión"
+
+#: session_client/models.py:237
+msgid "words for search"
+msgstr "palabras para buscar"
+
+#: session_client/templates/session_client/edit/edit_client_modal.html:120
+msgid "Archive"
+msgstr "Archivar"
+
+#: session_client/templates/session_client/edit/edit_client_modal.html:130
+#: session_client/templates/session_client/edit/edit_session_modal.html:119
+msgid "Save"
+msgstr "Guardar"
+
+#: session_client/templates/session_client/edit/edit_session_modal.html:9
+msgid "Add Session"
+msgstr "Agregar Sesión"
+
+#: session_client/templates/session_client/edit/edit_session_modal.html:107
+msgid "Delete"
+msgstr "Eliminar"
+
+#: session_client/templates/session_client/hx/_brief.html:6
+msgid "Notes"
+msgstr "Notas"
+
+#: session_client/templates/session_client/hx/_brief.html:12
+msgid "Send"
+msgstr "Enviar"
+
+#: session_client/templates/session_client/hx/_brief.html:15
+msgid "Client Link"
+msgstr "Enlace del Cliente"
+
+#: session_client/templates/session_client/item/client_modal.html:28
+#: session_client/templates/session_client/item/client_modal.html:66
+msgid "Day"
+msgstr "Día"
+
+#: session_client/templates/session_client/item/client_modal.html:70
+msgid "Time"
+msgstr "Hora"
+
+#: session_client/templates/session_client/item/client_modal.html:84
+msgid "Series"
+msgstr "Serie"
+
+#: session_client/templates/session_client/item/session_modal.html:36
+msgid "keywords"
+msgstr "palabras clave"
+
+#: session_client/templates/session_client/item/session_modal.html:49
+msgid "Status"
+msgstr "Estado"
+
+#: session_client/templates/session_client/item/session_modal.html:60
+msgid "Payment"
+msgstr "Pago"
+
+#: session_client/templates/session_client/lists/client_archived_list.html:13
+msgid "archived"
+msgstr "archivado"
+
+#: session_client/templates/session_client/lists/client_archived_list.html:22
+#: session_client/templates/session_client/lists/client_list.html:162
+msgid "There are no clients yet."
+msgstr "Aún no hay clientes."
+
+#: session_client/templates/session_client/lists/client_list.html:9
+msgid "Filter clients"
+msgstr "Filtrar clientes"
+
+#: session_client/templates/session_client/lists/client_list.html:48
+msgid "Time from creation"
+msgstr "Tiempo desde la creación"
+
+#: session_client/templates/session_client/lists/client_list.html:60
+msgid "Open Sessions"
+msgstr "Sesiones Abiertas"
+
+#: session_client/templates/session_client/lists/client_list.html:72
+msgid "Date default"
+msgstr "Fecha predeterminada"
+
+#: session_client/templates/session_client/lists/client_list.html:79
+#, fuzzy
+#| msgid "Client tenant"
+msgid "Client' tenant profile"
+msgstr "Profile inquilino del cliente"
+
+#: session_client/templates/session_client/lists/client_list.html:88
+msgid "sessions paid"
+msgstr "sesiones pagadas"
+
+#: session_client/templates/session_client/lists/client_list.html:96
+msgid "paiment expected"
+msgstr "pago esperado"
+
+#: session_client/templates/session_client/lists/client_list.html:105
+msgid "Attendance percentage"
+msgstr "Porcentaje de asistencia"
+
+#: session_client/templates/session_client/lists/client_list.html:121
+msgid "Future sessions"
+msgstr "Sesiones futuras"
+
+#: session_client/templates/session_client/lists/client_list.html:138
+msgid "book 3 forward"
+msgstr "reservar 3 adelante"
+
+#: session_client/templates/session_client/lists/client_list.html:151
+msgid "book 6 forward"
+msgstr "reservar 6 adelante"
+
+#: session_client/templates/session_client/lists/client_search.html:83
+msgid "Search in Sessions Keywords, Nick Name, and Room"
+msgstr "Buscar en palabras clave de sesiones, apodo y habitación"
+
+#: session_client/templates/session_client/lists/client_search.html:93
+msgid "Loading"
+msgstr "Cargando"
+
+#: session_client/templates/session_client/lists/session_overlap_modal.html:6
+msgid "Ups! Session overlaps"
+msgstr "¡Ups! La sesión se superpone"
+
+#: session_client/templates/session_client/lists/sessions_toast.html:6
+msgid "Created Sessions"
+msgstr "Sesiones Creadas"
+
+#: session_client/templates/session_client/lists/sessions_toast.html:6
+msgid "Overlapping Sessions"
+msgstr "Sesiones Superpuestas"
+
+#: session_client/templates/session_client/navs/client-nav.html:8
+msgid "Clients"
+msgstr "Clientes"
+
+#: session_client/templates/session_client/navs/client-nav.html:12
+msgid "Current"
+msgstr "Actual"
+
+#: session_client/templates/session_client/navs/client-nav.html:16
+#: session_client/templates/session_client/navs/session-nav.html:16
+msgid "Search"
+msgstr "Buscar"
+
+#: session_client/templates/session_client/navs/client-nav.html:20
+msgid "Review"
+msgstr "Revisar"
+
+#: session_client/templates/session_client/navs/client-nav.html:24
+msgid "Archived"
+msgstr "Archivado"
+
+#: session_client/templates/session_client/navs/session-nav.html:8
+msgid "Sessions"
+msgstr "Sesiones"
+
+#: session_client/views_session.py:212
+msgid "ups, overlaps"
+msgstr "ups, se superpone"
+
+#: session_client/views_session.py:213
+msgid "Saved ok"
+msgstr "Guardado correctamente"

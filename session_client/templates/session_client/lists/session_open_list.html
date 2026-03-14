@@ -1,0 +1,48 @@
+{% extends 'session_client/navs/session-nav.html' %}
+{% load i18n %}
+
+
+{% load django_bootstrap5 %}
+
+{% block search %}
+
+<!-- Search open -->
+<div class="" id="session-form-wrap">
+
+  {% partialdef session-form-partial inline %} <!-- Start form partial -->
+
+  <div class="card bg-primary p-1 rounded">
+
+    <form class="form bg-primary ps-3"
+          hx-post="{% url 'session_client:session_list' %}"
+            hx-target="#tableBody"
+            hx-swap="innerHTML settle:0.2s"
+            hx-trigger="change throttle:1s,RefreshTable"
+          id="session-list-form"
+>
+    <table class="table mb-0" id="client-form-table">
+      <tbody>
+      <tr>
+        <td class="col bg-primary" id="form-td-code">
+          {% bootstrap_field form.only_unpaid wrapper_class="col py-1" layout="horizontal" label_class="text-secondary" %}
+        </td>
+          <td class="col bg-primary" id="form-td-code">
+          {% bootstrap_field form.include_next wrapper_class="col py-1" layout="horizontal" label_class="text-secondary" %}
+        </td>
+        <td class="col bg-primary" id="form-td-type">
+          {% bootstrap_field form.client wrapper_class="col py-0" layout="horizontal" label_class="text-secondary" show_label="skip" %}
+        </td>
+      </tr>
+    </tbody>
+    </table>
+</form>
+  </div>
+  {% if messages %}{% include '_toasts.html' %}{% endif %}
+  {% endpartialdef session-form-partial%} <!-- end form partial -->
+  </div>
+</div>
+</div>
+
+
+  {% endblock search %}
+

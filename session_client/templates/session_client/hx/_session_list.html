@@ -1,0 +1,186 @@
+{% load hx_helpers %}
+{% load i18n django_bootstrap5 %}
+<!-- Session list -->
+    {% if sessions %} {% comment %} As i re use it its here, a bit messy :/ {% endcomment %}
+            <table class="table"  _="on htmx:load
+            tell <input[name='sessionSelectAllCheckbox']/> set your checked to false
+            end">
+                <thead>
+                <tr>
+                    <th scope="col">
+                        <div class="form-check">
+                            <input class="form-check-input bg-primary"
+                                   type="checkbox" name="sessionSelectAllCheckbox"
+                                   id="checkbox-all"
+                                   _="on click
+                                      tell <input[name='sessionCheckbox']/> in <tbody/>
+                                      set your checked to (my's checked)
+                                            end">
+                            {% translate 'All' %}
+                        </div>
+                    </th>
+                    <th scope="col">{% translate 'Date' %}
+                    </th>
+                    <th scope="col">{% translate 'Client' %}
+                    </th>
+                    <th scope="col">{% translate 'Attendance' %}
+                        <div id="spinner" class="htmx-indicator spinner-border text-success d-inline" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+
+                    </th>
+                    <th scope="col">{% translate '' %}
+                    </th>
+                    <th scope="col">{% translate 'Paid' %}
+                    </th>
+                    <th scope="col">{% translate 'Open' %}
+                    </th>
+                </tr>
+                </thead>
+            <tbody id="tableBody">
+        {% partialdef session-tbody-partial inline %}
+                {% for session in sessions %}
+                    {% partialdef row-instance inline %}
+                        <tr class="fade-in">
+                            <td class="col-1">
+                                <div class="form-check">
+                                    <input class="form-check-input bg-primary" type="checkbox" name="sessionCheckbox"
+                                           id="checkbox-{{ session.uuid }}"
+                                           value="{{ session.uuid }}"
+                                    >
+                                </div>
+                            </td>
+                            <th scope="row">
+                                <a href="{% url "session_client:edit_session" session.uuid %}"
+                                   hx-get="{% url "session_client:edit_session" session.uuid %}"
+                                   hx-target="#modal-wrapper"
+                                   hx-indicator=".htmx-indicator">
+                                    {% if session.date %}{{ session.date }}{% else %}
+                                        {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>
+                            </th>
+
+                            <td>{{ session.client }}</td>
+                            <td>
+                                {% partialdef attendance_partial inline %}
+                                    <select name="attendance" class="form-select"
+                                            id="id_{{ session.uuid }}"
+                                            hx-post="{% url 'session_client:session_patch_attendance' session.uuid %}"
+                                            hx-swap="outerHTML"
+                                            hx-indicator=".htmx-indicator">
+                                        <option value="{{ session.attendance }}"
+                                                selected="true">{{ session.get_attendance_display }}</option>
+                                        {% attendance_choices_as_html %}
+
+                                    </select>
+                                {% endpartialdef attendance_partial %}
+                            </td>
+                            <td>{% partialdef brief_partial inline %}
+                                <i class="bi bi-pencil-fill text-{% if session.keywords %}success{% else %}danger{% endif %}"
+                                   hx-get="{% url 'session_client:session_patch_brief' session.uuid %}"
+                                   hx-target="#modal-wrapper"
+                                   hx-trigger="click"
+                                   hx-indicator=".htmx-indicator">
+                                </i>
+                            {% endpartialdef brief_partial %}</td>
+
+                            <!-- paid/not paid partial -->
+                            {% partialdef session_paid inline %}
+                                <td hx-put="{% url "session_client:sessions_hx_edit_paid" session.uuid %}"
+                                    hx-indicator=".htmx-indicator">
+
+                                    {% if session.paid %}
+                                        <i
+                                                data-bs-toggle="tooltip" data-bs-trigger="hover"
+                                                data-bs-delay="500" data-bs-title="Paid"
+                                                class="bi bi-currency-exchange text-success"></i>
+                                    {% else %}
+                                        <i
+                                                data-bs-toggle="tooltip" data-bs-trigger="hover"
+                                                data-bs-delay="500" data-bs-title="Not Paid"
+                                                class="bi bi-currency-exchange text-danger"></i>
+                                    {% endif %}
+                                </td>
+                            {% endpartialdef session_paid %}
+
+                            <!-- Session open/closed partial -->
+                            {% partialdef session_open inline %}
+                                <td hx-put="{% url "session_client:sessions_hx_edit_open" session.uuid %}"
+                                    hx-indicator=".htmx-indicator">
+                                    {% if session.open %}
+                                        <i
+                                                data-bs-toggle="tooltip" data-bs-trigger="hover"
+                                                data-bs-delay="500" data-bs-title="Open"
+                                                class="bi bi-circle-fill text-warning"></i>
+                                    {% else %}
+                                        <i
+                                                data-bs-toggle="tooltip" data-bs-trigger="hover"
+                                                data-bs-delay="500" data-bs-title="Done"
+                                                class="bi bi-check-circle-fill text-success"></i>
+                                    {% endif %}
+                                </td>
+                                {% if messages %}
+                                    {% include '_toasts.html' %}{% endif %}{% comment %}trying to set a toast system for messages{% endcomment %}
+
+                            {% endpartialdef session_open %}
+                        </tr>
+                    {% endpartialdef %}
+                    {# adding a layer for global changes #}
+                {% endfor %}
+        {% endpartialdef session-tbody-partial %}
+        </tbody>
+                <tfoot>
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input bg-primary"
+                                   type="checkbox" name="sessionSelectAllCheckbox"
+                                   id="checkbox-all-bottom"
+                                   _="on click
+                                      tell <input[name='sessionCheckbox']/> in <tbody/>
+                                      set your checked to (my's checked)
+                                            end">
+                            {% translate 'All' %}
+                        </div>
+                    </td>
+                    <td>
+                        {% partialdef bulk_form inline %}
+                            {% if bulk_form %}
+                                <form id="bulkForm"
+                                      hx-post="{% url 'session_client:sessions_bulk_actions' %}"
+                                      hx-swap="outerHTML"
+                                      hx-trigger="change"
+                                      hx-indicator=".htmx-indicator"
+                                      hx-include="input[name='sessionCheckbox']"
+                                >
+                                    {% bootstrap_form bulk_form show_label='skip' %}
+                                </form>
+                            {% else %}
+                                <form id="bulkForm"
+                                      hx-get="{% url 'session_client:sessions_bulk_actions' %}"
+                                      hx-swap="outerHTML"
+                                      hx-trigger="load once"
+                                      hx-indicator=".htmx-indicator">
+                                    <div class="placeholder">form placeholder</div>
+                                </form>
+                            {% endif %}
+                        {% endpartialdef bulk_form %}
+                    </td>
+                    <td>
+                        <div id="spinner-bottom" class="htmx-indicator spinner-border text-success" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div id="bulk-response"></div>
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+    {% endif %}
+

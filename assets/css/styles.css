@@ -1,0 +1,90 @@
+/* View transition for the navs */
+@view-transition {
+    navigation: auto;
+}
+
+
+/* google fonts for Alchemist title */
+.love-light-regular {
+    font-family: "Love Light", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+/* alternative with css transitions */
+
+.fade-in.htmx-added {
+    opacity: .3;
+}
+
+.fade-in-slide.htmx-added {
+    opacity: .3;
+    transform: translateX(20px);
+}
+
+.success-shine.htmx-added {
+    background-color: var(--bs-success);
+    transition: all .2s ease-in;
+}
+
+.success-shine-7.htmx-added {
+    background-color: var(--bs-success);
+    transition: all .3s ease-in;
+}
+
+.warning-shine-7.htmx-added {
+    background-color: var(--bs-warning);
+    transition: all .3s ease-in;
+}
+
+.fade-in {
+    opacity: 1;
+    transform: translateX(0px);
+    transition: all .3s ease-in;
+}
+
+.fade-in-slide {
+    opacity: 1;
+    transform: translateX(0px);
+    transition: all .2s ease-in;
+}
+
+.success-shine {
+    opacity: 1;
+    transition: all .4s ease-in-out;
+}
+
+.success-shine-7 {
+    opacity: 1;
+    transition: all .7s ease-in-out;
+}
+
+.warning-shine-7 {
+    opacity: 1;
+    transition: all .7s ease-in-out;
+}
+
+.fade-out.htmx-swapping {
+    opacity: 0;
+    transition: opacity .2s ease-out;
+}
+
+.htmx-indicator {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 200ms ease-in;
+}
+
+caption {
+    caption-side: top;
+    text-align: center;
+    padding: 2px;
+    background-color: var(--bs-primary);
+}

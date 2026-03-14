@@ -1,0 +1,95 @@
+{% extends '_modal.html' %}
+{% comment %} Client modal {% endcomment %}
+{% load i18n %}
+{% block modal_title %}{{client.code}}
+    <small><a href="{% url 'session_client:edit_client' client.uuid %}"
+       hx-get="{% url 'session_client:edit_client' client.uuid %}"
+       hx-target="#modal-body-wrapper"
+       _="on htmx:afterOnLoad remove me"
+       class="card-link small" style="font-size:.9rem;"><i class="bi bi-pencil-square"></i></a></small>{% endblock modal_title %}
+
+    {% block modal_body %}
+
+<div id="modal-body-wrapper">
+{% partialdef modal-body-partial inline  %}
+
+        <div class="card mb-5 border border-secondary">
+            <div class="">
+
+                <!--- Client Title -->
+                <div class="container text-center">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small>{% translate 'Code' %}:</small>
+                            <h5>{{ client.code }}</h5>
+                        </div>
+                        <div class="col">
+                            <small>{% translate 'Day' %}:</small>
+                            {{ client.get_day_display }}
+                            {{ client.get_time_display }}
+                        </div>
+                    </div>
+                </div>
+
+                <!--- Client Type -->
+                <div class="container text-center border-top border-secondary">
+                    <small>Tipe:</small>
+                    <p>{{ client.get_type_display }}</p>
+                </div>
+               <!--- Client teannt  -->
+                        <div class="container text-center border-top border-secondary">
+                            <small>{% translate 'Tenant' %}:</small>
+                            <p>{{ client.tenant }}</p>
+
+                        </div>
+                <!--- Client Attendance -->
+
+                <div class="container text-center border-top border-secondary">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small>Fee:</small>
+                            <h5>{{ client.fee }}</h5>
+                        </div>
+                        <div class="col">
+                            <small>Status:</small>
+                            <h5>{{ client.active|yesno:"Active,Archived" }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <!--- Client Date defaults -->
+
+                <div class="container text-center border-top border-secondary">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small>{% translate 'Day' %}:</small>
+                            <h5>{{ client.get_day_display}}</h5>
+                        </div>
+                        <div class="col">
+                            <small>{% translate 'Time' %}:</small>
+                            <h5> {{ client.time}} </h5>
+                        </div>
+                    </div>
+                </div>
+                <!--- Client Durations -->
+
+                <div class="container text-center border-top border-secondary">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <small>{% translate 'Duration' %}:</small>
+                            <h5>{{ client.duration}}</h5>
+                        </div>
+                        <div class="col">
+                            <small>{% translate 'Series' %}:</small>
+                            <h5> {{ client.get_series_display}} </h5>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+{% endpartialdef %}
+</div>
+    {% endblock modal_body %}
+
+
