@@ -1,9 +1,9 @@
 {% extends '_modal.html' %}
 {% comment %} Client modal {% endcomment %}
-
-{% block modal_title %}{{client.code}}<small>{% if client.nick_name %}-{{client.nick_name}}{% endif %}</small>
-    <small><a href="{% url 'session_client:edit_client' client.pk %}"
-       hx-get="{% url 'session_client:edit_client' client.pk %}"
+{% load i18n %}
+{% block modal_title %}{{client.code}}
+    <small><a href="{% url 'session_client:edit_client' client.uuid %}"
+       hx-get="{% url 'session_client:edit_client' client.uuid %}"
        hx-target="#modal-body-wrapper"
        _="on htmx:afterOnLoad remove me"
        class="card-link small" style="font-size:.9rem;"><i class="bi bi-pencil-square"></i></a></small>{% endblock modal_title %}
@@ -13,20 +13,20 @@
 <div id="modal-body-wrapper">
 {% partialdef modal-body-partial inline  %}
 
-        <div class="card bg-dark mb-5 border border-secondary">
-            <div class="card-body">
+        <div class="card mb-5 border border-secondary">
+            <div class="">
 
                 <!--- Client Title -->
                 <div class="container text-center">
                     <div class="row align-items-center">
                         <div class="col">
-                            <small>Code:</small>
+                            <small>{% translate 'Code' %}:</small>
                             <h5>{{ client.code }}</h5>
                         </div>
                         <div class="col">
-                            <small>Date:</small>
-                            <h5>{% if client.nick_name %}{{ client.nick_name }}{% else %}
-                                -- {% endif %}</h5>
+                            <small>{% translate 'Day' %}:</small>
+                            {{ client.get_day_display }}
+                            {{ client.get_time_display }}
                         </div>
                     </div>
                 </div>
@@ -36,10 +36,10 @@
                     <small>Tipe:</small>
                     <p>{{ client.get_type_display }}</p>
                 </div>
-               <!--- Client calendar  -->
+               <!--- Client teannt  -->
                         <div class="container text-center border-top border-secondary">
-                            <small>Calendar:</small>
-                            <p>{{ client.calendar }}</p>
+                            <small>{% translate 'Tenant' %}:</small>
+                            <p>{{ client.tenant }}</p>
 
                         </div>
                 <!--- Client Attendance -->
@@ -62,11 +62,11 @@
                 <div class="container text-center border-top border-secondary">
                     <div class="row align-items-center">
                         <div class="col">
-                            <small>Day:</small>
+                            <small>{% translate 'Day' %}:</small>
                             <h5>{{ client.get_day_display}}</h5>
                         </div>
                         <div class="col">
-                            <small>Time:</small>
+                            <small>{% translate 'Time' %}:</small>
                             <h5> {{ client.time}} </h5>
                         </div>
                     </div>
@@ -76,11 +76,11 @@
                 <div class="container text-center border-top border-secondary">
                     <div class="row align-items-center">
                         <div class="col">
-                            <small>Duration:</small>
+                            <small>{% translate 'Duration' %}:</small>
                             <h5>{{ client.duration}}</h5>
                         </div>
                         <div class="col">
-                            <small>Series:</small>
+                            <small>{% translate 'Series' %}:</small>
                             <h5> {{ client.get_series_display}} </h5>
                         </div>
                     </div>

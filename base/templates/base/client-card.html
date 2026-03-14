@@ -1,0 +1,138 @@
+{% load i18n %}
+<!-- Client card display -->
+<div class="card col fade-out fade-in
+                                    container text-center
+                                    border border-secondary
+                                    "
+>
+    <div class="card-header d-flex align-items-center bg-primary">
+
+        <a id="code" class="col link-secondary link-client-code"
+           data-bs-toggle="tooltip"
+           data-bs-trigger="hover"
+           data-bs-title="{% translate 'Client code' %}"
+           data-bs-custom-class="custom-tooltip"
+
+        >TEST1234
+        </a>
+
+        <!-- list month forward -->
+        <span id="created" class="text-secondary small me-1"
+              data-bs-toggle="tooltip"
+              data-bs-trigger="hover"
+              data-bs-title="{% translate 'Time from creation' %}"
+              data-bs-custom-class="custom-tooltip"
+              style="font-size:0.7rem">4 weeks ago</span>
+
+
+        <!-- count of open before today -->
+        <a id="open" class="btn btn-info btn-sm text-bg-info"
+           data-bs-toggle="tooltip"
+           data-bs-trigger="hover"
+           data-bs-title="{% translate 'Open Sessions' %}"
+           data-bs-custom-class="custom-tooltip"
+        >3</a>
+    </div>
+
+    <div class="row"><!--first client card row -->
+
+        <div class="col"> <!-- total sessions, type, created at -->
+            <ul class="my-1 lh-1" style="list-style-type:circle;">
+                <li>
+                                                <span class="small"
+                                                      id="total-sessions"
+                                                      data-bs-toggle="tooltip"
+                                                      data-bs-trigger="hover"
+                                                      data-bs-title="{% translate 'Total Sessions' %}"
+                                                      data-bs-custom-class="custom-tooltip"
+                                                ><i class="bi bi-list-check">45</i></span>
+                </li>
+                <li>
+                                                    <span class="small"
+                                                          id="client-type"
+                                                          data-bs-toggle="tooltip"
+                                                          data-bs-trigger="hover"
+                                                          data-bs-title="{% translate 'Client Type' %}"
+                                                          data-bs-custom-class="custom-tooltip"
+                                                    ><i
+                                                            class="bi bi-hash">Private</i></span>
+                </li>
+                <li>
+                                                    <span class="small"
+                                                          id="created-at"
+                                                          data-bs-toggle="tooltip"
+                                                          data-bs-trigger="hover"
+                                                          data-bs-title="{% translate 'Client created at' %}"
+                                                          data-bs-custom-class="custom-tooltip"
+                                                    ><i
+                                                            class="bi bi-calendar3-week">03/25</i></span>
+                </li>
+            </ul>
+
+        </div>
+        <div class="col"> <!-- month back paid and expected pay -->
+            <span id="paid"
+                  data-bs-toggle="tooltip"
+                  data-bs-trigger="hover"
+                  data-bs-title="{% translate 'sessions paid in 30 days' %}"
+                  data-bs-custom-class="custom-tooltip"
+
+                  class="fs-5">120</span>
+            /<span id="expected"
+                   data-bs-toggle="tooltip"
+                   data-bs-trigger="hover"
+                   data-bs-title="{% translate 'payment expected in 30 days' %}"
+                   data-bs-custom-class="custom-tooltip"
+                   class="small">350</span>
+        </div>
+        <div class="col-auto">
+                                        <span id="attendance"
+                                              data-bs-toggle="tooltip"
+                                              data-bs-trigger="hover"
+                                              data-bs-title="{% translate 'Attendance percentage for 3 months' %}"
+                                              data-bs-custom-class="custom-tooltip"
+                                              class="fs-5">60%</span>
+        </div>
+    </div>
+
+    <div class="row"><!--second client card row -->
+        <div class="col-4"
+             id="future-sessions">
+            <a id="future" class="btn btn-outline-secondary btn-sm success-shine"
+               data-bs-toggle="tooltip"
+               data-bs-trigger="hover"
+               data-bs-title="{% translate 'Future sessions' %}"
+               data-bs-custom-class="custom-tooltip"
+            >
+                <i class="bi bi-fast-forward-fill"></i>
+                <span class=""
+                > 12</span>
+            </a>
+
+        </div>
+        <div class="col-4"> <!-- add 4 sessions forward -->
+            <a id="book3"
+               class="btn btn-outline-secondary btn-sm"
+               data-bs-toggle="tooltip"
+               data-bs-trigger="hover"
+               data-bs-title="{% translate 'book 4 weeks forward' %}"
+               data-bs-custom-class="custom-tooltip"
+            >
+                +4w
+            </a>
+        </div>
+        <div class="col-4"> <!-- manage times -->
+            <a class="btn btn-outline-secondary btn-sm"
+               id="manage-times"
+               data-bs-toggle="tooltip"
+               data-bs-trigger="hover"
+               data-bs-delay="500"
+               data-bs-title="{% translate 'Open times modal' %}"
+               data-bs-custom-class="custom-tooltip"
+            >
+                <i class="bi bi-clock-fill"></i>
+            </a>
+
+        </div>
+    </div>
+</div>

@@ -1,43 +1,23 @@
-{% extends '_base.html' %}
+{% extends 'room_calendar_app/navs/calendar-nav.html' %}
+
+{% load django_bootstrap5 i18n %}
 
 
-{% load django_bootstrap5 %}
-{% block title %}Week View{% endblock title %}
+{% block title %}{% translate 'Week View' %}{% endblock title %}
 
 {% block content %}
 
     <div id="page-wrapper">
-
-        <div id="form-table-wrapper">
-            {% partialdef form-partial inline %}
-                <form
-                        hx-post="{% url "room_calendar_app:week_view" %}"
-                        hx-target="#calendar-table-wrapper"
-                        hx-trigger="change throttle:1s"
-                >
-                    <table
-                            class="table table-primary table-striped-columns table-sm mb-0"
-                            id="switch-table"
-                    >
-                        <tr class="" id="calendar-form-tr">
-                            <td id="cell-form-field-date"
-                            >{% bootstrap_field form.date_reference show_label='skip' %}
-                            </td>
-                            <td id="cell-form-field-calendar"
-                            >{% bootstrap_field form.calendar show_label='skip' %}
-                            </td>
-                        </tr>
-                    </table>
-                </form>
-            {% endpartialdef %} <!-- end partial table -->
-        </div>
-
         <!-- Partial def  week calendar -->
 
         <div id="calendar-table-wrapper">
             {% partialdef calendar-view-partial inline %}
-                <table class="table table-secondary table-striped-columns table-sm"
+                <table class="table table-secondary table-striped-columns table-sm mb-0 pb-0"
                        id="week-view-table">
+
+                <!-- navigation caption -->
+                    {% include 'room_calendar_app/navs/cal-caption.html' with inner_url="room_calendar_app:week_view" %}
+
                     <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -49,7 +29,7 @@
                         {% endfor %}
                     </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="mb-0 pb-0">
 
                     {% for slot,data in calendar.week_dict.items %}
                         <tr> <!-- row for time -->
@@ -58,24 +38,24 @@
                         >{{ slot|time:"H:i" }}</th>
 
                         {% for weekday,occurrence in data.items %}
-                            {% if occurrence.date %}
-                                <td class="table-info"
-                                    hx-get="{% url 'session_client:session_hx_item' occurrence.id %}"
+                            {% if occurrence.in_display %}
+                                <td class="table-info {% if occurrence.end_datetime_adjusted.time == slot %}border-warning-subtle border-bottom
+                                    {% endif %}"
+                                    hx-get="{% url 'session_client:session_hx_item' occurrence.uuid %}"
                                     hx-target="#modal-wrapper"
-                                    style="font-size:.6rem;"
+                                    style="font-size:.6rem;max-width:5rem;"
                                     id="{{ slot }}"
-                                >{{ occurrence.client.user }}-
-                                    {{ occurrence.start_time }}-
-                                    {{ occurrence.end_time }}</td>
+                                >{% if occurrence.start_time == slot %}
+                                {{ occurrence.display }}
+                                    {% else %}
+                                    ***
+                                    {% endif %}
+                                    </td>
                             {% else %}
                                 <td
                                         style="font-size:.6rem;">
                                     <i
-                                            {% if calendar.room_calendar %}
-                                                hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" calendar.room_calendar.pk %}"
-                                            {% else %}
                                                 hx-get="{% url 'session_client:week_view_add_session_client' calendar.year_ref calendar.week_ref weekday slot|time:"H:i" %}"
-                                            {% endif %}
                                                 hx-target="#modal-wrapper" class="bi bi-patch-plus"></i></a>
                                 </td>
                             {% endif %}
@@ -89,7 +69,6 @@
         <!-- End partial def -->
 
         <div id="modal-wrapper"></div>
-
 
     </div>
 {% endblock content %}

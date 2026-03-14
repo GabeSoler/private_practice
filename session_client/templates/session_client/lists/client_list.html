@@ -1,99 +1,216 @@
 {% extends 'session_client/navs/client-nav.html' %}
+{% load i18n %}
 
 {% load django_bootstrap5 %}
 
-{% block content %}
-    {% if clients|length > 3  %}
-    <div class="container bg-primary">
-        <label for="client-search-input">Filter clients</label>
-        <input class="form-control" type="text" placeholder="Search" id="client-search-input"
-                                                        _="on input
-                                                        tell <a/> in <div>.card/>
-                                                            show closest <div>.card/>
+{% block search %}
+    {% if clients|length > 3 %}
+        <div class="bg-primary d-block">
+            <label for="client-search-input" class="ps-2">{% translate 'Filter clients' %}</label>
+            <input class="form-control" type="text" placeholder="Search" id="client-search-input"
+                   _="on input
+                                                        tell <a.link-client-code/> in <.card/>
+                                                            show closest <.card/>
                                                             when your textContent.toLowerCase()
                                                             contains my value.toLowerCase()
                                                         end">
-    </div>
+        </div>
     {% endif %}
+{% endblock search %}
 
-    <div class="card p-2">
+{% block content %}
+    <div class="mx-auto col-12 col-md-10 align-content-center">
 
-        <div id="client-list-wrapper" class="container text-center">
-            <div class="row row-cols-md-2 row-cols-lg-3 g-1" id="cards-row">
+        <div id="client-list-wrapper">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2 my-1" id="cards-row">
                 {% partialdef client-list-partial inline %}
 
                     {% for client in clients %}
 
                         {% partialdef client-card-partial inline %}
-
-                            <div class="card col-auto fade-out fade-in
-                                    container text-center
+                            <div class="col">
+                                <div class="card
+                                    text-center
                                     border border-secondary
-                                    p-2"
-                                 id="{{ client.code }}">
-                                <div class="card-header d-flex justify-content-between align-items-center bg-primary">
-                                    <a class="col link-secondary link-client-code"
-                                       href="{% url 'session_client:client_hx_item' client.pk %}"
-                                       hx-get="{% url 'session_client:client_hx_item' client.pk %}"
-                                       hx-target="#modal-wrapper"
-                                    >{{ client.code }}{% if client.nick_name %} "{{ client.nick_name }}"{% endif %}
-                                    </a>
+                                    p-2 g-1" style="min-height: 10rem;"
+                                     id="{{ client.code }}">
+                                    <div class="card-header d-flex justify-content-between align-items-center bg-primary">
+                                        <div id="spinner-{{ client.uuid }}"
+                                             class="htmx-indicator spinner-border text-success d-inline" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
 
-                                    <!-- list month forward -->
-                                    <span class="text-secondary small me-1" style="font-size:0.7rem">{{ client.created_at|timesince }}</span>
-                                    <!-- count of open before today -->
-                                    <div class="badge text-bg-info"
-                                         hx-get="{% url 'session_client:session_pending_list_modal' client.pk %}"
-                                         hx-target="#modal-wrapper"
-                                    >{{ client.pending_sort_sessions|default:0 }}</div>
-                                </div>
+                                        <a class="col link-secondary link-client-code"
+                                           href="{% url 'session_client:client_hx_item' client.uuid %}"
+                                           hx-get="{% url 'session_client:client_hx_item' client.uuid %}"
+                                           hx-target="#modal-wrapper"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-trigger="hover"
+                                           data-bs-delay="500"
+                                           data-bs-title="{% translate 'Client code' %}"
+                                           data-bs-custom-class="custom-tooltip"
 
-                                <div class="row"><!--first client card row -->
+                                        >{{ client.code }}
+                                        </a>
 
-                                    <div class="col"> <!-- day, time and room -->
-                                        <p class="lh-1"><span
-                                                class="small">{{ client.get_day_display }}-{{ client.time }}</span>
-                                            </br> <span class="small">{{ client.calendar }}</span></p>
-                                    </div>
-                                    <div class="col"> <!-- month back paid and expected pay -->
-                                        <span class="fs-5">£{{ client.month_sessions_paid }}</span>/<span
-                                                class="small">{{ client.month_sessions_expected }}</span>
-                                    </div>
-                                    <div class="col-auto">
-                                        <span class="fs-5">{{ client.attendance_percentage|floatformat }}%</span>
-                                    </div>
-                                </div>
+                                        <!-- list month forward -->
+                                        <span class="text-secondary small me-1"
+                                              data-bs-toggle="tooltip"
+                                              data-bs-trigger="hover"
+                                              data-bs-delay="500"
+                                              data-bs-title="{% translate 'Time from creation' %}"
+                                              data-bs-custom-class="custom-tooltip"
+                                              style="font-size:0.7rem">{{ client.created_at|timesince }}</span>
 
-                                <div class="row"><!--second client card row -->
-                                    <div class="col-4"
-                                        hx-get="{% url 'session_client:session_list_modal' client.pk %}"
-                                        hx-target="#modal-wrapper"
-                                         id="future-sessions-{{ client.pk }}">
-                                        {% partialdef future_sessions_partial inline %}
-                                            <i class="bi bi-fast-forward-fill"></i>
-                                            <span class="fs-5"
-                                            > {{ client.future_sessions_count }}</span>
-                                            {% if add_toast %}{% include '_toasts.html' %}{% endif %}
-                                        {% endpartialdef future_sessions_partial %}
-                                    </div>
-                                    <div class="col-4"> <!-- add 3 sessions forward -->
-                                        +<i class="bi bi-3-circle-fill"
-                                            hx-post="{% url 'session_client:add_series' client.pk '3' %}"
-                                            hx-target="#future-sessions-{{ client.pk }}"></i>
-                                    </div>
-                                    <div class="col-4"> <!-- add 6 sessions forward -->
-                                        +<i class="bi bi-6-circle-fill"
-                                            hx-post="{% url 'session_client:add_series' client.pk '6' %}"
-                                            hx-target="#future-sessions-{{ client.pk }}"></i>
 
+                                        <!-- count of open before today -->
+                                        <a class="btn btn-info btn-sm text-bg-info"
+                                           hx-get="{% url 'session_client:session_pending_list_modal' client.uuid %}"
+                                           hx-target="#modal-wrapper"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-trigger="hover"
+                                           data-bs-delay="500"
+                                           data-bs-title="{% translate 'Open Sessions' %}"
+                                           data-bs-custom-class="custom-tooltip"
+                                        >{{ client.pending_sort_sessions|default:0 }}</a>
+                                    </div>
+
+                                    <div class="row"><!--first client card row -->
+
+                                        <div class="col"> <!-- total sessions, type, created at -->
+                                            <ul class="my-1 lh-1" style="list-style-type:circle;">
+                                                <li>
+                                                <span class="small"
+                                                      data-bs-toggle="tooltip"
+                                                      data-bs-trigger="hover"
+                                                      data-bs-title="{% translate 'Total Sessions' %}"
+                                                      data-bs-custom-class="custom-tooltip"
+                                                ><i class="bi bi-list-check">{{ client.total_sessions }}</i></span>
+                                                </li>
+                                                <li>
+                                                    <span class="small"
+                                                          data-bs-toggle="tooltip"
+                                                          data-bs-trigger="hover"
+                                                          data-bs-title="{% translate 'Client Type' %}"
+                                                          data-bs-custom-class="custom-tooltip"
+                                                    ><i
+                                                            class="bi bi-hash">{{ client.type }}</i></span>
+                                                </li>
+                                                <li>
+                                                    <span class="small"
+                                                          data-bs-toggle="tooltip"
+                                                          data-bs-trigger="hover"
+                                                          data-bs-title="{% translate 'Client created at' %}"
+                                                          data-bs-custom-class="custom-tooltip"
+                                                    ><i
+                                                            class="bi bi-calendar3-week">{{ client.created_at|date:'m/y' }}</i></span>
+                                                </li>
+                                            </ul>
+
+                                        </div>
+                                        <div class="col"> <!-- month back paid and expected pay -->
+                                            <span
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-trigger="hover"
+                                                    data-bs-delay="500"
+                                                    data-bs-title="{% translate 'sessions paid in 30 days' %}"
+                                                    data-bs-custom-class="custom-tooltip"
+
+                                                    class="fs-5">£{{ client.month_sessions_paid|default:0 }}</span>
+                                            /<span
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-trigger="hover"
+                                                    data-bs-delay="500"
+                                                    data-bs-title="{% translate 'payment expected in 30 days' %}"
+                                                    data-bs-custom-class="custom-tooltip"
+                                                    class="small">{{ client.month_sessions_expected|default:0 }}</span>
+                                        </div>
+                                        <div class="col-auto">
+                                        <span
+                                                data-bs-toggle="tooltip"
+                                                data-bs-trigger="hover"
+                                                data-bs-delay="500"
+                                                data-bs-title="{% translate 'Attendance percentage for 3 months' %}"
+                                                data-bs-custom-class="custom-tooltip"
+                                                class="fs-5">{{ client.attendance_percentage|floatformat }}%</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row"><!--second client card row -->
+
+                                        <!-- Future Sessions -->
+                                        <div class="col-4"
+                                             id="future-sessions-{{ client.uuid }}">
+                                            {% partialdef future_sessions_partial inline %}
+                                                <a class="btn btn-outline-secondary btn-sm success-shine"
+                                                   hx-get="{% url 'session_client:session_list_modal' client.uuid %}"
+                                                   hx-target="#modal-wrapper"
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-trigger="hover"
+                                                   data-bs-delay="500"
+                                                   data-bs-title="{% translate 'Future sessions' %}"
+                                                   data-bs-custom-class="custom-tooltip"
+                                                >
+                                                <i class="bi bi-fast-forward-fill"></i>
+                                                <span class=""
+                                                > {{ client.future_sessions_count }}</span>
+                                                {% if add_toast %}{% include '_toasts.html' %}{% endif %}
+                                            {% endpartialdef future_sessions_partial %}
+                                            </a>
+
+                                        </div>
+                                        <div class="col-4"> <!-- add 4 sessions forward -->
+                                            <a class="btn btn-outline-secondary btn-sm"
+                                                    {% if client.times_count > 0 %}
+                                               hx-post="{% url 'session_client:add_series' client.uuid 4 %}"
+                                               hx-target="#future-sessions-{{ client.uuid }}"
+                                                    {% else %}
+                                               hx-post="{% url 'session_client:manage_client_times' client.uuid %}"
+                                               hx-target="#modal-wrapper"
+                                                    {% endif %}
+                                               hx-indicator="#spinner-{{ client.uuid }}"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-trigger="hover"
+                                               data-bs-delay="500"
+                                               data-bs-title="{% translate 'book 4 weeks forward' %}"
+                                               data-bs-custom-class="custom-tooltip"
+                                            >
+                                                +4w
+                                            </a>
+                                        </div>
+                                        <div class="col-4"> <!-- manage times -->
+                                            <a class="btn btn-outline-secondary btn-sm"
+                                               hx-get="{% url 'session_client:manage_client_times' client.uuid %}"
+                                               hx-target="#modal-wrapper"
+                                               hx-indicator="#spinner-{{ client.uuid }}"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-trigger="hover"
+                                               data-bs-delay="500"
+                                               data-bs-title="{% translate 'Open times modal' %}"
+                                               data-bs-custom-class="custom-tooltip"
+                                            >
+                                                <i class="bi bi-clock-fill"></i>
+                                            </a>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         {% endpartialdef client-card-partial %}
                     {% empty %}
-                        <div class="card">There are no clients yet.</div>
 
                     {% endfor %}
+                    <div class="card border-secondary">
+                        <h1 class="mx-auto my-auto">
+                            <a hx-get="{% url 'session_client:add_client' %}"
+                               hx-target="#modal-wrapper"
+                               class="nav-link link-secondary">
+
+                                +
+                            </a>
+                        </h1>
+
+                    </div>
                 {% endpartialdef client-list-partial %}
             </div>
         </div>

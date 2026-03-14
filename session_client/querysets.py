@@ -1,25 +1,27 @@
 from django.db.models import Sum, Count, Q, Case, Avg, When, FloatField, ExpressionWrapper, F
+from django.db.models.fields import BooleanField
 from django.utils import timezone
 
 from session_client.models import ClientModel
 import pendulum as p
+
 
 def annotate_client_list(user, active=True):
     """
     Returns a queryset of clients with common annotations.
     The queryset is lazy and won't hit the database until evaluated.
     """
-    date_ref = p.instance(timezone.now())
+    date_ref = p.now()
     three_months_ago = date_ref.subtract(months=3).date()
 
     return ClientModel.objects.filter(
         user=user,
         active=active
     ).annotate(
-        total_payments=Sum('sessionmodel__amount_paid'),
+        total_payments=Sum('sessionmodel__fee'),
         total_sessions=Count('sessionmodel'),
         month_sessions_paid=Sum(
-            'sessionmodel__amount_paid',
+            'sessionmodel__fee',
             filter=Q(
                 sessionmodel__date__gte=date_ref.subtract(days=30).date(),
                 sessionmodel__date__lte=date_ref.date(),
@@ -27,11 +29,11 @@ def annotate_client_list(user, active=True):
             )
         ),
         month_sessions_expected=Sum(
-            'sessionmodel__amount_paid',
+            'sessionmodel__fee',
             filter=Q(
                 sessionmodel__date__gte=date_ref.subtract(days=30).date(),
                 sessionmodel__date__lte=date_ref.date(),
-            ),exclude=Q(sessionmodel__attendance__exact="Cancel")
+            ), exclude=Q(sessionmodel__attendance__exact="Cancel")
         ),
         pending_sort_sessions=Count(
             'sessionmodel',
@@ -58,10 +60,11 @@ def annotate_client_list(user, active=True):
                 default=0,
                 output_field=FloatField()
             ),
-            filter=Q(sessionmodel__date__gte=three_months_ago)
+            filter=Q(sessionmodel__date__gte=three_months_ago, sessionmodel__date__lte=date_ref.date())
         ),
         attendance_percentage=ExpressionWrapper(
             F('attendance_rate') * 100,
             output_field=FloatField()
-        )
+        ),
+        times_count=Count('times')
     )

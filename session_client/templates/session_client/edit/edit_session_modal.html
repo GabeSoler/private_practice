@@ -1,10 +1,12 @@
 {% extends '_modal.html' %}
-{% load django_bootstrap5 %}
+{% load django_bootstrap5 i18n %}
+
+{% block modal-id %}-{{ session.uuid }}{% endblock %}
 
 {% block modal_title %}
     {% if session %}Session: <small class="fs-5">{{ session.client }} - {{ session.date }}</small>
     {% else %}
-        <div class="display-4">Add Session</div>
+        <div class="display-4">{% translate 'Add Session' %}</div>
     {% endif %}
 {% endblock modal_title %}
 
@@ -13,31 +15,44 @@
     <div id="modal-body-wrapper">
         {% partialdef modal-body-partial inline %}
 
-            <div class="card bg-dark mb-5 border border-secondary">
-                <form data-bs-theme="dark"
+            <div class="card mb-5 border border-secondary">
+                <form
 
                         {% if session %}
-                      action="{% url 'session_client:edit_session' session.pk %}"
+                      action="{% url 'session_client:edit_session' session.uuid %}"
                       hx-target="#modal-body-wrapper"
-                      hx-post="{% url 'session_client:edit_session' session.pk %}"
+                      hx-post="{% url 'session_client:edit_session' session.uuid %}"
                         {% else %}
                       action="{% url 'session_client:add_session' %}"
+                      hx-post="{% url 'session_client:add_session' %}"
                         {% endif %}
                       method="post">
 
                     {% csrf_token %}
                     <div class="card-body">
 
-                        <!--- Session Title -->
+                        <!--- Session Client and Calendar -->
                         <div class="container text-center">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <small>Client:</small>
+                                    <small>{{ form.client.label }}:</small>
                                     {% bootstrap_field form.client layout="horizontal" show_label="skip" show_help=False %}
                                 </div>
                                 <div class="col">
-                                    <small>Date:</small>
+                            <small>{{ form.tenant.label }}:</small>
+                            {% bootstrap_field form.tenant layout="horizontal" show_label="skip" show_help=False field_class="mx-auto" %}
+                                </div>
+                            </div>
+                        </div>
+                        <!--- Session Date and time -->
+                        <div class="container text-center border-top border-secondary">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <small>{{ form.date.label }}:</small>
                                     {% bootstrap_field form.date layout="horizontal" show_label="skip" show_help=False %}
+                                </div>
+                                <div class="col">
+                                    <small>{{ form.time.label }}:</small>
                                     {% bootstrap_field form.start_time layout="horizontal" show_label="skip" show_help=False %}
 
                                 </div>
@@ -45,15 +60,12 @@
                         </div>
 
                         <!--- Session Brief -->
-                        <div class="container text-center border-top border-secondary m-1">
-                            <small>Session brief:</small>
-                            {% bootstrap_field form.brief layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
-                        </div>
+                        <div class="container text-center border-top border-secondary col-12 d-block">
+                            <div class="mx-auto">
+                            <small>{{ form.keywords.label}}:</small>
+                            {% bootstrap_field form.keywords layout="horizontal" show_label="skip" show_help=False field_class="col-12 mt-1" %}
 
-                        <!--- Session Calendar -->
-                        <div class="container text-center border-top border-secondary m-1">
-                            <small>Session Calendar:</small>
-                            {% bootstrap_field form.calendar layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
+                            </div>
                         </div>
 
                         <!--- Session Attendance -->
@@ -61,11 +73,11 @@
                         <div class="container text-center border-top border-secondary">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <small>Attendance:</small>
+                                    <small>{{ form.attendance.label }}:</small>
                                     {% bootstrap_field form.attendance layout="horizontal" show_label="skip" show_help=False %}
                                 </div>
                                 <div class="col">
-                                    <small>Status:</small>
+                                    <small>{{ form.status.label }}:</small>
                                     <p>{{ form.open.as_field_group }}</p>
                                 </div>
                             </div>
@@ -76,25 +88,38 @@
                         <div class="container text-center border-top border-secondary">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <small>Payment:</small>
+                                    <small></small>
                                     <p>{{ form.paid.as_field_group }}</p>
                                 </div>
                                 <div class="col">
-                                    <small>Amount:</small>
-                                    {% bootstrap_field form.amount_paid layout="horizontal" show_label="skip" show_help=False %}
+                                    <small>{{ form.fee.label }}:</small>
+                                    {% bootstrap_field form.fee layout="horizontal" show_label="skip" show_help=False %}
                                 </div>
                             </div>
                         </div>
 
-                        {% bootstrap_button "Save" button_type="submit" button_class="btn" extra_classes="float-end btn-secondary m-3" %}
-                    </div>
+                        <div class="row">
+                            <div class="col">
                     {% if session %}
                         <button
                                 hx-confirm="Confirm session delete"
-                                hx-delete="{% url 'session_client:hx_delete_session' session.pk %}"
-                                class="btn btn-outline-danger start-0 m-2">Delete
-                        </button>
+                                hx-delete="{% url 'session_client:hx_delete_session' session.uuid %}"
+                                class="btn btn-outline-danger start-0 m-2">{% translate 'Delete' %}</button>
                     {% endif %}
+
+                            </div>
+                            <div class="col" id="ups-col">
+                        <p class="text-danger" id="ups-message"></p>
+
+                            </div>
+                            <div class="col">
+
+                        <button
+                                type="submit"
+                                class="btn btn-secondary float-end">{% translate 'Save' %}</button>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
         {% endpartialdef %}

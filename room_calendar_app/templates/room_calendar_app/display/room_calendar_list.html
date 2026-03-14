@@ -1,10 +1,13 @@
 {% extends 'room_calendar_app/navs/rooms-nav.html' %}
+{% load django_bootstrap5 i18n %}
+
 
 {% block content %}
+
     {% if calendar_tenant|length > 3  %}
     <div class="container bg-primary">
-        <label for="client-search-input">Filter clients</label>
-        <input class="form-control" type="text" placeholder="Search" id="client-search-input"
+        <label for="client-search-input">{% translate 'Filter clients' %}</label>
+        <input class="form-control" type="text" placeholder="{% translate 'Search' %}" id="client-search-input"
                                                         _="on input
                                                         tell <a/> in <li/>
                                                             show closest <div>.card/>
@@ -18,49 +21,81 @@
 
 
     <ul class="list-group">
-        {% for calendar in calendar_tenant %}
-            <li class="list-group-item">
-                <div class="row">
-                    <div class="col">
+        {% for calendar in my_rooms %}
+            <li class="list-group-item border border-secondary my-1">
+        {% partialdef calendar_info_partial inline %}
+            <div id="calendar_info_wrapper">
+                <div class="row row-cols-3 row-cols-sm-5">
+                    <div class="col-4">
                         <span class="display-5">{{ calendar.name }}| </span>
 
                     </div>
-                    <div class="col">
 
+                    <div class="col px-0">
+                        <small>{% translate 'Period' %}:</small></br>
+
+                        <form class="d-inline mx-0 px-0">
+                                <input class="visually-hidden" name="calendar" value="{{ calendar.pk }}">
+                                <input class="visually-hidden" name="date_reference" value="{{ month_util.prev_ref|date:"Y-m-d" }}">
+                            <button class="btn d-inline px-0 mx-0" type="submit">
+                            <i class="bi bi-caret-left-fill"
+                                hx-post="{% url 'room_calendar_app:room_list_refresh' %}"
+                                hx-target="closest <li/>"
+                                hx-trigger="click"
+                            ></i>
+                            </button>
+                            </form>
+
+                        <small class="mx-0 px-0">{{ month_util.month}}
+                            </small>
+
+                            {% if date_initial %}
+                        <form class="d-inline px-0 mx-0"
+                                hx-post="{% url 'room_calendar_app:room_list_refresh' %}"
+                                hx-target="closest <li/>"
+                                hx-trigger="load once"
+                                >
+                                <input class="visually-hidden" name="calendar" value="{{ calendar.pk }}">
+                                <input class="visually-hidden" name="date_reference" value="{{ date_initial|date:"Y-m-d" }}">
+                            </form>
+                            {% endif %}
+
+                        <form class="d-inline mx-0 px-0">
+                                <input class="visually-hidden" name="date_reference" value="{{ month_util.next_ref|date:"Y-m-d" }}">
+                                <input class="visually-hidden" name="calendar" value="{{ calendar.pk }}">
+                            <button class="btn d-inline mx-0 px-0" type="submit">
+                            <i class="bi bi-caret-right-fill"
+                                hx-post="{% url 'room_calendar_app:room_list_refresh' %}"
+                                hx-target="closest <li/>"
+                                hx-trigger="click"
+                            ></i>
+                            </button>
+                            </form>
                     </div>
 
+                <div class="col">
+                    <small>{% translate 'Sessions' %}:</small></br>
+                    <span class="fs-4">{{ totals.total_sessions }}</span>
                 </div>
-                <div class="row">
-                    <div class="col">
-                        <ul class="list-group">
-                            {% for tenant in  calendar.tenants.all %}
-                                <li class="list-group-item py-0">
-                                    {% if tenant.user == user %}
-                                        <a href="{% url 'room_calendar_app:tenant' tenant.pk %}"
-                                           hx-get="{% url 'room_calendar_app:tenant' tenant.pk %}"
-                                            hx-target="#modal-wrapper"
-                                        >- {{ tenant.name }}
-                                        (Me)</a>
-                                    {% else %}
-                                        <span>- {{ tenant.name }}</span>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
+                <div class="col d-sm-none"></div>
+                <div class="col">
+                    <small>{% translate 'Income' %}</small></br>
+                    <span class="fs-4">{{ totals.total_income }}</span>
+                </div>
+                <div class="col">
+                    <small>{% translate 'Rent' %}</small></br>
+                    <span class="fs-4">{{ totals.total_pay }}</span>
+                </div>
+
                     </div>
-                <div class="col">
-                    Sessions Month</br>
-                    <span class="placeholder bg-secondary col-2"></span>
-                </div>
-                <div class="col">
-                    to pay month
-                    <span class="placeholder bg-secondary col-2"></span>
-                </div>
-                </div>
-            </li>
+                    {% endpartialdef calendar_info_partial %}
+        </li>
         {% empty %}
-            <li class="list-group-item">There are no clients yet.</li>
-            </ul>
+            <li class="list-group-item">{% translate 'There are no Spaces.' %}
+            <button class="btn"
+            hx-get="{% url 'room_calendar_app:add_room_calendar' %}"
+            >{% translate 'Add Room' %}</button></li>
         {% endfor %}
+            </ul>
 
 {% endblock content %}

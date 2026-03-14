@@ -1,6 +1,7 @@
 .venv
 .env
 ppm_app/.env
+ppm_app/.env.dk
 __pycache__/
 db.sqlite3
 .DS_Store

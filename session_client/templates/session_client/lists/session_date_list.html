@@ -1,9 +1,10 @@
-
-
 {% extends 'session_client/navs/session-nav.html' %}
+{% load i18n %}
+
+
 {% load django_bootstrap5 %}
 
-{% block search_nav %}
+{% block search %}
 
 
 
@@ -11,12 +12,12 @@
 
   <div id="form-table-wrapper">
   {% partialdef form-partial inline %}
-  <form action={% url 'session_client:session_search' %} method="post"
-    hx-post={% url "session_client:session_search" %}
-    hx-target="#session-list-wrapper"
-    hx-trigger="change throttle:1s,load once"
+  <form
+    hx-post="{% url "session_client:session_search" %}"
+            hx-target="#tableBody"
+    hx-trigger="change throttle:1s,load once,RefreshTable"
+              id="session-list-form"
     >
-    {% csrf_token %}
     <table
     class="table table-primary table-sm mb-0"
     id="switch-table"
@@ -44,4 +45,5 @@
       {% endpartialdef %} <!-- end partial table -->
       </div>
 
-  {% endblock search_nav %}
+  {% endblock search %}
+

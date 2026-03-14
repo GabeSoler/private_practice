@@ -1,0 +1,47 @@
+{% extends '_modal.html' %}
+    {% load django_bootstrap5 i18n %}
+
+{% block modal_title %}
+    {% if block_item %}
+        <h3>{% translate 'Edit Block' %}:{{ block_item.start_time }}-{{ block_item.end_time }}</h3>
+    {% else %}
+        <h2>{% translate 'Add a new Block' %}</h2>
+    {% endif %}
+{% endblock modal_title %}
+{% block modal_body %}
+
+
+    <div class="card">
+        <div class="card-body">
+
+            {% partialdef block-form-partial inline %}
+                <form id="block-form"
+                     >
+                    {% csrf_token %}
+
+
+                    {% bootstrap_field form.tenant size="lg" %}
+                    {% bootstrap_field form.day size="lg" %}
+                    {% bootstrap_field form.start_time size="sm" %}
+                    {% bootstrap_field form.end_time size="sm" %}
+
+                    <button
+                            {% if block_item.pk %}
+                      hx-post="{% url 'room_calendar_app:block_edit' block_item.pk %}"
+                      hx-target="#block-form"
+                      hx-swap="outerHTML"
+                        {% else %}
+                      hx-post="{% url 'room_calendar_app:block_add_with_room' calendar_pk %}"
+                      hx-target="#block-form"
+                      hx-swap="outerHTML"
+                        {% endif %}
+                            type="submit" class="btn btn-secondary float-end">{% translate 'Submit' %}</button>
+
+                    {% if block_item %}
+                        <button type="delete" class="btn btn-primary float-start">{% translate 'Delete' %}</button>
+                    {% endif %}
+                </form>
+            {% endpartialdef block-form-partial %}
+        </div>
+    </div>
+{% endblock modal_body %}

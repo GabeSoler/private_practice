@@ -1,160 +1,31 @@
 {% extends '_base.html' %}
-
+{% load i18n %}
 {% block local_nav %}
     <!-- Sessions Nav -->
     <nav
             class="nav mt-0 nav-tabs bg-secondary"
     >
-        <h4 class="text-primary m-2">Sessions</h4>
+        <h4 class="text-primary m-2">{% translate 'Sessions' %}</h4>
 
         <a class="nav-link {% if request.path == "/session_list/" %}active {% endif %}"
            href="{% url "session_client:session_list" %}" aria-current="page"
-        ><i class="bi bi-folder2-open"></i> Open</a
+        ><i class="bi bi-folder2-open"></i> {% translate 'Open' %}</a
         >
         <a class="nav-link {% if request.path == "/session_search/" %}active {% endif %}"
            href="{% url "session_client:session_search" %}"
-        ><i class="bi bi-calendar-date"></i> Search</a>
+        ><i class="bi bi-calendar-date"></i> {% translate 'Search' %}</a>
 
         <a class="nav-link {% if request.path == "/add_session/" %}active{% endif %}"
            href="{% url "session_client:add_session" %}"
            hx-get="{% url "session_client:add_session" %}"
            hx-target="#modal-wrapper"
-           hx-push-url="true">Add</a>
+           ><i class="bi bi-plus-circle"></i></a>
 
-        {% comment %}
-    <a class="nav-link {% if request.path == "/add_session/"  %}active{% endif %}"
-      href="{% url "session_client:add_session" %}">Add</a>{% endcomment %}
     </nav>
 
 
 {% endblock local_nav %}
 
-<div id="content_wrap">
-    {% block search-nav %} {% comment %} for local search of lists {% endcomment %}
-
-    {% endblock search-nav %}
-
     {% block content %}
-
-        <!-- Session list -->
-        <div id="session-list-wrapper">
-            {% if sessions %} {% comment %} As i re use it its here, a bit messy :/ {% endcomment %}
-                {% partialdef session-list-partial inline %}
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">Date
-                            </th>
-                            <th scope="col">Client
-                            </th>
-                            <th scope="col">Attendance
-                            </th>
-                            <th scope="col">Brief
-                            </th>
-                            <th scope="col">Paid
-                            </th>
-                            <th scope="col">Open
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody id="tableBody">
-                        {% for session in sessions %}
-                            {% partialdef row-instance inline %}
-                                <tr class="fade-in">
-                                    <th scope="row">
-                                        <a href="{% url "session_client:session_hx_item" session.pk %}"
-                                           hx-get="{% url "session_client:session_hx_item" session.pk %}"
-                                           hx-target="#modal-wrapper">
-                                            {% if session.date %}{{ session.date }}{% else %}
-                                                {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>
-                                    </th>
-
-                                    <td>{{ session.client }}</td>
-                                    {% partialdef attendance_partial inline %}
-                                        <td>
-                                            {{ session.get_attendance_display|default:"--" }}
-                                            <div class="dropdown d-inline">
-                                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li>
-                                                        <a class="dropdown-item small
-                                                        {% if 'Attended' == session.attendance %}
-                                                    disabled" aria-disabled="true"{% else %}"{% endif %}
-                                                        hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'Attended' %}"
-                                                        hx-target="closest <td/>"
-                                                        >Attended<i class="bi bi-play-fill"></i></a></li>
-                                                    <li>
-                                                        <a class="dropdown-item
-                                                        {% if 'LateC' == session.attendance %}
-                                                    disabled" aria-disabled="true"{% else %}"{% endif %}
-                                                        hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'LateC' %}"
-                                                        hx-target="closest <td/>"
-                                                        >Late Cancelled<i class="bi bi-play-fill"></i></a></li>
-                                                    <li>
-                                                        <a class="dropdown-item small
-                                                        {% if 'Missed' == session.attendance %}
-                                                    disabled" aria-disabled="true"{% else %}"{% endif %}
-                                                        hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'Missed' %}"
-                                                        hx-target="closest <td/>"
-                                                        >Missed<i class="bi bi-play-fill"></i></a></li>
-                                                    <li>
-                                                        <a class="dropdown-item small
-                                                        {% if 'Cancel' == session.attendance %}
-                                                    disabled" aria-disabled="true"{% else %}"{% endif %}
-                                                        hx-post="{% url 'session_client:sessions_hx_edit_attendance' session.pk 'Cancel' %}"
-                                                        hx-target="closest <td/>"
-                                                        >Cancelled<i class="bi bi-play-fill"></i></a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    {% endpartialdef attendance_partial %}
-                                    <td>{{ session.brief|truncatechars:10 }}</td>
-
-                                    <!-- paid/not paid partial -->
-                                    {% partialdef session_paid inline %}
-                                        <td hx-put={% url "session_client:sessions_hx_edit_paid" session.pk %}>
-
-                                            {% if session.paid %}
-                                                <i
-                                                        data-bs-toggle="tooltip" data-bs-title="Paid"
-                                                        class="bi bi-currency-exchange text-success"></i>
-                                            {% else %}
-                                                <i
-                                                        data-bs-toggle="tooltip" data-bs-title="Not Paid"
-                                                        class="bi bi-currency-exchange text-danger"></i>
-                                            {% endif %}
-                                        </td>
-                                    {% endpartialdef session_paid %}
-
-                                    <!-- Session open/closed partial -->
-                                    {% partialdef session_open inline %}
-                                        <td hx-put={% url "session_client:sessions_hx_edit_open" session.pk %}>
-                                            {% if session.open %}
-                                                <i
-                                                        data-bs-toggle="tooltip" data-bs-title="Open"
-                                                        class="bi bi-circle-fill text-warning"></i>
-                                            {% else %}
-                                                <i
-                                                        data-bs-toggle="tooltip" data-bs-title="Done"
-                                                        class="bi bi-check-circle-fill text-success"></i>
-                                            {% endif %}
-                                        </td>
-                                        {% if messages %}
-                                            {% include '_toasts.html' %}{% endif %}{% comment %}trying to set a toast system for messages{% endcomment %}
-
-                                    {% endpartialdef session_open %}
-                                </tr>
-                            {% endpartialdef %}
-
-                            </tbody>
-                        {% endfor %}
-                    </table>
-                {% endpartialdef session-list-partial %}
-            {% endif %}
-        </div> <!-- end session list -->
-
-        </div>
-
+        {% include 'session_client/hx/_session_list.html' %}
     {% endblock content %}

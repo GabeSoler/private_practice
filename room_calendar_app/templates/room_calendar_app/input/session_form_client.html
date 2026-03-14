@@ -1,22 +1,30 @@
 {% extends '_modal.html' %}
-{% load django_bootstrap5 %}
+{% load django_bootstrap5 i18n%}
 
 {% block modal_title %}
-    Add Session
+    {% translate 'Add Session' %}
 {% endblock modal_title %}
 
 {% block modal_body %}
     <div id="session-form-wrapper">
     {% partialdef session_calendar_form_partial inline %}
-        <form action="{% url 'session_client:week_view_add_session_client' %}"
-              method="post"
+        <form
               hx-post="{% url 'session_client:week_view_add_session_client' %}"
               hx-target="#session-form-wrapper"
         >
             {% csrf_token %}
 
-
+            <div class="row">
+                <div class="col">
             {% bootstrap_field form.client %}
+
+                </div>
+                <div class="col">
+
+            {% bootstrap_field form.tenant %}
+                </div>
+            </div>
+
 
             <div class="row">
                 <div class="col">
@@ -27,11 +35,10 @@
                 </div>
 
             </div>
-            {% bootstrap_field form.calendar %}
 
             <button type="submit"
                     class="btn btn-outline-secondary float-end"
-            >Add Session
+            >{% translate 'Add' %}
             </button>
 
         </form>
