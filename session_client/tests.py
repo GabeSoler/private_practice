@@ -1,11 +1,10 @@
+from copy import deepcopy
 from datetime import timedelta
 
 from django.test import TestCase
 from django.urls import reverse
-
-from room_calendar_app.models import TenantModel
 from room_calendar_app.tests import MetaTestSetupMixin
-from session_client.models import SessionModel, ClientModel, ClientExtraTimes
+from session_client.models import SessionModel, ClientModel, ClientTimes
 import pendulum as p
 
 from session_client.querysets import annotate_client_list
@@ -13,159 +12,12 @@ from session_client.utils import time_plus_duration
 
 
 class TestClientSession(MetaTestSetupMixin, TestCase):
-    def test_overlap_sessions(self):
-        """ tests the first part of the system to check for overlaps """
-        session = self.session_overlap_1
-        session_overlap = self.session_overlap_2
-        queryset = session.overlap_set()
-        self.assertIn(session_overlap, queryset)
-        self.assertEqual(len(queryset), 1)
-
-    def test_get_last_date_or_now(self):
-        """create a fresh client to set a first session on the past
-            then create a session on the future to test the function
-        """
-        new_client = ClientModel.objects.create(
-            user=self.user,
-            code='test',
-            tenant=self.tenant_default,
-            day=1,
-            time="09,00",
-            duration=timedelta(hours=1)
-        )
-        SessionModel.objects.create(
-            client=new_client,
-            date=p.now().subtract(weeks=3).date(),
-            start_time=p.time(8, 0),
-            end_time=p.time(9, 30),
-            calendar=self.room_1,
-
-        )
-        gotten_date = new_client.get_last_date_or_now()
-        self.assertEqual(gotten_date.date(), self.now.date())
-
-        # setting last date in the future
-        future_session = SessionModel.objects.create(
-            client=new_client,
-            date=p.now().add(weeks=3).date(),
-            start_time=p.time(8, 0),
-            end_time=p.time(9, 30),
-            calendar=self.room_1,
-        )
-        gotten_date = new_client.get_last_date_or_now()
-        self.assertEqual(future_session.date, gotten_date.date())
-
-    def test_deduce_next_datetime(self):
-        """ tests that the deduce function is calculating from client info """
-        client = self.client_instance
-        session_date = self.now.add(weeks=20).next(p.FRIDAY).date()
-        session = SessionModel.objects.create(client=client,
-                                              calendar=self.room_default,
-                                              date=session_date,
-                                              start_time=client.time,
-                                              end_time=time_plus_duration(client.time, client.duration)
-                                              )
-        deduced_datetime = client.deduce_next_datetime()
-        self.assertEqual(deduced_datetime.day_of_week, client.day)
-        # the deduced time should be a week later
-        self.assertEqual(deduced_datetime.subtract(weeks=1).week_of_year, session_date.week_of_year)
-        session.date = p.instance(session.date).next(p.TUESDAY)
-        session.save()
-        self.assertEqual(deduced_datetime.subtract(weeks=1).week_of_year, session_date.week_of_year)
-        new_client = client
-        new_client.pk = None
-        new_client.day = p.FRIDAY
-        new_client.save()
-        session.client = new_client
-        session.date = p.instance(session.date).next(p.THURSDAY)
-        session.save()
-        deduced_datetime = new_client.deduce_next_datetime()
-        # the deduced day must mach the client day
-        self.assertEqual(deduced_datetime.day_of_week, new_client.day)
-        # the deduced time should be a week later
-        self.assertEqual(deduced_datetime.subtract(weeks=1).week_of_year, session_date.week_of_year)
-
-    def test_deduce_from_client(self):
-        """ check session can deduce room and dates from client info """
-        building_session = SessionModel(client=self.client_instance)
-        self.assertTrue(building_session.start_time, "09:00:00")  # defaults
-        self.assertTrue(building_session.end_time, "10:00:00")  # defaults
-        self.assertFalse(building_session.calendar)
-        building_session.deduce_from_client()
-        self.assertTrue(building_session.start_time, "08:00:00")
-        self.assertTrue(building_session.end_time, "09:00:00")
-        self.assertTrue(building_session.date, p.now().date())
-        self.assertTrue(building_session.calendar, self.room_1)
-
-    def test_is_unique_session(self):
-        """ tests the overlap system is picking up one above and one bellow"""
-        session = self.session_overlap_1
-        session_overlap = self.session_overlap_1
-        ok, overlaps = session.is_unique()
-        self.assertFalse(ok)
-        ok, overlaps = session_overlap.is_unique()
-        self.assertFalse(ok)
-        self.assertEqual(len(overlaps), 1)
-
-    def test_series_overlap(self):
-        client_instance = self.client_instance
-        # creating a series to test overlaps with the defaults
-        saved, series = client_instance.add_series(5, add_weeks=2,
-                                                   overlap_check=False)
-        self.assertTrue(saved)
-        self.assertEqual(len(series), 5)
-
-        # creating overlaps with a new client
-        new_client = ClientModel(tenant=self.tenant,
-                                 user=self.user,
-                                 time=p.time(8, 30),
-                                 duration=p.duration(hours=1),
-                                 code="NewClient!",
-                                 day=p.MONDAY,
-                                 )
-        new_client.save()
-        new_saved, new_series = new_client.add_series(5, add_weeks=2,
-                                                      overlap_check=False)
-        self.assertTrue(new_saved)
-        self.assertEqual(len(new_series), 5)
-        date_of_new_session = p.instance(new_series[0].date)
-        self.assertEqual(date_of_new_session.day_of_week, client_instance.day)
-        # The range to test
-        start_range = self.now.add(weeks=2)
-        end_range = self.now.add(weeks=9)
-        # testing with only the calendar, range and day of the week
-        overlaps = client_instance.check_series_overlap(start_range, end_range)
-        overlaps_2 = new_client.check_series_overlap(start_range, end_range)
-        print(f"* Series list,old {series}")
-        print(f"* Series list,new {new_series}")
-        print("* ❗️Overlap list", overlaps)
-        self.assertEqual(len(overlaps), 10)
-        self.assertEqual(len(overlaps_2), 10)
-
-    def test_create_series(self):
-        """ tests the series creation """
-        client_instance = self.client_instance
-        client_count = SessionModel.objects.filter(client=self.client_instance).count()
-        client_instance.add_series(amount=5)
-        client_count_after = SessionModel.objects.filter(client=self.client_instance).count()
-        self.assertTrue(client_count < client_count_after)
-        self.assertEqual(client_count_after - client_count, 5)
-
-    def test_create_session(self):
-        ...
-
-    def test_session_instance_modal(self):
-        self.client.force_login(self.user)
-        response = self.client.get(reverse('session_client:session_hx_item',
-                                           args=(self.session_1.pk,)),
-                                   headers=self.htmx_headers)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.session_1.client)
-        self.assertContains(response, self.session_1.keywords)
-
     def test_annotate_client_list(self):
-        clients = annotate_client_list(self.user, active=True)
+        clients = annotate_client_list(self.user)
         client = clients[0]
+        sessions = client.sessionmodel_set.all()
+        self.assertTrue(len(clients) > 0)
+        self.assertTrue(len(sessions) > 0)
         self.assertEqual(len(clients), 2)
         print("total_payments:", client.total_payments)
         self.assertEqual(client.total_payments, 840)
@@ -197,6 +49,164 @@ class TestClientSession(MetaTestSetupMixin, TestCase):
         self.assertIsNotNone(client.attendance_rate)
         print("attendance_percentage:", client.attendance_percentage)
         self.assertAlmostEqual(client.attendance_percentage, client.attendance_rate * 100)
+
+    def test_overlap_sessions(self):
+        """ tests the first part of the system to check for overlaps """
+        session = self.session_overlap_1
+        session_overlap = self.session_overlap_2
+        queryset = session.overlap_set()
+        self.assertIn(session_overlap, queryset)
+        self.assertEqual(len(queryset), 1)
+
+    def test_get_last_date_or_now(self):
+        """create a fresh client to set a first session on the past
+            then create a session on the future to test the function
+        """
+        new_client = ClientModel.objects.create(
+            user=self.user,
+            code='test',
+            tenant=self.tenant_default,
+            duration=timedelta(hours=1)
+        )
+        SessionModel.objects.create(
+            client=new_client,
+            date=p.now().subtract(weeks=3).date(),
+            start_time=p.time(8, 0),
+            end_time=p.time(9, 30),
+            tenant=self.tenant_default,
+
+        )
+        gotten_date = new_client.get_last_date_or_now()
+        self.assertEqual(gotten_date.date(), self.now.date())
+
+        # setting last date in the future
+        future_session = SessionModel.objects.create(
+            client=new_client,
+            date=p.now().add(weeks=3).date(),
+            start_time=p.time(8, 0),
+            end_time=p.time(9, 30),
+            tenant=self.tenant_default,
+        )
+        gotten_date = new_client.get_last_date_or_now()
+        self.assertEqual(future_session.date, gotten_date.date())
+
+    def test_deduce_next_datetime(self):
+        """ tests that the deduce function is calculating from client info """
+        client = self.client_instance
+        session_date = self.now.add(weeks=20).next(p.FRIDAY).date()
+        session = SessionModel.objects.create(client=client,
+                                              tenant=self.tenant_default,
+                                              date=session_date,
+                                              start_time="09:00",
+                                              end_time=time_plus_duration("09:00", client.duration)
+                                              )
+        deduced_datetime = client.deduce_next_datetime()
+        self.assertEqual(deduced_datetime.day_of_week, p.MONDAY)
+        # the deduced time should be a week later
+        self.assertEqual(deduced_datetime.subtract(weeks=1).week_of_year, session_date.week_of_year)
+        session.date = p.instance(session.date).next(p.TUESDAY)
+        session.save()
+        self.assertEqual(deduced_datetime.subtract(weeks=1).week_of_year, session_date.week_of_year)
+        new_client = ClientModel.objects.create(code="NEW", tenant=self.tenant_default,
+                                                duration=timedelta(hours=1),
+                                                user=self.user
+                                                )
+        session.client = new_client
+        session.date = p.instance(session.date).next(p.THURSDAY)
+        session_date = session.date
+        session.save()
+        deduced_datetime = new_client.deduce_next_datetime()
+        # the deduced day must match the client day
+        self.assertEqual(deduced_datetime.day_of_week, session_date.day_of_week)
+        # the deduced time should be a week later
+        self.assertEqual(deduced_datetime.subtract(weeks=1).week_of_year, session_date.week_of_year)
+
+    def test_deduce_from_client(self):
+        """ check session can deduce room and dates from client info """
+        client = self.client_instance
+        client_time = self.client_instance_time_1
+        building_session = SessionModel(client=client)
+        self.assertEqual(building_session.start_time, "09:00:00")  # defaults
+        self.assertEqual(building_session.end_time, "10:00:00")  # defaults
+        self.assertFalse(building_session.tenant)
+        building_session.deduce_from_client()
+        self.assertNotEqual(building_session.start_time, client_time.time)  # as it has thre is not change
+        building_session.start_time = None
+        building_session.deduce_from_client()
+        self.assertEqual(building_session.start_time, client_time.time)  # now it finds something
+        self.assertEqual(building_session.end_time, time_plus_duration(client_time.time, client.duration))  # defaults
+        self.assertEqual(building_session.tenant, client_time.tenant)
+        self.assertEqual(building_session.date, client.deduce_next_datetime().date())
+        self.assertEqual(building_session.tenant.calendar, self.room_1)
+
+    def test_is_unique_session(self):
+        """ tests the overlap system is picking up one above and one bellow"""
+        session = self.session_overlap_1
+        session_overlap = self.session_overlap_1
+        ok, overlaps = session.is_unique()
+        self.assertFalse(ok)
+        ok, overlaps = session_overlap.is_unique()
+        self.assertFalse(ok)
+        self.assertEqual(len(overlaps), 1)
+
+    def test_series_overlap(self):
+        client_instance = self.client_instance
+        # creating a series to test overlaps with the defaults
+        saved, series = client_instance.add_series(5, add_weeks=2,
+                                                   overlap_check=False)
+        self.assertTrue(saved)
+        self.assertEqual(len(series), 5)
+
+        # creating overlaps with a new client
+        new_client = ClientModel(tenant=self.tenant,
+                                 user=self.user,
+                                 duration=p.duration(hours=1),
+                                 code="NewClient!",
+                                 )
+        new_client.save()
+        client_time = ClientTimes.objects.create(client=new_client,
+                                                 time="08:00:00",
+                                                 tenant=self.tenant,
+                                                 day=p.FRIDAY,
+                                                 fortnight=False)
+        new_saved, new_series = new_client.add_series(5, add_weeks=2,
+                                                      overlap_check=False)
+        self.assertTrue(new_saved)
+        self.assertEqual(len(new_series), 5)
+        date_of_new_session = p.instance(new_series[0].date)
+        self.assertEqual(date_of_new_session.day_of_week, client_time.day)
+        # The range to test
+        start_range = self.now.add(weeks=2)
+        end_range = self.now.add(weeks=9)
+        # testing with only the calendar, range and day of the week
+        overlaps = self.client_instance_time_1.check_series_overlap(start_range, end_range)
+        overlaps_2 = client_time.check_series_overlap(start_range, end_range)
+        print(f"* Series list,old {series}")
+        print(f"* Series list,new {new_series}")
+        print("* ❗️Overlap list", overlaps)
+        self.assertEqual(len(overlaps), 5)
+        self.assertEqual(len(overlaps_2), 5)
+
+    def test_create_series(self):
+        """ tests the series creation """
+        client_instance = self.client_instance
+        client_count = SessionModel.objects.filter(client=self.client_instance).count()
+        client_instance.add_series(5)
+        client_count_after = SessionModel.objects.filter(client=self.client_instance).count()
+        self.assertTrue(client_count < client_count_after)
+        self.assertEqual(client_count_after - client_count, 5)
+
+    def test_create_session(self):
+        ...
+
+    def test_session_instance_modal(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('session_client:session_hx_item',
+                                           args=(self.session_1.uuid,)),
+                                   headers=self.htmx_headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.session_1.client)
+        self.assertContains(response, self.session_1.keywords)
 
     def test_client_add_view(self):
         self.client.force_login(self.user)
@@ -230,35 +240,37 @@ class TestClientSession(MetaTestSetupMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('session_client:client_search'))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('session_client:edit_client', args=[self.client_instance.pk, ]))
+        response = self.client.get(reverse('session_client:edit_client', args=[self.client_instance.uuid, ]))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('session_client:client_hx_item', args=[self.client_instance.pk, ]))
+        response = self.client.get(reverse('session_client:client_hx_item', args=[self.client_instance.uuid, ]))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('session_client:session_list_with_client', args=[self.client_instance.pk, ]))
+        response = self.client.get(
+            reverse('session_client:session_list_with_client', args=[self.client_instance.uuid, ]))
         self.assertEqual(response.status_code, 200)
 
     def test_render_session_views(self):
         self.client.force_login(self.user)
-        response = self.client.get(reverse('session_client:session_list_with_client', args=[self.client_instance.pk, ]))
+        response = self.client.get(
+            reverse('session_client:session_list_with_client', args=[self.client_instance.uuid, ]))
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('session_client:session_list'))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('session_client:session_hx_item', args=[self.session_1.pk, ]))
+        response = self.client.get(reverse('session_client:session_hx_item', args=[self.session_1.uuid, ]))
         self.assertEqual(response.status_code, 200)
         response = self.client.get(reverse('session_client:session_search'))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse('session_client:edit_session', args=[self.session_1.pk, ]))
+        response = self.client.get(reverse('session_client:edit_session', args=[self.session_1.uuid, ]))
         self.assertEqual(response.status_code, 200)
         response = self.client.get(
-            reverse('session_client:session_pending_list_modal', args=[self.client_instance.pk, ]))
+            reverse('session_client:session_pending_list_modal', args=[self.client_instance.uuid, ]))
         self.assertEqual(response.status_code, 200)
 
     def test_extra_times_client_method(self):
         client = self.client_instance
         extra_time_1 = client.add_time(p.MONDAY, p.time(10, 30))
         extra_time_2 = client.add_time(p.TUESDAY, p.time(10, 30))
-        self.assertTrue(isinstance(extra_time_1, ClientExtraTimes))
-        self.assertEqual(2, client.clientextratimes_set.count())
+        self.assertTrue(isinstance(extra_time_1, ClientTimes))
+        self.assertEqual(3, client.times.count())
         created, sessions = client.add_series(3)
         self.assertTrue(created)
         self.assertEqual(len(sessions), 9)

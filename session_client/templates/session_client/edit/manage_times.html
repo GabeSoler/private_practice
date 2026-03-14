@@ -13,8 +13,8 @@
 
             <div class="mb-5">
                 <form
-                        action="{% url 'session_client:manage_client_times' client.uuid %}" method="post"
                         hx-post="{% url 'session_client:manage_client_times' client.uuid %}"
+                        hx-target="#modal-body-wrapper"
                 >
 
                     {% csrf_token %}
@@ -39,6 +39,10 @@
                             <div class="row">
                                 <div class="col">
                                     {% bootstrap_field form.tenant show_help=False show_label='skip' size="sm" %}
+                                </div>
+
+                                <div class="col">
+                                    {% bootstrap_field form.fortnight show_help=False %}
                                 </div>
 
                                 <div class="col">

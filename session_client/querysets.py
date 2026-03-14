@@ -1,4 +1,5 @@
 from django.db.models import Sum, Count, Q, Case, Avg, When, FloatField, ExpressionWrapper, F
+from django.db.models.fields import BooleanField
 from django.utils import timezone
 
 from session_client.models import ClientModel
@@ -64,5 +65,6 @@ def annotate_client_list(user, active=True):
         attendance_percentage=ExpressionWrapper(
             F('attendance_rate') * 100,
             output_field=FloatField()
-        )
+        ),
+        times_count=Count('times')
     )

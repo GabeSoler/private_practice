@@ -66,13 +66,13 @@ urlpatterns = [
          views_session.add_copy_forward_view, name='session_add_copy'),
     path('add_series/<uuid:client_uuid>/<int:number>/',
          views_session.add_series_view, name='add_series'),
+    path('session_bulk/',
+         views_session.bulk_actions_hx, name='sessions_bulk_actions'),
 
     # create a htmx response that sends back a modal with forms to add a quick sessin reference
     path("hx-week_view_add_session_client/",
          views_session.week_view_add_session_client, name="week_view_add_session_client"),
     path("hx-week_view_add_session_client/<int:year>/<int:week>/<int:week_day>/<str:time>/",
-         views_session.week_view_add_session_client, name="week_view_add_session_client"),
-    path("hx-week_view_add_session_client/<int:year>/<int:week>/<int:week_day>/<str:time>/<uuid:calendar_uuid>/",
          views_session.week_view_add_session_client, name="week_view_add_session_client"),
 
     # time views

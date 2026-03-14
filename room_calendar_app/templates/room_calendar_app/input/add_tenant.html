@@ -16,12 +16,10 @@
             {% partialdef tenant-form-partial inline %}
                 <form id="tenant-form"
                         {% if tenant %}
-                      action="{% url 'room_calendar_app:edit_tenant' tenant.uuid %}"
                       hx-post="{% url 'room_calendar_app:edit_tenant' tenant.uuid %}"
                       hx-target="#tenant-form"
                       hx-swap="outerHTML"
                         {% else %}
-                      action="{% url 'room_calendar_app:add_tenant' %}"
                       hx-post="{% url 'room_calendar_app:add_tenant' %}"
                       hx-target="#tenant-form"
                       hx-swap="outerHTML"

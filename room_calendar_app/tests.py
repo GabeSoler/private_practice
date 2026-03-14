@@ -121,7 +121,7 @@ class MetaTestSetupMixin:
             tenant=cls.tenant_host,
             fee=60,
         )
-        cls.client_instance.add_time(p.WEDNESDAY, p.now().at(12, 0).time())
+        cls.client_instance_3.add_time(p.WEDNESDAY, p.now().at(12, 0).time())
 
         # Create sessions (equivalent to occurrences)
         cls.session_1 = SessionModel.objects.create(
@@ -229,22 +229,24 @@ class CalendarOccurrenceTest(MetaTestSetupMixin, TestCase):
 
     def test_week_view_today_render(self):
         self.client.force_login(self.user)
-        response = self.client.get('/calendar/week-view/')
+        response = self.client.get(reverse('room_calendar_app:week_view'))
         self.assertEqual(response.status_code, 200)
         expected_string = p.instance(self.session_1.end_time).format("H a")
         self.assertContains(response, expected_string)
 
     def test_week_view_today_render_htmx(self):
         self.client.force_login(self.user)
-        expected_string = self.tenant.display_name
-        response = self.client.post('/calendar/week-view/',
+        expected_string = self.client_instance.code
+        response = self.client.post(reverse('room_calendar_app:week_client_defaults_view'),
                                     self.calendar_data_2,
                                     follow=True,
                                     headers=self.htmx_headers)
         self.assertContains(response, expected_string)
 
     def test_week_dict_utils(self):
-        sessions = SessionModel.objects.filter(date__week=self.now.week_of_year)
+        from .querysets import week_view_session_qs
+        sessions = week_view_session_qs(self.user)
+        sessions = sessions.filter(date__week=self.now.week_of_year)
         calendar_render = CalendarRender(sessions, self.now)
         session = sessions[0]
         start_time = session.start_time

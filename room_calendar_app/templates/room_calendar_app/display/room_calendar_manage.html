@@ -38,19 +38,19 @@
                                     <span class="bg-primary border" hidden id="code-{{ calendar.uuid }}">{{ calendar.uuid }}</span>
                     <button class="btn btn-outline-secondary btn-sm"
                             _="on click
-                    put innerHTML of previous <span/> into myText
-                    writeText(myText) into the navigator's clipboard
-                    remove .bi-clipboard from the first <i/> in me
-                    add .bi-clipboard-check-fill to the first <i/> in me
-                    end"
+                            put innerHTML of #code-{{ calendar.uuid }} into myText
+                            call navigator.clipboard.writeText(myText)
+                            remove .bi-clipboard from the first <i/> in me
+                            add .bi-clipboard-check-fill to the first <i/> in me
+                            end"
                     ><i class="bi bi-clipboard"></i>
                     </button>
                     <button class="btn btn-outline-secondary btn-sm"
                             _="on click
-                    put innerHTML of previous <span/> into myText
-                    call the navigator.share({text:myText})
-                    set my innerHTML to 'Copied!'
-                    end"
+                            put innerHTML of #code-{{ calendar.uuid }} into myText
+                            call navigator.share({text:myText})
+                            set my innerHTML to 'Copied!'
+                            end"
                     ><i class="bi bi-share-fill"></i>
                     </button>
 

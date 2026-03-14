@@ -2,10 +2,11 @@ from django.shortcuts import render, get_object_or_404
 from django_htmx.http import HttpResponseClientRefresh
 import pendulum as p
 
+from ppm_app.responses.hx_responses import ok_response_modal
 from room_calendar_app.models import TenantModel
-from .forms import TimeForm, TimeClientSetForm
+from .forms import TimeForm
 from .models import ClientTimes, ClientModel
-from django.forms import modelformset_factory, inlineformset_factory
+from django.forms import inlineformset_factory
 
 
 def edit_time(request, time_pk):
@@ -40,16 +41,22 @@ def manage_times(request, client_uuid):
     client = get_object_or_404(ClientModel, uuid=client_uuid)
     tenant_qs = TenantModel.objects.filter(user=request.user)
     FormSet = inlineformset_factory(ClientModel, ClientTimes,
-                                    fields=["day", "time", "tenant"],
+                                    fields=["day", "time", "tenant", "fortnight"],
                                     extra=1, max_num=6,
                                     )
-    initial = [{"tenant": client.pk} for _ in range(5) if client.pk]
-    formset = FormSet(instance=client, initial=initial)
+    initial = [{"tenant": client.tenant} for _ in range(5) if client.pk]
     if request.method == 'POST':
-        form = FormSet(request.POST, instance=client, initial=initial)
-        if form.is_valid():
-            form.save()
-            return HttpResponseClientRefresh()
-    for form in formset.forms:
-        form.fields["tenant"].queryset = tenant_qs
-    return render(request, template, {'formset': formset, "client": client})
+        formset = FormSet(request.POST, instance=client, initial=initial)
+        if formset.is_valid():
+            formset.save()
+            return ok_response_modal(request, "all good")
+        else:
+            for form in formset.forms:
+                form.fields["tenant"].queryset = tenant_qs
+            template += "#modal-body-partial"
+            return render(request, template, {'formset': formset, "client": client})
+    else:
+        formset = FormSet(instance=client, initial=initial)
+        for form in formset.forms:
+            form.fields["tenant"].queryset = tenant_qs
+        return render(request, template, {'formset': formset, "client": client})

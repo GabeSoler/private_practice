@@ -1,14 +1,14 @@
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Count, Q
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 
-from ppm_app.responses.hx_responses import ok_response_modal, ups_response
-from room_calendar_app.models import TenantModel, RoomCalendarModel
+from ppm_app.responses.hx_responses import ok_response_modal, ups_response, ok_response
+from room_calendar_app.models import RoomCalendarModel, TenantModel
 from .models import ClientModel, SessionModel
 from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, \
-    SelectAttendanceForm, PatchBriefForm
-from django_htmx.http import retarget, HttpResponseClientRefresh, trigger_client_event, reswap
+    SelectAttendanceForm, PatchBriefForm, SessionsBulkActionsForm
+from django_htmx.http import retarget, HttpResponseClientRefresh, reswap
 import pendulum as p
 from django.contrib import messages
 from .utils import csv_session_list_response
@@ -44,7 +44,7 @@ def sessions_view(request, client_uuid=None, add_forward=False) -> HttpResponse:
                 sessions = sessions.filter(date__lte=p.now().date())
             if client:
                 sessions = sessions.filter(client=client)
-            template_calendar = "session_client/hx/_session_list.html" + "#session-list-partial"
+            template_calendar = "session_client/hx/_session_list.html" + "#session-tbody-partial"
             context = {'sessions': sessions}
             return render(request, template_calendar, context)
         # render form errors
@@ -116,7 +116,7 @@ def sessions_search(request, review=False):
         template_hx = template + "#session-list-partial"
     else:
         template += "session_date_list.html"
-        template_hx = "session_client/hx/_session_list.html" + "#session-list-partial"
+        template_hx = "session_client/hx/_session_list.html" + "#session-tbody-partial"
     clients_user = ClientModel.objects.filter(user=request.user) or ClientModel.objects.none()  # for select
     if request.POST:
         form_partial = SearchSessionForm(data=request.POST)
@@ -229,7 +229,7 @@ def hx_delete_session(request, session_uuid):
     return render(request, '_toasts.html')
 
 
-def week_view_add_session_client(request, year=None, week=None, week_day=None, time=None, calendar_uuid=None):
+def week_view_add_session_client(request, year=None, week=None, week_day=None, time=None):
     """ to create sessions from the calendar using calendar info as base """
     template = 'room_calendar_app/input/session_form_client.html'
 
@@ -267,10 +267,9 @@ def week_view_add_session_client(request, year=None, week=None, week_day=None, t
     }
     form = SessionFromCalendarForm(initial=data)
     client_qs = ClientModel.objects.filter(user=request.user)
-    if calendar_uuid:
-        calendar = RoomCalendarModel.objects.get(uuid=calendar_uuid)
-        client_qs.filter(tenant__calendar=calendar)
-    form.fields['client'].queryset = ClientModel.objects.filter(user=request.user)
+    tenant_qs = TenantModel.objects.filter(user=request.user)
+    form.fields['client'].queryset = client_qs
+    form.fields['tenant'].queryset = tenant_qs
     context = {'form': form}
     return render(request, template, context)
 
@@ -354,3 +353,33 @@ def patch_brief_view(request, session_uuid):
         logger.info("form not valid")
     template = "session_client/hx/_brief.html"
     return render(request, template, {"form": form, "session": session})
+
+
+def bulk_actions_hx(request):
+    template = "session_client/hx/_session_list.html#bulk_form"
+    form = SessionsBulkActionsForm()
+    if request.method == 'POST':
+        form = SessionsBulkActionsForm(request.POST)
+        selected_uuids = request.POST.getlist('sessionCheckbox')
+        print(request.POST)
+        if form.is_valid():
+            action = form.cleaned_data['actions']
+            sessions = SessionModel.objects.filter(uuid__in=selected_uuids)
+            match action:
+                case "close":
+                    rows_changed = sessions.update(open=False)
+                case "open":
+                    rows_changed = sessions.update(open=True)
+                case "paid":
+                    rows_changed = sessions.update(paid=True)
+                case "unpaid":
+                    rows_changed = sessions.update(paid=False)
+                case "attended":
+                    rows_changed = sessions.update(attendance="Attended")
+                case _:
+                    rows_changed = 0
+            return ok_response(request, f"Updates: {rows_changed}",
+                               "#bulk-response",
+                               ("RefreshTable", "#session-list-form"),
+                               "innerHTML")
+    return render(request, template, {"bulk_form": form})

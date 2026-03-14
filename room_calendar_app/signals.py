@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=get_user_model())
 def signal_setup_room_calendar(sender, **kwargs):
-    created: bool = True  # if created is false in one of the bellow stops the process as it already happened
+    created = True  # if created is false in one of the bellows stops the process as it already happened
     while created:
         user = kwargs['instance']
         base_room, created = RoomCalendarModel.objects.get_or_create(user=user,

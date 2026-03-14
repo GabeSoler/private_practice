@@ -28,7 +28,26 @@
 
                 <div class="">
 
-                    {% bootstrap_form form %}
+                            <div class="row">
+                                <div class="col">
+                                    {% bootstrap_field form.day show_help=False show_label='skip' %}
+                                </div>
+
+                                <div class="col">
+                                    {% bootstrap_field form.time show_help=False show_label='skip' %}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col">
+                                    {% bootstrap_field form.tenant show_help=False show_label='skip' size="sm" %}
+                                </div>
+
+                                <div class="col">
+                                    {% bootstrap_field form.fortnight show_help=False %}
+                                </div>
+                             </div>
+                            </div>
                     <button
                             type="submit"
                             class="btn btn-secondary float-end">{% translate 'Save' %}

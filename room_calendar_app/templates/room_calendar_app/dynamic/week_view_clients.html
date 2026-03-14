@@ -39,14 +39,17 @@
                         >{{ slot|time:"H:i" }}</th>
 
                         {% for weekday,occurrence in data.items %}
-                            {% if occurrence.pk %}
+                            {% if occurrence %}
                                 <td class="table-danger"
-                                    hx-get="{% url 'session_client:edit_client_time' occurrence.pk %}"
-                                    hx-target="#modal-wrapper"
                                     style="font-size:.6rem;max-width:5rem;"
-                                    id="{{ slot }}"
-                                >{{ occurrence.code }}-
-                                    {{ occurrence.time }}</td>
+                                    id="{{ slot }}">
+                                {% for time in occurrence %}
+                                    <a class="link-info"
+                                            hx-get="{% url 'session_client:edit_client_time' time.pk %}"
+                                       hx-target="#modal-wrapper"
+                                    >{{ time.client_code }}</a>,&nbsp;
+                                    {% endfor %}
+                                </td>
                             {% else %}
                                 <td
                                         style="font-size:.6rem;">

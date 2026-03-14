@@ -51,9 +51,9 @@ def get_tenant_qs_totals(tenants_qs):
     return totals
 
 
-def week_view_session_qs(request):
+def week_view_session_qs(user):
     sessions_qs = (SessionModel.objects
-    .filter(client__user=request.user)
+    .filter(client__user=user)
     .select_related('client__user')
     .exclude(attendance="Cancel")
     .annotate(
@@ -71,7 +71,7 @@ def week_view_session_qs(request):
             Value("-"),
             Cast("end_time", output_field=CharField(max_length=5)),
             output_field=CharField()),
-        display=Case(When(client__user=request.user, then=F("in_display")), default=F("out_display")),
+        display=Case(When(client__user=user, then=F("in_display")), default=F("out_display")),
         start_datetime=ExpressionWrapper(
             F("date") + F("start_time"),
             output_field=DateTimeField()),

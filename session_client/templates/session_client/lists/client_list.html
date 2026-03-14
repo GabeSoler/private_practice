@@ -77,16 +77,33 @@
 
                                     <div class="row"><!--first client card row -->
 
-                                        <div class="col"> <!-- day, time and room -->
+                                        <div class="col"> <!-- total sessions, type, created at -->
                                             <ul class="my-1 lh-1" style="list-style-type:circle;">
                                                 <li>
-                                                <span class="small"><i class="bi bi-list-check">{{ client.total_sessions }}</i></span>
+                                                <span class="small"
+                                                      data-bs-toggle="tooltip"
+                                                      data-bs-trigger="hover"
+                                                      data-bs-title="{% translate 'Total Sessions' %}"
+                                                      data-bs-custom-class="custom-tooltip"
+                                                ><i class="bi bi-list-check">{{ client.total_sessions }}</i></span>
                                                 </li>
                                                 <li>
-                                                    <span class="small"><i class="bi bi-hash">{{ client.type }}</i></span>
+                                                    <span class="small"
+                                                          data-bs-toggle="tooltip"
+                                                          data-bs-trigger="hover"
+                                                          data-bs-title="{% translate 'Client Type' %}"
+                                                          data-bs-custom-class="custom-tooltip"
+                                                    ><i
+                                                            class="bi bi-hash">{{ client.type }}</i></span>
                                                 </li>
                                                 <li>
-                                                <span class="small"><i class="bi bi-calendar3-week">{{ client.created_at|date:'m/y' }}</i></span>
+                                                    <span class="small"
+                                                          data-bs-toggle="tooltip"
+                                                          data-bs-trigger="hover"
+                                                          data-bs-title="{% translate 'Client created at' %}"
+                                                          data-bs-custom-class="custom-tooltip"
+                                                    ><i
+                                                            class="bi bi-calendar3-week">{{ client.created_at|date:'m/y' }}</i></span>
                                                 </li>
                                             </ul>
 
@@ -113,7 +130,7 @@
                                                 data-bs-toggle="tooltip"
                                                 data-bs-trigger="hover"
                                                 data-bs-delay="500"
-                                                data-bs-title="{% translate 'Attendance percentage in 3 months' %}"
+                                                data-bs-title="{% translate 'Attendance percentage for 3 months' %}"
                                                 data-bs-custom-class="custom-tooltip"
                                                 class="fs-5">{{ client.attendance_percentage|floatformat }}%</span>
                                         </div>
@@ -142,29 +159,34 @@
                                             </a>
 
                                         </div>
-                                        <div class="col-4"> <!-- add 3 sessions forward -->
+                                        <div class="col-4"> <!-- add 4 sessions forward -->
                                             <a class="btn btn-outline-secondary btn-sm"
-                                               hx-post="{% url 'session_client:add_series' client.uuid 3 %}"
+                                                    {% if client.times_count > 0 %}
+                                               hx-post="{% url 'session_client:add_series' client.uuid 4 %}"
                                                hx-target="#future-sessions-{{ client.uuid }}"
+                                                    {% else %}
+                                               hx-post="{% url 'session_client:manage_client_times' client.uuid %}"
+                                               hx-target="#modal-wrapper"
+                                                    {% endif %}
                                                hx-indicator="#spinner-{{ client.uuid }}"
                                                data-bs-toggle="tooltip"
                                                data-bs-trigger="hover"
                                                data-bs-delay="500"
-                                               data-bs-title="{% translate 'book 3 extra weeks' %}"
+                                               data-bs-title="{% translate 'book 4 weeks forward' %}"
                                                data-bs-custom-class="custom-tooltip"
                                             >
-                                                +3
+                                                +4w
                                             </a>
                                         </div>
                                         <div class="col-4"> <!-- manage times -->
                                             <a class="btn btn-outline-secondary btn-sm"
-                                               hx-post="{% url 'session_client:manage_client_times' client.uuid %}"
+                                               hx-get="{% url 'session_client:manage_client_times' client.uuid %}"
                                                hx-target="#modal-wrapper"
                                                hx-indicator="#spinner-{{ client.uuid }}"
                                                data-bs-toggle="tooltip"
                                                data-bs-trigger="hover"
                                                data-bs-delay="500"
-                                               data-bs-title="{% translate 'manage times' %}"
+                                               data-bs-title="{% translate 'Open times modal' %}"
                                                data-bs-custom-class="custom-tooltip"
                                             >
                                                 <i class="bi bi-clock-fill"></i>
@@ -178,17 +200,17 @@
                     {% empty %}
 
                     {% endfor %}
-                        <div class="card border-secondary">
+                    <div class="card border-secondary">
                         <h1 class="mx-auto my-auto">
                             <a hx-get="{% url 'session_client:add_client' %}"
-                            hx-target="#modal-wrapper"
-                            class="nav-link link-secondary">
+                               hx-target="#modal-wrapper"
+                               class="nav-link link-secondary">
 
-                            +
+                                +
                             </a>
                         </h1>
 
-                        </div>
+                    </div>
                 {% endpartialdef client-list-partial %}
             </div>
         </div>

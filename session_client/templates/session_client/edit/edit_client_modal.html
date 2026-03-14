@@ -78,19 +78,6 @@
 
                         <!--- Client Date defaults -->
 
-                        <div class="container text-center border-top border-secondary my-1 p-1">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <small>{{ form.day.label }}:</small>
-                                    {% bootstrap_field form.day layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
-                                </div>
-                                <div class="col">
-                                    <small>{{  form.time.label }}:</small>
-                                    {% bootstrap_field form.time layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
-                                </div>
-                            </div>
-                        </div>
-
                         <!--- Client Durations -->
 
                         <div class="container text-center border-top border-secondary my-1 p-1">
@@ -98,10 +85,6 @@
                                 <div class="col">
                                     <small>{{ form.duration.label }}:</small>
                                     {% bootstrap_field form.duration layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
-                                </div>
-                                <div class="col">
-                                    <small>{{ form.series.label }}:</small>
-                                    {% bootstrap_field form.series layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
                                 </div>
                             </div>
                         </div>

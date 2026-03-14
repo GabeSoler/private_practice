@@ -31,12 +31,12 @@
             <span>
           {{tenant.calendar}}
                 {% if tenant.calendar %}
-              <i class="bi bi-x-circle-fill text-danger ms-4"
+              <button class="btn btn-outline-secondary ms-2"><i class="bi bi-x-circle-fill text-danger mx-auto"
                 hx-post="{% url 'room_calendar_app:unlink_tenant' tenant.uuid %}"
            hx-target="closest <span/>"
            hx-swap="outerHTML"
            hx-confirm="{% translate 'Un-link tenant'  %}"
-        ></i>
+        ></i></button>
                 {% endif %}
             </span>
           </div>

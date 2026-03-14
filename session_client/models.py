@@ -1,6 +1,8 @@
+import datetime
+from calendar import Calendar
+
 from django.db import models
-from django.db.models import Q, CheckConstraint, F, Func, ExpressionWrapper
-from django.db.transaction import commit
+from django.db.models import Q, Max, Min
 
 from ppm_app.settings.base import AUTH_USER_MODEL
 import uuid
@@ -14,10 +16,6 @@ import pendulum as p
 
 from .utils import time_plus_duration, range_from_date
 import logging
-
-from django.contrib.postgres.constraints import ExclusionConstraint
-from django.contrib.postgres.fields import RangeOperators, DateTimeRangeField, RangeField
-from django.contrib.postgres.indexes import OpClass
 
 logger = logging.getLogger(__name__)
 
@@ -82,39 +80,39 @@ class ClientModel(models.Model):
             get_session returns two arguments, the date and the session used to calculate it
              """
         ref_date = self.get_last_date_or_now()
-        target_date = ref_date.next(self.day)
-        if self.series == 2:
-            target_date = target_date.add(weeks=1)
+        try:
+            min_max_days = self.times.all().aggregate(Min('day'), Max('day'))
+        except ClientTimes.DoesNotExist:
+            add_weeks = add_weeks + 1 if add_weeks else 1
+        target_date = ref_date.next(min_max_days['day__min'])
         if add_weeks:
             target_date = target_date.add(weeks=add_weeks)
         return target_date
 
-    def add_series(self, amount: int, add_weeks=None, overlap_check=True):
+    def add_series(self, n_weeks: int, add_weeks=None, overlap_check=True):
         """
         Wraps self.create_series_session_list, adding the extra times before calling a bulk create
         returns two argumets, created and sessions, if not created sessions are overlaping problems found in the process.
         The recursions stop every time there is an overlap, which means if there are many extra times, it will return
         only the last one before a problem occurs.
-        It uses the creation of virtual clients, to trigger the same functions already placed in clients.
+        It uses the creation of virtual clients to trigger the same functions already placed in clients.
         """
         ref_date = self.deduce_next_datetime(add_weeks=add_weeks)
         ref_date = ref_date
         session_list = []
-        rounds = 0
-        if self.times_set.exists():
-            for t in self.times_set.all():
+        loop_n = 0
+        if self.times.exists():
+            for t in self.times.all():
                 t_ref_date = ref_date.next(t.day)
-                created, sessions = t.create_series_session_list(amount, t_ref_date,
+                created, sessions = t.create_series_session_list(n_weeks, t_ref_date,
                                                                  overlap_check=overlap_check)
                 if not created:
                     return False, sessions
                 session_list.extend(sessions)
-                rounds += 1
-        extra_time_len = len(rounds) + 1 or 1
+                loop_n += 1
         sessions = SessionModel.objects.bulk_create(session_list)
         sessions_len = len(sessions)
         logger.debug(f"Sessions created, length: {sessions_len}")
-        assert sessions_len == amount * extra_time_len, f"sessions created must match amount, {sessions_len} != {amount}"
         __bool__ = True
         return True, sessions
 
@@ -136,7 +134,8 @@ class SessionManager(models.Manager):
 
 
 class SessionModel(models.Model):
-    client = models.ForeignKey(ClientModel, null=True, on_delete=models.CASCADE, help_text=_("Link to a client"))
+    client = models.ForeignKey(ClientModel, null=True,
+                               on_delete=models.CASCADE, help_text=_("Link to a client"))
     uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
@@ -182,6 +181,9 @@ class SessionModel(models.Model):
         start = self.start_time
         end = self.end_time
         calendar = self.tenant.calendar
+        assert isinstance(calendar, RoomCalendarModel)
+        assert isinstance(start, datetime.time), "start must be a time object"
+        assert isinstance(end, datetime.time), "end must be a time object"
         qs = SessionModel.objects.filter(tenant__calendar=calendar, date=self.date).filter(
             models.Q(
                 start_time__gte=start,
@@ -216,6 +218,11 @@ class SessionModel(models.Model):
         else:
             return False, overlaps
 
+    def end_time_from_client(self):
+        duration = self.client.duration or p.duration(hours=1)
+        end_time = time_plus_duration(self.start_time, duration)
+        return end_time
+
     def deduce_from_client(self,
                            date=True,
                            start_time=True,
@@ -234,17 +241,17 @@ class SessionModel(models.Model):
         client = self.client
         client_time_ref = client.times.earliest('created_at')
         if tenant:
-            if client_time_ref.tenant:
-                self.tenant = client_time_ref.tenant
+            if client.tenant:
+                self.tenant = client.tenant
             else:
                 base_tenant, _ = TenantModel.objects.get_or_create(user=self.client.user, name="Base Tenant")
                 self.tenant = base_tenant
         if date:
-            self.date = client.deduce_next_datetime().date() if not self.date else self.date
+            self.date = client.deduce_next_datetime().date()
         if start_time:
-            self.start_time = client_time_ref.time if not self.start_time else self.start_time
+            self.start_time = self.start_time or client_time_ref.time
         if end_time:
-            self.end_time = time_plus_duration(self.start_time, client.duration) if not self.end_time else self.end_time
+            self.end_time = time_plus_duration(self.start_time, client.duration)
         return self
 
 
@@ -255,6 +262,7 @@ class ClientTimes(models.Model):
     time = models.TimeField(choices=time_slot_options(), help_text=_('Time of Session'))
     tenant = models.ForeignKey(TenantModel, on_delete=models.SET_NULL,
                                blank=True, null=True, help_text=_("Set different tenant"))
+    fortnight = models.BooleanField(default=False, help_text=_("Set as fortnight"))
 
     def __str__(self):
         return f"{self.client}-{self.day}:{self.time}"
@@ -262,11 +270,11 @@ class ClientTimes(models.Model):
     def __repr__(self):
         return f"ClientExtraTime: {self.client}-{self.day}:{self.time}"
 
-    def create_series_session_list(self, amount: int, ref_date, overlap_check=True, client=None, user=None):
+    def create_series_session_list(self, n_weeks: int, ref_date, overlap_check=True, client=None, user=None):
         """ Creates a series of sessions, based on the client defaults,
             calculate the last session created first and move from there
         args:
-            amount sets the number of series forwards
+            n_weeks sets the number of series forwards
             from_date: if you want to start from a specific date,
             room switch tries with the base room. Handle from view to communicate with user messages
         returns:
@@ -276,13 +284,13 @@ class ClientTimes(models.Model):
         """
         client = client or self.client
         user = user or client.user
-        fortnight = True if client.series == 2 else False
-        range_weeks = amount * 2 - 1 if fortnight else amount - 1  # double of weeks if a fortnight,take one week as starts on day
-        interval = p.interval(ref_date, ref_date.add(weeks=range_weeks))
+        fortnight = self.fortnight
+        add_weeks = n_weeks - 1
+        interval = p.interval(ref_date, ref_date.add(weeks=add_weeks))
         assert isinstance(ref_date, p.DateTime)
         assert ref_date.day_of_week == self.day, f"The ref_date should be on the client.day, {ref_date.day_of_week} != {self.day}"
         session_list = []
-        step = client.series or 1
+        step = 2 if fortnight else 1
         if self.tenant:
             tenant = self.tenant
         else:
@@ -310,6 +318,9 @@ class ClientTimes(models.Model):
             )
 
             session_list.append(session_instance)
+        len_sessions = len(session_list)
+        demanded_number = add_weeks // step
+        assert len_sessions == n_weeks, f"Sessions pre-created must match n_weeks {len_sessions} != {demanded_number}"
         __bool__ = True
         return True, session_list
 
@@ -343,10 +354,10 @@ class ClientTimes(models.Model):
         user = user or self.client.user
         if calendar:
             calendar_ref = calendar
-        elif self.tenant:
+        elif self.tenant.calendar:
             calendar_ref = self.tenant.calendar
         else:
-            calendar_ref = RoomCalendarModel.objects.get(user=user, name="Base Room")
+            calendar_ref, _ = RoomCalendarModel.objects.get_or_create(user=user, name="Base Room")
         assert isinstance(calendar_ref, RoomCalendarModel), "calendar must be a RoomCalendarModel object"
         start_time = self.time
         end_time = time_plus_duration(self.time, client.duration)

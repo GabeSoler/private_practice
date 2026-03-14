@@ -23,7 +23,7 @@ def week_view(request):
     """ Displays a calendar table with occurrences
         You can change the week to display or select a specific room calendar
        """
-    sessions = week_view_session_qs(request)
+    sessions = week_view_session_qs(request.user)
     template = "room_calendar_app/dynamic/week_view.html"
     calendar_user = RoomCalendarModel.objects.filter(
         Q(tenantmodel__user=request.user) | Q(user=request.user)).distinct()  # filter room_calendars options
@@ -101,9 +101,10 @@ def week_client_defaults_view(request):
     template = "room_calendar_app/dynamic/week_view_clients.html"
     room_qs = (RoomCalendarModel.objects.
                filter(Q(tenantmodel__user=request.user) | Q(user=request.user))).distinct()
-    times = ClientTimes.objects.filter(client__user=request.user).select_related("client").annotate(
-        end_time=F("time") + F("client__duration")
-    )
+    times = ClientTimes.objects.filter(client__user=request.user).annotate(
+        end_time=F("time") + F("client__duration"),
+        client_code=F("client__code"),
+        duration=F("client__duration"))
     if request.method == 'POST':
         form = RoomSwitchForm(data=request.POST)
         if form.is_valid():
@@ -251,7 +252,7 @@ def tenant_add_view(request):
                 return HttpResponseClientRefresh()
             return redirect('room_calendar_app:tenant_list')
     # display a blank or invalid form
-    context = {'form': form, "action": action}
+    context = {'form': form}
     return render(request, 'room_calendar_app/input/add_tenant.html', context)
 
 
@@ -270,7 +271,7 @@ def tenant_edit_view(request, tenant_uuid):
                                      "Tenant Saved",
                                      event_and_target=("RefreshTable", "#hx-helper"))
         form = TenantForm(instance=tenant)
-        template = template + '#form-partial'
+        template = template + '#tenant-form-partial'
         context = {'form': form}
         return render(request, template, context)
     if request.htmx.target == 'modalBody':
@@ -286,14 +287,16 @@ def tenant_link_view(request, tenant_uuid):
         form = LinkTenantForm(data=request.POST)
         if form.is_valid():
             room_uuid = form.cleaned_data["room_id"]
-            room = get_object_or_404(RoomCalendarModel, uuid=room_uuid)
-            if tenant.calendar is not None:
-                if tenant.calendar == room:
-                    form.add_error('room_id', "Same room")
-                    status = "warning"
-                else:
-                    form = LinkTenantForm()
-                    status = "success"
+            room = RoomCalendarModel.objects.filter(uuid=room_uuid).first()
+            if not room:
+                form.add_error('room_id', "Room not found")
+                status = "warning"
+            elif tenant.calendar is room:
+                form.add_error('room_id', "Same room")
+                status = "warning"
+            else:
+                form = LinkTenantForm()
+                status = "success"
             tenant.calendar = room
             tenant.save()
             template_partial = "room_calendar_app/dynamic/tenant_list.html" + "#tenant_item_partial"
@@ -372,7 +375,8 @@ def tenant_duplicate_hx(request, tenant_uuid):
         tenant_2.save()
         tenant_2.refresh_from_db()
         template = 'room_calendar_app/dynamic/tenant_list.html' + '#tenant_item_partial'
-        return render(request, template, {'tenant': tenant_2})
+        form = LinkTenantForm()
+        return render(request, template, {'tenant': tenant_2, 'form': form})
     return Http404("ups, page not wat you thought")
 
 

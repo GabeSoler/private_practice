@@ -15,9 +15,10 @@
 
     <form class="form bg-primary ps-3"
           hx-post="{% url 'session_client:session_list' %}"
-            hx-target="#session-list-wrapper"
+            hx-target="#tableBody"
             hx-swap="innerHTML settle:0.2s"
-            hx-trigger="change throttle:1s"
+            hx-trigger="change throttle:1s,RefreshTable"
+          id="session-list-form"
 >
     <table class="table mb-0" id="client-form-table">
       <tbody>

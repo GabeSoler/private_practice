@@ -25,7 +25,7 @@ def ok_response_modal(request, text: str,
         event, target = event_and_target
         response = trigger_client_event(response, event, {"target": target})
     if re_swap:
-        response = reswap(response)
+        response = reswap(response, re_swap)
     return response
 
 
@@ -40,7 +40,7 @@ def ok_response(request, text: str = None,
         event, target = event_and_target
         response = trigger_client_event(response, event, {"target": target})
     if re_swap:
-        response = reswap(response)
+        response = reswap(response, re_swap)
     return response
 
 

@@ -12,7 +12,7 @@ def week_slot_dic() -> dict:
     for slot in time_slots():
         week_dict[slot] = {}
         for i in range(1, 8):
-            weekday = {i: "empty"}
+            weekday = {i: set()}
             week_dict[slot].update(weekday)
     return week_dict
 
@@ -114,7 +114,7 @@ class CalendarTimesRender:
             iso_day = time.day + 1
             for time_slot in time_range.range('minutes', 30):
                 slot = time_slot.time()
-                times_dict[slot][iso_day] = time
+                times_dict[slot][iso_day].add(time)
         return times_dict
 
 

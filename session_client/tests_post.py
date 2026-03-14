@@ -221,27 +221,30 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
     def test_manage_client_times(self):
         url = reverse('session_client:manage_client_times', args=[self.client_instance.uuid])
         data = {
-            "clienttimes_set-TOTAL_FORMS": "3",
-            "clienttimes_set-INITIAL_FORMS": "2",
-            "clienttimes_set-MIN_NUM_FORMS": "0",
-            "clienttimes_set-MAX_NUM_FORMS": "6",
+            "times-TOTAL_FORMS": "4",
+            "times-INITIAL_FORMS": "3",
+            "times-MIN_NUM_FORMS": "0",
+            "times-MAX_NUM_FORMS": "6",
 
             # existing row 0
-            "clienttimes_set-0-id": self.client_instance.pk,
-            "clienttimes_set-0-day": "1",
-            "clienttimes_set-0-time": "09:00",
-            "clienttimes_set-0-tenant": self.tenant_default,
+            "times-0-id": self.client_instance.pk,
+            "times-0-day": "1",
+            "times-0-time": "09:00",
+            "times-0-tenant": self.tenant_default,
+            "times-0-fortnight": False,
 
             # existing row 1
-            "clienttimes_set-1-id": self.client_instance.pk,
-            "clienttimes_set-1-day": "3",
-            "clienttimes_set-1-time": "14:30",
-            "clienttimes_set-1-tenant": self.tenant_default,
+            "times-1-id": self.client_instance.pk,
+            "times-1-day": "3",
+            "times-1-time": "14:30",
+            "times-1-tenant": self.tenant_default,
+            "times-1-fortnight": False,
 
             # new extra row 2 (no id)
-            "clienttimes_set-2-day": "5",
-            "clienttimes_set-2-time": "10:15",
-            "clienttimes_set-2-tenant": self.tenant_default,
+            "times-2-day": "5",
+            "times-2-time": "10:15",
+            "times-2-tenant": self.tenant_default,
+            "times-2-fortnight": False,
         }
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)

@@ -1,5 +1,9 @@
+import pprint
+
 from django.test import TestCase
 from django.urls import reverse
+
+from .forms import TenantForm, RoomReportForm, BlockForm
 from .models import RoomCalendarModel, TenantModel, BlocksModel
 from django.utils import translation
 import pendulum as p
@@ -32,7 +36,7 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         }
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "test")  # tenant display_name
+        self.assertContains(response, self.tenant.name)  # tenant display_name
 
     def test_room_list_refresh_view_post(self):
         url = reverse('room_calendar_app:room_list_refresh')
@@ -76,10 +80,13 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
             'display_name': 'New Tenant',
             'name': 'new_tenant',
             'description': 'Some description',
-            'agreement': 'Private',
+            'agreement': 'Percentage',
         }
+        form = TenantForm(data)
+        self.assertTrue(form.is_valid())
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'errorlist')
         self.assertTrue(TenantModel.objects.filter(display_name='New Tenant').exists())
 
     def test_tenant_edit_view_post(self):
@@ -88,16 +95,18 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
             'display_name': 'Updated Tenant',
             'name': 'updated_tenant',
             'description': 'Updated description',
-            'agreement': 'Private',
+            'agreement': 'Percentage',
         }
+        form = TenantForm(data, instance=self.tenant)
+        self.assertTrue(form.is_valid())
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.tenant.refresh_from_db()
         self.assertEqual(self.tenant.display_name, 'Updated Tenant')
 
     def test_tenant_link_view_post(self):
-        url = reverse('room_calendar_app:link_tenant', args=[self.room_2.uuid])
-        data = {'tenant_id': str(self.tenant.uuid)}
+        url = reverse('room_calendar_app:link_tenant', args=[self.tenant.uuid])
+        data = {'room_id': str(self.room_2.uuid)}
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         self.tenant.refresh_from_db()
@@ -118,9 +127,11 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
             'month': p.now().month,
             'year': p.now().year,
         }
+        form = RoomReportForm(data)
+        self.assertTrue(form.is_valid())
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Session 1")
+        self.assertContains(response, self.session_1.date.strftime('%B %d, %Y'))
 
     def test_tenant_duplicate_hx_post(self):
         url = reverse('room_calendar_app:duplicate_tenant', args=[self.tenant.uuid])
@@ -150,11 +161,11 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertNotContains(response, self.tenant_host_room_1.name)
 
     def test_week_schedule_view_post(self):
-        url = reverse('room_calendar_app:week_schedule_view')
+        url = reverse('room_calendar_app:week_client_defaults_view')
         data = {'room': self.room_1.pk}
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "calendar")
+        self.assertContains(response, self.client_instance.code)
 
     def test_block_add_view_post(self):
         url = reverse('room_calendar_app:block_add_view')
@@ -176,13 +187,15 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
             end_time='10:00:00',
             day=1,
         )
-        url = reverse('room_calendar_app:block_edit', args=[block.uuid])
+        url = reverse('room_calendar_app:block_edit', args=[block.pk])
         data = {
             'tenant': self.tenant.pk,
             'start_time': '11:00:00',
             'end_time': '12:00:00',
             'day': 2,
         }
+        form = BlockForm(data, instance=block)
+        self.assertTrue(form.is_valid())
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
         block.refresh_from_db()

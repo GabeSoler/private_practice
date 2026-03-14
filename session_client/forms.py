@@ -133,10 +133,16 @@ class ClientFromCalendarForm(forms.ModelForm):
 class TimeForm(forms.ModelForm):
     class Meta:
         model = ClientTimes
-        fields = ['tenant', 'day', 'time', 'client']
+        fields = ['tenant', 'day', 'time', 'client', 'fortnight']
 
 
-class TimeClientSetForm(forms.ModelForm):
-    class Meta:
-        model = ClientTimes
-        fields = ['tenant', 'day', 'time']
+class SessionsBulkActionsForm(forms.Form):
+    actions = forms.ChoiceField(widget=forms.Select, required=True,
+                                choices=(
+                                    ("None", "---"),
+                                    ("open", "Set as Open"),
+                                    ("close", "Set as Close"),
+                                    ("attended", "Set as Attended"),
+                                    ("paid", "Set as Paid"),
+                                    ("unpaid", "Set as Unpaid"),
+                                ))

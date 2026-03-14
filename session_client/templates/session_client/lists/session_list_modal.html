@@ -2,7 +2,6 @@
 {% load i18n %}
 
 {% block modal_title %}
-    {% if client %}
     <div class="fs-3">Client Sessions <a class="link-secondary ms-2" style="font-size:1rem;"
             {% if forward %}
                                          href="{% url 'session_client:session_list_with_client_and_forward' client_uuid "add_forward" %}"
@@ -10,7 +9,6 @@
                                          href="{% url 'session_client:session_list_with_client' client_uuid %}"
             {% endif %}
     ><i class="bi bi-arrows-angle-expand"></i></a></div>
-    {% endif %}
 {% endblock %}
 
 {% block modal_body %}
