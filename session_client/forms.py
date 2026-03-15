@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 class ClientForm(forms.ModelForm):
     class Meta:
         model = ClientModel
-        fields = ['code', 'type', 'fee', 'tenant', 'duration', 'series', 'active', 'link']
+        fields = ['code', 'type', 'fee', 'tenant', 'duration', 'active', 'link']
         labels = {'code': _('Code'),
                   'type': _('Type'),
                   'fee': _('Fee'),

@@ -19,6 +19,7 @@
 {% endblock search %}
 
 {% block content %}
+    <a id="refresh" hx-boost="true" href="{% url 'session_client:client_list' %}" hidden _="on RefreshTable call me.click() end"></a>
     <div class="mx-auto col-12 col-md-10 align-content-center">
 
         <div id="client-list-wrapper">
@@ -29,7 +30,7 @@
 
                         {% partialdef client-card-partial inline %}
                             <div class="col">
-                                <div class="card
+                                <div class="card fade-in-slide
                                     text-center
                                     border border-secondary
                                     p-2 g-1" style="min-height: 10rem;"
@@ -200,7 +201,7 @@
                     {% empty %}
 
                     {% endfor %}
-                    <div class="card border-secondary">
+                    <div class="card border-secondary" id="client-add-card">
                         <h1 class="mx-auto my-auto">
                             <a hx-get="{% url 'session_client:add_client' %}"
                                hx-target="#modal-wrapper"

@@ -17,103 +17,106 @@
             <div class="card mb-5 border border-secondary">
                 <form
                         {% if client %}
-                      action="{% url 'session_client:edit_client' client.uuid %}" method="post"
-                      hx-post="{% url 'session_client:edit_client' client.uuid %}"
+                            hx-post="{% url 'session_client:edit_client' client.uuid %}"
+                            hx-swap="outerHTML"
+                            hx-target="#modal-body-wrapper"
                         {% else %}
-                            action="{% url 'session_client:add_client' %}" method="post"
                             hx-post="{% url 'session_client:add_client' %}"
+                            hx-swap="outerHTML"
+                            hx-target="#modal-body-wrapper"
+
                         {% endif %}>
 
-                {% csrf_token %}
+                    {% csrf_token %}
 
-                <div class="">
+                    <div class="">
 
-                    <!--- Client Code -->
-                    <div class="container text-center my-1 p-1">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <small>{{ form.code.label }}:</small>
-                                {% bootstrap_field form.code layout="horizontal" show_label="skip" show_help=True size='sm' wrapper_class="mx-auto" %}
-                            </div>
-                            <div class="col">
-                                <small>{{ form.link.label }}:</small>
-                                {% bootstrap_field form.link layout="horizontal" show_label="skip" show_help=True size='sm' wrapper_class="mx-auto" %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!--- Client Type and tenant -->
-                    <div class="container text-center border-top border-secondary my-1 p-1">
-                        <div class="row align-items-center">
-                            <div class="col">
-                        <small>{{ form.type.label }}:</small>
-                        {% bootstrap_field form.type layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
-
-                            </div>
-
-                            <div class="col">
-                        <small>{{ form.tenant.label }}:</small>
-                        {% bootstrap_field form.tenant layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="container text-center border-top border-secondary my-1 p-1">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <small>{{ form.fee.label }}:</small>
-                                {% bootstrap_field form.fee layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
-                            </div>
-                            <div class="col mx-auto">
-                                <small>{{ form.active.label }}:</small>
-                                <div class="row">
-                                    <div class="col"></div>
-                                    <div class="form-check form-switch col">
-                                        {{ form.active }}
-                                    </div>
+                        <!--- Client Code -->
+                        <div class="container text-center my-1 p-1">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <small>{{ form.code.label }}:</small>
+                                    {% bootstrap_field form.code layout="horizontal" show_label="skip" show_help=True size='sm' wrapper_class="mx-auto" %}
+                                </div>
+                                <div class="col">
+                                    <small>{{ form.link.label }}:</small>
+                                    {% bootstrap_field form.link layout="horizontal" show_label="skip" show_help=True size='sm' wrapper_class="mx-auto" %}
                                 </div>
                             </div>
                         </div>
 
-                        <!--- Client Date defaults -->
+                        <!--- Client Type and tenant -->
+                        <div class="container text-center border-top border-secondary my-1 p-1">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <small>{{ form.type.label }}:</small>
+                                    {% bootstrap_field form.type layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
 
-                        <!--- Client Durations -->
+                                </div>
+
+                                <div class="col">
+                                    <small>{{ form.tenant.label }}:</small>
+                                    {% bootstrap_field form.tenant layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
+
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="container text-center border-top border-secondary my-1 p-1">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <small>{{ form.duration.label }}:</small>
-                                    {% bootstrap_field form.duration layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
+                                    <small>{{ form.fee.label }}:</small>
+                                    {% bootstrap_field form.fee layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
+                                </div>
+                                <div class="col mx-auto">
+                                    <small>{{ form.active.label }}:</small>
+                                    <div class="row">
+                                        <div class="col"></div>
+                                        <div class="form-check form-switch col">
+                                            {{ form.active }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
+                            <!--- Client Date defaults -->
+
+                            <!--- Client Durations -->
+
+                            <div class="container text-center border-top border-secondary my-1 p-1">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <small>{{ form.duration.label }}:</small>
+                                        {% bootstrap_field form.duration layout="horizontal" show_label="skip" show_help=False wrapper_class="mx-auto" %}
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
-                    </div>
-
-                    <div class="row">
-                        <div class="col">
-                            {% if client %}
+                        <div class="row">
+                            <div class="col">
+                                {% if client %}
+                                    <button
+                                            class="btn btn-outline-danger start-0"
+                                            hx-confirm="Confirm client archive"
+                                            hx-patch="{% url 'session_client:client_toggle_active' client.uuid %}"
+                                            hx-target="#{{ client.code }}"
+                                            hx-swap="outerHTML"
+                                    >{% translate 'Archive' %}
+                                    </button>
+                                {% endif %}
+                            </div>
+                            <div class="col">
+                                {% bootstrap_form_errors form type="non_fields" %}
+                            </div>
+                            <div class="col">
                                 <button
-                                        class="btn btn-outline-danger start-0"
-                                        hx-confirm="Confirm client archive"
-                                        hx-patch="{% url 'session_client:client_toggle_active' client.uuid %}"
-                                        hx-target="#{{ client.code }}"
-                                        hx-swap="outerHTML"
-                                >{% translate 'Archive' %}
+                                        type="submit"
+                                        class="btn btn-secondary float-end">{% translate 'Save' %}
                                 </button>
-                            {% endif %}
+                            </div>
                         </div>
-                        <div class="col">
-                            <p></p>
-                        </div>
-                        <div class="col">
-                    <button
-                            type="submit"
-                            class="btn btn-secondary float-end">{% translate 'Save' %}
-                    </button>
-                        </div>
-                    </div>
                 </form>
 
             </div>

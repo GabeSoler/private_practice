@@ -15,7 +15,7 @@ class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel">
       {% partialdef ok-body-partial inline %}
       <h5  _="init
   log 'after init'
-  wait 400ms then send CloseModal
+  wait 600ms then send CloseModal
    log 'CloseModal sent'
     end">
         {% block modal_body %}{{ text }}{% endblock %}

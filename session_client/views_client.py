@@ -1,14 +1,14 @@
-import time
-
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
-from room_calendar_app.models import RoomCalendarModel, TenantModel
+from ppm_app.responses.hx_responses import ok_response_modal
+from room_calendar_app.models import TenantModel
 from .models import ClientModel, SessionModel
 from django.http import Http404
-from .forms import ClientForm, SearchClientForm, ClientFormShort, SearchSessionForm, ClientFromCalendarForm
-from django_htmx.http import HttpResponseClientRedirect, HttpResponseClientRefresh, retarget
+from .forms import ClientForm, SearchClientForm, ClientFormShort
+from django_htmx.http import HttpResponseClientRedirect, HttpResponseClientRefresh, retarget, reswap
 from django.utils import timezone
 from django.contrib import messages
 
@@ -18,7 +18,9 @@ from django.contrib.postgres.search import (SearchHeadline,
                                             SearchRank,
                                             SearchVector)
 
-import pendulum as p
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Create your views here.
@@ -125,18 +127,24 @@ def add_client_view(request):
     template = 'session_client/edit/edit_client_modal.html'
     if request.htmx.target == "modal-body-wrapper":
         template = template + "#modal-body-partial"
+    form = ClientForm()
     if request.method == 'POST':
         # POST data submitted; process data
         form = ClientForm(data=request.POST)
         if form.is_valid():
+            logger.debug("Client form is valid")
             instance = form.save(commit=False)
             instance.user = request.user
             instance.save()
-            if request.htmx:
-                return HttpResponseClientRefresh()
-            return redirect('session_client:client_list')
+            # client = annotate_client_list(request.user).filter(pk=instance.pk).first()
+            # partial_template = "session_client/lists/client_list.html" + "#client-card-partial"
+            # response = render(request, partial_template, {"client": client})
+            # response = retarget(response, "#client-add-card")
+            # return reswap(response, "beforebegin")
+            return ok_response_modal(request, _("Client added"), event_and_target=("RefreshTable", "#refresh"),
+                                     modal_body=False)
+        logger.debug(f"Client form is invalid, by: {form.errors}")
     # display a blank or invalid form
-    form = ClientForm()
     form.fields['tenant'].queryset = TenantModel.objects.filter(user=request.user)
     context = {'form': form}
     return render(request, template, context)
