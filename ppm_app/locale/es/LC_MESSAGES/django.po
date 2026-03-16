@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-16 23:17+0000\n"
+"POT-Creation-Date: 2026-03-16 23:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,43 +67,43 @@ msgstr "Atardecer"
 msgid "Hello"
 msgstr "Hola"
 
-#: ppm_app/templates/_base.html:209
+#: ppm_app/templates/_base.html:211
 msgid "Logout"
 msgstr "Cerrar sesión"
 
-#: ppm_app/templates/_base.html:220
+#: ppm_app/templates/_base.html:222
 msgid "Report bugs"
 msgstr ""
 
-#: ppm_app/templates/_base.html:229
+#: ppm_app/templates/_base.html:231
 msgid "Manage Account"
 msgstr ""
 
-#: ppm_app/templates/_base.html:237
+#: ppm_app/templates/_base.html:239
 msgid "Signup"
 msgstr ""
 
-#: ppm_app/templates/_base.html:239
+#: ppm_app/templates/_base.html:241
 msgid "Login"
 msgstr "Iniciar sesión"
 
-#: ppm_app/templates/_base.html:307 ppm_app/templates/_base.html:312
+#: ppm_app/templates/_base.html:309 ppm_app/templates/_base.html:314
 msgid "Home"
 msgstr "Inicio"
 
-#: ppm_app/templates/_base.html:328
+#: ppm_app/templates/_base.html:330
 #, fuzzy
 #| msgid "My Clients"
 msgid "Clients"
 msgstr "Mis Clientes"
 
-#: ppm_app/templates/_base.html:344
+#: ppm_app/templates/_base.html:346
 #, fuzzy
 #| msgid "My Sessions"
 msgid "Sessions"
 msgstr "Mis Sessiones"
 
-#: ppm_app/templates/_base.html:360
+#: ppm_app/templates/_base.html:362
 msgid "Week View"
 msgstr "Semana"
 

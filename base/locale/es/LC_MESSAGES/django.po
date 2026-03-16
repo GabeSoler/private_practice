@@ -3,13 +3,12 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: base/templates/base/session-intro.html:12
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-16 23:30+0000\n"
+"POT-Creation-Date: 2026-03-16 23:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -368,9 +367,7 @@ msgstr ""
 msgid ""
 "Client code you can create a code to identify your client avoiding personal "
 "information"
-msgstr ""
-"Codigo de clientes para identificarlos evitando datos "
-"personales"
+msgstr "Codigo de clientes para identificarlos evitando datos personales"
 
 #: base/templates/base/client-card-intro.html:27
 #, fuzzy
@@ -560,6 +557,28 @@ msgstr "Los terapeútas manejan mucha complejidad"
 msgid "Let's make it a bit easier to handle their admin"
 msgstr "Hagamos más fácil manejar su admin"
 
+#: base/templates/base/index.html:74
+#, fuzzy
+#| msgid "Supervision"
+msgid "Session's list"
+msgstr "Lista de Sesiones"
+
+#: base/templates/base/index.html:76
+msgid "Quickly handle the management of your sessions once it is time for it."
+msgstr "Maneja rápidamente tus sesiones"
+
+#: base/templates/base/index.html:84
+msgid "Rooms management"
+msgstr "Manejo de Cuartos"
+
+#: base/templates/base/index.html:86
+msgid "Rooms can be quickly seen, shared and managed."
+msgstr "Cuartos pueden ser compartidos y administrados"
+
+#: base/templates/base/index.html:97
+msgid "See your sessions by room and date, while in sync with your colleagues."
+msgstr "Ve tus sesiones separadas por cuartos y fechas en el calendario"
+
 #: base/templates/base/room-info.html:12
 msgid "Period"
 msgstr "Período"
@@ -587,6 +606,10 @@ msgstr "Session Cliente"
 #| msgid "Attended"
 msgid "Attendance"
 msgstr "Attendida"
+
+#: base/templates/base/session-intro.html:12
+msgid "Keywords"
+msgstr ""
 
 #: base/templates/base/session-intro.html:14
 msgid "Paid"

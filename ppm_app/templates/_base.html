@@ -199,6 +199,8 @@
                 {% if user.is_authenticated %}
                     <li class='nav-item'>
                     <span class='navbar-text me-2'>{% translate 'Hello' %}, {{ user.username }}!</span>
+                    </li>
+                    <li>
                     <form action="{% url 'account_logout' %}" method='post' style='display:inline;'>
                         {% csrf_token %}
                         <button name="submit" class="btn btn-outline-secondary mx-1"
