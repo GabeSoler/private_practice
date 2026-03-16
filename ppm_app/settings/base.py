@@ -58,6 +58,8 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     "django_htmx",
     "django_browser_reload",
+    'allauth',
+    'allauth.account',
 
     # mine
     'accounts.apps.AccountsConfig',
@@ -81,6 +83,7 @@ MIDDLEWARE = [
     "django_htmx.middleware.HtmxMiddleware",  # django-htmx middleware
     "django_browser_reload.middleware.BrowserReloadMiddleware",  # django reload (browser experience)
     "django.contrib.admindocs.middleware.XViewMiddleware",  # django documentation view link
+    "allauth.account.middleware.AccountMiddleware",  # allauth
 
 ]
 
@@ -230,3 +233,31 @@ LOGGING = {
 INTERNAL_IPS = (
     '127.0.0.1',
 )
+
+LOGIN_REDIRECT_URL = 'base:index'
+LOGOUT_REDIRECT_URL = 'base:index'
+LOGIN_URL = 'account_login'
+AUTHENTICATION_LOGOUT_REDIRECT = 'base:index'
+AUTH_USER_MODEL = 'accounts.CustomUser'
+ACCOUNT_LOGIN_BY_CODE_ENABLED = True
+
+MFA_TOTP_ISSUER = 'Dreamy-admin'
+
+MFA_SUPPORTED_TYPES = ["totp", "webauthn", "recovery_codes"]
+MFA_PASSKEY_LOGIN_ENABLED = True
+
+# * Django All auth config
+SITE_ID = 1
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = 'phone_number'
+
+ACCOUNT_FORMS = {'signup': 'accounts.forms.MyCustomSignupForm',
+                 'login': 'accounts.forms.MyCustomLoginForm'}
+
+ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False

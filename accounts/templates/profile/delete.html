@@ -1,0 +1,28 @@
+{% extends '_base.html' %}
+{% block title %}Delete Account{%endblock title%}
+
+{% load django_bootstrap5 %}
+
+{% block content%}
+
+<div class"card">
+    <div class="card-header">
+        <h1>Confirm Deleting your Account</h1>
+    </div>
+
+    <div class="card-body">
+
+    <p>❗ This will erase your account and all information attached to it (irreversible).</p>
+    <p>Please help us with a little feedback before you leave</p>
+
+    <form action="{% url 'accounts:delete_account' %}" method='post'>
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% bootstrap_button button_type='submit' button_class='btn-danger' content='Delete Account' %}
+    </form>
+
+</div>
+
+</div>
+{% endblock content %}
+

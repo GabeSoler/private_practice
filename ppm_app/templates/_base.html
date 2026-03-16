@@ -173,18 +173,23 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
                 {% if user.is_authenticated %}
                 <li class='nav-item'>
                     <span class='navbar-text me-2'>{% translate 'Hello' %}, {{user.username}}!
-                    <form action="{% url 'accounts:logout' %}" method='post' style='display:inline;'>
+                    <form action="{% url 'account_logout' %}" method='post' style='display:inline;'>
                         {% csrf_token %}
                         <button name='submit' class='btn btn-outline-secondary btn-sm'>
                             {% translate 'Logout' %}</button>
                         </form>
                       </span>
                       </li>
+                    <li>
+                    <a class="btn btn-outline-info" href="{% url 'accounts:account_profile' %}"><i class="bi bi-person-circle"></i></a>
+                    </li>
                     {% else %}
 {#                <li class='nav-item'>#}
 {#                    <a class='nav-link' href="{% url 'accounts:register'%}">Signup</a></li>#}
                 <li class='nav-item'>
-                    <a class='nav-link' href="{% url 'accounts:login' %}">{% translate 'Login' %}</a></li>
+                    <a class='btn btn-outline-secondary' href="{% url 'account_signup' %}">{% translate 'Signup' %}</a></li>
+                <li class='nav-item'>
+                    <a class='btn btn-outline-success' href="{% url 'account_login' %}">{% translate 'Login' %}</a></li>
                 {% endif %}
             </ul> 
                <!-- End of account related links -->
@@ -193,11 +198,11 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 </nav><!-- end of navbar -->
 
 <!-- Main section -->
+{% block body %}
 
 <div id="toast-wrapper">
   {% if messages %}{% include '_toasts.html'%}{% endif %}
   </div>
-
 
 
 {% block hero_block %}
@@ -213,11 +218,10 @@ hx-ext="{% if debug %}debug{% endif %}, event-header">
 
 {% block search_nav %} {% comment %} for search inside lists{% endcomment %}
 {% endblock search_nav %}
-    <div> 
-        {% block content %} {% endblock content %}      
-    </div>
-    
-    
+
+        {% block content %} {% endblock content %}
+
+    {% endblock body %}
 </main>
 
 <!--Fixed footer nav -->

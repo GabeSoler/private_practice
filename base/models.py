@@ -11,6 +11,12 @@ class Page(models.Model):
     content = models.TextField()
     image = models.ImageField(upload_to='images/', blank=True)
 
+    def __str__(self):
+        return self.title
+
+    def __repr__(self):
+        return f"Base.Page:{self.title}"
+
 
 class IndexPage(models.Model):
     created = models.DateTimeField(auto_now_add=True)

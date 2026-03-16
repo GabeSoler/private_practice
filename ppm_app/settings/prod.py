@@ -18,3 +18,20 @@ sentry_sdk.init(
     # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
     send_default_pii=True,
 )
+
+# resend activated all the time
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# REsend configuration and email back ends
+RESEND_API_KEY = config('RESEND_API_KEY')
+RESEND_SMTP_PORT = 587
+RESEND_SMTP_USERNAME = 'resend'
+RESEND_SMTP_HOST = 'smtp.resend.com'
+
+EMAIL_HOST = RESEND_SMTP_HOST
+EMAIL_USE_TLS = True
+EMAIL_PORT = RESEND_SMTP_PORT
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = RESEND_SMTP_USERNAME
+EMAIL_HOST_PASSWORD = RESEND_API_KEY
+DEFAULT_FROM_EMAIL = 'admin@crea-therapy.com'

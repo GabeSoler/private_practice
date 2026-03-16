@@ -1,22 +1,26 @@
 """Account creation for PPM app"""
 
-from django.shortcuts import render,redirect
-from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
+from .forms import DeleteAccountForm
 
-def register(request):
-    """registetr new users"""
+
+def profile_view(request):
+    """deals with password and user details"""
+    return render(request, 'profile.html')
+
+
+def delete_account_view(request):
+    user = request.user
     if request.method != 'POST':
-        form = UserCreationForm
+        form = DeleteAccountForm()
     else:
-        form = UserCreationForm(data=request.POST)
+        form = DeleteAccountForm(data=request.POST)
         if form.is_valid():
-            new_user = form.save()
-            login(request,new_user)
-            return redirect('base:index')
-
-    context = {'form':form}
-    return render(request,'registration/register.html',context)
-
-
-
+            form.save()
+            if form.cleaned_data['confirm'] == True:
+                user.delete()
+                return redirect('between_app:index')
+            else:
+                messages.warning(request, "Account not deleted! Extra confirmation required")
+    context = {'form': form}
+    return render(request, 'profile/delete.html', context)

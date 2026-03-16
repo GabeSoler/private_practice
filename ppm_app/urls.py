@@ -18,6 +18,7 @@ urlpatterns = [
 
 urlpatterns += i18n_patterns(
     path('', include('base.urls')),
+    path('accounts/', include('allauth.urls')),
     path('accounts/', include('accounts.urls')),
 
     path('clients/', include('session_client.urls')),
