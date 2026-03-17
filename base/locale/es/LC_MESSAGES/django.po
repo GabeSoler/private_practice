@@ -537,7 +537,7 @@ msgstr "Administración para terapeutas"
 #, fuzzy
 #| msgid "Client's Session"
 msgid "Clients"
-msgstr "Session Cliente"
+msgstr "Clientes"
 
 #: base/templates/base/index.html:33 base/templates/base/room-info.html:37
 #, fuzzy
@@ -565,7 +565,7 @@ msgstr "Características"
 #, fuzzy
 #| msgid "Client's Session"
 msgid "Client Card"
-msgstr "Session Cliente"
+msgstr "Carta de Clientes"
 
 #: base/templates/base/index.html:62
 msgid "Will give you a quick glance of a client's admin situation"
@@ -623,11 +623,11 @@ msgstr "Session Cliente"
 #, fuzzy
 #| msgid "Attended"
 msgid "Attendance"
-msgstr "Attendida"
+msgstr "Atención"
 
 #: base/templates/base/session-intro.html:12
 msgid "Keywords"
-msgstr ""
+msgstr "Palabras clave"
 
 #: base/templates/base/session-intro.html:14
 msgid "Paid"
