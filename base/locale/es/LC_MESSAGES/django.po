@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-17 00:19+0000\n"
+"POT-Creation-Date: 2026-03-17 19:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -344,109 +344,52 @@ msgid "March(21)-March(20)"
 msgstr "Marzo(21)'Marzo(20)"
 
 #: base/templates/base/client-card-intro.html:10
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            Here you're going to see the different properties of the "
-#| "(Client) card press arrow to follow\n"
-#| "            "
 msgid ""
 "Here you're going to see the different properties of the (Client) card press "
 "arrow to follow"
 msgstr ""
 "            Aquí vas a ver diferentes propiedades de  la carta de Clientes, "
-"apreta la flecha para seguir\n"
+"apreta la flecha para seguir"
 
 #: base/templates/base/client-card-intro.html:18
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "             Client code you can create a code to identify your client "
-#| "avoiding personal information\n"
-#| "            "
 msgid ""
 "Client code you can create a code to identify your client avoiding personal "
 "information"
 msgstr "Codigo de clientes para identificarlos evitando datos personales"
 
 #: base/templates/base/client-card-intro.html:27
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            Time with a client, accounts from the creation of the "
-#| "client.\n"
 msgid "Time with a client, accounts from the creation of the client."
 msgstr "Tiempo que el cliente ha estado en sesión"
 
 #: base/templates/base/client-card-intro.html:36
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            Sessions that are currently open past current date\n"
 msgid "Sessions that are currently open past current date"
 msgstr "Sesiones que ya pasaron la fecha de hoy"
 
 #: base/templates/base/client-card-intro.html:45
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            Total amount of sessions of a client\n"
-#| "            "
 msgid "Total amount of sessions of a client"
 msgstr "Total de sesiones de un cliente"
 
 #: base/templates/base/client-card-intro.html:54
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            The type of client, in this scase private\n"
-#| "            "
 msgid "The type of client, in this scase private"
 msgstr "Tipo de cliente, en este caso es privado"
 
 #: base/templates/base/client-card-intro.html:63
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            Month and year of the creations of a client\n"
-#| "            "
 msgid "Month and year of the creations of a client"
 msgstr "Mes y año de la creacion del cliente para referencia"
 
 #: base/templates/base/client-card-intro.html:72
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            The amount of money a client has paid in the last month\n"
-#| "            "
 msgid "The amount of money a client has paid in the last month"
 msgstr "Cuanto el cliente ha pagado en los ultimos 30 dias"
 
 #: base/templates/base/client-card-intro.html:81
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            The expected money a claim would have paid in this mont\n"
-#| "            "
 msgid "The expected money a claim would have paid in this mont"
 msgstr "Cuanto esperabamos que pague en los ultimos 30 días"
 
 #: base/templates/base/client-card-intro.html:90
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            What percentage of attendance in the last three months\n"
-#| "            "
 msgid "What percentage of attendance in the last three months"
 msgstr "Que porcentaje de atenciones ha habido en los ultimos tres meses"
 
 #: base/templates/base/client-card-intro.html:99
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            How many sessions has been booked in the future and can be "
-#| "pressed to see them\n"
-#| "            "
 msgid ""
 "How many sessions has been booked in the future and can be pressed to see "
 "them"
@@ -454,50 +397,32 @@ msgstr ""
 "Cuantas sesiones hay resevadas en el futuro, puedes apretar para ver la lista"
 
 #: base/templates/base/client-card-intro.html:108
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            Book three sessions towards the future, using the defaults\n"
-#| "            "
 msgid "Book three sessions towards the future, using the defaults"
 msgstr "Agenda cuatro semanas hacia el futuro usando los tiempos asignados"
 
 #: base/templates/base/client-card-intro.html:117
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "            Open to manage the times a client is using in a week\n"
-#| "            "
 msgid "Open to manage the times a client is using in a week"
 msgstr "Maneja los timepos del paciente"
 
 #: base/templates/base/client-card.html:13
-#, fuzzy
-#| msgid "Client's Session"
 msgid "Client code"
-msgstr "Session Cliente"
+msgstr "Cóodigo Cliente"
 
 #: base/templates/base/client-card.html:23
 msgid "Time from creation"
 msgstr ""
 
 #: base/templates/base/client-card.html:32
-#, fuzzy
-#| msgid "Supervision"
 msgid "Open Sessions"
 msgstr "Sesiones"
 
 #: base/templates/base/client-card.html:46
-#, fuzzy
-#| msgid "Supervision"
 msgid "Total Sessions"
-msgstr "Sesiones"
+msgstr "Total de Sesiones"
 
 #: base/templates/base/client-card.html:55
-#, fuzzy
-#| msgid "Client's Session"
 msgid "Client Type"
-msgstr "Session Cliente"
+msgstr "Tipo de Cliente"
 
 #: base/templates/base/client-card.html:65
 msgid "Client created at"
@@ -516,10 +441,8 @@ msgid "Attendance percentage for 3 months"
 msgstr "Porcentaje de atenciones 3 meses"
 
 #: base/templates/base/client-card.html:104
-#, fuzzy
-#| msgid "Supervision"
 msgid "Future sessions"
-msgstr "Sesiones"
+msgstr "Sesiones adelante"
 
 #: base/templates/base/client-card.html:118
 msgid "book 4 weeks forward"
@@ -530,18 +453,14 @@ msgid "Open times modal"
 msgstr "Abre para manejar tiempos"
 
 #: base/templates/base/index.html:15
-msgid "Admin for therapists"
-msgstr "Administración para terapeutas"
+msgid "Admin for therapists -Beta"
+msgstr "Administración para terapeutas -Beta"
 
 #: base/templates/base/index.html:28
-#, fuzzy
-#| msgid "Client's Session"
 msgid "Clients"
 msgstr "Clientes"
 
 #: base/templates/base/index.html:33 base/templates/base/room-info.html:37
-#, fuzzy
-#| msgid "Supervision"
 msgid "Sessions"
 msgstr "Sesiones"
 
@@ -562,8 +481,6 @@ msgid "Features"
 msgstr "Características"
 
 #: base/templates/base/index.html:60
-#, fuzzy
-#| msgid "Client's Session"
 msgid "Client Card"
 msgstr "Carta de Clientes"
 
@@ -572,8 +489,6 @@ msgid "Will give you a quick glance of a client's admin situation"
 msgstr "Una mirada rápida de la situación de tu cliente"
 
 #: base/templates/base/index.html:74
-#, fuzzy
-#| msgid "Supervision"
 msgid "Session's list"
 msgstr "Lista de Sesiones"
 
