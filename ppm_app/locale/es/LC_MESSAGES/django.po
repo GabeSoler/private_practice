@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-16 23:47+0000\n"
+"POT-Creation-Date: 2026-03-17 00:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,59 +51,59 @@ msgstr "Mis Cuartos"
 msgid "My Calendar"
 msgstr "Mis Calendarios"
 
-#: ppm_app/templates/_base.html:151 ppm_app/templates/_base.html:153
+#: ppm_app/templates/_base.html:148 ppm_app/templates/_base.html:150
 msgid "Toggle theme"
 msgstr "Cambiar tema"
 
-#: ppm_app/templates/_base.html:159
+#: ppm_app/templates/_base.html:156
 msgid "Dawn"
 msgstr "Amanecer"
 
-#: ppm_app/templates/_base.html:165
+#: ppm_app/templates/_base.html:162
 msgid "Dusk"
 msgstr "Atardecer"
 
-#: ppm_app/templates/_base.html:201
+#: ppm_app/templates/_base.html:199
 msgid "Hello"
 msgstr "Hola"
 
-#: ppm_app/templates/_base.html:211
+#: ppm_app/templates/_base.html:209
 msgid "Logout"
 msgstr "Cerrar sesión"
 
-#: ppm_app/templates/_base.html:222
+#: ppm_app/templates/_base.html:220
 msgid "Report bugs"
 msgstr ""
 
-#: ppm_app/templates/_base.html:231
+#: ppm_app/templates/_base.html:229
 msgid "Manage Account"
 msgstr ""
 
-#: ppm_app/templates/_base.html:239
+#: ppm_app/templates/_base.html:237
 msgid "Signup"
 msgstr ""
 
-#: ppm_app/templates/_base.html:241
+#: ppm_app/templates/_base.html:239
 msgid "Login"
 msgstr "Iniciar sesión"
 
-#: ppm_app/templates/_base.html:309 ppm_app/templates/_base.html:314
+#: ppm_app/templates/_base.html:307 ppm_app/templates/_base.html:312
 msgid "Home"
 msgstr "Inicio"
 
-#: ppm_app/templates/_base.html:330
+#: ppm_app/templates/_base.html:328
 #, fuzzy
 #| msgid "My Clients"
 msgid "Clients"
 msgstr "Mis Clientes"
 
-#: ppm_app/templates/_base.html:346
+#: ppm_app/templates/_base.html:344
 #, fuzzy
 #| msgid "My Sessions"
 msgid "Sessions"
 msgstr "Mis Sessiones"
 
-#: ppm_app/templates/_base.html:362
+#: ppm_app/templates/_base.html:360
 msgid "Week View"
 msgstr "Semana"
 

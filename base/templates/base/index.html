@@ -53,13 +53,13 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="text-primary display-1 fw-bold">Features</h1>
+    <h1 class="text-primary display-1 fw-bold">{% translate "Features" %}</h1>
 
     <!-- Client card display -->
     <section class="my-5 p-2">
-    <h2 class="text-primary border-bottom">Client Card</h2>
+    <h2 class="text-primary border-bottom">{% translate "Client Card" %}</h2>
     <p class="text-primary fs-3"
-        >Will give you a quick glance of a client's admin situation</p>
+        >{% translate "Will give you a quick glance of a client's admin situation" %}</p>
     <div class="row">
 
         {% include 'base/client-card.html' %}
@@ -92,7 +92,7 @@
 
 <!-- Calendar -->
     <section class="my-5">
-        <h2 class="text-primary border-bottom">Calendar View</h2>
+        <h2 class="text-primary border-bottom">{% translate "Calendar View" %}</h2>
             <p class="text-primary fs-3">
                 {% translate "See your sessions by room and date, while in sync with your colleagues." %}
             </p>

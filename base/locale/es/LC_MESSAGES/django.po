@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-16 23:51+0000\n"
+"POT-Creation-Date: 2026-03-17 00:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -501,19 +501,19 @@ msgstr "Session Cliente"
 
 #: base/templates/base/client-card.html:65
 msgid "Client created at"
-msgstr ""
+msgstr "Cliente creado en"
 
 #: base/templates/base/client-card.html:77
 msgid "sessions paid in 30 days"
-msgstr ""
+msgstr "Sesiones pagadas en 30 días"
 
 #: base/templates/base/client-card.html:84
 msgid "payment expected in 30 days"
-msgstr ""
+msgstr "Pago esperado en 30 días"
 
 #: base/templates/base/client-card.html:92
 msgid "Attendance percentage for 3 months"
-msgstr ""
+msgstr "Porcentaje de atenciones 3 meses"
 
 #: base/templates/base/client-card.html:104
 #, fuzzy
@@ -523,11 +523,11 @@ msgstr "Sesiones"
 
 #: base/templates/base/client-card.html:118
 msgid "book 4 weeks forward"
-msgstr ""
+msgstr "reserva 4 semanas"
 
 #: base/templates/base/client-card.html:130
 msgid "Open times modal"
-msgstr ""
+msgstr "Abre para manejar tiempos"
 
 #: base/templates/base/index.html:15
 msgid "Admin for therapists"
@@ -557,6 +557,20 @@ msgstr "Los terapeútas manejan mucha complejidad"
 msgid "Let's make it a bit easier to handle their admin"
 msgstr "Hagamos más fácil manejar su admin"
 
+#: base/templates/base/index.html:56
+msgid "Features"
+msgstr "Características"
+
+#: base/templates/base/index.html:60
+#, fuzzy
+#| msgid "Client's Session"
+msgid "Client Card"
+msgstr "Session Cliente"
+
+#: base/templates/base/index.html:62
+msgid "Will give you a quick glance of a client's admin situation"
+msgstr "Una mirada rápida de la situación de tu cliente"
+
 #: base/templates/base/index.html:74
 #, fuzzy
 #| msgid "Supervision"
@@ -574,6 +588,10 @@ msgstr "Manejo de Cuartos"
 #: base/templates/base/index.html:86
 msgid "Rooms can be quickly seen, shared and managed."
 msgstr "Cuartos pueden ser compartidos y administrados"
+
+#: base/templates/base/index.html:95
+msgid "Calendar View"
+msgstr "Visualisar en Calendario"
 
 #: base/templates/base/index.html:97
 msgid "See your sessions by room and date, while in sync with your colleagues."
