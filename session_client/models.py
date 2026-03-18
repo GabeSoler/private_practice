@@ -239,8 +239,8 @@ class SessionModel(models.Model):
         """
         assert self.client is not None
         client = self.client
-        client_time_ref = client.times.earliest('created_at')
-        if tenant:
+        client_time_ref = client.times.earliest('created_at') or None
+        if tenant and not self.tenant:
             if client.tenant:
                 self.tenant = client.tenant
             else:
@@ -251,11 +251,11 @@ class SessionModel(models.Model):
                     base_tenant = TenantModel.objects.create(user=self.client.user, name=self.client.user.username,
                                                              display_name=self.client.user.username)
                 self.tenant = base_tenant
-        if date:
+        if date and not self.date:
             self.date = client.deduce_next_datetime().date()
-        if start_time:
+        if start_time and not self.start_time:
             self.start_time = self.start_time or client_time_ref.time
-        if end_time:
+        if end_time and not self.end_time:
             self.end_time = time_plus_duration(self.start_time, client.duration)
         return self
 
