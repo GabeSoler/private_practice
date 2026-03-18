@@ -182,8 +182,6 @@ class SessionModel(models.Model):
         end = self.end_time
         calendar = self.tenant.calendar
         assert isinstance(calendar, RoomCalendarModel)
-        assert isinstance(start, datetime.time), "start must be a time object"
-        assert isinstance(end, datetime.time), "end must be a time object"
         qs = SessionModel.objects.filter(tenant__calendar=calendar, date=self.date).filter(
             models.Q(
                 start_time__gte=start,
