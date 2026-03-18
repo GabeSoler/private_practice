@@ -50,6 +50,7 @@ def ok_response_render(request, template, context,
                        re_target: str = None,
                        event_and_target: tuple[str, str] = None,
                        re_swap: str = None):
+    """ to be able to render and changing target and adding events """
     response = render(request, template, context)
     response = hx_flex_response(response, re_target, event_and_target, re_swap)
     return response
