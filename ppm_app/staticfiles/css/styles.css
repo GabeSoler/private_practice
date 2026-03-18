@@ -33,6 +33,11 @@
     transition: all .3s ease-in;
 }
 
+.success-shine-7.htmx-swapping {
+    background-color: var(--bs-success);
+    transition: all .3s ease-in;
+}
+
 .warning-shine-7.htmx-added {
     background-color: var(--bs-warning);
     transition: all .3s ease-in;

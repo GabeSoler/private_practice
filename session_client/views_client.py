@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from ppm_app.responses.hx_responses import ok_response_modal
+from ppm_app.responses.hx_responses import ok_response_modal, ok_response_render
 from room_calendar_app.models import TenantModel
 from .models import ClientModel, SessionModel
 from django.http import Http404
@@ -136,13 +136,14 @@ def add_client_view(request):
             instance = form.save(commit=False)
             instance.user = request.user
             instance.save()
-            # client = annotate_client_list(request.user).filter(pk=instance.pk).first()
-            # partial_template = "session_client/lists/client_list.html" + "#client-card-partial"
-            # response = render(request, partial_template, {"client": client})
-            # response = retarget(response, "#client-add-card")
-            # return reswap(response, "beforebegin")
-            return ok_response_modal(request, _("Client added"), event_and_target=("RefreshTable", "#refresh"),
-                                     modal_body=False)
+            client = annotate_client_list(request.user).filter(pk=instance.pk).first()
+            partial_template = "session_client/lists/client_list.html" + "#client-card-partial"
+            context = {'client': client}
+            return ok_response_render(request, partial_template, context,
+                                      "#client-add-card", ("CloseModal", ".modal"),
+                                      "beforebegin")
+            # return ok_response_modal(request, _("Client added"), event_and_target=("RefreshTable", "#refresh"),
+            #                          modal_body=False)
         logger.debug(f"Client form is invalid, by: {form.errors}")
     # display a blank or invalid form
     form.fields['tenant'].queryset = TenantModel.objects.filter(user=request.user)

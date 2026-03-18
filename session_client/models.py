@@ -244,7 +244,12 @@ class SessionModel(models.Model):
             if client.tenant:
                 self.tenant = client.tenant
             else:
-                base_tenant, _ = TenantModel.objects.get_or_create(user=self.client.user, name="Base Tenant")
+                base_tenant = TenantModel.objects.filter(user=self.client.user,
+                                                         name=self.client.user.username,
+                                                         display_name=self.client.user.username).first()
+                if not base_tenant:
+                    base_tenant = TenantModel.objects.create(user=self.client.user, name=self.client.user.username,
+                                                             display_name=self.client.user.username)
                 self.tenant = base_tenant
         if date:
             self.date = client.deduce_next_datetime().date()
@@ -261,7 +266,7 @@ class ClientTimes(models.Model):
     day = models.IntegerField(choices=WEEKDAY_SHORT, default=1, help_text=_("Day of Week"))
     time = models.TimeField(choices=time_slot_options(), help_text=_('Time of Session'))
     tenant = models.ForeignKey(TenantModel, on_delete=models.SET_NULL,
-                               blank=True, null=True, help_text=_("Set different tenant"))
+                               null=True, help_text=_("Set tenant"))
     fortnight = models.BooleanField(default=False, help_text=_("Set as fortnight"))
 
     def __str__(self):
@@ -295,9 +300,11 @@ class ClientTimes(models.Model):
             tenant = self.tenant
         else:
             logger.debug("Using base tenant to set a series")
-            tenant, _ = TenantModel.objects.get_or_create(user=user,
-                                                          name=user.username,
-                                                          display_name=user.username)
+            tenant = TenantModel.objects.filter(user=user,
+                                                name=user.username,
+                                                display_name=user.username).first()
+            if not tenant:
+                tenant = TenantModel.objects.create(user=user, name=user.username, display_name=user.username)
         if overlap_check:
             """ stops the process to check for overlaps and returns overlaps"""
             possible_overlap = self.check_series_overlap(interval.start, interval.end, fortnight=fortnight)

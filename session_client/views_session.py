@@ -285,7 +285,7 @@ def add_series_view(request, client_uuid, number):
             client_after = ClientModel.objects.filter(uuid=client_uuid).annotate(
                 future_sessions_count=Count('sessionmodel',
                                             filter=Q(sessionmodel__date__gt=date_ref.date()))).last()
-            return render(request, template, {"client": client_after, 'oob': True})
+            return render(request, template, {"client": client_after})
         else:
             template_overlap = "session_client/lists/sessions_toast.html"
             response = render(request, template_overlap, {'sessions': sessions, "created": False})

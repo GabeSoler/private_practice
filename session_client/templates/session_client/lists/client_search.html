@@ -55,7 +55,7 @@ similar to events. needs custom form and view {% endcomment %}
   {% partialdef client-list-partial inline %}
   {% for session in sessions%}
     <li class="list-group-item list-group-item-primary">
-       {% if forloop.last %}{% comment %}to add endless scroll{% endcomment %}
+       {% if forloop.last %}{# Start endless scroll #}
            {% if sessions.has_next %}
            <div
            hx-post="{% url 'session_client:client_search' %}{% querystring page=sessions.next_page_number %}"
@@ -70,14 +70,14 @@ similar to events. needs custom form and view {% endcomment %}
            {% endif %}
       {%  else  %}
 
-           {% comment %}end endless trigger{% endcomment %}
+           {# end endless scrolling #}
 
       <a href="{%url 'session_client:session_hx_item' session.uuid %}"
          hx-get="{%url 'session_client:session_hx_item' session.uuid %}"
          hx-target="#modal-wrapper"
       >{{ session.client }} -- {{session.date}}</a>
         <i class="bi bi-archive-fill text-danger" 
-          hx-put={% url 'session_client:edit_session' session.uuid %}
+          hx-put="{% url 'session_client:edit_session' session.uuid %}"
           hx-trigger="click"
           hx-target="closest li"
           hx-swap="outerHTML"
@@ -86,7 +86,7 @@ similar to events. needs custom form and view {% endcomment %}
       {% endif %}
     </li>
     {% empty %}
-    <li class="list-group-item list-group-item-primary">{% translate 'Search in Sessions Keywords, Nick Name, and Room' %}</li>
+    <li class="list-group-item list-group-item-primary">{% translate 'Search in Sessions Keywords, Tenant, and Room' %}</li>
     
     {% endfor %}
   {% endpartialdef %}

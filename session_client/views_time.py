@@ -2,11 +2,13 @@ from django.shortcuts import render, get_object_or_404
 from django_htmx.http import HttpResponseClientRefresh
 import pendulum as p
 
-from ppm_app.responses.hx_responses import ok_response_modal
+from ppm_app.responses.hx_responses import ok_response_modal, ok_response_render
 from room_calendar_app.models import TenantModel
 from .forms import TimeForm
 from .models import ClientTimes, ClientModel
 from django.forms import inlineformset_factory
+
+from .querysets import annotate_client_list
 
 
 def edit_time(request, time_pk):
@@ -49,7 +51,12 @@ def manage_times(request, client_uuid):
         formset = FormSet(request.POST, instance=client, initial=initial)
         if formset.is_valid():
             formset.save()
-            return ok_response_modal(request, "all good")
+            client = annotate_client_list(request.user).filter(pk=client.pk).first()
+            partial_template = "session_client/lists/client_list.html" + "#client-card-partial"
+            context = {'client': client}
+            return ok_response_render(request, partial_template, context,
+                                      f"#card-{client.uuid}", ("CloseModal", ".modal"),
+                                      "outerHTML")
         else:
             for form in formset.forms:
                 form.fields["tenant"].queryset = tenant_qs
