@@ -1,7 +1,6 @@
 {% load hx_helpers %}
 {% load i18n django_bootstrap5 %}
 <!-- Session list -->
-    {% if sessions %} {% comment %} As i re use it its here, a bit messy :/ {% endcomment %}
             <table class="table"  _="on htmx:load
             tell <input[name='sessionSelectAllCheckbox']/> set your checked to false
             end">
@@ -182,5 +181,4 @@
                 </tr>
                 </tfoot>
             </table>
-    {% endif %}
 
