@@ -239,7 +239,10 @@ class SessionModel(models.Model):
         """
         assert self.client is not None
         client = self.client
-        client_time_ref = client.times.earliest('created_at') or None
+        try:
+            client_time_ref = client.times.earliest('created_at')
+        except ClientTimes.DoesNotExist:
+            client_time_ref = None
         if tenant and not self.tenant:
             if client.tenant:
                 self.tenant = client.tenant
