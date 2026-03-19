@@ -111,36 +111,11 @@ class CalendarTimesRender:
             end_datetime = now_at_time(time.end_time).subtract(minutes=30)
             start_datetime = now_at_time(time.time)  # using now() is ok!
             time_range = p.interval(start_datetime, end_datetime)
-            iso_day = time.day + 1
+            iso_day = time.day
             for time_slot in time_range.range('minutes', 30):
                 slot = time_slot.time()
                 times_dict[slot][iso_day].add(time)
         return times_dict
-
-
-class CalendarClientsRender:
-    def __init__(self, clients, room_cal: RoomCalendarModel = None):
-        self.clients = clients
-        self.week_days = WEEKDAY_SHORT
-        self.room_calendar = room_cal
-
-    @property
-    def client_dict(self) -> dict:
-        """organises the dictionary by clients default times in a week"""
-        client_dict = week_slot_dic()
-        if not self.clients:
-            return client_dict
-        for client in self.clients:
-            # assert session.start_time is not None, "Calendar UtilsL: start_datetime should not be None"
-            end_time = time_plus_duration(client.time, client.duration)
-            start_datetime = now_at_time(client.time)  # using now() is ok!
-            end_datetime = now_at_time(end_time).subtract(minutes=30)
-            time_range = p.interval(start_datetime, end_datetime)
-            iso_day = client.day + 1
-            for time_slot in time_range.range('minutes', 30):
-                slot = time_slot.time()
-                client_dict[slot][iso_day] = client
-        return client_dict
 
 
 class MonthNextUtil:

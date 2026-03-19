@@ -4,36 +4,54 @@ import pendulum as p
 
 from ppm_app.responses.hx_responses import ok_response_modal, ok_response_render
 from room_calendar_app.models import TenantModel
-from .forms import TimeForm
+from .forms import TimeAddForm, TimeEditForm
 from .models import ClientTimes, ClientModel
 from django.forms import inlineformset_factory
 
 from .querysets import annotate_client_list
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def edit_time(request, time_pk):
+    logger.debug("Edit time called")
     template = 'session_client/edit/edit_time.html'
     time = get_object_or_404(ClientTimes, pk=time_pk)
-    form = TimeForm(request.POST, instance=time)
-    if form.is_valid():
-        form.save()
-        return HttpResponseClientRefresh()
-    form = TimeForm(instance=time)
-    context = {'form': form}
+    tenant_qs = TenantModel.objects.filter(user=request.user)
+    form = TimeEditForm(instance=time)
+    form.fields["tenant"].queryset = tenant_qs
+    if request.method == 'POST':
+        form = TimeEditForm(request.POST, instance=time)
+        if form.is_valid():
+            logger.debug("form edit_time::TimeEditForm is valid")
+            form.save()
+            return HttpResponseClientRefresh()
+        logger.debug(f"form TimeFrom is not valid: {form.errors}")
+        template += "#times-form-partial"
+    context = {'form': form, "time": time}
     return render(request, template, context)
 
 
-def add_time(request, time=None, week_day=None):
+def add_time(request, week_day, time):
+    logger.debug("Add time called")
     template = 'session_client/edit/edit_time.html'
+    tenant_qs = TenantModel.objects.filter(user=request.user)
+    client_qs = ClientModel.objects.filter(user=request.user)
+    initial = {"day": week_day, "time": p.parse(time).time()}
+    form = TimeAddForm(initial=initial)
     if request.method == 'POST':
-        form = TimeForm(request.POST)
+        form = TimeAddForm(request.POST, initial)
         if form.is_valid():
-            form.save()
+            logger.debug("form add_time::TimeAddForm is valid")
+            new_time = form.save()
+            logger.debug(f"form add_time::TimeAddForm is saved: {new_time}")
             return HttpResponseClientRefresh()
-    form = TimeForm()
-    if week_day:
-        form = TimeForm(initial={"day": week_day, "time": p.parse(time).time()})
-    context = {'form': form}
+        logger.debug(f"form TimeFrom is not valid: {form.errors}")
+        template += "#times-form-partial"
+    form.fields["tenant"].queryset = tenant_qs
+    form.fields["client"].queryset = client_qs
+    context = {'form': form, "time_ref": time, "week_day": week_day}
     return render(request, template, context)
 
 

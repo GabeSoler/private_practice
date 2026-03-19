@@ -130,10 +130,16 @@ class ClientFromCalendarForm(forms.ModelForm):
         fields = ['code', 'duration', 'fee', 'type', 'tenant']
 
 
-class TimeForm(forms.ModelForm):
+class TimeAddForm(forms.ModelForm):
     class Meta:
         model = ClientTimes
         fields = ['tenant', 'day', 'time', 'client', 'fortnight']
+
+
+class TimeEditForm(forms.ModelForm):
+    class Meta:
+        model = ClientTimes
+        fields = ['tenant', 'day', 'time', 'fortnight']
 
 
 class SessionsBulkActionsForm(forms.Form):

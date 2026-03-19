@@ -39,7 +39,7 @@
                         >{{ slot|time:"H:i" }}</th>
 
                         {% for weekday,occurrence in data.items %}
-                            {% if occurrence %}
+                            {% if occurrence|length > 0 %}
                                 <td class="table-danger"
                                     style="font-size:.6rem;max-width:5rem;"
                                     id="{{ slot }}">

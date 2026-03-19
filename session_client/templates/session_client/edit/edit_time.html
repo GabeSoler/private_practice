@@ -2,8 +2,8 @@
 {% load django_bootstrap5 %}
 {% load i18n %}
 {% block modal_title %}
-    {% if client %}
-        {{ client.code }}
+    {% if time %}
+        Time from: {{ time.client }}
     {% else %}
         <div class="display-4">Add Time</div>
     {% endif %}
@@ -16,18 +16,19 @@
 
             <div class="card mb-5 border border-secondary">
                 <form
-                        {% if client %}
-                      action="{% url 'session_client:edit_client' client.uuid %}" method="post"
-                      hx-post="{% url 'session_client:edit_client' client.uuid %}"
+                        {% if time %}
+                      hx-post="{% url 'session_client:edit_client_time' time.pk %}"
                         {% else %}
-                            action="{% url 'session_client:add_client_time' %}" method="post"
-                            hx-post="{% url 'session_client:add_client_time' %}"
+                      hx-post="{% url 'session_client:add_client_time_with_time' week_day time_ref %}"
                         {% endif %}>
-
-                {% csrf_token %}
+                {% partialdef times-form-partial inline %}
 
                 <div class="">
-
+                            {% if time_ref %}
+                            <div class="row">
+                                {% bootstrap_field form.client size="lg" %}
+                            </div>
+                    {% endif %}
                             <div class="row">
                                 <div class="col">
                                     {% bootstrap_field form.day show_help=False show_label='skip' %}
@@ -49,10 +50,9 @@
                              </div>
                             </div>
                     <button
-                            type="submit"
                             class="btn btn-secondary float-end">{% translate 'Save' %}
                     </button>
-                        </div>
+                    {% endpartialdef times-form-partial %}
                 </form>
 
             </div>
