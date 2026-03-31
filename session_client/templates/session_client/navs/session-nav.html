@@ -9,11 +9,10 @@
 
         <a class="nav-link {% if request.path == "/session_list/" %}active {% endif %}"
            href="{% url "session_client:session_list" %}" aria-current="page"
-        ><i class="bi bi-folder2-open"></i> {% translate 'Open' %}</a
-        >
+        ><i class="bi bi-folder2-open"></i> <span class="d-none d-md-inline">{% translate 'Open' %}</span></a>
         <a class="nav-link {% if request.path == "/session_search/" %}active {% endif %}"
            href="{% url "session_client:session_search" %}"
-        ><i class="bi bi-calendar-date"></i> {% translate 'Search' %}</a>
+        ><i class="bi bi-calendar-date"></i> <span class="d-none d-md-inline">{% translate 'Search' %}</span></a>
 
         <a class="nav-link {% if request.path == "/add_session/" %}active{% endif %}"
            href="{% url "session_client:add_session" %}"
@@ -27,5 +26,8 @@
 {% endblock local_nav %}
 
     {% block content %}
+        <div class="table-responsive">
+
         {% include 'session_client/hx/_session_list.html' %}
+        </div>
     {% endblock content %}
