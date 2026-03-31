@@ -3,27 +3,25 @@
 {% block local_nav %}
 <!-- Sessions Nav -->
 <nav
-  class="nav mt-0 nav-tabs bg-secondary"
->
+  class="nav mt-0 nav-tabs bg-secondary">
   <h4 class="text-primary m-2">{% translate 'Clients' %}</h4>
 
-  <a class="nav-link {% if request.path == "/client_list/"  %}active {% endif %}"
+  <a class="nav-link px-3 px-md-4 {% if request.path == "/client_list/"  %}active {% endif %}"
       href="{% url "session_client:client_list" %}" aria-current="page"
-    >{% translate 'Current' %}</a
-  >
-  <a class="nav-link {% if request.path == "/client_search/"  %}active {% endif %}" 
+  ><i class="bi bi-folder2-open"></i> <span class="d-none d-md-inline">{% translate 'Current' %}</span></a>
+  <a class="nav-link px-3 px-md-4 {% if request.path == "/client_search/"  %}active {% endif %}"
       href="{% url "session_client:client_search" %}"
-      >{% translate 'Search' %}</a>
+  ><i class="bi bi-search"></i> <span class="d-none d-md-inline">{% translate 'Search' %}</span></a>
 
-  <a class="nav-link {% if request.path == "/client_review/"  %}active {% endif %}"
+  <a class="nav-link px-3 px-md-4 {% if request.path == "/client_review/"  %}active {% endif %}"
       href="{% url "session_client:client_review" %}"
-      >{% translate 'Review' %}</a>
+  ><i class="bi bi-list-check"></i> <span class="d-none d-md-inline">{% translate 'Review' %}</span></a>
 
-    <a class="nav-link {% if request.path == "/client_archived/"  %}active {% endif %}" 
+    <a class="nav-link px-3 px-md-4 {% if request.path == "/client_archived/"  %}active {% endif %}"
       href={% url 'session_client:client_archived' %}
-      >{% translate 'Archived' %}</a>
+    ><i class="bi bi-file-earmark-zip"></i> <span class="d-none d-md-inline">{% translate 'Archived' %}</span></a>
 
-  <a id="add-client-link" class="nav-link {% if request.path == "/add_client/"  %}active{% endif %}"
+  <a id="add-client-link" class="nav-link px-3 px-md-4 {% if request.path == "/add_client/"  %}active{% endif %}"
     href="{% url "session_client:add_client" %}"
         hx-get="{% url "session_client:add_client" %}"
        hx-target="#modal-wrapper"
