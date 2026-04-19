@@ -14,10 +14,8 @@
            href="{% url "session_client:session_search" %}"
         ><i class="bi bi-calendar-date"></i> <span class="d-none d-md-inline">{% translate 'Search' %}</span></a>
 
-        <a class="nav-link px-3 px-md-4 {% if request.path == "/add_session/" %}active{% endif %}"
-           href="{% url "session_client:add_session" %}"
-           hx-get="{% url "session_client:add_session" %}"
-           hx-target="#modal-wrapper"
+        <a class="nav-link px-3 px-md-4 {% if request.path == "/session-add-set/" %}active{% endif %}"
+           href="{% url "session_client:sessions_add_set" %}"
            ><i class="bi bi-plus-circle"></i></a>
 
     </nav>

@@ -68,6 +68,10 @@ urlpatterns = [
          views_session.add_series_view, name='add_series'),
     path('session_bulk/',
          views_session.bulk_actions_hx, name='sessions_bulk_actions'),
+    path('session-add-set/',
+         views_session.sessions_add_set_view, name='sessions_add_set'),
+    path('session-add-set-hx/<uuid:client_uuid>/<str:date_str>/',
+         views_session.sessions_add_set_hx, name='sessions_add_set_hx'),
 
     # create a htmx response that sends back a modal with forms to add a quick sessin reference
     path("hx-week_view_add_session_client/",

@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django_htmx.http import HttpResponseClientRefresh
 import pendulum as p
 
-from ppm_app.responses.hx_responses import ok_response_modal, ok_response_render
+from ppm_app.responses.hx_responses import ok_response_render
 from room_calendar_app.models import TenantModel
 from .forms import TimeAddForm, TimeEditForm
 from .models import ClientTimes, ClientModel

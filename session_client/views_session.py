@@ -1,17 +1,18 @@
+from django.forms.models import inlineformset_factory
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Count, Q
 from django.shortcuts import render, get_object_or_404
 
 from ppm_app.responses.hx_responses import ok_response_modal, ups_response, ok_response
-from room_calendar_app.models import RoomCalendarModel, TenantModel
+from room_calendar_app.models import TenantModel
 from .models import ClientModel, SessionModel
 from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, \
-    SelectAttendanceForm, PatchBriefForm, SessionsBulkActionsForm
+    SelectAttendanceForm, PatchBriefForm, SessionsBulkActionsForm, SessionShortForm, ClientAndMonthForSessions
 from django_htmx.http import retarget, HttpResponseClientRefresh, reswap
 import pendulum as p
 from django.contrib import messages
-from .utils import csv_session_list_response
+from .utils import csv_session_list_response, time_plus_duration
 import logging
 
 logger = logging.getLogger(__name__)
@@ -383,3 +384,79 @@ def bulk_actions_hx(request):
                                ("RefreshTable", "#session-list-form"),
                                "innerHTML")
     return render(request, template, {"bulk_form": form})
+
+
+def sessions_add_set_view(request):
+    clients = ClientModel.objects.filter(user=request.user, active=True)
+    template = "session_client/edit/add_sessions_set.html"
+    form = ClientAndMonthForSessions()
+    if request.method == 'POST':
+        form = ClientAndMonthForSessions(request.POST)
+        if form.is_valid():
+            logger.debug("form 'client and month for session is valid")
+            client = form.cleaned_data['clients']
+            date = form.cleaned_data['dates']
+            return sessions_add_set_hx(request, client=client, date=date)
+    form.fields['clients'].queryset = clients
+    context = {'form': form}
+    return render(request, template, context)
+
+
+def sessions_add_set_hx(request, client_uuid=None, client=None, date=None, date_str=None, ):
+    FormSet = inlineformset_factory(ClientModel, SessionModel,
+                                    fields=['date', 'start_time', 'paid', 'attendance', 'open'],
+                                    extra=5, max_num=8, can_delete=True,
+                                    )
+    client_instance = client if client else ClientModel.objects.get(uuid=client_uuid)
+    client_instance.sort_tenant_calendar()  # gives them a tenant and room if do not have one
+    date_p = p.instance(date) if date else p.from_format(date_str, 'YYYY-MM-DD')
+    if request.method == 'POST':
+        client_instance = client_instance
+        formset = FormSet(data=request.POST, instance=client_instance,
+                          queryset=SessionModel.objects.filter(date__month=date_p.month,
+                                                               date__year=date_p.year, client=client_instance))
+        if formset.is_valid():
+            sessions = formset.save(commit=False)
+            sessions = set(s for s in sessions if s.pk)
+            for obj in formset.deleted_objects:
+                obj.delete()
+            result = "Overlaps"
+            new_sessions = set()
+            update_sessions = set()
+            overlaps = set()
+            for session in sessions:
+                session.end_time = time_plus_duration(session.start_time, client_instance.duration)
+                session.open = True
+                session.paid = False
+                session.fee = client_instance.fee
+                session.tenant = client_instance.tenant
+                unique, overlap = session.is_unique()
+                if unique:
+                    logger.info(f"sessions created: {session}")
+                    if session.pk:
+                        update_sessions.add(session)
+                    else:
+                        new_sessions.add(session)
+                else:
+                    overlaps.add(overlap)
+            if not overlaps:
+                result = _("Created")
+                logger.info(f"sessions created: {len(new_sessions)}")
+                logger.info(f"sessions updated: {len(update_sessions)}")
+                SessionModel.objects.bulk_create(new_sessions)
+                SessionModel.objects.bulk_update(update_sessions,
+                                                 fields=['start_time', 'end_time', 'open', 'paid', 'date',
+                                                         'attendance'])
+            if overlaps:
+                sessions = overlaps
+            else:
+                sessions = new_sessions | update_sessions
+            context = {'sessions': sessions, 'result': result}
+            logger.info(f"sessions overlap: {len(sessions)}")
+            return render(request, 'session_client/hx/_sessions_result.html', context)
+    template = 'session_client/hx/_session_set_form.html'
+    formset = FormSet(instance=client_instance,
+                      queryset=SessionModel.objects.filter(date__month=date_p.month,
+                                                           date__year=date_p.year, client=client))
+    context = {'formset': formset, 'client': client_instance, 'date': date_p.to_date_string()}
+    return render(request, template, context)

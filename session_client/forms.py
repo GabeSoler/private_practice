@@ -5,6 +5,8 @@ from base.choices import time_slot_options
 from django.forms.widgets import DateInput, Select, SearchInput
 from django.utils.translation import gettext_lazy as _
 
+from .utils import time_plus_duration
+
 
 class ClientForm(forms.ModelForm):
     class Meta:
@@ -63,11 +65,7 @@ class SessionForm(forms.ModelForm):
 class SessionShortForm(forms.ModelForm):
     class Meta:
         model = SessionModel
-        fields = ['date', 'start_time', 'client']
-        labels = {
-            'start_time': _('Day and Time'),
-            'client': _('Client'),
-        }
+        fields = ['date', 'start_time']
         widgets = {'date': DateInput(attrs={'class': 'form-select', 'type': 'date'},
                                      format="%Y-%m-%d"),
                    'start_time': Select(attrs={'class': 'form-select', 'type': 'time'},
@@ -152,3 +150,47 @@ class SessionsBulkActionsForm(forms.Form):
                                     ("paid", "Set as Paid"),
                                     ("unpaid", "Set as Unpaid"),
                                 ))
+
+
+class ClientAndMonthForSessions(forms.Form):
+    clients = forms.ModelChoiceField(queryset=ClientModel.objects.all(), widget=forms.RadioSelect())
+    dates = forms.DateField(widget=forms.Select(
+        choices=[(p.now().subtract(months=1).start_of('month').to_date_string(),
+                  p.now().subtract(months=1).start_of('month').format(
+                      'MMM YYYY')),
+                 (p.now().start_of('month').to_date_string(),
+                  p.now().start_of('month').format('MMM YYYY')),
+                 (p.now().add(months=1).start_of('month').to_date_string(),
+                  p.now().add(months=1).start_of('month').format('MMM YYYY'))]))
+
+
+from django.forms import BaseInlineFormSet
+from django.db import models
+
+
+class SessionInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        # example custom validation across forms in the formset
+        for form in self.forms:
+            # your custom formset validation
+            start = form.cleaned_data['start_time']
+            duration = form.instance.duration
+            end = time_plus_duration(start, duration)
+            form.cleaned_data['end_time'] = end
+            date = form.cleaned_data['date']
+            calendar = form.cleaned_data['tenant'].calendar
+            qs = SessionModel.objects.filter(tenant__calendar=calendar, date=date).filter(
+                models.Q(
+                    start_time__gte=start,
+                    start_time__lt=end,
+                )
+                | models.Q(
+                    end_time__gt=start,
+                    end_time__lte=end,
+                )
+                | models.Q(start_time__lt=start,
+                           end_time__gt=end)
+            )
+            if qs:
+                raise Exception("Session overlaps")

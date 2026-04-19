@@ -274,3 +274,7 @@ class TestClientSession(MetaTestSetupMixin, TestCase):
         created, sessions = client.add_series(3)
         self.assertTrue(created)
         self.assertEqual(len(sessions), 9)
+
+    def test_sessions_add_set(self):
+        response = self.client(reverse('session_client:sessions_add_set'))
+        self.assertEqual(response.status_code, 200)

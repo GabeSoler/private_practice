@@ -128,6 +128,17 @@ class ClientModel(models.Model):
         )
         return extra_time
 
+    def sort_tenant_calendar(self):
+        if not self.tenant:
+            tenant = TenantModel.objects.filter(user=self.user, name=self.user.username,
+                                                display_name=self.user.username).first()
+            if not tenant:
+                tenant, _ = TenantModel.objects.get_or_create(user=self.user, name=self.user.username,
+                                                              display_name=self.user.username)
+            self.tenant = tenant
+        if not self.tenant.calendar:
+            tenant.calendar, _ = RoomCalendarModel.objects.get_or_create(user=self.user, name="Base Room")
+
 
 class SessionManager(models.Manager):
     pass
@@ -173,6 +184,33 @@ class SessionModel(models.Model):
     def __lt__(self, other):
         return self.start_time < other.start_time
 
+    def q_objects(self, calendar=None):
+        if calendar:
+            cal = calendar
+        elif self.tenant.calendar:
+            cal = self.tenant.calendar
+        else:
+            cal = RoomCalendarModel.objects.get_or_create(user=self.client.user, name="Base Room")
+        calendar = cal
+        start = self.start_time
+        end = self.end_time
+        q = models.Q()
+        q &= models.Q(tenant__calendar=calendar)
+        q &= (models.Q(
+            start_time__gte=start,
+            start_time__lt=end,
+            date=self.date
+        )
+              | models.Q(
+                    end_time__gt=start,
+                    end_time__lte=end,
+                    date=self.date
+                )
+              | models.Q(start_time__lt=start,
+                         end_time__gt=end,
+                         date=self.date))
+        return q
+
     def overlap_set(self):
         """
         Returns a queryset of for instances that have any overlap with a
@@ -182,7 +220,7 @@ class SessionModel(models.Model):
         end = self.end_time
         calendar = self.tenant.calendar
         assert isinstance(calendar, RoomCalendarModel)
-        qs = SessionModel.objects.filter(tenant__calendar=calendar, date=self.date).filter(
+        qs = (SessionModel.objects.filter(tenant__calendar=calendar, date=self.date).filter(
             models.Q(
                 start_time__gte=start,
                 start_time__lt=end,
@@ -193,7 +231,11 @@ class SessionModel(models.Model):
             )
             | models.Q(start_time__lt=start,
                        end_time__gt=end)
-        ).exclude(pk=self.pk).select_related("client", "client__tenant")
+        ).exclude(pk=self.pk)
+              .exclude(attendance="cancelled")
+              .select_related("client", "client__tenant")
+              .distinct()
+              )
         return qs
 
     def is_unique(self):
