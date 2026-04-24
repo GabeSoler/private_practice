@@ -10,10 +10,10 @@ from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, \
     SelectAttendanceForm, PatchBriefForm, SessionsBulkActionsForm, SessionShortForm, ClientAndMonthForSessions
 from django_htmx.http import retarget, HttpResponseClientRefresh, reswap
-import pendulum as p
 from django.contrib import messages
 from .utils import csv_session_list_response, time_plus_duration
 import logging
+import pendulum as p
 
 logger = logging.getLogger(__name__)
 
@@ -403,60 +403,74 @@ def sessions_add_set_view(request):
 
 
 def sessions_add_set_hx(request, client_uuid=None, client=None, date=None, date_str=None, ):
+    from django.forms import DateInput, Select
+    from base.choices import time_slot_options
+
     FormSet = inlineformset_factory(ClientModel, SessionModel,
                                     fields=['date', 'start_time', 'paid', 'attendance', 'open'],
                                     extra=5, max_num=8, can_delete=True,
+                                    widgets={'date': DateInput(attrs={'class': 'form-select', 'type': 'date'},
+                                                               format="%Y-%m-%d"),
+                                             'start_time': Select(attrs={'class': 'form-select', 'type': 'time'},
+                                                                  choices=time_slot_options)}
                                     )
     client_instance = client if client else ClientModel.objects.get(uuid=client_uuid)
-    client_instance.sort_tenant_calendar()  # gives them a tenant and room if do not have one
-    date_p = p.instance(date) if date else p.from_format(date_str, 'YYYY-MM-DD')
+    client_instance.sort_tenant_calendar()  # gives them a tenant and room if they do not have one
+    date_p: p.DateTime = p.instance(date) if date else p.from_format(date_str, 'YYYY-MM-DD')
     if request.method == 'POST':
-        client_instance = client_instance
         formset = FormSet(data=request.POST, instance=client_instance,
                           queryset=SessionModel.objects.filter(date__month=date_p.month,
                                                                date__year=date_p.year, client=client_instance))
         if formset.is_valid():
-            sessions = formset.save(commit=False)
-            sessions = set(s for s in sessions if s.pk)
-            for obj in formset.deleted_objects:
-                obj.delete()
-            result = "Overlaps"
-            new_sessions = set()
-            update_sessions = set()
-            overlaps = set()
-            for session in sessions:
+            result = _("Overlaps")
+            new_sessions = []
+            update_sessions = []
+            to_delete_ids = []
+            qs_check_list = []
+            for form in formset:
+                if form.cleaned_data['DELETE']:
+                    to_delete_ids.append(form.cleaned_data['DELETE'])
+                    continue
+                if not form.has_changed():
+                    continue
+                session = form.save(commit=False)
                 session.end_time = time_plus_duration(session.start_time, client_instance.duration)
-                session.open = True
-                session.paid = False
-                session.fee = client_instance.fee
-                session.tenant = client_instance.tenant
-                unique, overlap = session.is_unique()
-                if unique:
-                    logger.info(f"sessions created: {session}")
-                    if session.pk:
-                        update_sessions.add(session)
-                    else:
-                        new_sessions.add(session)
+                session.client = client_instance
+                if session.pk:
+                    update_sessions.append(session)
                 else:
-                    overlaps.add(overlap)
+                    session.open = True
+                    session.paid = False
+                    session.fee = client_instance.fee
+                    session.tenant = client_instance.tenant
+                    new_sessions.append(session)
+                qs_check_list.append(session.overlap_set())
+
+            if qs_check_list:
+                overlaps = qs_check_list[0].union(*qs_check_list[1:])
+                logger.debug(qs_check_list)
+                logger.debug(overlaps)
+            else:
+                overlaps = []
+
             if not overlaps:
                 result = _("Created")
-                logger.info(f"sessions created: {len(new_sessions)}")
-                logger.info(f"sessions updated: {len(update_sessions)}")
+                logger.debug(f"sessions created: {len(new_sessions)}")
+                logger.debug(f"sessions updated: {len(update_sessions)}")
+                logger.debug(f"queries: {len(qs_check_list)}")
                 SessionModel.objects.bulk_create(new_sessions)
                 SessionModel.objects.bulk_update(update_sessions,
                                                  fields=['start_time', 'end_time', 'open', 'paid', 'date',
                                                          'attendance'])
-            if overlaps:
-                sessions = overlaps
+                sessions = update_sessions + new_sessions
             else:
-                sessions = new_sessions | update_sessions
+                sessions = overlaps
             context = {'sessions': sessions, 'result': result}
-            logger.info(f"sessions overlap: {len(sessions)}")
+            logger.debug(f"sessions overlap: {len(sessions)}")
             return render(request, 'session_client/hx/_sessions_result.html', context)
     template = 'session_client/hx/_session_set_form.html'
     formset = FormSet(instance=client_instance,
                       queryset=SessionModel.objects.filter(date__month=date_p.month,
-                                                           date__year=date_p.year, client=client))
+                                                           date__year=date_p.year, client=client_instance))
     context = {'formset': formset, 'client': client_instance, 'date': date_p.to_date_string()}
     return render(request, template, context)

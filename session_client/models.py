@@ -184,33 +184,6 @@ class SessionModel(models.Model):
     def __lt__(self, other):
         return self.start_time < other.start_time
 
-    def q_objects(self, calendar=None):
-        if calendar:
-            cal = calendar
-        elif self.tenant.calendar:
-            cal = self.tenant.calendar
-        else:
-            cal = RoomCalendarModel.objects.get_or_create(user=self.client.user, name="Base Room")
-        calendar = cal
-        start = self.start_time
-        end = self.end_time
-        q = models.Q()
-        q &= models.Q(tenant__calendar=calendar)
-        q &= (models.Q(
-            start_time__gte=start,
-            start_time__lt=end,
-            date=self.date
-        )
-              | models.Q(
-                    end_time__gt=start,
-                    end_time__lte=end,
-                    date=self.date
-                )
-              | models.Q(start_time__lt=start,
-                         end_time__gt=end,
-                         date=self.date))
-        return q
-
     def overlap_set(self):
         """
         Returns a queryset of for instances that have any overlap with a
@@ -232,7 +205,7 @@ class SessionModel(models.Model):
             | models.Q(start_time__lt=start,
                        end_time__gt=end)
         ).exclude(pk=self.pk)
-              .exclude(attendance="cancelled")
+              .exclude(attendance="Cancel")
               .select_related("client", "client__tenant")
               .distinct()
               )
