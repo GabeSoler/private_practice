@@ -128,6 +128,19 @@ class ClientModel(models.Model):
         )
         return extra_time
 
+    def sort_tenant_calendar(self):
+        if not self.tenant:
+            tenant = TenantModel.objects.filter(user=self.user, name=self.user.username,
+                                                display_name=self.user.username).first()
+            if not tenant:
+                tenant, _ = TenantModel.objects.get_or_create(user=self.user, name=self.user.username,
+                                                              display_name=self.user.username)
+            self.tenant = tenant
+        if not self.tenant.calendar:
+            tenant.calendar = RoomCalendarModel.objects.filter(user=self.user, name="Base Room").first()
+            if not tenant.calendar:
+                tenant.calendar, _ = RoomCalendarModel.objects.get_or_create(user=self.user, name="Base Room")
+
 
 class SessionManager(models.Manager):
     pass
@@ -140,7 +153,7 @@ class SessionModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
     # datetime fields
-    date = models.DateField(blank=True, default="2025-10-3", help_text=_("Date of session"))
+    date = models.DateField(blank=False, default=p.now().date, help_text=_("Date of session"))
     start_time = models.TimeField(editable=True, default="09:00:00", help_text=_("Start of session?"))
     end_time = models.TimeField(default="10:00:00", blank=True, editable=True, help_text=_("End of session"))
     keywords = models.CharField(blank=True, max_length=25, help_text=_("words for search"))
@@ -182,7 +195,7 @@ class SessionModel(models.Model):
         end = self.end_time
         calendar = self.tenant.calendar
         assert isinstance(calendar, RoomCalendarModel)
-        qs = SessionModel.objects.filter(tenant__calendar=calendar, date=self.date).filter(
+        qs = (SessionModel.objects.filter(tenant__calendar=calendar, date=self.date).filter(
             models.Q(
                 start_time__gte=start,
                 start_time__lt=end,
@@ -193,7 +206,11 @@ class SessionModel(models.Model):
             )
             | models.Q(start_time__lt=start,
                        end_time__gt=end)
-        ).exclude(pk=self.pk).select_related("client", "client__tenant")
+        ).exclude(pk=self.pk)
+              .exclude(attendance="Cancel")
+              .select_related("client", "client__tenant")
+              .distinct()
+              )
         return qs
 
     def is_unique(self):

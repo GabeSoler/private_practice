@@ -1,5 +1,6 @@
 from django_htmx.http import retarget, trigger_client_event, reswap
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
+from django.template.loader import render_to_string
 
 
 def hx_flex_response(response,
@@ -14,6 +15,16 @@ def hx_flex_response(response,
     if re_swap:
         response = reswap(response, re_swap)
     return response
+
+
+def hx_oob_render(request, template_1, template_2, context_dict):
+    """ chains two template renders and adds oob true to context
+    returns a HttpResponse
+    remember to add '{% if oob %}"hx-swap-oob="true"{% endif %}' to the second element"""
+    context_dict['oob'] = True
+    render_1 = render_to_string(template_1, context_dict, request)
+    render_2 = render_to_string(template_2, context_dict, request)
+    return HttpResponse(render_1 + render_2)
 
 
 def ok_response_modal(request, text: str,

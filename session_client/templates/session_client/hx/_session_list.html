@@ -23,9 +23,6 @@
         <th scope="col">{% translate 'Client' %}
         </th>
         <th scope="col">{% translate 'Attendance' %}
-            <div id="spinner" class="htmx-indicator spinner-border text-success d-inline" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
 
         </th>
         <th scope="col">{% translate 'Keyword' %}
@@ -40,7 +37,7 @@
     {% partialdef session-tbody-partial inline %}
         {% for session in sessions %}
             {% partialdef row-instance inline %}
-                <tr class="fade-in">
+                <tr class="fade-in success-shine">
                     <td class="col-1">
                         <div class="form-check">
                             <input class="form-check-input bg-primary" type="checkbox" name="sessionCheckbox"
@@ -54,7 +51,7 @@
                            hx-get="{% url "session_client:edit_session" session.uuid %}"
                            hx-target="#modal-wrapper"
                            hx-indicator=".htmx-indicator">
-                            {% if session.date %}{{ session.date }}{% else %}
+                            {% if session.date %}{{ session.date }}, {{ session.start_time }}{% else %}
                                 {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>
                     </th>
 

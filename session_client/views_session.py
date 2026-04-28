@@ -2,17 +2,22 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models import Count, Q
 from django.shortcuts import render, get_object_or_404
 
-from ppm_app.responses.hx_responses import ok_response_modal, ups_response, ok_response
-from room_calendar_app.models import RoomCalendarModel, TenantModel
+from ppm_app.responses.hx_responses import (ok_response_modal,
+                                            ups_response,
+                                            ok_response,
+                                            hx_flex_response,
+                                            hx_oob_render)
+from room_calendar_app.models import TenantModel
 from .models import ClientModel, SessionModel
 from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, \
-    SelectAttendanceForm, PatchBriefForm, SessionsBulkActionsForm
+    SelectAttendanceForm, PatchBriefForm, SessionsBulkActionsForm, \
+    ClientAndMonthForSessions
 from django_htmx.http import retarget, HttpResponseClientRefresh, reswap
-import pendulum as p
 from django.contrib import messages
-from .utils import csv_session_list_response
+from .utils import csv_session_list_response, time_plus_duration
 import logging
+import pendulum as p
 
 logger = logging.getLogger(__name__)
 
@@ -361,6 +366,8 @@ def bulk_actions_hx(request):
     if request.method == 'POST':
         form = SessionsBulkActionsForm(request.POST)
         selected_uuids = request.POST.getlist('sessionCheckbox')
+        if not selected_uuids:
+            form.add_error('actions', 'Please select at least one session')
         print(request.POST)
         if form.is_valid():
             action = form.cleaned_data['actions']
@@ -383,3 +390,61 @@ def bulk_actions_hx(request):
                                ("RefreshTable", "#session-list-form"),
                                "innerHTML")
     return render(request, template, {"bulk_form": form})
+
+
+def sessions_add_in_month_view(request):
+    clients = ClientModel.objects.filter(user=request.user, active=True)
+    template = "session_client/edit/add_sessions_in_month.html"
+    initial = {'date': p.now().date}
+    form = ClientAndMonthForSessions(initial=initial)
+    if request.method == 'POST':
+        form = ClientAndMonthForSessions(request.POST, initial=initial)
+        template += '#add_session_form_partial'
+        if form.is_valid():
+            logger.debug("form 'client and month for session is valid")
+            client = form.cleaned_data['client']
+            client.sort_tenant_calendar()
+            date = form.cleaned_data['date']
+            time = form.cleaned_data['time']
+
+            if request.htmx.triggering_event.get('type') == 'RefreshTable':
+                logger.debug("triggering event if bracket")
+                date = p.instance(date)
+                sessions = SessionModel.objects.filter(date__range=(date.start_of('month'), date.end_of('month')),
+                                                       client__user=request.user)
+                if client:
+                    sessions &= sessions.filter(client=client)
+                response = render(request, 'session_client/hx/_session_list.html#session-tbody-partial',
+                                  {"sessions": sessions})
+                return reswap(response, "innerHTML")
+
+            session = SessionModel(client=client,
+                                   date=date,
+                                   start_time=time,
+                                   end_time=time_plus_duration(time, client.duration),
+                                   tenant=client.tenant, )
+            # response to reset the form, but keeping the data just created without errors of ticks
+            # it renders a new inline session and a form with hx out of bands
+            reset_initial = {'date': date, 'client': client, 'time': time}
+            response = lambda sess: hx_oob_render(request, 'session_client/hx/_session_list.html#row-instance',
+                                                  template,
+                                                  {"session": sess,
+                                                   'form': ClientAndMonthForSessions(initial=reset_initial)})
+            if date < p.now().date():
+                session.save()
+                return response(session)
+            else:
+                unique, sessions = session.is_unique()
+                if unique:
+                    logger.debug(f"sessions: {sessions},unique: {unique}")
+                    session.save()
+                    return response(session)
+                else:
+                    form.add_error('time', "Session overlaps!")
+        response = render(request, template, {"form": form})
+        return hx_flex_response(response, "#session-list-form",
+                                ("ReloadForm", "#session-list-form"),
+                                "innerHTML")
+    form.fields['client'].queryset = clients
+    context = {'form': form}
+    return render(request, template, context)
