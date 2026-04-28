@@ -1,9 +1,11 @@
 from django import forms
+from django.forms import inlineformset_factory
 from .models import ClientModel, SessionModel, ClientTimes
 import pendulum as p
 from base.choices import time_slot_options
-from django.forms.widgets import DateInput, Select, SearchInput
+from django.forms.widgets import DateInput, Select, SearchInput, TimeInput
 from django.utils.translation import gettext_lazy as _
+from django.forms import BaseInlineFormSet
 
 from .utils import time_plus_duration
 
@@ -152,20 +154,31 @@ class SessionsBulkActionsForm(forms.Form):
                                 ))
 
 
+from django.urls import reverse, reverse_lazy
+
+
 class ClientAndMonthForSessions(forms.Form):
-    clients = forms.ModelChoiceField(queryset=ClientModel.objects.all(), widget=forms.RadioSelect())
-    dates = forms.DateField(widget=forms.Select(
-        choices=[(p.now().subtract(months=1).start_of('month').to_date_string(),
-                  p.now().subtract(months=1).start_of('month').format(
-                      'MMM YYYY')),
-                 (p.now().start_of('month').to_date_string(),
-                  p.now().start_of('month').format('MMM YYYY')),
-                 (p.now().add(months=1).start_of('month').to_date_string(),
-                  p.now().add(months=1).start_of('month').format('MMM YYYY'))]))
+    client = forms.ModelChoiceField(queryset=ClientModel.objects.all(),
+                                    widget=forms.Select(attrs={'class': 'form-select',
+                                                               'hx-get': reverse_lazy(
+                                                                   'session_client:sessions_month_list'),
+                                                               'hx-target': "#tableBody",
+                                                               'hx-trigger': "load once,change",
+                                                               'hx-include': 'this,[name=date]'}
+                                                        )
+                                    )
+    date = forms.DateField(widget=DateInput(attrs={'class': 'form-control', 'type': 'date',
+                                                   'hx-get': reverse_lazy('session_client:sessions_month_list'),
+                                                   'hx-target': "#tableBody",
+                                                   'hx-trigger': "load once,change",
+                                                   'hx-include': 'this,[name=client]'}
+                                            )
+                           )
+    time = forms.TimeField(widget=Select(attrs={'class': 'form-control', 'type': 'time'},
+                                         choices=time_slot_options()))
 
 
-from django.forms import BaseInlineFormSet
-from django.db import models
+import datetime
 
 
 class SessionInlineFormSet(BaseInlineFormSet):
@@ -173,24 +186,22 @@ class SessionInlineFormSet(BaseInlineFormSet):
         super().clean()
         # example custom validation across forms in the formset
         for form in self.forms:
+            if form.errors:
+                return
             # your custom formset validation
             start = form.cleaned_data['start_time']
-            duration = form.instance.duration
+            duration = self.instance.duration
             end = time_plus_duration(start, duration)
             form.cleaned_data['end_time'] = end
-            date = form.cleaned_data['date']
-            calendar = form.cleaned_data['tenant'].calendar
-            qs = SessionModel.objects.filter(tenant__calendar=calendar, date=date).filter(
-                models.Q(
-                    start_time__gte=start,
-                    start_time__lt=end,
-                )
-                | models.Q(
-                    end_time__gt=start,
-                    end_time__lte=end,
-                )
-                | models.Q(start_time__lt=start,
-                           end_time__gt=end)
-            )
-            if qs:
-                raise Exception("Session overlaps")
+            if not isinstance(form.cleaned_data['date'], datetime.date):
+                forms.ValidationError("add a date to include others")
+
+
+SessionFormSet = inlineformset_factory(ClientModel, SessionModel, formset=SessionInlineFormSet,
+                                       fields=['date', 'start_time', 'end_time', 'paid', 'attendance', 'open'],
+                                       extra=5, max_num=8, can_delete=True,
+                                       widgets={'date': DateInput(attrs={'class': 'form-control', 'type': 'date'},
+                                                                  format="%Y-%m-%d"),
+                                                'start_time': Select(attrs={'class': 'form-select', 'type': 'time', },
+                                                                     choices=time_slot_options)}
+                                       )

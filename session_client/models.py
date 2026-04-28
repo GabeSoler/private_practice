@@ -137,7 +137,9 @@ class ClientModel(models.Model):
                                                               display_name=self.user.username)
             self.tenant = tenant
         if not self.tenant.calendar:
-            tenant.calendar, _ = RoomCalendarModel.objects.get_or_create(user=self.user, name="Base Room")
+            tenant.calendar = RoomCalendarModel.objects.filter(user=self.user, name="Base Room").first()
+            if not tenant.calendar:
+                tenant.calendar, _ = RoomCalendarModel.objects.get_or_create(user=self.user, name="Base Room")
 
 
 class SessionManager(models.Manager):
@@ -151,7 +153,7 @@ class SessionModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
     # datetime fields
-    date = models.DateField(blank=True, default="2025-10-3", help_text=_("Date of session"))
+    date = models.DateField(blank=False, default=p.now().date, help_text=_("Date of session"))
     start_time = models.TimeField(editable=True, default="09:00:00", help_text=_("Start of session?"))
     end_time = models.TimeField(default="10:00:00", blank=True, editable=True, help_text=_("End of session"))
     keywords = models.CharField(blank=True, max_length=25, help_text=_("words for search"))

@@ -1,14 +1,18 @@
-from django.forms.models import inlineformset_factory
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Count, Q
 from django.shortcuts import render, get_object_or_404
 
-from ppm_app.responses.hx_responses import ok_response_modal, ups_response, ok_response
+from ppm_app.responses.hx_responses import (ok_response_modal,
+                                            ups_response,
+                                            ok_response,
+                                            hx_flex_response,
+                                            hx_oob_render)
 from room_calendar_app.models import TenantModel
 from .models import ClientModel, SessionModel
 from django.http import Http404, HttpResponse
 from .forms import SessionForm, SessionSelectGroupForm, SearchSessionForm, SessionFromCalendarForm, \
-    SelectAttendanceForm, PatchBriefForm, SessionsBulkActionsForm, SessionShortForm, ClientAndMonthForSessions
+    SelectAttendanceForm, PatchBriefForm, SessionsBulkActionsForm, \
+    ClientAndMonthForSessions
 from django_htmx.http import retarget, HttpResponseClientRefresh, reswap
 from django.contrib import messages
 from .utils import csv_session_list_response, time_plus_duration
@@ -386,91 +390,63 @@ def bulk_actions_hx(request):
     return render(request, template, {"bulk_form": form})
 
 
-def sessions_add_set_view(request):
+def sessions_add_in_month_view(request):
     clients = ClientModel.objects.filter(user=request.user, active=True)
-    template = "session_client/edit/add_sessions_set.html"
-    form = ClientAndMonthForSessions()
+    template = "session_client/edit/add_sessions_in_month.html"
+    initial = {'date': p.now().date}
+    form = ClientAndMonthForSessions(initial=initial)
     if request.method == 'POST':
-        form = ClientAndMonthForSessions(request.POST)
+        form = ClientAndMonthForSessions(request.POST, initial=initial)
+        template += '#add_session_form_partial'
         if form.is_valid():
             logger.debug("form 'client and month for session is valid")
-            client = form.cleaned_data['clients']
-            date = form.cleaned_data['dates']
-            return sessions_add_set_hx(request, client=client, date=date)
-    form.fields['clients'].queryset = clients
+            client = form.cleaned_data['client']
+            client.sort_tenant_calendar()
+            date = form.cleaned_data['date']
+            time = form.cleaned_data['time']
+            session = SessionModel(client=client,
+                                   date=date,
+                                   start_time=time,
+                                   end_time=time_plus_duration(time, client.duration),
+                                   tenant=client.tenant, )
+            # response to reset the form, but keeping the data just created without errors of ticks
+            # it renders a new inline session and a form with hx out of bands
+            reset_initial = {'date': date, 'client': client, 'time': time}
+            response = lambda sess: hx_oob_render(request, 'session_client/hx/_session_list.html#row-instance',
+                                                  template,
+                                                  {"session": sess,
+                                                   'form': ClientAndMonthForSessions(initial=reset_initial)})
+            if date < p.now().date():
+                session.save()
+                return response(session)
+            else:
+                unique, sessions = session.is_unique()
+                if unique:
+                    logger.debug(f"sessions: {sessions},unique: {unique}")
+                    session.save()
+                    return response(session)
+                else:
+                    form.add_error('time', "Session overlaps!")
+        response = render(request, template, {"form": form})
+        return hx_flex_response(response, "#add_session_form",
+                                ("ReloadForm", "#add_session_form"),
+                                "innerHTML")
+    form.fields['client'].queryset = clients
     context = {'form': form}
     return render(request, template, context)
 
 
-def sessions_add_set_hx(request, client_uuid=None, client=None, date=None, date_str=None, ):
-    from django.forms import DateInput, Select
-    from base.choices import time_slot_options
-
-    FormSet = inlineformset_factory(ClientModel, SessionModel,
-                                    fields=['date', 'start_time', 'paid', 'attendance', 'open'],
-                                    extra=5, max_num=8, can_delete=True,
-                                    widgets={'date': DateInput(attrs={'class': 'form-select', 'type': 'date'},
-                                                               format="%Y-%m-%d"),
-                                             'start_time': Select(attrs={'class': 'form-select', 'type': 'time'},
-                                                                  choices=time_slot_options)}
-                                    )
-    client_instance = client if client else ClientModel.objects.get(uuid=client_uuid)
-    client_instance.sort_tenant_calendar()  # gives them a tenant and room if they do not have one
-    date_p: p.DateTime = p.instance(date) if date else p.from_format(date_str, 'YYYY-MM-DD')
-    if request.method == 'POST':
-        formset = FormSet(data=request.POST, instance=client_instance,
-                          queryset=SessionModel.objects.filter(date__month=date_p.month,
-                                                               date__year=date_p.year, client=client_instance))
-        if formset.is_valid():
-            result = _("Overlaps")
-            new_sessions = []
-            update_sessions = []
-            to_delete_ids = []
-            qs_check_list = []
-            for form in formset:
-                if form.cleaned_data['DELETE']:
-                    to_delete_ids.append(form.cleaned_data['DELETE'])
-                    continue
-                if not form.has_changed():
-                    continue
-                session = form.save(commit=False)
-                session.end_time = time_plus_duration(session.start_time, client_instance.duration)
-                session.client = client_instance
-                if session.pk:
-                    update_sessions.append(session)
-                else:
-                    session.open = True
-                    session.paid = False
-                    session.fee = client_instance.fee
-                    session.tenant = client_instance.tenant
-                    new_sessions.append(session)
-                qs_check_list.append(session.overlap_set())
-
-            if qs_check_list:
-                overlaps = qs_check_list[0].union(*qs_check_list[1:])
-                logger.debug(qs_check_list)
-                logger.debug(overlaps)
-            else:
-                overlaps = []
-
-            if not overlaps:
-                result = _("Created")
-                logger.debug(f"sessions created: {len(new_sessions)}")
-                logger.debug(f"sessions updated: {len(update_sessions)}")
-                logger.debug(f"queries: {len(qs_check_list)}")
-                SessionModel.objects.bulk_create(new_sessions)
-                SessionModel.objects.bulk_update(update_sessions,
-                                                 fields=['start_time', 'end_time', 'open', 'paid', 'date',
-                                                         'attendance'])
-                sessions = update_sessions + new_sessions
-            else:
-                sessions = overlaps
-            context = {'sessions': sessions, 'result': result}
-            logger.debug(f"sessions overlap: {len(sessions)}")
-            return render(request, 'session_client/hx/_sessions_result.html', context)
-    template = 'session_client/hx/_session_set_form.html'
-    formset = FormSet(instance=client_instance,
-                      queryset=SessionModel.objects.filter(date__month=date_p.month,
-                                                           date__year=date_p.year, client=client_instance))
-    context = {'formset': formset, 'client': client_instance, 'date': date_p.to_date_string()}
-    return render(request, template, context)
+def sessions_month_list_view(request):
+    """ related to sessions_add_in_month_view to fill the month visualisation """
+    if request.htmx:
+        logger.debug("called: sessions_month_list_view")
+        date = p.from_format(request.GET.get('date'), 'YYYY-MM-DD')
+        client = request.GET.get('client')
+        logger.debug(f"get from post: {date}, {client}")
+        sessions = SessionModel.objects.filter(date__range=(date.start_of('month'), date.end_of('month')),
+                                               client__user=request.user)
+        if client:
+            sessions &= sessions.filter(client=client)
+        return render(request, 'session_client/hx/_session_list.html#session-tbody-partial',
+                      {"sessions": sessions})
+    return HttpResponse()
