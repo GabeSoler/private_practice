@@ -4,10 +4,15 @@
 
 {% block search %}
     <form class="border border-bottom-1 mb-1 p-1"
-          id="add_session_form">
+          id="session-list-form"
+          hx-post="{% url 'session_client:sessions_add_in_month' %}"
+          hx-target="#tableBody"
+          hx-swap="afterbegin"
+          hx-trigger="submit,keyup[enterKey],RefreshTable"
+    >
 
         {% partialdef add_session_form_partial inline %}
-            <div id="inner-form" {% if oob %}hx-swap-oob="true"{% endif %}>
+            <div {% if oob %}hx-swap-oob="true"{% endif %} id="inner-form">
 
                 <div class="row">
                     <div class="col">
@@ -25,7 +30,7 @@
                         {% bootstrap_field form.time show_label='skip' layout='horizontal' %}
                     </div>
                     <div class="col">
-                        <i class="bi bi-info-circle"
+                        <i class="bi bi-info-circle text-info"
                            data-bs-toggle="tooltip"
                            data-bs-trigger="hover"
                            data-bs-delay="500"
@@ -36,9 +41,6 @@
                     </div>
                     <div class="col">
                         <button class="btn btn-outline-secondary"
-                                hx-post="{% url 'session_client:sessions_add_in_month' %}"
-                                hx-target="#tableBody"
-                                hx-swap="afterbegin"
                         >Add
                         </button>
 

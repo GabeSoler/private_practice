@@ -366,6 +366,8 @@ def bulk_actions_hx(request):
     if request.method == 'POST':
         form = SessionsBulkActionsForm(request.POST)
         selected_uuids = request.POST.getlist('sessionCheckbox')
+        if not selected_uuids:
+            form.add_error('actions', 'Please select at least one session')
         print(request.POST)
         if form.is_valid():
             action = form.cleaned_data['actions']
@@ -404,6 +406,18 @@ def sessions_add_in_month_view(request):
             client.sort_tenant_calendar()
             date = form.cleaned_data['date']
             time = form.cleaned_data['time']
+
+            if request.htmx.triggering_event.get('type') == 'RefreshTable':
+                logger.debug("triggering event if bracket")
+                date = p.instance(date)
+                sessions = SessionModel.objects.filter(date__range=(date.start_of('month'), date.end_of('month')),
+                                                       client__user=request.user)
+                if client:
+                    sessions &= sessions.filter(client=client)
+                response = render(request, 'session_client/hx/_session_list.html#session-tbody-partial',
+                                  {"sessions": sessions})
+                return reswap(response, "innerHTML")
+
             session = SessionModel(client=client,
                                    date=date,
                                    start_time=time,
@@ -428,25 +442,9 @@ def sessions_add_in_month_view(request):
                 else:
                     form.add_error('time', "Session overlaps!")
         response = render(request, template, {"form": form})
-        return hx_flex_response(response, "#add_session_form",
-                                ("ReloadForm", "#add_session_form"),
+        return hx_flex_response(response, "#session-list-form",
+                                ("ReloadForm", "#session-list-form"),
                                 "innerHTML")
     form.fields['client'].queryset = clients
     context = {'form': form}
     return render(request, template, context)
-
-
-def sessions_month_list_view(request):
-    """ related to sessions_add_in_month_view to fill the month visualisation """
-    if request.htmx:
-        logger.debug("called: sessions_month_list_view")
-        date = p.from_format(request.GET.get('date'), 'YYYY-MM-DD')
-        client = request.GET.get('client')
-        logger.debug(f"get from post: {date}, {client}")
-        sessions = SessionModel.objects.filter(date__range=(date.start_of('month'), date.end_of('month')),
-                                               client__user=request.user)
-        if client:
-            sessions &= sessions.filter(client=client)
-        return render(request, 'session_client/hx/_session_list.html#session-tbody-partial',
-                      {"sessions": sessions})
-    return HttpResponse()

@@ -154,24 +154,14 @@ class SessionsBulkActionsForm(forms.Form):
                                 ))
 
 
-from django.urls import reverse, reverse_lazy
-
-
 class ClientAndMonthForSessions(forms.Form):
     client = forms.ModelChoiceField(queryset=ClientModel.objects.all(),
                                     widget=forms.Select(attrs={'class': 'form-select',
-                                                               'hx-get': reverse_lazy(
-                                                                   'session_client:sessions_month_list'),
-                                                               'hx-target': "#tableBody",
-                                                               'hx-trigger': "load once,change",
-                                                               'hx-include': 'this,[name=date]'}
+                                                               "_": "on change send RefreshTable to closest <form/> end"}
                                                         )
                                     )
     date = forms.DateField(widget=DateInput(attrs={'class': 'form-control', 'type': 'date',
-                                                   'hx-get': reverse_lazy('session_client:sessions_month_list'),
-                                                   'hx-target': "#tableBody",
-                                                   'hx-trigger': "load once,change",
-                                                   'hx-include': 'this,[name=client]'}
+                                                   "_": "on change send RefreshTable to closest <form/> end"}
                                             )
                            )
     time = forms.TimeField(widget=Select(attrs={'class': 'form-control', 'type': 'time'},

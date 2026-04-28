@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import timedelta
 
 from django.test import TestCase
@@ -275,6 +274,37 @@ class TestClientSession(MetaTestSetupMixin, TestCase):
         self.assertTrue(created)
         self.assertEqual(len(sessions), 9)
 
-    def test_sessions_add_set(self):
-        response = self.client(reverse('session_client:sessions_add_set'))
+    def test_sessions_add_in_month(self):
+        """ Test gives the view son basic testing
+        still misses some more specific checks
+        """
+        import json
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('session_client:sessions_add_in_month'))
+        self.assertEqual(response.status_code, 200)
+        headers = {
+            "HX-Request": "true",
+            "HX-Trigger": "id_client",
+            "HX-Trigger-Name": "client",
+            "HX-Target": "session-list-form",
+            "HX-Current-URL": reverse("session_client:sessions_add_in_month"),
+            "Triggering-Event": json.dumps({
+                "type": "RefreshTable",
+            }),
+        }
+        data = {'date': p.now().date(), 'client': self.client_instance.pk, 'time': p.now().time()}
+        response = self.client.post(reverse('session_client:sessions_add_in_month'), data, headers=headers)
+        self.assertEqual(response.status_code, 200)
+        headers = {
+            "HX-Request": "true",
+            "HX-Trigger": "id_client",
+            "HX-Trigger-Name": "client",
+            "HX-Target": "session-list-form",
+            "HX-Current-URL": reverse("session_client:sessions_add_in_month"),
+            "Triggering-Event": json.dumps({
+                "type": "submit",
+            }),
+        }
+        data = {'date': p.now().date(), 'client': self.client_instance.pk, 'time': p.now().time()}
+        response = self.client.post(reverse('session_client:sessions_add_in_month'), data, headers=headers)
         self.assertEqual(response.status_code, 200)

@@ -70,8 +70,6 @@ urlpatterns = [
          views_session.bulk_actions_hx, name='sessions_bulk_actions'),
     path('session-add-in-month/',
          views_session.sessions_add_in_month_view, name='sessions_add_in_month'),
-    path('session-month-list/',
-         views_session.sessions_month_list_view, name='sessions_month_list'),
 
     # create a htmx response that sends back a modal with forms to add a quick sessin reference
     path("hx-week_view_add_session_client/",
