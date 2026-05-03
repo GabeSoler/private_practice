@@ -342,7 +342,7 @@ def room_report_view(request):
                 sessions.filter(client__user=request.user)
             sessions = sessions.annotate(
                 pay=Case(
-                    When(client__type="RoomP",
+                    When(tenant__agreement="Percentage",
                          then=F("fee") * room.percentage / 100),
                     default=room.cost,
                     output_field=FloatField()
