@@ -229,7 +229,7 @@ class SessionModel(models.Model):
         unique, overlaps = self.is_unique()
         if unique:
             self.save()
-            return True, overlaps
+            return True, None
         else:
             return False, overlaps
 
@@ -269,12 +269,13 @@ class SessionModel(models.Model):
                     base_tenant = TenantModel.objects.create(user=self.client.user, name=self.client.user.username,
                                                              display_name=self.client.user.username)
                 self.tenant = base_tenant
-        if date and not self.date:
-            self.date = client.deduce_next_datetime().date()
-        if start_time and not self.start_time:
-            self.start_time = self.start_time or client_time_ref.time
-        if end_time and not self.end_time:
-            self.end_time = time_plus_duration(self.start_time, client.duration)
+        if client_time_ref:
+            if date:
+                self.date = client.deduce_next_datetime().date()
+            if start_time:
+                self.start_time = client_time_ref.time
+                if end_time:
+                    self.end_time = time_plus_duration(self.start_time, client.duration)
         return self
 
 

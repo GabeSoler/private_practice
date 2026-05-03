@@ -63,7 +63,7 @@ def week_view(request):
     form = WeekCalendarForm()
     form.fields['calendar'].queryset = calendar_user
     assert sessions is not None, "no sessions found"
-    calendar = CalendarRender(sessions=sessions)  # today by default
+    calendar = CalendarRender(sessions=sessions, date_ref=p.now())  # today by default
     context = {'calendar': calendar, 'form': form}
     return render(request, template, context)
 
@@ -412,7 +412,7 @@ def block_add_view(request, day=None, time=None, room=None):
     initial = {}
     if day and time:
         start_time = p.parse(time).time()
-        initial = {"day": day, "start_time": start_time, "end_time": start_time.add(hours=1)}
+        initial = {"day": day - 1, "start_time": start_time, "end_time": start_time.add(hours=1)}
     form = BlockForm(initial=initial)
     form.fields["tenant"].queryset = TenantModel.objects.filter(user=request.user, calendar=room)
     form.fields["tenant"].label_from_instance = lambda obj: obj.display_name
