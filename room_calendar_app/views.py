@@ -333,10 +333,13 @@ def room_report_view(request):
             year = form.cleaned_data['year']
             month = form.cleaned_data['month']
             room = form.cleaned_data['room']
-            sessions = SessionModel.objects.filter(date__month=month,
-                                                   date__year=year,
-                                                   tenant__calendar=room,
-                                                   ).exclude(attendance__exact="Cancel")
+            sessions = (SessionModel.objects.filter(date__month=month,
+                                                    date__year=year,
+                                                    tenant__calendar=room,
+                                                    )
+                        .exclude(attendance__exact="Cancel")
+                        .select_related('client', 'tenant')
+                        )
             template_partial = template + '#session-list-partial'
             if room.user != request.user:
                 sessions.filter(client__user=request.user)

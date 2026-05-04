@@ -52,11 +52,13 @@
                     <table class="table">
                         <thead>
                         <tr>
+                            <th scope="col">{% translate 'Invoice' %}
+                            </th>
                             <th scope="col">{% translate 'Date' %}
                             </th>
-                            <th scope="col">{% translate 'Client' %}
+                            <th scope="col">{% translate 'Type' %}
                             </th>
-                            <th scope="col">{% translate 'Attendance' %}
+                            <th scope="col">{% translate 'Agreement' %}
                             </th>
                             <th scope="col">{% translate 'Pay' %}
                             </th>
@@ -67,6 +69,7 @@
                         {% for session in sessions %}
                             {% partialdef row-instance inline %}
                                 <tr class="fade-in">
+                                    <td>{{ session.uuid|truncatechars:10 }}</td>
                                     <th scope="row">
                                         <a href="{% url "session_client:edit_session" session.uuid %}"
                                            hx-get="{% url "session_client:edit_session" session.uuid %}"
@@ -75,8 +78,8 @@
                                                 {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>
                                     </th>
 
-                                    <td>{{ session.client }}</td>
-                                    <td>{{ session.get_attendance_display }}</td>
+                                    <td>{{ session.client.type }}</td>
+                                    <td>{{ session.tenant.get_agreement_display }}</td>
                                     <td class="text-info">{{ session.pay }}</td>
 
 

@@ -68,9 +68,9 @@ def csv_room_report_response(sessions, room: RoomCalendarModel, year: int, month
     response = HttpResponse(
         content_type="text/csv",
         headers={"Content-Disposition": f'attachment; filename="{file_name}.csv"'})
-    fieldnames = ["date", "client", "attendance", "pay"]
+    fieldnames = ["id", "date", "type", "agreement", "pay"]
     writer = csv.writer(response)  # response is the output
     writer.writerow(fieldnames)
     for row in sessions:
-        writer.writerow([row.date, row.client, row.attendance, row.pay])
+        writer.writerow([row.uuid, row.date, row.client.type, row.tenant.agreement, row.pay])
     return response
