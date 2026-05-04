@@ -1,3 +1,4 @@
+import pendulum as p
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -127,7 +128,8 @@ def add_client_view(request):
     template = 'session_client/edit/edit_client_modal.html'
     if request.htmx.target == "modal-body-wrapper":
         template = template + "#modal-body-partial"
-    form = ClientForm()
+    initial = {'duration': '1 hour'}
+    form = ClientForm(initial=initial)
     if request.method == 'POST':
         # POST data submitted; process data
         form = ClientForm(data=request.POST)
@@ -140,7 +142,7 @@ def add_client_view(request):
             partial_template = "session_client/lists/client_list.html" + "#client-card-partial"
             context = {'client': client}
             return ok_response_render(request, partial_template, context,
-                                      "#client-add-card", ("CloseModal", ".modal"),
+                                      "me", ("CloseModal", ".modal"),
                                       "beforebegin")
             # return ok_response_modal(request, _("Client added"), event_and_target=("RefreshTable", "#refresh"),
             #                          modal_body=False)

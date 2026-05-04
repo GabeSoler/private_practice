@@ -52,14 +52,14 @@ def time_slots() -> list:
     return slots
 
 
-def duration_times() -> tuple[timedelta, timedelta, timedelta, timedelta, timedelta]:
+def duration_times() -> tuple[p.Duration, p.Duration, p.Duration, p.Duration, p.Duration]:
     """ Creates a list of durations """
     return (
-        timedelta(minutes=30),
-        timedelta(hours=1),
-        timedelta(minutes=90),
-        timedelta(hours=2),
-        timedelta(hours=3),
+        p.duration(minutes=30),
+        p.duration(hours=1),
+        p.duration(minutes=90),
+        p.duration(hours=2),
+        p.duration(hours=3),
     )
 
 
@@ -67,7 +67,7 @@ def duration_times_as_choices() -> list:
     """ creates a list of tuples of duration"""
     choices_list = []
     for t in duration_times():
-        choices_list.append((t, str(t)))
+        choices_list.append((t.as_timedelta(), t))
     return choices_list
 
 
