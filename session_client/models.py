@@ -3,7 +3,7 @@ from calendar import Calendar
 
 from django.db import models
 from django.db.models import Q, Max, Min
-
+from django.utils.timezone import now
 from ppm_app.settings.base import AUTH_USER_MODEL
 import uuid
 from django.utils.translation import gettext_lazy as _
@@ -153,7 +153,7 @@ class SessionModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
     # datetime fields
-    date = models.DateField(blank=False, default=p.now().date(), help_text=_("Date of session"))
+    date = models.DateField(blank=False, default=now(), help_text=_("Date of session"))
     start_time = models.TimeField(editable=True, default="09:00:00", help_text=_("Start of session?"))
     end_time = models.TimeField(default="10:00:00", blank=True, editable=True, help_text=_("End of session"))
     keywords = models.CharField(blank=True, max_length=25, help_text=_("words for search"))
