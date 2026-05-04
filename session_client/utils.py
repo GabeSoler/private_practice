@@ -72,5 +72,5 @@ def csv_room_report_response(sessions, room: RoomCalendarModel, year: int, month
     writer = csv.writer(response)  # response is the output
     writer.writerow(fieldnames)
     for row in sessions:
-        writer.writerow([row.uuid, row.date, row.client.type, row.tenant.agreement, row.pay])
+        writer.writerow([row.uuid, row.date, row.client.type, row.tenant.display_name, row.pay])
     return response

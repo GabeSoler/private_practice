@@ -58,7 +58,7 @@
                             </th>
                             <th scope="col">{% translate 'Type' %}
                             </th>
-                            <th scope="col">{% translate 'Agreement' %}
+                            <th scope="col">{% translate 'Tenant' %}
                             </th>
                             <th scope="col">{% translate 'Pay' %}
                             </th>
@@ -79,7 +79,7 @@
                                     </th>
 
                                     <td>{{ session.client.type }}</td>
-                                    <td>{{ session.tenant.get_agreement_display }}</td>
+                                    <td>{{ session.tenant.display_name }}</td>
                                     <td class="text-info">{{ session.pay }}</td>
 
 
