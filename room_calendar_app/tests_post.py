@@ -131,7 +131,9 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.assertTrue(form.is_valid())
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.session_1.date.strftime('%B %d, %Y'))
+        self.assertContains(response, self.session_1.date.strftime('%B %-d, %Y'))
+        to_pay = self.session_1.fee * self.session_1.tenant.calendar.percentage / 100
+        self.assertContains(response, to_pay)
 
     def test_tenant_duplicate_hx_post(self):
         url = reverse('room_calendar_app:duplicate_tenant', args=[self.tenant.uuid])

@@ -129,10 +129,10 @@ class TestClientSession(MetaTestSetupMixin, TestCase):
         self.assertEqual(building_session.end_time, "10:00:00")  # defaults
         self.assertFalse(building_session.tenant)
         building_session.deduce_from_client()
-        self.assertNotEqual(building_session.start_time, client_time.time)  # as it has thre is not change
-        building_session.start_time = None
-        building_session.deduce_from_client()
-        self.assertEqual(building_session.start_time, client_time.time)  # now it finds something
+        self.assertEqual(building_session.start_time, client_time.time)  # it to defaults of client
+        building_session.start_time = p.time(12, 0)
+        building_session.deduce_from_client(start_time=False)
+        self.assertNotEqual(building_session.start_time, client_time.time)  # needs to update and set bellow endtime
         self.assertEqual(building_session.end_time, time_plus_duration(client_time.time, client.duration))  # defaults
         self.assertEqual(building_session.tenant, client_time.tenant)
         self.assertEqual(building_session.date, client.deduce_next_datetime().date())

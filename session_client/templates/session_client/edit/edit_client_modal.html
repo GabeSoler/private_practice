@@ -98,7 +98,7 @@
                             <div class="col">
                                 {% if client %}
                                     <button
-                                            class="btn btn-outline-danger start-0"
+                                            class="btn btn-outline-warning start-0 m-2"
                                             hx-confirm="Confirm client archive"
                                             hx-patch="{% url 'session_client:client_toggle_active' client.uuid %}"
                                             hx-target="#{{ client.code }}"
@@ -113,7 +113,7 @@
                             <div class="col">
                                 <button
                                         type="submit"
-                                        class="btn btn-secondary float-end">{% translate 'Save' %}
+                                        class="btn btn-secondary float-end m-2">{% translate 'Save' %}
                                 </button>
                             </div>
                         </div>

@@ -40,12 +40,16 @@ class MetaTestSetupMixin:
             user=cls.user_host,
             name="Blue",
             description="Testing Blue Room",
+            percentage=20,
+            cost=10,
         )
         cls.room_1.save()
         cls.room_2 = RoomCalendarModel(
             user=cls.user_host,
             name="Green",
             description="Testing Green Room",
+            percentage=20,
+            cost=10,
         )
         cls.room_2.save()
         cls.room_default = RoomCalendarModel.objects.create(user=cls.user, name="Base Room",
@@ -57,7 +61,8 @@ class MetaTestSetupMixin:
             name="Testing",
             display_name="test-display",
             description="Testing tenancy",
-            calendar=cls.room_1)
+            calendar=cls.room_1,
+            agreement='Percentage')
         cls.tenant.save()
 
         cls.tenant_host = TenantModel(
@@ -65,7 +70,8 @@ class MetaTestSetupMixin:
             name="T-Host",
             display_name="t-host-display",
             description="Testing tenancy",
-            calendar=cls.room_2)
+            calendar=cls.room_2,
+            agreement='Percentage')
         cls.tenant_host.save()
 
         cls.tenant_host_room_1 = TenantModel(
@@ -73,7 +79,8 @@ class MetaTestSetupMixin:
             name="T-Host",
             display_name="t-host-display",
             description="Testing tenancy",
-            calendar=cls.room_1)
+            calendar=cls.room_1,
+            agreement='Percentage')
         cls.tenant_host_room_1.save()
 
         cls.tenant_default, _ = TenantModel.objects.get_or_create(user=cls.user,

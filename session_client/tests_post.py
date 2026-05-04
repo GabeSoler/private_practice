@@ -8,7 +8,7 @@ from datetime import timedelta
 from .forms import (ClientForm,
                     SearchClientForm,
                     SessionFromCalendarForm,
-                    SessionSelectGroupForm, TimeForm)
+                    SessionSelectGroupForm, TimeAddForm)
 
 
 class PostMethodTests(MetaTestSetupMixin, TestCase):
@@ -201,18 +201,19 @@ class PostMethodTests(MetaTestSetupMixin, TestCase):
         self.session_1.refresh_from_db()
         self.assertEqual(self.session_1.keywords, 'NEW NOTES')
 
-    def test_create_client_time(self):
-        url = reverse('session_client:add_client_time')
+    def test_create_client_time_with_time(self):
+        url = reverse('session_client:add_client_time_with_time', args=[p.WEDNESDAY, "09:00:00"])
         data = {
             'day': p.WEDNESDAY,
-            'time': 'c',
+            'time': 'c',  # invalid time to start
             'client': self.client_instance.pk,
             'tenant': self.tenant_default.pk,
+            'fortnight': False,
         }
-        form_invalid = TimeForm(data)
+        form_invalid = TimeAddForm(data)
         self.assertFalse(form_invalid.is_valid())
         data['time'] = '09:00:00'
-        form = TimeForm(data)
+        form = TimeAddForm(data)
         self.assertTrue(form.is_valid())
         response = self.client.post(url, data, headers=self.htmx_headers)
         self.assertEqual(response.status_code, 200)

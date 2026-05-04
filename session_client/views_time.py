@@ -38,7 +38,7 @@ def add_time(request, week_day, time):
     template = 'session_client/edit/edit_time.html'
     tenant_qs = TenantModel.objects.filter(user=request.user)
     client_qs = ClientModel.objects.filter(user=request.user)
-    initial = {"day": week_day, "time": p.parse(time).time()}
+    initial = {"day": week_day - 1, "time": p.parse(time).time()}
     form = TimeAddForm(initial=initial)
     if request.method == 'POST':
         form = TimeAddForm(request.POST, initial)

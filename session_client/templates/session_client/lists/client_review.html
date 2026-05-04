@@ -13,13 +13,13 @@
   <form action="{% url 'session_client:client_review' %}" method="post"
     hx-post="{% url "session_client:client_review" %}"
     hx-target="#session-list-wrapper"
-    hx-trigger="change throttle:1s,load once"
+    hx-trigger="change throttle:1s,load once,RefreshTable"
         hx-indicator="#spinner"
     >
     {% csrf_token %}
     <table
     class="table table-primary table-sm mb-0"
-    id="switch-table"
+    id="session-list-form"
     >
     <tr class="" id="calendar-form-tr">
         <td id="cell-form-field-date"

@@ -190,6 +190,7 @@ def add_session_view(request):
                                     overlaps=overlap)  # TODO ; can i know more specific overlap??
             return ok_response_modal(request, f"Saved ok")
     # display a blank or invalid form
+    form.fields['tenant'].queryset = TenantModel.objects.filter(user=request.user)
     context = {'form': form}
     return render(request, template, context)
 
@@ -210,16 +211,19 @@ def edit_session_view(request, session_uuid):
         form = SessionForm(instance=session, data=request.POST)
         if form.is_valid():
             session = form.save(commit=False)
-            saved, overlap = session.save_with_checks()
-            if not saved:
-                # template_overlap = "session_client/lists/session_overlap_modal.html"+"#modal-inner-partial"
-                # response = render(request, template_overlap,{"sessions":overlap})
-                # return retarget(response,f"#modal-{session.uuid}")
-                return ups_response(request, _(f"ups"), "#ups-col",
-                                    overlaps=overlap)  # TODO ; can i know more specific overlap??
-            return ok_response_modal(request, _(f"Saved ok"))
+            if session.date > p.now().date():
+                saved, overlap = session.save_with_checks()
+                if not saved:
+                    # template_overlap = "session_client/lists/session_overlap_modal.html"+"#modal-inner-partial"
+                    # response = render(request, template_overlap,{"sessions":overlap})
+                    # return retarget(response,f"#modal-{session.uuid}")
+                    return ups_response(request, _(f"ups"), "#ups-col",
+                                        overlaps=overlap)  # TODO ; can i know more specific overlap??
+            session.save()
+            return ok_response_modal(request, _(f"Saved ok"), event_and_target=("RefreshTable", "#session-list-form"))
         else:
             return render(request, template, {'form': form})
+    form.fields['tenant'].queryset = TenantModel.objects.filter(user=request.user)
     context = {'session': session, 'form': form}
     return render(request, template, context)
 
@@ -263,6 +267,7 @@ def week_view_add_session_client(request, year=None, week=None, week_day=None, t
     assert week is not None, "Week is required for get calls"
     assert week_day is not None, "Week_day is required for get calls"
     assert time is not None, "Time is required for get calls"
+    week_day = week_day
     iso_week = f"{year}-W{week:02d}-{week_day}"
     date_from_iso_week = p.parse(iso_week).date()
     time_from_str = p.parse(time).time()

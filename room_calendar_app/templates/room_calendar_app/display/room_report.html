@@ -12,7 +12,8 @@
   <form action="{% url 'room_calendar_app:room_report' %}" method="post"
     hx-post="{% url "room_calendar_app:room_report" %}"
     hx-target="#session-list-wrapper"
-    hx-trigger="change throttle:1s,load once"
+    hx-trigger="change throttle:1s,load once,RefreshTable"
+        id="session-list-form"
     >
     {% csrf_token %}
     <table
@@ -67,8 +68,8 @@
                             {% partialdef row-instance inline %}
                                 <tr class="fade-in">
                                     <th scope="row">
-                                        <a href="{% url "session_client:session_hx_item" session.uuid %}"
-                                           hx-get="{% url "session_client:session_hx_item" session.uuid %}"
+                                        <a href="{% url "session_client:edit_session" session.uuid %}"
+                                           hx-get="{% url "session_client:edit_session" session.uuid %}"
                                            hx-target="#modal-wrapper">
                                             {% if session.date %}{{ session.date }}{% else %}
                                                 {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>

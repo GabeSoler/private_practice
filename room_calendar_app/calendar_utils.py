@@ -44,10 +44,7 @@ class CalendarRender:
 
     @property
     def week_days(self) -> list:
-        date_ref = self.datetime
-        week_start = date_ref.start_of("week")
-        week_end = date_ref.end_of("week")
-        iter_week = p.interval(week_start, week_end)
+        iter_week = p.interval(self.week_start, self.week_end)
         week_days_list = []
         for day in iter_week.range("days"):
             week_days_list.append(day)
@@ -87,7 +84,7 @@ class CalendarBlocksRender:
             start_datetime = p.now().at(block.start_time.hour, block.start_time.minute)  # now() is ok!
             end_datetime = p.now().at(block.end_time.hour, block.end_time.minute).subtract(minutes=30)
             time_range = p.interval(start_datetime, end_datetime)
-            iso_day = block.day
+            iso_day = block.day + 1
             for time_slot in time_range.range('minutes', 30):
                 slot = time_slot.time()
                 block_dict[slot][iso_day] = block
@@ -111,7 +108,7 @@ class CalendarTimesRender:
             end_datetime = now_at_time(time.end_time).subtract(minutes=30)
             start_datetime = now_at_time(time.time)  # using now() is ok!
             time_range = p.interval(start_datetime, end_datetime)
-            iso_day = time.day
+            iso_day = time.day + 1
             for time_slot in time_range.range('minutes', 30):
                 slot = time_slot.time()
                 times_dict[slot][iso_day].add(time)
