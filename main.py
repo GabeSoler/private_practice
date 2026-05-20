@@ -47,7 +47,7 @@ def start_django_server():
     custom_env["DJANGO_SUPERUSER_PASSWORD"] = "12345"
     custom_env["DJANGO_SUPERUSER_EMAIL"] = "admin@example.com"
 
-    cmd_static = [sys.executable, "manage.py", "collectstatic", "--noinput", "--clear"]
+    cmd_static = [sys.executable, "src/manage.py", "collectstatic", "--noinput", "--clear"]
     print("🌙 Starting Dreamy CLI version...")
     print("💿 A SQLite database will keep your data locally as 'cli.sqlite3'")
     print("Collecting static files...")
@@ -58,18 +58,9 @@ def start_django_server():
         print(f"Error during static files collection: {e}")
         return
 
-    cmd_migrate = [sys.executable, "manage.py", "migrate", "--noinput"]
-    print("Updating database...")
-    try:
-        subprocess.run(cmd_migrate, env=custom_env, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error during migration: {e}")
-        return
-
-        # 2. Define the command to run
     # sys.executable ensures we use the same Python interpreter/virtual env running this script
     if args.debug:
-        cmd = [sys.executable, "manage.py", "runserver", args.port]
+        cmd = [sys.executable, "src/manage.py", "runserver", args.port]
     else:
         cmd = [
             sys.executable,
@@ -83,7 +74,7 @@ def start_django_server():
         # Step A: Run migrations (can't make a user without a user table!)
         print("🔄 Running database migrations...")
         subprocess.run(
-            [sys.executable, "manage.py", "migrate"],
+            [sys.executable, "src/manage.py", "migrate"],
             env=custom_env,
             check=True,
         )
@@ -91,7 +82,7 @@ def start_django_server():
         # Step B: Attempt to create the superuser non-interactively
         print("👤 Checking/Creating superuser...")
         subprocess.run(
-            [sys.executable, "manage.py", "createsuperuser", "--noinput"],
+            [sys.executable, "src/manage.py", "createsuperuser", "--noinput"],
             env=custom_env,
             # We don't use check=True here because if the admin already exists,
             # Django exits with a failure code. We want to skip that and keep going.
