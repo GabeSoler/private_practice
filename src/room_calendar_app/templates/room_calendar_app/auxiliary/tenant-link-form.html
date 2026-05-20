@@ -1,0 +1,16 @@
+{% load django_bootstrap5 i18n %}
+
+
+    <div class="col" id="tenant-link-form-{{ tenant.uuid }}">
+{% partialdef form-partial inline %}
+    {% bootstrap_field form.room_id show_label='skip'%}
+{% endpartialdef form-partial %}
+    </div>
+        <div class="col">
+    <button class="btn btn-outline-secondary d-inline"
+    hx-post="{% url 'room_calendar_app:link_tenant' tenant.uuid %}"
+    hx-target="closest <li/>"
+    hx-swap="outerHTML"
+    hx-include="previous <input/>"
+>{% translate 'link' %}</button>
+        </div>

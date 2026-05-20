@@ -1,0 +1,74 @@
+{% extends 'room_calendar_app/navs/calendar-nav.html' %}
+
+{% load django_bootstrap5 i18n%}
+{% block title %}{% translate 'Week View Clients' %}{% endblock title %}
+
+{% block content %}
+
+    <div id="page-wrapper">
+
+        <!-- Partial def  week calendar -->
+
+        <div id="calendar-table-wrapper">
+            {% partialdef calendar-table-partial inline %}
+                <table class="table table-info table-striped-columns table-sm"
+                       id="week-view-table">
+
+
+                        <!-- navigation caption -->
+                    {% include 'room_calendar_app/navs/cal-caption.html' with inner_url="room_calendar_app:week_client_defaults_view" %}
+
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        {% for n,day in calendar.week_days %}
+
+                            <th scope="col"
+                                style="font-size:.8rem;"
+                            >{{ day }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% for slot,data in calendar.times_dict.items %}
+                        <tr> <!-- row for time -->
+                        <th scope="row"
+                            style="font-size:.6rem;"
+                        >{{ slot|time:"H:i" }}</th>
+
+                        {% for weekday,occurrence in data.items %}
+                            {% if occurrence|length > 0 %}
+                                <td class="table-danger"
+                                    style="font-size:.6rem;max-width:5rem;"
+                                    id="{{ slot }}">
+                                {% for time in occurrence %}
+                                    <a class="link-info"
+                                            hx-get="{% url 'session_client:edit_client_time' time.pk %}"
+                                       hx-target="#modal-wrapper"
+                                    >{{ time.client_code }}</a>,&nbsp;
+                                    {% endfor %}
+                                </td>
+                            {% else %}
+                                <td
+                                        style="font-size:.6rem;">
+                                    <i
+                                                hx-get="{% url 'session_client:add_client_time_with_time' weekday slot|time:"H:i" %}"
+                                                hx-target="#modal-wrapper" class="bi bi-patch-plus"></i></a>
+                                </td>
+                            {% endif %}
+                        {% endfor %}<!-- end of for weekday -->
+                    {% endfor %}<!-- end of for slot -->
+                    </tr>
+                    </tbody>
+                </table>
+            {% endpartialdef %}
+        </div>
+        <!-- End partial def -->
+
+        <div id="modal-wrapper"></div>
+
+
+    </div>
+{% endblock content %}

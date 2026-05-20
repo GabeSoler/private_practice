@@ -1,0 +1,19 @@
+<!-- Modal -->
+<div _="init call bootstrap.Modal.getOrCreateInstance(me).show() end
+    on CloseModal call bootstrap.Modal.getOrCreateInstance(me).hide() end"
+class="modal fade" id="modal{% block modal-id %}{% endblock %}" tabindex="-1" aria-labelledby="modalLabel">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content bg-body">
+      <div class="modal-header bg-primary text-secondary">
+        <h1 class="modal-title display-6" id="modalLabel">{% block modal_title %}Modal title{% endblock %}</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        {% block modal_body %}Modal Body{% endblock %}
+      </div>
+      <div class="modal-footer">
+        {% block modal_footer %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</div>

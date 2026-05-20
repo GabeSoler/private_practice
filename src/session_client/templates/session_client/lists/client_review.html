@@ -1,0 +1,92 @@
+{% extends 'session_client/navs/client-nav.html' %}
+{% load i18n %}
+
+
+{% load django_bootstrap5 %}
+{% load clean_text %}
+
+{% block search %}
+<div id="wrapper">
+
+  <div id="form-table-wrapper">
+  {% partialdef form-partial inline %}
+  <form action="{% url 'session_client:client_review' %}" method="post"
+    hx-post="{% url "session_client:client_review" %}"
+    hx-target="#session-list-wrapper"
+    hx-trigger="change throttle:1s,load once,RefreshTable"
+        hx-indicator="#spinner"
+    >
+    {% csrf_token %}
+    <table
+    class="table table-primary table-sm mb-0"
+    id="session-list-form"
+    >
+    <tr class="" id="calendar-form-tr">
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form.date_ref_start show_label='skip'  %}
+        </td>
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form.date_ref_end show_label='skip'  %}
+        </td>
+        <td id="cell-form-field-calendar"
+          >{% bootstrap_field form.client show_label='skip'  %}
+        </td>
+        <td id="cell-form-button">
+            <div class="row">
+                <div class="col">
+                <button class="btn link btn-secondary" type="submit" value="submit" >
+                <i class="bi bi-cloud-download text-primary fs-5"></i></button>
+                </div>
+                <div class="col p-0 m-0">
+                  <div id="spinner" class="htmx-indicator spinner-border text-success" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                    </div>
+
+                </div>
+            </div>
+      </td>
+        <td class="">
+        </td>
+    </tr>
+  </table>
+</form>
+      {% endpartialdef %} <!-- end partial table -->
+
+      </div>
+
+{% endblock search  %}
+
+{% block content %}
+
+        <!-- Session list -->
+        <div id="session-list-wrapper">
+            {% if sessions %} {% comment %} As i re use it its here, a bit messy :/ {% endcomment %}
+                {% partialdef session-list-partial inline %}
+                    <ul class="list-group">
+                        {% for session in sessions %}
+                            {% partialdef row-instance inline %}
+                                <li class="list-group-item">
+                                    <div>
+                                        {% ifchanged %}<h3 class="border-bottom">{{ session.client }}</h3>{% endifchanged %}
+                                        <a class="ms-4"
+                                                href="{% url "session_client:session_hx_item" session.uuid %}"
+                                           hx-get="{% url "session_client:session_hx_item" session.uuid %}"
+                                           hx-target="#modal-wrapper">
+
+                                            {% if session.date %}{{ session.date }}{% else %}
+                                                {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>
+                                    </div>
+
+                                    <p class="ms-auto">{{ session.brief|markdown_emphasis|linebreaks}}</p>
+
+                                </li>
+                            {% endpartialdef %}
+                        {% endfor %}
+                    </ul>
+                {% endpartialdef session-list-partial %}
+            {% endif %}
+        </div> <!-- end session list -->
+
+        </div>
+
+  {% endblock content %}

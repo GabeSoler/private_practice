@@ -1,0 +1,15 @@
+{% extends '_toast_content.html' %}
+{% load i18n %}
+
+
+{% block content %}
+    {% if created %}{% translate 'Created Sessions' %}{% else %}{% translate 'Overlapping Sessions' %}{% endif %}
+    <ul>
+        {% for session in sessions %}
+
+            <li>
+                {{ session.date }} - {{ session.time }} - {{ session.brief|truncatechars:10 }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

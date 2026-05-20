@@ -1,0 +1,96 @@
+
+
+{% extends 'room_calendar_app/navs/rooms-nav.html' %}
+{% load django_bootstrap5 i18n %}
+
+
+{% block content %}
+<div id="wrapper">
+
+  <div id="form-table-wrapper">
+  {% partialdef form-partial inline %}
+  <form action="{% url 'room_calendar_app:room_report' %}" method="post"
+    hx-post="{% url "room_calendar_app:room_report" %}"
+    hx-target="#session-list-wrapper"
+    hx-trigger="change throttle:1s,load once,RefreshTable"
+        id="session-list-form"
+    >
+    {% csrf_token %}
+    <table
+    class="table table-primary table-sm mb-0"
+    id="switch-table"
+    >
+    <tr class="" id="calendar-form-tr">
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form.year show_label='skip'  %}
+        </td>
+        <td id="cell-form-field-date"
+          >{% bootstrap_field form.month show_label='skip'  %}
+        </td>
+        <td id="cell-form-field-calendar"
+          >{% bootstrap_field form.room show_label='skip'  %}
+        </td>
+        <td id="cell-form-button">
+          <div class="dropdown">
+            <button class="btn link btn-secondary" type="submit" value="submit" >
+              <i class="bi bi-cloud-download text-primary fs-5"></i>
+            </button>
+        </div>
+      </td>
+    </tr>
+  </table>
+</form>
+      {% endpartialdef %} <!-- end partial table -->
+      </div>
+
+
+        <!-- Session list -->
+        <div id="session-list-wrapper">
+            {% if sessions %} {% comment %} As i re use it its here, a bit messy :/ {% endcomment %}
+                {% partialdef session-list-partial inline %}
+                    <p class="bg-secondary text-primary">{% translate 'Total Sessions' %}: {{ totals.session_count }} - {% translate 'Expected pay' %}: {{ totals.session_pay }}</p>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">{% translate 'Invoice' %}
+                            </th>
+                            <th scope="col">{% translate 'Date' %}
+                            </th>
+                            <th scope="col">{% translate 'Type' %}
+                            </th>
+                            <th scope="col">{% translate 'Tenant' %}
+                            </th>
+                            <th scope="col">{% translate 'Pay' %}
+                            </th>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                        {% for session in sessions %}
+                            {% partialdef row-instance inline %}
+                                <tr class="fade-in">
+                                    <td>{{ session.uuid|truncatechars:10 }}</td>
+                                    <th scope="row">
+                                        <a href="{% url "session_client:edit_session" session.uuid %}"
+                                           hx-get="{% url "session_client:edit_session" session.uuid %}"
+                                           hx-target="#modal-wrapper">
+                                            {% if session.date %}{{ session.date }}{% else %}
+                                                {{ session.created_at|date:'d, M,Y' }}{% endif %}</a>
+                                    </th>
+
+                                    <td>{{ session.client.type }}</td>
+                                    <td>{{ session.tenant.display_name }}</td>
+                                    <td class="text-info">{{ session.pay }}</td>
+
+
+                                </tr>
+                            {% endpartialdef %}
+
+                            </tbody>
+                        {% endfor %}
+                    </table>
+                {% endpartialdef session-list-partial %}
+            {% endif %}
+        </div> <!-- end session list -->
+</div>
+{% endblock content %}
