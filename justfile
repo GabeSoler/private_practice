@@ -1,41 +1,41 @@
 # default with just
 play:
-    uv run manage.py runserver
+    uv run src/manage.py runserver
 
 #start testing
 test *arg:
-    uv run manage.py test {{arg}}
+    uv run src/manage.py test {{arg}}
 
 #start testing
 testx:
-    uv run manage.py test --parallel
+    uv run src/manage.py test --parallel
 
 # run migrate
 migrate: makemigrations
-    uv run manage.py migrate
+    uv run src/manage.py migrate
 
 #rung migrate and makemigrations together
 makemigrations:
-    uv run manage.py makemigrations
+    uv run src/manage.py makemigrations
 
 #run collect static
 static:
-    uv run manage.py collectstatic
+    uv run src/manage.py collectstatic
 
 #Allows commands passed to just manage (manage.py)
 manage *arg:
-    uv run manage.py {{arg}}
+    uv run src/manage.py {{arg}}
 
 context:
-    uv run manage.py add_context 5
+    uv run src/manage.py add_context 5
 
 shell:
-    uv run manage.py shell -i ipython
+    uv run src/manage.py shell -i ipython
 
 
 # alias for full migrations to 'just db'
 db:
-    uv run manage.py dbshell
+    uv run src/manage.py dbshell
 
 redis:
     brew services start redis

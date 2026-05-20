@@ -6,8 +6,7 @@ services:
     env_file:
       - ppm_app/.env.dk
     environment:
-      DJANGO_SETTINGS_MODULE: ppm_app.settings.dev
+      DJANGO_SETTINGS_MODULE: src.ppm_app.settings.dev
     volumes:
       - .:/app
     command: uv run python3 manage.py runserver 0.0.0.0:3000
-
