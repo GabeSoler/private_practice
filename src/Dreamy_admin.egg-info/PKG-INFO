@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
-Name: Dreamy-admin
-Version: 0.3.0
+Name: dreamy-admin
+Version: 0.1.1
 Summary: App to help therapist handle their admin
 Requires-Python: >=3.13
 Description-Content-Type: text/markdown
@@ -48,3 +48,4 @@ was not as easy, and there was a need for that interconnection.
 
 I solved the problem somehow with Notion, but there where some gaps,
 as the need to coordinate with others.
+

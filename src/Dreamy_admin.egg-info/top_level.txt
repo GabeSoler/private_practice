@@ -2,6 +2,7 @@ accounts
 ai_chat
 assets
 base
+main
 manage
 my_numbers
 ppm_app

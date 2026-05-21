@@ -53,7 +53,7 @@ def start_django_server():
     print("Collecting static files...")
 
     try:
-        cmd_static = [sys.executable, "src/manage.py", "collectstatic", "--noinput", "--clear"]
+        cmd_static = [sys.executable, "./manage.py", "collectstatic", "--noinput", "--clear"]
         subprocess.run(cmd_static, env=custom_env, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error during static files collection: {e}")
@@ -63,7 +63,7 @@ def start_django_server():
         # Step A: Run migrations (can't make a user without a user table!)
         print("🔄 Running database migrations...")
         subprocess.run(
-            [sys.executable, "src/manage.py", "migrate"],
+            [sys.executable, "./manage.py", "migrate"],
             env=custom_env,
             check=True,
         )
@@ -71,7 +71,7 @@ def start_django_server():
         # Step B: Attempt to create the superuser non-interactively
         print("👤 Checking/Creating superuser...")
         subprocess.run(
-            [sys.executable, "src/manage.py", "createsuperuser", "--noinput"],
+            [sys.executable, "./manage.py", "createsuperuser", "--noinput"],
             env=custom_env,
             # We don't use check=True here because if the admin already exists,
             # Django exits with a failure code. We want to skip that and keep going.
@@ -88,7 +88,7 @@ def start_django_server():
 
     try:
         # env=custom_env injects your variables into the command's context
-        subprocess.run([sys.executable, "src/manage.py", "runserver",
+        subprocess.run([sys.executable, "./manage.py", "runserver",
                         f"{args.port}"], env=custom_env, check=True)
     except KeyboardInterrupt:
         # Gracefully handle Ctrl+C without printing a massive Python stack trace
@@ -97,5 +97,9 @@ def start_django_server():
         print(f"\n❌ Server exited with an error: {e}")
 
 
-if __name__ == "__main__":
+def main():
     start_django_server()
+
+
+if __name__ == "__main__":
+    main()

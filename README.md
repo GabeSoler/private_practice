@@ -7,3 +7,4 @@ was not as easy, and there was a need for that interconnection.
 
 I solved the problem somehow with Notion, but there where some gaps,
 as the need to coordinate with others.
+

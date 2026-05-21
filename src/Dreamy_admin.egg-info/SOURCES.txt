@@ -1,5 +1,6 @@
 README.md
 pyproject.toml
+src/main.py
 src/manage.py
 src/Dreamy_admin.egg-info/PKG-INFO
 src/Dreamy_admin.egg-info/SOURCES.txt
@@ -50,6 +51,12 @@ src/base/migrations/0003_alter_page_image.py
 src/base/migrations/__init__.py
 src/base/templatetags/clean_text.py
 src/base/templatetags/hx_helpers.py
+src/dreamy_admin.egg-info/PKG-INFO
+src/dreamy_admin.egg-info/SOURCES.txt
+src/dreamy_admin.egg-info/dependency_links.txt
+src/dreamy_admin.egg-info/entry_points.txt
+src/dreamy_admin.egg-info/requires.txt
+src/dreamy_admin.egg-info/top_level.txt
 src/my_numbers/__init__.py
 src/my_numbers/admin.py
 src/my_numbers/apps.py
@@ -120,4 +127,5 @@ src/session_client/migrations/0014_alter_clientmodel_duration.py
 src/session_client/migrations/0015_alter_sessionmodel_date.py
 src/session_client/migrations/0016_alter_sessionmodel_date.py
 src/session_client/migrations/0017_alter_sessionmodel_date.py
+src/session_client/migrations/0018_alter_sessionmodel_date.py
 src/session_client/migrations/__init__.py
