@@ -23,6 +23,14 @@ def parse_arguments():
         help="Port for the Django server (default: 8000)",
     )
 
+    parser.add_argument(
+        "--debug",
+        type=str,
+        choices=["true", "false"],
+        default="false",
+        help="Debug settings (default: false)",
+    )
+
     return parser.parse_args()
 
 
@@ -31,7 +39,7 @@ def start_django_server():
 
     # 1. Define your custom environment variables
     custom_env = os.environ.copy()  # Copy the current system environment
-    custom_env["DEBUG"] = 'false'
+    custom_env["DEBUG"] = args.debug
     custom_env["SECRET_KEY"] = args.secret_key
     custom_env["DJANGO_SETTINGS_MODULE"] = "ppm_app.settings.cli"
     custom_env["PYTHONWARNINGS"] = "ignore"
@@ -81,7 +89,7 @@ def start_django_server():
     try:
         # env=custom_env injects your variables into the command's context
         subprocess.run([sys.executable, "src/manage.py", "runserver",
-                        args.port], env=custom_env, check=True)
+                        f"{args.port}"], env=custom_env, check=True)
     except KeyboardInterrupt:
         # Gracefully handle Ctrl+C without printing a massive Python stack trace
         print("\n🛑 Server stopped by user.")
