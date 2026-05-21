@@ -153,7 +153,7 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 STATIC_ROOT = (
-    "assets/"  # change when knowing the real address, plus change url patterns
+        BASE_DIR / "assets/"  # change when knowing the real address, plus change url patterns
 )
 STATICFILES_DIRS = [BASE_DIR / "ppm_app/staticfiles"]
 

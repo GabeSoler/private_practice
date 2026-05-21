@@ -22,13 +22,6 @@ def parse_arguments():
         default="8000",
         help="Port for the Django server (default: 8000)",
     )
-    parser.add_argument(
-        "--debug",
-        type=str,
-        choices=["True", "False"],
-        default="False",
-        help="Set Django DEBUG mode (default: False)",
-    )
 
     return parser.parse_args()
 
@@ -38,7 +31,7 @@ def start_django_server():
 
     # 1. Define your custom environment variables
     custom_env = os.environ.copy()  # Copy the current system environment
-    custom_env["DEBUG"] = args.debug
+    custom_env["DEBUG"] = 'false'
     custom_env["SECRET_KEY"] = args.secret_key
     custom_env["DJANGO_SETTINGS_MODULE"] = "ppm_app.settings.cli"
     custom_env["PYTHONWARNINGS"] = "ignore"
@@ -47,29 +40,17 @@ def start_django_server():
     custom_env["DJANGO_SUPERUSER_PASSWORD"] = "12345"
     custom_env["DJANGO_SUPERUSER_EMAIL"] = "admin@example.com"
 
-    cmd_static = [sys.executable, "src/manage.py", "collectstatic", "--noinput", "--clear"]
     print("🌙 Starting Dreamy CLI version...")
     print("💿 A SQLite database will keep your data locally as 'cli.sqlite3'")
     print("Collecting static files...")
 
     try:
+        cmd_static = [sys.executable, "src/manage.py", "collectstatic", "--noinput", "--clear"]
         subprocess.run(cmd_static, env=custom_env, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error during static files collection: {e}")
         return
 
-    # sys.executable ensures we use the same Python interpreter/virtual env running this script
-    if args.debug:
-        cmd = [sys.executable, "src/manage.py", "runserver", args.port]
-    else:
-        cmd = [
-            sys.executable,
-            "-m",
-            "gunicorn",
-            "ppm_app.wsgi:application",
-            f"--bind 0.0.0.0:{args.port}",
-            "--workers 2",
-        ]
     try:
         # Step A: Run migrations (can't make a user without a user table!)
         print("🔄 Running database migrations...")
@@ -99,7 +80,8 @@ def start_django_server():
 
     try:
         # env=custom_env injects your variables into the command's context
-        subprocess.run(cmd, env=custom_env, check=True)
+        subprocess.run([sys.executable, "src/manage.py", "runserver",
+                        args.port], env=custom_env, check=True)
     except KeyboardInterrupt:
         # Gracefully handle Ctrl+C without printing a massive Python stack trace
         print("\n🛑 Server stopped by user.")
