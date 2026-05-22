@@ -1,2 +1,2 @@
 [console_scripts]
-dreamy-admin = main:main
+dreamy = main:main

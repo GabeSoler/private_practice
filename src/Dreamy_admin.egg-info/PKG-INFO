@@ -4,39 +4,25 @@ Version: 0.1.1
 Summary: App to help therapist handle their admin
 Requires-Python: >=3.13
 Description-Content-Type: text/markdown
-Requires-Dist: anyio==4.12.1
 Requires-Dist: asgiref==3.11.1
-Requires-Dist: asttokens==3.0.1
 Requires-Dist: bleach>=6.3.0
-Requires-Dist: certifi==2026.2.25
 Requires-Dist: charset-normalizer==3.4.5
-Requires-Dist: cython==3.2.4
 Requires-Dist: django==6.0.3
 Requires-Dist: django-allauth>=65.15.0
 Requires-Dist: django-bootstrap5==26.2
 Requires-Dist: django-browser-reload==1.21.0
 Requires-Dist: django-htmx==1.27.0
 Requires-Dist: docutils==0.22.4
-Requires-Dist: greenlet==3.3.2
 Requires-Dist: gunicorn==25.1.0
-Requires-Dist: idna==3.11
-Requires-Dist: ipython==9.11.0
 Requires-Dist: markdown==3.10.2
-Requires-Dist: numpy>=2.4
 Requires-Dist: pendulum==3.2.0
 Requires-Dist: pgvector>=0.4.2
 Requires-Dist: pillow==12.1.1
 Requires-Dist: playwright==1.58.0
-Requires-Dist: polib>=1.2.0
 Requires-Dist: psycopg2==2.9.11
 Requires-Dist: python-decouple<4,>=3.8
-Requires-Dist: requests>=2.32.5
 Requires-Dist: resend>=2.24.0
 Requires-Dist: sentry-sdk>=2.54.0
-Requires-Dist: setuptools==82.0.1
-Requires-Dist: sqlparse==0.5.5
-Requires-Dist: typing-extensions==4.15.0
-Requires-Dist: tzdata==2025.3
 Requires-Dist: whitenoise==6.12.0
 
 # Dreamy admin

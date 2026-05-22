@@ -52,8 +52,11 @@ def start_django_server():
     print("💿 A SQLite database will keep your data locally as 'cli.sqlite3'")
     print("Collecting static files...")
 
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    manage_py_path = os.path.join(base_dir, "manage.py")
+
     try:
-        cmd_static = [sys.executable, "./manage.py", "collectstatic", "--noinput", "--clear"]
+        cmd_static = [sys.executable, manage_py_path, "collectstatic", "--noinput", "--clear"]
         subprocess.run(cmd_static, env=custom_env, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error during static files collection: {e}")
@@ -63,7 +66,7 @@ def start_django_server():
         # Step A: Run migrations (can't make a user without a user table!)
         print("🔄 Running database migrations...")
         subprocess.run(
-            [sys.executable, "./manage.py", "migrate"],
+            [sys.executable, manage_py_path, "migrate"],
             env=custom_env,
             check=True,
         )
@@ -71,7 +74,7 @@ def start_django_server():
         # Step B: Attempt to create the superuser non-interactively
         print("👤 Checking/Creating superuser...")
         subprocess.run(
-            [sys.executable, "./manage.py", "createsuperuser", "--noinput"],
+            [sys.executable, manage_py_path, "createsuperuser", "--noinput"],
             env=custom_env,
             # We don't use check=True here because if the admin already exists,
             # Django exits with a failure code. We want to skip that and keep going.
@@ -88,7 +91,7 @@ def start_django_server():
 
     try:
         # env=custom_env injects your variables into the command's context
-        subprocess.run([sys.executable, "./manage.py", "runserver",
+        subprocess.run([sys.executable, manage_py_path, "runserver",
                         f"{args.port}"], env=custom_env, check=True)
     except KeyboardInterrupt:
         # Gracefully handle Ctrl+C without printing a massive Python stack trace

@@ -1,9 +1,12 @@
 from .base import *
+from pathlib import Path
+
+REL_PATH = Path.cwd()
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "cli.sqlite3",
+        "NAME": config('DB_PATH', default=REL_PATH) / "cli.sqlite3",
     }
 }
 
