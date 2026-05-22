@@ -154,7 +154,6 @@ source = { editable = "." }
 dependencies = [
     { name = "asgiref" },
     { name = "bleach" },
-    { name = "charset-normalizer" },
     { name = "django" },
     { name = "django-allauth" },
     { name = "django-bootstrap5" },
@@ -178,7 +177,6 @@ dependencies = [
 requires-dist = [
     { name = "asgiref", specifier = "==3.11.1" },
     { name = "bleach", specifier = ">=6.3.0" },
-    { name = "charset-normalizer", specifier = "==3.4.5" },
     { name = "django", specifier = "==6.0.3" },
     { name = "django-allauth", specifier = ">=65.15.0" },
     { name = "django-bootstrap5", specifier = "==26.2" },

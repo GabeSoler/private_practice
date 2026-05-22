@@ -1,6 +1,5 @@
 accounts
 ai_chat
-assets
 base
 main
 manage

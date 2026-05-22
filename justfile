@@ -22,6 +22,10 @@ makemigrations:
 static:
     uv run src/manage.py collectstatic
 
+#run collect static
+check:
+    uv run src/manage.py check
+
 #Allows commands passed to just manage (manage.py)
 manage *arg:
     uv run src/manage.py {{arg}}
@@ -31,6 +35,8 @@ context:
 
 shell:
     uv run src/manage.py shell -i ipython
+
+
 
 
 # alias for full migrations to 'just db'

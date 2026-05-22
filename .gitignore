@@ -27,3 +27,4 @@ Dockerrun.aws.json
 /docs/_build
 .idea/
 accounts.json
+/src/ppm_app/settings/.env.dk
