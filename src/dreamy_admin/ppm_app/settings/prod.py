@@ -1,13 +1,15 @@
 from .base import *
 
+import sentry_sdk
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('POSTGRES_NAME'),
-        'USER': config('POSTGRES_USER'),
-        'PASSWORD': config('POSTGRES_KEY'),
-        'HOST': config('POSTGRES_HOST'),
-        'PORT': config('POSTGRES_PORT'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("POSTGRES_NAME"),
+        "USER": config("POSTGRES_USER"),
+        "PASSWORD": config("POSTGRES_KEY"),
+        "HOST": config("POSTGRES_HOST"),
+        "PORT": config("POSTGRES_PORT"),
     }
 }
 
@@ -21,7 +23,6 @@ BOOTSTRAP5 = {
     "theme_url": STATIC_URL + "css/dreamy.css",
 }
 
-import sentry_sdk
 
 sentry_sdk.init(
     dsn=config("SENTRY_DSN"),
@@ -31,13 +32,13 @@ sentry_sdk.init(
 )
 
 # resend activated all the time
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 # REsend configuration and email back ends
-RESEND_API_KEY = config('RESEND_API_KEY')
+RESEND_API_KEY = config("RESEND_API_KEY")
 RESEND_SMTP_PORT = 587
-RESEND_SMTP_USERNAME = 'resend'
-RESEND_SMTP_HOST = 'smtp.resend.com'
+RESEND_SMTP_USERNAME = "resend"
+RESEND_SMTP_HOST = "smtp.resend.com"
 
 EMAIL_HOST = RESEND_SMTP_HOST
 EMAIL_USE_TLS = True
@@ -45,4 +46,4 @@ EMAIL_PORT = RESEND_SMTP_PORT
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = RESEND_SMTP_USERNAME
 EMAIL_HOST_PASSWORD = RESEND_API_KEY
-DEFAULT_FROM_EMAIL = 'admin@crea-therapy.com'
+DEFAULT_FROM_EMAIL = "admin@crea-therapy.com"

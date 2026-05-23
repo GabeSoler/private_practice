@@ -1,6 +1,3 @@
-import datetime
-from calendar import Calendar
-
 from django.db import models
 from django.db.models import Q, Max, Min
 from django.utils.timezone import now

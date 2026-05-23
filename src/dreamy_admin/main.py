@@ -41,6 +41,7 @@ def start_django_server():
     custom_env = os.environ.copy()  # Copy the current system environment
     custom_env["DEBUG"] = args.debug
     custom_env["SECRET_KEY"] = args.secret_key
+    custom_env["ADMIN_URL"] = "admin/"
     custom_env["DJANGO_SETTINGS_MODULE"] = "ppm_app.settings.cli"
     custom_env["PYTHONWARNINGS"] = "ignore"
     # These exact variables are read by Django's `createsuperuser --noinput` command
@@ -56,7 +57,13 @@ def start_django_server():
     manage_py_path = os.path.join(base_dir, "manage.py")
 
     try:
-        cmd_static = [sys.executable, manage_py_path, "collectstatic", "--noinput", "--clear"]
+        cmd_static = [
+            sys.executable,
+            manage_py_path,
+            "collectstatic",
+            "--noinput",
+            "--clear",
+        ]
         subprocess.run(cmd_static, env=custom_env, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error during static files collection: {e}")
@@ -91,8 +98,11 @@ def start_django_server():
 
     try:
         # env=custom_env injects your variables into the command's context
-        subprocess.run([sys.executable, manage_py_path, "runserver",
-                        f"{args.port}"], env=custom_env, check=True)
+        subprocess.run(
+            [sys.executable, manage_py_path, "runserver", f"{args.port}"],
+            env=custom_env,
+            check=True,
+        )
     except KeyboardInterrupt:
         # Gracefully handle Ctrl+C without printing a massive Python stack trace
         print("\n🛑 Server stopped by user.")

@@ -3,8 +3,8 @@ from .base import *
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('POSTGRES_NAME', default=''),
-        'USER': config('POSTGRES_USER', default=''),
+        'NAME': config('POSTGRES_NAME', default='ppm_app'),
+        'USER': config('POSTGRES_USER', default='gsole'),
         'PASSWORD': config('POSTGRES_KEY', default=''),
         'HOST': config('POSTGRES_HOST', default='localhost'),
         'PORT': config('POSTGRES_PORT', default='5432'),

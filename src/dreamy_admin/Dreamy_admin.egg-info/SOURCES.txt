@@ -99,6 +99,7 @@ src/session_client/admin.py
 src/session_client/apps.py
 src/session_client/forms.py
 src/session_client/models.py
+src/session_client/models_sessions.py
 src/session_client/querysets.py
 src/session_client/tests.py
 src/session_client/tests_post.py
