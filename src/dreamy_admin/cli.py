@@ -73,7 +73,7 @@ def call_migrate():
         subprocess.run(
             [sys.executable, manage_py_path, "migrate"],
             env=create_env(),
-            check=True, timeout=10,
+            check=True, timeout=20,
         )
 
         # Step B: Attempt to create the superuser non-interactively

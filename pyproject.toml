@@ -1,6 +1,6 @@
 [project]
 name = "dreamy-admin"
-version = "0.1.8"
+version = "0.1.9"
 description = "App to help therapist handle their admin"
 readme = "README.md"
 requires-python = ">=3.13"
