@@ -31,3 +31,4 @@ accounts.json
 /src/dreamy_admin/ppm_app/settings/.env
 /src/dreamy_admin/ppm_app/settings/.env.dk
 /cli.sqlite3
+/src/dreamy_admin/cli.sqlite3
