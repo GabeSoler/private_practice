@@ -96,7 +96,7 @@ def start_server():
     args = parse_arguments()
     print(f"🚀 Starting Django server on port {args.port}...")
     print(f"🔑 Using SECRET_KEY: {args.secret_key[:10]}...")
-    print(f"🪲 Using DEBUG: {args.debug}")
+    print(f"🪲 Using DEBUG: False")
     try:
         # env=create_env() injects your variables into the command's context
         subprocess.run(
