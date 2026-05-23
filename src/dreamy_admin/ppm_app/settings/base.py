@@ -60,7 +60,6 @@ INSTALLED_APPS = [
     # third party
     "django_bootstrap5",
     "django_htmx",
-    "django_browser_reload",
     "allauth",
     "allauth.account",
     # mine
@@ -83,7 +82,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",  # django-htmx middleware
-    "django_browser_reload.middleware.BrowserReloadMiddleware",  # django reload (browser experience)
     "django.contrib.admindocs.middleware.XViewMiddleware",  # django documentation view link
     "allauth.account.middleware.AccountMiddleware",  # allauth
 ]
