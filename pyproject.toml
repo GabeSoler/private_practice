@@ -1,6 +1,6 @@
 [project]
 name = "dreamy-admin"
-version = "0.1.1"
+version = "0.1.2"
 description = "App to help therapist handle their admin"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -10,7 +10,6 @@ dependencies = [
     "django==6.0.3",
     "django-allauth>=65.15.0",
     "django-bootstrap5==26.2",
-    "django-browser-reload==1.21.0",
     "django-htmx==1.27.0",
     "docutils==0.22.4",
     "gunicorn==25.1.0",
@@ -18,7 +17,6 @@ dependencies = [
     "pendulum==3.2.0",
     "pgvector>=0.4.2",
     "pillow==12.1.1",
-    "playwright==1.58.0",
     "psycopg2==2.9.11",
     "python-decouple>=3.8,<4",
     "resend>=2.24.0",
@@ -26,13 +24,22 @@ dependencies = [
     "whitenoise==6.12.0",
 ]
 
+[dependency-groups]
+dev = [
+    "django-browser-reload==1.21.0",
+    "ipython>=9.13.0",
+    "playwright==1.58.0",
+]
+
+
 [tool.uv]
 managed = true
 package = true
 
-[tool.setuptools]
-package-dir = { "" = "src" }
-
 [project.scripts]
 dreamy = "main:main"
 
+
+[build-system]
+requires = ["uv_build>=0.11.16,<0.12"]
+build-backend = "uv_build"

@@ -59,8 +59,8 @@ COPY --chown=gsoler:gsoler . .
 CMD ["sh", "-c", "uv run src/manage.py collectstatic --nonput --clear \
       && uv run scr/manage.py migrate --noinput \
       && uv run gunicorn ppm_app.wsgi:application \
-      --bind 0.0.0.0:$PORT" \
+      --bind 0.0.0.0:$PORT \
       --workers=6 \
-      --chdir src \
+      --chdir src/dreamy_admin/ \
       --access-log=- \
-      --error-log=-]
+      --error-log=-"]
