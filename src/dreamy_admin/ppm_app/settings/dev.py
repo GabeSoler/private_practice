@@ -1,5 +1,12 @@
 from .base import *
 
+INSTALLED_APPS += [
+    "django_browser_reload",
+
+]
+
+MIDDLEWARE += ["django_browser_reload.middleware.BrowserReloadMiddleware", ]
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

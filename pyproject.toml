@@ -1,6 +1,6 @@
 [project]
 name = "dreamy-admin"
-version = "0.1.2"
+version = "0.1.5"
 description = "App to help therapist handle their admin"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -37,7 +37,7 @@ managed = true
 package = true
 
 [project.scripts]
-dreamy = "main:main"
+dreamy = "dreamy_admin.main:main"
 
 
 [build-system]

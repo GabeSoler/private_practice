@@ -64,7 +64,10 @@ def start_django_server():
             "--noinput",
             "--clear",
         ]
-        subprocess.run(cmd_static, env=custom_env, check=True)
+        subprocess.run(cmd_static,
+                       env=custom_env,
+                       check=True, timeout=10
+                       )
     except subprocess.CalledProcessError as e:
         print(f"Error during static files collection: {e}")
         return
