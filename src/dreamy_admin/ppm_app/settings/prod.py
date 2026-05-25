@@ -23,9 +23,9 @@ BOOTSTRAP5 = {
     "theme_url": STATIC_URL + "css/dreamy.css",
 }
 
-
 sentry_sdk.init(
     dsn=config("SENTRY_DSN"),
+    traces_sample_rate=.8,
     # Add data like request headers and IP for users,
     # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
     send_default_pii=True,
