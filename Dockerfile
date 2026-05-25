@@ -15,7 +15,6 @@ ENV PYTHONUNBUFFERED=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_MANAGED_PYTHON=1 \
-    DJANGO_SETTINGS_MODULE='ppm_app.settings.prod'
 
 # Use /app folder as a directory where the source code is stored.
 WORKDIR /app
@@ -57,7 +56,7 @@ COPY --chown=gsoler:gsoler . .
 # Runtime command that executes when "docker run" is called.
 #collect static is needed at the end, so gets the env variables made dynamically
 # It migrates the database and then starts Gunicorn.
-CMD ["sh", "-c", "uv run src/dreamy_admin/manage.py collectstatic --nonput --clear \
+CMD ["sh", "-c", "uv run src/dreamy_admin/manage.py collectstatic --noinput --clear \
       && uv run src/dreamy_admin/manage.py migrate --noinput \
       && uv run gunicorn ppm_app.wsgi:application \
       --bind 0.0.0.0:$PORT \
