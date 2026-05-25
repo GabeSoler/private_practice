@@ -56,4 +56,11 @@ COPY --chown=gsoler:gsoler . .
 # Runtime command that executes when "docker run" is called.
 #collect static is needed at the end, so gets the env variables made dynamically
 # It migrates the database and then starts Gunicorn.
-CMD ["sh", "-c", "uv run manage.py collectstatic --noinput --clear && uv run manage.py migrate --noinput && uv run gunicorn ppm_app.wsgi:application --bind 0.0.0.0:$PORT"]
+CMD ["sh", "-c", "uv run src/manage.py collectstatic --nonput --clear \
+      && uv run scr/manage.py migrate --noinput \
+      && uv run gunicorn ppm_app.wsgi:application \
+      --bind 0.0.0.0:$PORT \
+      --workers=6 \
+      --chdir src/dreamy_admin/ \
+      --access-log=- \
+      --error-log=-"]

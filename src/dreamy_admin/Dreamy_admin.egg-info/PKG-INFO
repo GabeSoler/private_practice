@@ -1,0 +1,36 @@
+Metadata-Version: 2.4
+Name: dreamy-admin
+Version: 0.1.2
+Summary: App to help therapist handle their admin
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: asgiref==3.11.1
+Requires-Dist: bleach>=6.3.0
+Requires-Dist: django==6.0.3
+Requires-Dist: django-allauth>=65.15.0
+Requires-Dist: django-bootstrap5==26.2
+Requires-Dist: django-browser-reload==1.21.0
+Requires-Dist: django-htmx==1.27.0
+Requires-Dist: docutils==0.22.4
+Requires-Dist: gunicorn==25.1.0
+Requires-Dist: markdown==3.10.2
+Requires-Dist: pendulum==3.2.0
+Requires-Dist: pgvector>=0.4.2
+Requires-Dist: pillow==12.1.1
+Requires-Dist: playwright==1.58.0
+Requires-Dist: psycopg2==2.9.11
+Requires-Dist: python-decouple<4,>=3.8
+Requires-Dist: resend>=2.24.0
+Requires-Dist: sentry-sdk>=2.54.0
+Requires-Dist: whitenoise==6.12.0
+
+# Dreamy admin
+
+Dreamy is an admin for therapists.
+It is a sort of CRM, with a centre on sessions of clients that happen in rooms.
+After working on a centre, I saw that the admin for therapists
+was not as easy, and there was a need for that interconnection.
+
+I solved the problem somehow with Notion, but there where some gaps,
+as the need to coordinate with others.
+

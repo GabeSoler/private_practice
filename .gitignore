@@ -27,3 +27,8 @@ Dockerrun.aws.json
 /docs/_build
 .idea/
 accounts.json
+/src/ppm_app/settings/.env.dk
+/src/dreamy_admin/ppm_app/settings/.env
+/src/dreamy_admin/ppm_app/settings/.env.dk
+/cli.sqlite3
+/src/dreamy_admin/cli.sqlite3
