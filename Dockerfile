@@ -61,6 +61,4 @@ CMD ["sh", "-c", "uv run src/dreamy_admin/manage.py collectstatic --noinput --cl
       && uv run gunicorn ppm_app.wsgi:application \
       --bind 0.0.0.0:$PORT \
       --workers=6 \
-      --chdir src/dreamy_admin/ \
-      --access-log=- \
-      --error-log=-"]
+      --chdir src/dreamy_admin"]
