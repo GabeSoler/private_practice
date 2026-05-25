@@ -15,7 +15,7 @@ ENV PYTHONUNBUFFERED=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_MANAGED_PYTHON=1 \
-    DEBUG=0
+    DJANGO_SETTINGS_MODULE='ppm_app.settings.prod'
 
 # Use /app folder as a directory where the source code is stored.
 WORKDIR /app
