@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "django_htmx",
     "allauth",
     "allauth.account",
+    "allauth.mfa",
     # mine
     "accounts.apps.AccountsConfig",
     "base.apps.BaseConfig",
