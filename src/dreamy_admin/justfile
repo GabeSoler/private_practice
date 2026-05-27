@@ -22,9 +22,14 @@ makemigrations:
 static:
     uv run manage.py collectstatic
 
-#run collect static
-check:
-    uv run manage.py check
+#run checks
+check *arg:
+    uv run manage.py check {{arg}}
+
+#run checks production
+checkp:
+    uv run manage.py check --deploy --settings ppm_app.settings.prod
+
 
 #Allows commands passed to just manage (manage.py)
 manage *arg:
