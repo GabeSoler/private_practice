@@ -114,8 +114,6 @@
                                         class="bi bi-check-circle-fill text-success"></i>
                             {% endif %}
                         </td>
-                        {% if messages %}
-                            {% include '_toasts.html' %}{% endif %}{% comment %}trying to set a toast system for messages{% endcomment %}
 
                     {% endpartialdef session_open %}
                 </tr>
@@ -147,6 +145,7 @@
                           hx-trigger="change"
                           hx-indicator=".htmx-indicator"
                           hx-include="input[name='sessionCheckbox']"
+                          {% if oob %}hx-swap-oob="true"{% endif %}
                     >
                         {% bootstrap_form bulk_form show_label='skip' %}
                     </form>
@@ -167,7 +166,7 @@
             </div>
         </td>
         <td>
-            <div id="bulk-response"></div>
+            <div id="bulk-response" _="on change transition *opacity to 0 then remove me"></div>
         </td>
         <td>
         </td>
