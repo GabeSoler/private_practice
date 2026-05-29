@@ -86,3 +86,9 @@ playwright:
 link:
     adb reverse tcp:3000 tcp:3000
     adb usb
+
+messages:
+    uv run manage.py makemessages -l es
+
+compile:
+    uv run manage.py compilemmessages -l es

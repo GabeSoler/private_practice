@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-16 23:17+0000\n"
+"POT-Creation-Date: 2026-05-29 20:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,6 +65,7 @@ msgid "link"
 msgstr "vínculo"
 
 #: room_calendar_app/templates/room_calendar_app/auxiliary/tenant_list_info.html:7
+#: room_calendar_app/templates/room_calendar_app/display/room_report.html:62
 msgid "Tenant"
 msgstr "Inquilino"
 
@@ -131,27 +132,27 @@ msgstr "Filtrar habitaciones"
 msgid "Add a new Room."
 msgstr "Agregar una nueva habitación."
 
-#: room_calendar_app/templates/room_calendar_app/display/room_report.html:51
+#: room_calendar_app/templates/room_calendar_app/display/room_report.html:52
 msgid "Total Sessions"
 msgstr "Total de Sesiones"
 
-#: room_calendar_app/templates/room_calendar_app/display/room_report.html:51
+#: room_calendar_app/templates/room_calendar_app/display/room_report.html:52
 msgid "Expected pay"
 msgstr "Pago esperado"
 
-#: room_calendar_app/templates/room_calendar_app/display/room_report.html:55
+#: room_calendar_app/templates/room_calendar_app/display/room_report.html:56
+msgid "Invoice"
+msgstr ""
+
+#: room_calendar_app/templates/room_calendar_app/display/room_report.html:58
 msgid "Date"
 msgstr "Fecha"
 
-#: room_calendar_app/templates/room_calendar_app/display/room_report.html:57
-msgid "Client"
-msgstr "Cliente"
+#: room_calendar_app/templates/room_calendar_app/display/room_report.html:60
+msgid "Type"
+msgstr ""
 
-#: room_calendar_app/templates/room_calendar_app/display/room_report.html:59
-msgid "Attendance"
-msgstr "Asistencia"
-
-#: room_calendar_app/templates/room_calendar_app/display/room_report.html:61
+#: room_calendar_app/templates/room_calendar_app/display/room_report.html:64
 msgid "Pay"
 msgstr "Pago"
 
@@ -270,6 +271,12 @@ msgstr "Gestionar"
 #: room_calendar_app/templates/room_calendar_app/navs/rooms-nav.html:25
 msgid "Report"
 msgstr "Informe"
+
+#~ msgid "Client"
+#~ msgstr "Cliente"
+
+#~ msgid "Attendance"
+#~ msgstr "Asistencia"
 
 #~ msgid "Link"
 #~ msgstr "Enlace"

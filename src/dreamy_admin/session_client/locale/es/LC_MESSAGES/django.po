@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-16 23:51+0000\n"
+"POT-Creation-Date: 2026-05-29 20:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,151 +19,158 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
 "1 : 2;\n"
 
-#: session_client/forms.py:13 session_client/forms.py:30
+#: session_client/forms.py:17 session_client/forms.py:34
 #: session_client/templates/session_client/item/client_modal.html:24
 msgid "Code"
 msgstr "Código"
 
-#: session_client/forms.py:14
+#: session_client/forms.py:18
 msgid "Type"
 msgstr "Tipo"
 
-#: session_client/forms.py:15
+#: session_client/forms.py:19
 msgid "Fee"
 msgstr "Tarifa"
 
-#: session_client/forms.py:16 session_client/forms.py:48
-#: session_client/templates/session_client/item/client_modal.html:42
+#: session_client/forms.py:20 session_client/forms.py:52
+#: session_client/templates/session_client/item/client_modal.html:37
 msgid "Tenant"
 msgstr "Inquilino"
 
-#: session_client/forms.py:17 session_client/forms.py:31
-#: session_client/templates/session_client/item/client_modal.html:80
+#: session_client/forms.py:21 session_client/forms.py:35
+#: session_client/templates/session_client/item/client_modal.html:61
 msgid "Duration"
 msgstr "Duración"
 
-#: session_client/forms.py:18
+#: session_client/forms.py:22
 msgid "Active"
 msgstr "Activo"
 
-#: session_client/forms.py:19
+#: session_client/forms.py:23
 msgid "Link"
 msgstr "Enlace"
 
-#: session_client/forms.py:40
+#: session_client/forms.py:44
 msgid "Keywords"
 msgstr "Palabras clave"
 
-#: session_client/forms.py:41
-#: session_client/templates/session_client/hx/_session_list.html:23
+#: session_client/forms.py:45
+#: session_client/templates/session_client/hx/_session_list.html:21
 #: session_client/templates/session_client/item/session_modal.html:28
 msgid "Date"
 msgstr "Fecha"
 
-#: session_client/forms.py:42
+#: session_client/forms.py:46
 msgid "time"
 msgstr "hora"
 
-#: session_client/forms.py:43 session_client/forms.py:69
-#: session_client/templates/session_client/hx/_session_list.html:25
+#: session_client/forms.py:47
+#: session_client/templates/session_client/hx/_session_list.html:23
 #: session_client/templates/session_client/item/session_modal.html:24
 msgid "Client"
 msgstr "Cliente"
 
-#: session_client/forms.py:44
-#: session_client/templates/session_client/hx/_session_list.html:35
+#: session_client/forms.py:48
+#: session_client/templates/session_client/hx/_session_list.html:30
 msgid "Paid"
 msgstr "Pagado"
 
-#: session_client/forms.py:45
+#: session_client/forms.py:49
 #: session_client/templates/session_client/item/session_modal.html:64
 msgid "Amount"
 msgstr "Monto"
 
-#: session_client/forms.py:46
-#: session_client/templates/session_client/hx/_session_list.html:37
+#: session_client/forms.py:50
 #: session_client/templates/session_client/navs/session-nav.html:12
 msgid "Open"
 msgstr "Abierto"
 
-#: session_client/forms.py:47
-#: session_client/templates/session_client/hx/_session_list.html:27
+#: session_client/forms.py:51
+#: session_client/templates/session_client/hx/_session_list.html:25
 #: session_client/templates/session_client/item/session_modal.html:45
 msgid "Attendance"
 msgstr "Asistencia"
 
-#: session_client/forms.py:68 session_client/forms.py:89
+#: session_client/forms.py:89
 msgid "Day and Time"
 msgstr "Día y Hora"
 
-#: session_client/models.py:35
+#: session_client/models.py:32
 msgid "Add an Identifier code"
 msgstr "Agregar un código identificador"
 
-#: session_client/models.py:38
+#: session_client/models.py:35
 msgid "Select a type of client"
 msgstr "Seleccionar un tipo de cliente"
 
-#: session_client/models.py:40
+#: session_client/models.py:37
 msgid "Whats your agreed fee"
 msgstr "Tarifa acordada"
 
-#: session_client/models.py:42
+#: session_client/models.py:39
 msgid "Move from archive to active or vice versa"
 msgstr "Mover de archivado a activo o viceversa"
 
-#: session_client/models.py:45
+#: session_client/models.py:42
 msgid "default duration"
 msgstr "duración predeterminada"
 
-#: session_client/models.py:47
+#: session_client/models.py:44
 msgid "External link"
 msgstr "Enlace externo"
 
-#: session_client/models.py:138
+#: session_client/models.py:144
 msgid "Link to a client"
 msgstr "Enlace a un cliente"
 
-#: session_client/models.py:143
+#: session_client/models.py:149
 msgid "Date of session"
 msgstr "Fecha de la sesión"
 
-#: session_client/models.py:144
+#: session_client/models.py:150
 msgid "Start of session?"
 msgstr "¿Inicio de la sesión?"
 
-#: session_client/models.py:145
+#: session_client/models.py:151
 msgid "End of session"
 msgstr "Fin de la sesión"
 
-#: session_client/models.py:146
+#: session_client/models.py:152
 msgid "words for search"
 msgstr "palabras para buscar"
 
-#: session_client/models.py:156
+#: session_client/models.py:160
 #, fuzzy
 #| msgid "Client tenant"
 msgid "Override Client's tenant"
 msgstr "Profile inquilino del cliente"
 
-#: session_client/models.py:261
+#: session_client/models.py:276
 #, fuzzy
 #| msgid "Default day of week"
 msgid "Day of Week"
 msgstr "Día predeterminado"
 
-#: session_client/models.py:262
+#: session_client/models.py:277
 #, fuzzy
 #| msgid "Date of session"
 msgid "Time of Session"
 msgstr "Fecha de la sesión"
 
-#: session_client/models.py:264
-msgid "Set different tenant"
+#: session_client/models.py:279
+#, fuzzy
+#| msgid "Tenant"
+msgid "Set tenant"
+msgstr "Inquilino"
+
+#: session_client/models.py:280
+msgid "Set as fortnight"
 msgstr ""
 
-#: session_client/models.py:265
-msgid "Set as fortnight"
+#: session_client/templates/session_client/edit/add_sessions_in_month.html:37
+msgid ""
+"Sessions rendered by month and client, there are not checks on creation when "
+"in the past"
 msgstr ""
 
 #: session_client/templates/session_client/edit/edit_client_modal.html:106
@@ -201,27 +208,22 @@ msgstr "Enviar"
 msgid "Client Link"
 msgstr "Enlace del Cliente"
 
-#: session_client/templates/session_client/hx/_session_list.html:20
-#: session_client/templates/session_client/hx/_session_list.html:144
+#: session_client/templates/session_client/hx/_session_list.html:18
+#: session_client/templates/session_client/hx/_session_list.html:136
 msgid "All"
 msgstr ""
 
-#: session_client/templates/session_client/hx/_session_list.html:33
+#: session_client/templates/session_client/hx/_session_list.html:28
 #, fuzzy
 #| msgid "Keywords"
 msgid "Keyword"
 msgstr "Palabras clave"
 
-#: session_client/templates/session_client/item/client_modal.html:28
-#: session_client/templates/session_client/item/client_modal.html:66
-msgid "Day"
-msgstr "Día"
+#: session_client/templates/session_client/hx/_session_list.html:32
+msgid "Sorted"
+msgstr "Listo"
 
-#: session_client/templates/session_client/item/client_modal.html:70
-msgid "Time"
-msgstr "Hora"
-
-#: session_client/templates/session_client/item/client_modal.html:84
+#: session_client/templates/session_client/item/client_modal.html:65
 msgid "Series"
 msgstr "Serie"
 
@@ -301,21 +303,23 @@ msgstr "Porcentaje de asistencia"
 msgid "Future sessions"
 msgstr "Sesiones futuras"
 
-#: session_client/templates/session_client/lists/client_list.html:176
+#: session_client/templates/session_client/lists/client_list.html:175
 #, fuzzy
 #| msgid "book 3 forward"
 msgid "book 4 weeks forward"
 msgstr "reservar 3 adelante"
 
-#: session_client/templates/session_client/lists/client_list.html:190
+#: session_client/templates/session_client/lists/client_list.html:189
 msgid "Open times modal"
-msgstr ""
+msgstr "Abrir tiempos"
 
-#: session_client/templates/session_client/lists/client_search.html:92
-msgid "Search in Sessions Keywords, Nick Name, and Room"
+#: session_client/templates/session_client/lists/client_search.html:90
+#, fuzzy
+#| msgid "Search in Sessions Keywords, Nick Name, and Room"
+msgid "Search in Sessions Keywords, Tenant, and Room"
 msgstr "Buscar en palabras clave de sesiones, apodo y habitación"
 
-#: session_client/templates/session_client/lists/client_search.html:102
+#: session_client/templates/session_client/lists/client_search.html:100
 msgid "Loading"
 msgstr "Cargando"
 
@@ -331,24 +335,24 @@ msgstr "Sesiones Creadas"
 msgid "Overlapping Sessions"
 msgstr "Sesiones Superpuestas"
 
-#: session_client/templates/session_client/navs/client-nav.html:8
+#: session_client/templates/session_client/navs/client-nav.html:7
 msgid "Clients"
 msgstr "Clientes"
 
-#: session_client/templates/session_client/navs/client-nav.html:12
+#: session_client/templates/session_client/navs/client-nav.html:11
 msgid "Current"
 msgstr "Actual"
 
-#: session_client/templates/session_client/navs/client-nav.html:16
-#: session_client/templates/session_client/navs/session-nav.html:16
+#: session_client/templates/session_client/navs/client-nav.html:14
+#: session_client/templates/session_client/navs/session-nav.html:15
 msgid "Search"
 msgstr "Buscar"
 
-#: session_client/templates/session_client/navs/client-nav.html:20
+#: session_client/templates/session_client/navs/client-nav.html:18
 msgid "Review"
 msgstr "Revisar"
 
-#: session_client/templates/session_client/navs/client-nav.html:24
+#: session_client/templates/session_client/navs/client-nav.html:22
 msgid "Archived"
 msgstr "Archivado"
 
@@ -356,19 +360,28 @@ msgstr "Archivado"
 msgid "Sessions"
 msgstr "Sesiones"
 
-#: session_client/views_client.py:144
-#, fuzzy
-#| msgid "Client"
-msgid "Client added"
-msgstr "Cliente"
+#: session_client/templates/session_client/navs/session-nav.html:19
+msgid "Month"
+msgstr "Mes"
 
-#: session_client/views_session.py:184 session_client/views_session.py:213
+#: session_client/views_session.py:189 session_client/views_session.py:220
 msgid "ups"
-msgstr ""
+msgstr "ups"
 
-#: session_client/views_session.py:215
+#: session_client/views_session.py:223
 msgid "Saved ok"
 msgstr "Guardado correctamente"
+
+#~ msgid "Day"
+#~ msgstr "Día"
+
+#~ msgid "Time"
+#~ msgstr "Hora"
+
+#, fuzzy
+#~| msgid "Client"
+#~ msgid "Client added"
+#~ msgstr "Cliente"
 
 #~ msgid "Default Day"
 #~ msgstr "Día predeterminado"

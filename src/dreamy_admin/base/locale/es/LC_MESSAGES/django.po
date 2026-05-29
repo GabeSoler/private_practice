@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-17 19:23+0000\n"
+"POT-Creation-Date: 2026-05-29 20:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,279 +67,279 @@ msgstr "Supervisado"
 msgid "Other"
 msgstr "Otros"
 
-#: base/choices.py:29
+#: base/choices.py:28
 msgid "Every week"
 msgstr "Cada Semana"
 
-#: base/choices.py:30
+#: base/choices.py:29
 msgid "Every two weeks"
 msgstr "Cada dos Semanas"
 
-#: base/choices.py:81
+#: base/choices.py:75
 msgid "Client's Session"
 msgstr "Session Cliente"
 
-#: base/choices.py:82
+#: base/choices.py:76
 msgid "Supervision"
 msgstr "Supervision"
 
-#: base/choices.py:83
+#: base/choices.py:77
 msgid "Admin"
 msgstr "Admin"
 
-#: base/choices.py:84
+#: base/choices.py:78
 msgid "Processing"
 msgstr "Processar"
 
-#: base/choices.py:85
+#: base/choices.py:79
 msgid "CPD"
 msgstr "Desarrollo profesional"
 
-#: base/choices.py:90
+#: base/choices.py:83
 msgid "Mon"
 msgstr "Lu"
 
-#: base/choices.py:91
+#: base/choices.py:84
 msgid "Tue"
 msgstr "Ma"
 
-#: base/choices.py:92
+#: base/choices.py:85
 msgid "Wed"
 msgstr "Mi"
 
-#: base/choices.py:93
+#: base/choices.py:86
 msgid "Thu"
 msgstr "Ju"
 
-#: base/choices.py:94
+#: base/choices.py:87
 msgid "Fri"
 msgstr "Vi"
 
-#: base/choices.py:95
+#: base/choices.py:88
 msgid "Sat"
 msgstr "Sa"
 
-#: base/choices.py:96
+#: base/choices.py:89
 msgid "Sun"
 msgstr "Do"
 
-#: base/choices.py:100
+#: base/choices.py:93
 msgid "Monday"
 msgstr "Lunes"
 
-#: base/choices.py:101
+#: base/choices.py:94
 msgid "Tuesday"
 msgstr "Martes"
 
-#: base/choices.py:102
+#: base/choices.py:95
 msgid "Wednesday"
 msgstr "Miercoles"
 
-#: base/choices.py:103
+#: base/choices.py:96
 msgid "Thursday"
 msgstr "Jueves"
 
-#: base/choices.py:104
+#: base/choices.py:97
 msgid "Friday"
 msgstr "Viernes"
 
-#: base/choices.py:105
+#: base/choices.py:98
 msgid "Saturday"
 msgstr "Sabado"
 
-#: base/choices.py:106
+#: base/choices.py:99
 msgid "Sunday"
 msgstr "Domingo"
 
-#: base/choices.py:110
+#: base/choices.py:103
 msgid "January"
 msgstr "Enero"
 
-#: base/choices.py:111
+#: base/choices.py:104
 msgid "February"
 msgstr "Febrero"
 
-#: base/choices.py:112
+#: base/choices.py:105
 msgid "March"
 msgstr "Marzo"
 
-#: base/choices.py:113
+#: base/choices.py:106
 msgid "April"
 msgstr "Abril"
 
-#: base/choices.py:114 base/choices.py:129
+#: base/choices.py:107 base/choices.py:122
 msgid "May"
 msgstr "Mayo"
 
-#: base/choices.py:115
+#: base/choices.py:108
 msgid "June"
 msgstr "Junio"
 
-#: base/choices.py:116
+#: base/choices.py:109
 msgid "July"
 msgstr "Julio"
 
-#: base/choices.py:117
+#: base/choices.py:110
 msgid "August"
 msgstr "Agosto"
 
-#: base/choices.py:118
+#: base/choices.py:111
 msgid "September"
 msgstr "Septiembre"
 
-#: base/choices.py:119
+#: base/choices.py:112
 msgid "October"
 msgstr "Octubre"
 
-#: base/choices.py:120
+#: base/choices.py:113
 msgid "November"
 msgstr "Noviembre"
 
-#: base/choices.py:121
+#: base/choices.py:114
 msgid "December"
 msgstr "Diciembre"
 
-#: base/choices.py:125
+#: base/choices.py:118
 msgid "Jan"
 msgstr "En"
 
-#: base/choices.py:126
+#: base/choices.py:119
 msgid "Feb"
 msgstr "Feb"
 
-#: base/choices.py:127
+#: base/choices.py:120
 msgid "Mar"
 msgstr "Mar"
 
-#: base/choices.py:128
+#: base/choices.py:121
 msgid "Apr"
 msgstr "Abr"
 
-#: base/choices.py:130
+#: base/choices.py:123
 msgid "Jun"
 msgstr "Jun"
 
-#: base/choices.py:131
+#: base/choices.py:124
 msgid "Jul"
 msgstr "Jul"
 
-#: base/choices.py:132
+#: base/choices.py:125
 msgid "Aug"
 msgstr "Ago"
 
-#: base/choices.py:133
+#: base/choices.py:126
 msgid "Sep"
 msgstr "Sep"
 
-#: base/choices.py:134
+#: base/choices.py:127
 msgid "Oct"
 msgstr "Oct"
 
-#: base/choices.py:135
+#: base/choices.py:128
 msgid "Nov"
 msgstr "Nov"
 
-#: base/choices.py:136
+#: base/choices.py:129
 msgid "Dec"
 msgstr "Dic"
 
-#: base/choices.py:141
+#: base/choices.py:133
 msgid "first"
 msgstr "Primero"
 
-#: base/choices.py:142
+#: base/choices.py:134
 msgid "second"
 msgstr "Segundo"
 
-#: base/choices.py:143
+#: base/choices.py:135
 msgid "third"
 msgstr "Tercero"
 
-#: base/choices.py:144
+#: base/choices.py:136
 msgid "fourth"
 msgstr "Cuarto"
 
-#: base/choices.py:145
+#: base/choices.py:137
 msgid "last"
 msgstr "Ultimo"
 
-#: base/choices.py:149
+#: base/choices.py:141
 msgid "30 min"
 msgstr "30 min"
 
-#: base/choices.py:150
+#: base/choices.py:142
 msgid "1 hour"
 msgstr "1 hora"
 
-#: base/choices.py:151
+#: base/choices.py:143
 msgid "1.5 hours"
 msgstr "1.5 Horas"
 
-#: base/choices.py:152
+#: base/choices.py:144
 msgid "2 hours"
 msgstr "2 Horas"
 
-#: base/choices.py:157
+#: base/choices.py:148
 msgid "By count"
 msgstr "Por conteo"
 
-#: base/choices.py:158
+#: base/choices.py:149
 msgid "Until date"
 msgstr "Hasta fecha"
 
-#: base/choices.py:162
+#: base/choices.py:152
 msgid "On the"
 msgstr "En el"
 
-#: base/choices.py:163
+#: base/choices.py:153
 msgid "Each:"
 msgstr "Cada"
 
-#: base/choices.py:178
+#: base/choices.py:169
 msgid "quarter"
 msgstr "cuarto"
 
-#: base/choices.py:179
+#: base/choices.py:170
 msgid "year"
 msgstr "año"
 
-#: base/choices.py:180
+#: base/choices.py:171
 msgid "tax_year"
 msgstr "año tributario"
 
-#: base/choices.py:184
+#: base/choices.py:175
 msgid "first quarter"
 msgstr "primer cuarto"
 
-#: base/choices.py:185
+#: base/choices.py:176
 msgid "second quarter"
 msgstr "segundo cuarto"
 
-#: base/choices.py:186
+#: base/choices.py:177
 msgid "third quarter"
 msgstr "tercer cuarto"
 
-#: base/choices.py:187
+#: base/choices.py:178
 msgid "fourth quarter"
 msgstr "cuarto cuarto"
 
-#: base/choices.py:203
+#: base/choices.py:194
 msgid "January(1)-December(31)"
 msgstr "Enero(1)'Diembre(31)"
 
-#: base/choices.py:204
+#: base/choices.py:195
 msgid "April(6)-April(5)"
 msgstr "Abril(6)'Abril(5)"
 
-#: base/choices.py:205
+#: base/choices.py:196
 msgid "April(1)-March(31)"
 msgstr "Abril(1)'Marzo(31)"
 
-#: base/choices.py:206
+#: base/choices.py:197
 msgid "July(1)-June(30)"
 msgstr "Julio(1)'Junio(30)"
 
-#: base/choices.py:207
+#: base/choices.py:198
 msgid "March(21)-March(20)"
 msgstr "Marzo(21)'Marzo(20)"
 

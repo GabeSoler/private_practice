@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-17 00:19+0000\n"
+"POT-Creation-Date: 2026-05-29 20:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
 "1 : 2;\n"
 
-#: ppm_app/settings/base.py:202
+#: ppm_app/settings/base.py:196
 msgid "Spanish"
 msgstr "Español"
 
-#: ppm_app/settings/base.py:203
+#: ppm_app/settings/base.py:197
 msgid "English"
 msgstr "Inglés"
 
@@ -35,75 +35,75 @@ msgstr "Ups"
 msgid "This page does not exist"
 msgstr "Esta página no existe"
 
-#: ppm_app/templates/_base.html:127
+#: ppm_app/templates/_base.html:125
 msgid "My Clients"
 msgstr "Mis Clientes"
 
-#: ppm_app/templates/_base.html:130
+#: ppm_app/templates/_base.html:128
 msgid "My Sessions"
 msgstr "Mis Sessiones"
 
-#: ppm_app/templates/_base.html:133
+#: ppm_app/templates/_base.html:131
 msgid "My Rooms"
 msgstr "Mis Cuartos"
 
-#: ppm_app/templates/_base.html:136
+#: ppm_app/templates/_base.html:134
 msgid "My Calendar"
 msgstr "Mis Calendarios"
 
-#: ppm_app/templates/_base.html:148 ppm_app/templates/_base.html:150
+#: ppm_app/templates/_base.html:146 ppm_app/templates/_base.html:148
 msgid "Toggle theme"
 msgstr "Cambiar tema"
 
-#: ppm_app/templates/_base.html:156
+#: ppm_app/templates/_base.html:154
 msgid "Dawn"
 msgstr "Amanecer"
 
-#: ppm_app/templates/_base.html:162
+#: ppm_app/templates/_base.html:160
 msgid "Dusk"
 msgstr "Atardecer"
 
-#: ppm_app/templates/_base.html:199
+#: ppm_app/templates/_base.html:197
 msgid "Hello"
 msgstr "Hola"
 
-#: ppm_app/templates/_base.html:209
+#: ppm_app/templates/_base.html:207
 msgid "Logout"
 msgstr "Cerrar sesión"
 
-#: ppm_app/templates/_base.html:220
+#: ppm_app/templates/_base.html:218
 msgid "Report bugs"
 msgstr ""
 
-#: ppm_app/templates/_base.html:229
+#: ppm_app/templates/_base.html:227
 msgid "Manage Account"
 msgstr ""
 
-#: ppm_app/templates/_base.html:237
+#: ppm_app/templates/_base.html:235
 msgid "Signup"
 msgstr ""
 
-#: ppm_app/templates/_base.html:239
+#: ppm_app/templates/_base.html:237
 msgid "Login"
 msgstr "Iniciar sesión"
 
-#: ppm_app/templates/_base.html:307 ppm_app/templates/_base.html:312
+#: ppm_app/templates/_base.html:305 ppm_app/templates/_base.html:310
 msgid "Home"
 msgstr "Inicio"
 
-#: ppm_app/templates/_base.html:328
+#: ppm_app/templates/_base.html:326
 #, fuzzy
 #| msgid "My Clients"
 msgid "Clients"
 msgstr "Mis Clientes"
 
-#: ppm_app/templates/_base.html:344
+#: ppm_app/templates/_base.html:342
 #, fuzzy
 #| msgid "My Sessions"
 msgid "Sessions"
 msgstr "Mis Sessiones"
 
-#: ppm_app/templates/_base.html:360
+#: ppm_app/templates/_base.html:358
 msgid "Week View"
 msgstr "Semana"
 
