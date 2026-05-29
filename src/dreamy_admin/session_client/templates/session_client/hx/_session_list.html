@@ -142,13 +142,20 @@
                     <form id="bulkForm"
                           hx-post="{% url 'session_client:sessions_bulk_actions' %}"
                           hx-swap="outerHTML"
-                          hx-trigger="change"
                           hx-indicator=".htmx-indicator"
                           hx-include="input[name='sessionCheckbox']"
                           {% if oob %}hx-swap-oob="true"{% endif %}
                     >
+                        <div class="row">
+                            <div class="col">
                         {% bootstrap_form bulk_form show_label='skip' %}
-                        {% bootstrap_button bulk_form %}
+
+                            </div>
+                            <div class="col">
+                        <button type="submit" class="btn btn-secondary"><i class="bi bi-box-arrow-in-right"></i></button>
+
+                            </div>
+                        </div>
                     </form>
                 {% else %}
                     <form id="bulkForm"

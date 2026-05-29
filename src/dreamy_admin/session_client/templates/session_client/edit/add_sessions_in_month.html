@@ -8,7 +8,7 @@
           hx-post="{% url 'session_client:sessions_add_in_month' %}"
           hx-target="#tableBody"
           hx-swap="afterbegin"
-          hx-trigger="submit,keyup[enterKey],RefreshTable"
+          hx-trigger="submit,RefreshTable"
     >
 
         {% partialdef add_session_form_partial inline %}
