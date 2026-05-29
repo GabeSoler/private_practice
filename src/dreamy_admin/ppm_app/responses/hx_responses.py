@@ -52,6 +52,7 @@ def ok_response(request, text: str = None,
                 re_target: str = None,
                 event_and_target: tuple[str, str] = None,
                 re_swap: str = None):
+    """ creates an ok response with a template and a text"""
     response = render(request, "_ok.html", {"text": text})
     response = hx_flex_response(response, re_target, event_and_target, re_swap)
     return response
