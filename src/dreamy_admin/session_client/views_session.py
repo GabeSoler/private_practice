@@ -388,6 +388,11 @@ def bulk_actions_hx(request):
                     rows_changed = sessions.update(paid=False)
                 case "attended":
                     rows_changed = sessions.update(attendance="Attended")
+                case "sort_all":
+                    rows_changed = sessions.update(attendance="Attended",
+                                                   paid=True,
+                                                   open=False
+                                                   )
                 case _:
                     rows_changed = 0
             return ok_response(request, f"Updates: {rows_changed}",

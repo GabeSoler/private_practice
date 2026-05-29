@@ -151,6 +151,7 @@ class SessionsBulkActionsForm(forms.Form):
                                     ("attended", "Set as Attended"),
                                     ("paid", "Set as Paid"),
                                     ("unpaid", "Set as Unpaid"),
+                                    ("sort_all", "Sort All"),
                                 ))
 
 
