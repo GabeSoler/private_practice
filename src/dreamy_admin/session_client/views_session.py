@@ -376,7 +376,8 @@ def bulk_actions_hx(request):
         print(request.POST)
         if form.is_valid():
             action = form.cleaned_data['actions']
-            sessions = SessionModel.objects.filter(uuid__in=selected_uuids)
+            sessions = SessionModel.objects.filter(uuid__in=selected_uuids,
+                                                   client__user=request.user)
             match action:
                 case "close":
                     rows_changed = sessions.update(open=False)
